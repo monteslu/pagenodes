@@ -1,0 +1,175 @@
+<!--
+  Copyright 2013, 2015 IBM Corp.
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+
+<script type="text/x-red" data-template-name="notify">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> <span data-i18n="common.label.name"></span></label>
+        <input type="text" id="node-input-name" data-i18n="[placeholder]common.label.name">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="notify">
+    <p>The Notify node can be connected to the output of any node. It can be used to display the output of a <b>msg.payload</b> .</p>
+    <p>Each message will also display the title, <b>msg.topic</b> .</p>
+</script>
+
+<script type="text/javascript">
+
+    function notifyMe(topic, body) {
+      // Let's check if the browser supports notifications
+      if (!("Notification" in window)) {
+        console.error("This browser does not support desktop notification");
+      }
+
+      // Let's check whether notification permissions have already been granted
+      else if (Notification.permission === "granted") {
+        // If it's okay let's create a notification
+        var notification = new Notification(topic || 'PageNodes', {body: body || 'notify', icon: 'red/images/node-red.png'});
+      }
+
+      // Otherwise, we need to ask the user for permission
+      else if (Notification.permission !== 'denied') {
+        Notification.requestPermission(function (permission) {
+          // If the user accepts, let's create a notification
+          if (permission === "granted") {
+            var notification = new Notification(topic || 'PageNodes', {body: body || 'notify', icon: 'red/images/node-red.png'});
+          }
+        });
+      }
+
+      // At last, if the user has denied notifications, and you
+      // want to be respectful there is no need to bother them any more.
+    }
+
+    RED.nodes.registerType('notify',{
+        category: 'output',
+        defaults: {
+            name: {value:""},
+            active: {value:true}
+        },
+        label: function() {
+            return this.name||"notify";
+        },
+        labelStyle: function() {
+            return this.name?"node_label_italic":"";
+        },
+        color:"#b7a990",
+        inputs:1,
+        outputs:0,
+        icon: "debug.png",
+        align: "right",
+        button: {
+            toggle: "active",
+            onclick: function() {
+                var label = this.name||"notify";
+                var node = this;
+                RED.comms.rpc('notify', [this.id, (this.active?"enable":"disable")], function(result){
+                    if (result == 200) {
+                        RED.notify(node._("debug.notification.activated",{label:label}),"success");
+                    } else if (result == 201) {
+                        RED.notify(node._("debug.notification.deactivated",{label:label}),"success");
+                    }
+                });
+            }
+        },
+        onpaletteadd: function() {
+            function sanitize(m) {
+                return m.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+            }
+            this.handleDebugMessage = function(t,o) {
+                console.log('notify message in!', t, o);
+                //console.log(o);
+                var name = sanitize(((o.name?o.name:o.id)||"").toString());
+                var topic = sanitize((o.topic||"").toString());
+                // var property = sanitize(o.property?o.property:'');
+                var payload = sanitize((o.msg||"").toString());
+                // var format = sanitize((o.format||"").toString());
+
+                notifyMe(topic, payload);
+
+
+            };
+            RED.comms.subscribe("notify",this.handleDebugMessage);
+
+
+        },
+        onpaletteremove: function() {
+            RED.comms.unsubscribe("notify",this.handleDebugMessage);
+            // RED.sidebar.removeTab("debug");
+            // delete RED._debug;
+        },
+        oneditprepare: oneditprepare
+    });
+</script>
+
+<style>
+    #debug-content {
+        position: absolute;
+        top: 30px;
+        bottom: 0px;
+        left:0px;
+        right: 0px;
+        overflow-y: scroll;
+    }
+    #debug-toolbar {
+        padding: 3px 10px;
+        height: 24px;
+        background: #f3f3f3;
+    }
+    .debug-message {
+        cursor: pointer;
+        border-bottom: 1px solid #eee;
+        border-left: 8px solid #eee;
+        border-right: 8px solid #eee;
+        padding: 2px;
+    }
+    .debug-message-date {
+        background: #fff;
+        font-size: 9px;
+        color: #aaa;
+        padding: 1px 5px 1px 1px;
+    }
+    .debug-message-topic {
+        display: block;
+        background: #fff;
+        padding: 1px;
+        font-size: 10px;
+        color: #a66;
+    }
+    .debug-message-name {
+        background: #fff;
+        padding: 1px 5px;
+        font-size: 9px;
+        color: #aac;
+    }
+    .debug-message-payload {
+        display: block;
+        padding: 2px;
+        background: #fff;
+    }
+    .debug-message-level-log {
+        border-left-color: #eee;
+        border-right-color: #eee;
+    }
+    .debug-message-level-30 {
+        border-left-color: #ffdf9d;
+        border-right-color: #ffdf9d;
+    }
+    .debug-message-level-20 {
+        border-left-color: #f99;
+        border-right-color: #f99;
+    }
+</style>

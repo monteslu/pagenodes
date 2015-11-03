@@ -94,40 +94,6 @@ module.exports = function(grunt) {
             options: {
                 separator: ";",
             },
-            build: {
-              src: [
-                  // Ensure editor source files are concatenated in
-                  // the right order
-                  "editor/js/main.js",
-                  "editor/js/events.js",
-                  "editor/js/i18n.js",
-                  "editor/js/settings.js",
-                  "editor/js/user.js",
-                  "editor/js/comms.js",
-                  "editor/js/ui/state.js",
-                  "editor/js/nodes.js",
-                  "editor/js/history.js",
-                  "editor/js/validators.js",
-                  "editor/js/ui/deploy.js",
-                  "editor/js/ui/menu.js",
-                  "editor/js/ui/keyboard.js",
-                  "editor/js/ui/tabs.js",
-                  "editor/js/ui/popover.js",
-                  "editor/js/ui/workspaces.js",
-                  "editor/js/ui/view.js",
-                  "editor/js/ui/sidebar.js",
-                  "editor/js/ui/palette.js",
-                  "editor/js/ui/tab-info.js",
-                  "editor/js/ui/tab-config.js",
-                  "editor/js/ui/editor.js",
-                  "editor/js/ui/clipboard.js",
-                  "editor/js/ui/library.js",
-                  "editor/js/ui/notifications.js",
-                  "editor/js/ui/subflow.js",
-                  "editor/js/ui/touch/radialMenu.js"
-              ],
-              dest: "public/red/red.js"
-            },
             vendor: {
                 files: {
                     "public/vendor/vendor.js": [
@@ -151,7 +117,7 @@ module.exports = function(grunt) {
         uglify: {
             build: {
                 files: {
-                    'public/red/red.min.js': 'public/red/red.js'
+                    'public/red/red.min.js': 'public/red/red.bundle.js'
                 }
             }
         },
@@ -195,7 +161,7 @@ module.exports = function(grunt) {
             build: {
                 src: [
                     "public/red",
-                    "public/index.html",
+                    // "public/index.html",
                     "public/favicon.ico",
                     "public/icons",
                     "public/vendor"
@@ -410,7 +376,8 @@ module.exports = function(grunt) {
 
     grunt.registerTask('build',
         'Builds editor content',
-        ['clean:build','concat:build','concat:vendor','uglify:build','sass:build','jsonlint:messages','copy:build','attachCopyright']);
+        ['clean:build', 'concat:vendor','sass:build','jsonlint:messages','copy:build']);
+        // ['clean:build','concat:build','concat:vendor','uglify:build','sass:build','jsonlint:messages','copy:build','attachCopyright']);
 
     grunt.registerTask('dev',
         'Developer mode: run node-red, watch for source changes and build/restart',

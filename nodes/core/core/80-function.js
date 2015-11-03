@@ -14,6 +14,9 @@
  * limitations under the License.
  **/
 
+//var babel = require('babel-core');
+var _ = require('lodash');
+
 module.exports = function(RED) {
     "use strict";
     var util = require("util");
@@ -62,6 +65,7 @@ module.exports = function(RED) {
                               "};\n"+
                               this.func+"\n"+
                            "})(msg);";
+        // functionText = babel.transform(functionText).code;
         this.topic = n.topic;
         var sandbox = {
             console:console,
@@ -98,13 +102,13 @@ module.exports = function(RED) {
             this.script = vm.createScript(functionText);
             this.on("input", function(msg) {
                 try {
-                    var start = process.hrtime();
+                    var start = Date.now(); //process.hrtime();
                     context.msg = msg;
                     this.script.runInContext(context);
                     sendResults(this,msg._msgid,context.results);
 
-                    var duration = process.hrtime(start);
-                    var converted = Math.floor((duration[0] * 1e9 + duration[1])/10000)/100;
+                    var duration = Date.now() - start; //process.hrtime(start);
+                    var converted = duration; //Math.floor((duration[0] * 1e9 + duration[1])/10000)/100;
                     this.metric("duration", msg, converted);
                     if (process.env.NODE_RED_FUNCTION_TIME) {
                         this.status({fill:"yellow",shape:"dot",text:""+converted});

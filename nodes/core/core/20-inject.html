@@ -39,8 +39,6 @@
         <select id="inject-time-type-select" style="width: 73%">
             <option value="none" data-i18n="inject.none"></option>
             <option value="interval" data-i18n="inject.interval"></option>
-            <option value="interval-time" data-i18n="inject.interval-time"></option>
-            <option value="time" data-i18n="inject.time"></option>
         </select>
         <input type="hidden" id="node-input-repeat">
         <input type="hidden" id="node-input-crontab">
@@ -56,6 +54,7 @@
         </select><br/>
     </div>
 
+<!--
     <div class="form-row inject-time-row hidden" id="inject-time-row-interval-time">
         <span data-i18n="inject.every"></span> <select style="width: 90px" id="inject-time-interval-time-units" class="inject-time-int-count" value="1">
             <option value="1">1</option>
@@ -114,6 +113,8 @@
             </div>
         </div>
     </div>
+
+    -->
 
     <div class="form-row" id="node-once">
         <label>&nbsp;</label>
@@ -487,24 +488,27 @@
                 if (this.payloadType === "date") { label = this._("inject.timestamp"); }
                 if (this.payloadType === "none") { label = this._("inject.blank"); }
                 var node = this;
-                $.ajax({
-                    url: "inject/"+this.id,
-                    type:"POST",
-                    success: function(resp) {
-                        RED.notify(node._("inject.success",{label:label}),"success");
-                    },
-                    error: function(jqXHR,textStatus,errorThrown) {
-                        if (jqXHR.status == 404) {
-                            RED.notify(node._("common.notification.error",{message:node._("common.notification.errors.not-deployed")}),"error");
-                        } else if (jqXHR.status == 500) {
-                            RED.notify(node._("common.notification.error",{message:node._("inject.errors.failed")}),"error");
-                        } else if (jqXHR.status == 0) {
-                            RED.notify(node._("common.notification.error",{message:node._("common.notification.errors.no-response")}),"error");
-                        } else {
-                            RED.notify(node._("common.notification.error",{message:node._("common.notification.errors.unexpected",{status:jqXHR.status,message:textStatus})}),"error");
-                        }
-                    }
+                RED.comms.rpc('inject', [this.id], function(result){
+                    RED.notify(node._("inject.success",{label:label}),"success");
                 });
+                // $.ajax({
+                //     url: "inject/"+this.id,
+                //     type:"POST",
+                //     success: function(resp) {
+                //         RED.notify(node._("inject.success",{label:label}),"success");
+                //     },
+                //     error: function(jqXHR,textStatus,errorThrown) {
+                //         if (jqXHR.status == 404) {
+                //             RED.notify(node._("common.notification.error",{message:node._("common.notification.errors.not-deployed")}),"error");
+                //         } else if (jqXHR.status == 500) {
+                //             RED.notify(node._("common.notification.error",{message:node._("inject.errors.failed")}),"error");
+                //         } else if (jqXHR.status == 0) {
+                //             RED.notify(node._("common.notification.error",{message:node._("common.notification.errors.no-response")}),"error");
+                //         } else {
+                //             RED.notify(node._("common.notification.error",{message:node._("common.notification.errors.unexpected",{status:jqXHR.status,message:textStatus})}),"error");
+                //         }
+                //     }
+                // });
             }
         }
     });

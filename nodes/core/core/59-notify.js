@@ -22,7 +22,7 @@ module.exports = function(RED) {
     var useColors = false;
     // util.inspect.styles.boolean = "red";
 
-    function DebugNode(n) {
+    function NotifyNode(n) {
         RED.nodes.createNode(this,n);
         this.name = n.name;
         this.complete = (n.complete||"payload").toString();
@@ -42,7 +42,7 @@ module.exports = function(RED) {
                     node.log("\n"+util.inspect(msg, {colors:useColors, depth:10}));
                 }
                 if (this.active) {
-                    sendDebug({id:this.id,name:this.name,topic:msg.topic,msg:msg,_path:msg._path});
+                    sendNotify({id:this.id,name:this.name,topic:msg.topic,msg:msg,_path:msg._path});
                 }
             } else {
             // debug user defined msg property
@@ -69,15 +69,15 @@ module.exports = function(RED) {
                     }
                 }
                 if (this.active) {
-                    sendDebug({id:this.id,name:this.name,topic:msg.topic,property:property,msg:output,_path:msg._path});
+                    sendNotify({id:this.id,name:this.name,topic:msg.topic,property:property,msg:output,_path:msg._path});
                 }
             }
         });
     }
 
-    RED.nodes.registerType("debug",DebugNode);
+    RED.nodes.registerType("notify",NotifyNode);
 
-    function sendDebug(msg) {
+    function sendNotify(msg) {
         if (msg.msg instanceof Error) {
             msg.format = "error";
             msg.msg = msg.msg.toString();
@@ -125,18 +125,18 @@ module.exports = function(RED) {
             msg.msg = msg.msg.substr(0,debuglength) +" ....";
         }
 
-        RED.comms.publish("debug",msg);
+        RED.comms.publish("notify",msg);
     }
 
-    DebugNode.logHandler = new events.EventEmitter();
-    DebugNode.logHandler.on("log",function(msg) {
+    NotifyNode.logHandler = new events.EventEmitter();
+    NotifyNode.logHandler.on("log",function(msg) {
         if (msg.level === RED.log.WARN || msg.level === RED.log.ERROR) {
-            sendDebug(msg);
+            sendNotify(msg);
         }
     });
-    RED.log.addHandler(DebugNode.logHandler);
+    RED.log.addHandler(NotifyNode.logHandler);
 
-    RED.events.on("rpc_debug", function(data) {
+    RED.events.on("rpc_notify", function(data) {
         var node = RED.nodes.getNode(data.params[0]);
         var state = data.params[1];
         if (node !== null && typeof node !== "undefined" ) {

@@ -247,8 +247,14 @@ module.exports = function(grunt) {
                 },
                 {
                     expand: true,
-                    src: ['editor/index.html','editor/favicon.ico'],
+                    src: ['editor/index.html','editor/backend.html','editor/favicon.ico'],
                     dest: 'public/',
+                    flatten: true
+                },
+                {
+                    expand: true,
+                    src: ['editor/locales/**'],
+                    dest: 'public/locales/',
                     flatten: true
                 }]
             },

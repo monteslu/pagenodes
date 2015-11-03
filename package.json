@@ -12,7 +12,7 @@
   "scripts": {
     "start": "node red.js",
     "test": "./node_modules/.bin/grunt",
-    "build": "babel ./src --out-dir ./build && webpack",
+    "build": "babel ./src --out-dir ./build && webpack && grunt build",
     "server": "ecstatic public --port 1337"
   },
   "bin": {

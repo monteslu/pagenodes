@@ -38,7 +38,8 @@ function init(_server,_settings) {
 
 
 function parentPost(message){
-    parent.postMessage(message, window.location);
+    // console.log('server parentPost', typeof message, message);
+    parent.postMessage(JSON.stringify(message), window.location);
 }
 
 
@@ -49,7 +50,15 @@ function start() {
     window.addEventListener("message", function(evt){
         var data = evt.data;
 
-        console.log('message received on server', data);
+        // console.log('message received on server', data);
+        if(typeof data === 'string'){
+            try{
+                data = JSON.parse(data);
+            }
+            catch(err){
+                console.log('server err parsing comms message', err);
+            }
+        }
         if(data.type === 'rpc'){
             if(data.id){
                 data.reply = function(result){

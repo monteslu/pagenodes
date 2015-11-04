@@ -42,7 +42,7 @@ module.exports = function(RED) {
                     node.log("\n"+util.inspect(msg, {colors:useColors, depth:10}));
                 }
                 if (this.active) {
-                    sendDebug({id:this.id,name:this.name,topic:msg.topic,msg:msg,_path:msg._path});
+                    sendDebug({id:this.id,name:this.name,topic:msg.topic,msg:msg,_path:msg._path, image: msg.image});
                 }
             } else {
             // debug user defined msg property
@@ -69,7 +69,7 @@ module.exports = function(RED) {
                     }
                 }
                 if (this.active) {
-                    sendDebug({id:this.id,name:this.name,topic:msg.topic,property:property,msg:output,_path:msg._path});
+                    sendDebug({id:this.id,name:this.name,topic:msg.topic,property:property,msg:output,_path:msg._path, image: msg.image});
                 }
             }
         });
@@ -124,6 +124,8 @@ module.exports = function(RED) {
         if (msg.msg.length > debuglength) {
             msg.msg = msg.msg.substr(0,debuglength) +" ....";
         }
+
+        //msg.image = msg.image;
 
         RED.comms.publish("debug",msg);
     }

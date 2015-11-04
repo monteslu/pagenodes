@@ -33,6 +33,7 @@ var i18n = require("../../i18n");
 var functionHTML = require("raw!../../../../nodes/core/core/80-function.html");
 var injectHTML = require("raw!../../../../nodes/core/core/20-inject.html");
 var debugHTML = require("raw!../../../../nodes/core/core/58-debug.html");
+var templateHTML = require("raw!../../../../nodes/core/core/80-template.html");
 var notifyHTML = require("raw!../../../../nodes/core/core/59-notify.html");
 var sentimentHTML = require("raw!../../../../nodes/core/analysis/72-sentiment.html");
 var switchHTML = require("raw!../../../../nodes/core/logic/10-switch.html");
@@ -40,6 +41,7 @@ var changeHTML = require("raw!../../../../nodes/core/logic/15-change.html");
 var rangeHTML = require("raw!../../../../nodes/core/logic/16-range.html");
 var commentHTML = require("raw!../../../../nodes/core/core/90-comment.html");
 var httpinHTML = require("raw!../../../../nodes/core/io/21-httpin.html");
+var cameraHTML = require("raw!../../../../nodes/core/io/24-camera.html");
 var socketioHTML = require("raw!../../../../nodes/core/io/15-socketio.html");
 var peer2peerHTML = require("raw!../../../../nodes/core/io/16-peer2peer.html");
 var JSONHTML = require("raw!../../../../nodes/core/parsers/70-JSON.html");
@@ -47,6 +49,7 @@ var JSONHTML = require("raw!../../../../nodes/core/parsers/70-JSON.html");
 var nodeContents = {
     "function.html": functionHTML,
     "debug.html":  debugHTML,
+    "template.html": templateHTML,
     "notify.html": notifyHTML,
     "inject.html":  injectHTML,
     "sentiment.html": sentimentHTML,
@@ -55,6 +58,7 @@ var nodeContents = {
     "range.html": rangeHTML,
     "comment.html": commentHTML,
     "httpin.html": httpinHTML,
+    "camera.html": cameraHTML,
     "socketio.html": socketioHTML,
     "peer2peer.html": peer2peerHTML,
     "JSON.html": JSONHTML
@@ -63,6 +67,7 @@ var nodeContents = {
 var functionNode = require("../../../../nodes/core/core/80-function");
 var injectNode = require("../../../../nodes/core/core/20-inject");
 var debugNode = require("../../../../nodes/core/core/58-debug");
+var templateNode = require("../../../../nodes/core/core/80-template");
 var notifyNode = require("../../../../nodes/core/core/59-notify");
 var sentimentNode = require("../../../../nodes/core/analysis/72-sentiment");
 var switchNode = require("../../../../nodes/core/logic/10-switch");
@@ -70,6 +75,7 @@ var changeNode = require("../../../../nodes/core/logic/15-change");
 var rangeNode = require("../../../../nodes/core/logic/16-range");
 var commentNode = require("../../../../nodes/core/core/90-comment");
 var httpinNode = require("../../../../nodes/core/io/21-httpin");
+var cameraNode = require("../../../../nodes/core/io/24-camera");
 var socketioNode = require("../../../../nodes/core/io/15-socketio");
 var peer2peerNode = require("../../../../nodes/core/io/16-peer2peer");
 var JSONNode = require("../../../../nodes/core/parsers/70-JSON");
@@ -77,6 +83,7 @@ var JSONNode = require("../../../../nodes/core/parsers/70-JSON");
 var requiredNodes = {
     "function.js": functionNode,
     "debug.js" : debugNode,
+    "template.js": templateNode,
     "notify.js" : notifyNode,
     "inject.js" : injectNode,
     "sentiment.js": sentimentNode,
@@ -85,6 +92,7 @@ var requiredNodes = {
     "range.js": rangeNode,
     "comment.js": commentNode,
     "httpin.js": httpinNode,
+    "camera.js": cameraNode,
     "socketio.js": socketioNode,
     "peer2peer.js": peer2peerNode,
     "JSON.js": JSONNode

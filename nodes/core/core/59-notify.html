@@ -28,7 +28,12 @@
 
 <script type="text/javascript">
 
-    function notifyMe(topic, body) {
+    function createNotification(msg){
+        return new Notification(msg.topic || 'PageNodes', {body: msg.payload || 'notify', icon: msg.image || 'red/images/node-red.png'});
+    }
+
+    function notifyMe(msg) {
+        console.log('notifyMe', msg);
       // Let's check if the browser supports notifications
       if (!("Notification" in window)) {
         console.error("This browser does not support desktop notification");
@@ -37,7 +42,7 @@
       // Let's check whether notification permissions have already been granted
       else if (Notification.permission === "granted") {
         // If it's okay let's create a notification
-        var notification = new Notification(topic || 'PageNodes', {body: body || 'notify', icon: 'red/images/node-red.png'});
+        createNotification(msg);
       }
 
       // Otherwise, we need to ask the user for permission
@@ -45,7 +50,7 @@
         Notification.requestPermission(function (permission) {
           // If the user accepts, let's create a notification
           if (permission === "granted") {
-            var notification = new Notification(topic || 'PageNodes', {body: body || 'notify', icon: 'red/images/node-red.png'});
+            createNotification(msg);
           }
         });
       }
@@ -90,19 +95,26 @@
                 return m.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
             }
             this.handleDebugMessage = function(t,o) {
-                console.log('notify message in!', t, o);
+                if(typeof o.msg === 'string'){
+                    try{
+                        o.msg = JSON.parse(o.msg);
+                    }
+                    catch(err){
+                        console.log('error parsing notification', err);
+                    }
+                }
                 //console.log(o);
-                var name = sanitize(((o.name?o.name:o.id)||"").toString());
-                var topic = sanitize((o.topic||"").toString());
+                // var name = sanitize(((o.name?o.name:o.id)||"").toString());
+                var topic = sanitize((o.msg.topic||"").toString());
                 // var property = sanitize(o.property?o.property:'');
-                var payload = sanitize((o.msg||"").toString());
+                var payload = sanitize((o.msg.payload||"").toString());
                 // var format = sanitize((o.format||"").toString());
 
-                notifyMe(topic, payload);
+                notifyMe({topic: topic, payload: payload, image: o.msg.image});
 
 
             };
-            RED.comms.subscribe("notify",this.handleDebugMessage);
+            RED.comms.subscribe("notification",this.handleDebugMessage);
 
 
         },

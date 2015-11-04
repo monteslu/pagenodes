@@ -10,8 +10,7 @@
   },
   "main": "red/red.js",
   "scripts": {
-    "start": "node red.js",
-    "test": "./node_modules/.bin/grunt",
+    "test": "grunt test",
     "build": "babel ./src --out-dir ./build && webpack && grunt build",
     "server": "ecstatic public --port 1337"
   },

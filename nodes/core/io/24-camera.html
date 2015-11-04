@@ -1,0 +1,94 @@
+<!--
+  Copyright 2013 IBM Corp.
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+
+
+
+<script type="text/x-red" data-template-name="camera">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> <span data-i18n="common.label.name"></span></label>
+        <input type="text" id="node-input-name" data-i18n="[placeholder]common.label.name">
+    </div>
+    <div class="form-tips" id="tip-json" hidden><span data-i18n="httpin.tip.req"></span></div>
+</script>
+
+<script type="text/x-red" data-help-name="camera">
+    <p>Attaches a base64 (dataURL) picture from your webcam to <code>msg.image</code>.</p>
+</script>
+
+
+
+
+<script type="text/javascript">
+
+
+
+
+
+
+      RED.nodes.registerType('camera',{
+        category: 'function',
+        color:"rgb(174, 174, 231)",
+        defaults: {
+            name: {value:""},
+        },
+        inputs:1,
+        outputs:1,
+        icon: "white-globe.png",
+        label: function() {
+            return this.name||'camera';
+        },
+        labelStyle: function() {
+            return this.name?"node_label_italic":"";
+        },
+        oneditprepare: function() {
+
+
+        },
+        onpaletteadd: function() {
+            // startup();
+            // var self = this;
+            // this.handleDebugMessage = function(t,o) {
+            //     console.log('camera message in!', t, o);
+            //     if(typeof o.msg === 'string'){
+            //         try{
+            //             o.msg = JSON.parse(o.msg);
+            //         }
+            //         catch(err){
+            //             console.log('error parsing notification', err);
+            //         }
+            //     }
+
+            //     // console.log('take a pic!', topic, payload, o.msg);
+            //     takepicture(function(image){
+            //       console.log('image', image);
+            //       o.msg.image = image;
+            //       RED.comms.rpc('camera', [o.id, o.msg], function(result){
+            //           console.log('cam pic sent', result);
+            //       });
+            //     });
+
+
+            // };
+            // RED.comms.subscribe("camera",this.handleDebugMessage);
+
+
+        }
+    });
+
+
+
+
+</script>

@@ -247,7 +247,7 @@ module.exports = function(grunt) {
                 },
                 {
                     expand: true,
-                    src: ['editor/index.html','editor/backend.html','editor/favicon.ico'],
+                    src: ['editor/index.html','editor/backend.html','editor/favicon.ico', 'editor/*.png', 'editor/CNAME', 'editor/webmanifest.json'],
                     dest: 'public/',
                     flatten: true
                 },
@@ -367,6 +367,10 @@ module.exports = function(grunt) {
     grunt.registerTask('default',
         'Builds editor content then runs code style checks and unit tests on all components',
         ['build','test-core','test-editor','test-nodes']);
+
+    grunt.registerTask('test',
+        'Builds editor content then runs code style checks and unit tests on all components',
+        ['test-core','test-editor','test-nodes']);
 
     grunt.registerTask('test-core',
         'Runs code style check and unit tests on core runtime code',

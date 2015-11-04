@@ -173,6 +173,7 @@
             }
             this.handleDebugMessage = function(t,o) {
                 var msg = document.createElement("div");
+                console.log('handleDebug', o);
                 msg.onmouseover = function() {
                     msg.style.borderRightColor = "#999";
                     var n = RED.nodes.node(o.id);
@@ -227,7 +228,12 @@
 
                                     '</span>';
                 }
-                msg.innerHTML += '<span class="debug-message-payload">'+ payload+ '</span>';
+                var imgHTML = '';
+                if(o.image){
+                    var imgURL = o.image.replace(/\"/g,'').replace(/\'/g,'');
+                    imgHTML = '<br><img src=\"' + imgURL + '\">';
+                }
+                msg.innerHTML += '<span class="debug-message-payload">'+ payload+ imgHTML+ '</span>';
                 var atBottom = (sbc.scrollHeight-messages.offsetHeight-sbc.scrollTop) < 5;
                 messageCount++;
                 $(messages).append(msg);

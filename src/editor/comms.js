@@ -18,8 +18,17 @@ console.log('starting client comms');
 
 window.addEventListener("message", function(evt){
     var data = evt.data;
+    if(typeof data === 'string'){
+        try{
+            data = JSON.parse(data);
+            // console.log('typeof evt.data', typeof data, data);
+        }
+        catch(err){
+            console.log('client parsing comms message', err);
+        }
+    }
 
-    console.log('message received on client', data);
+    // console.log('message received on client', data);
     if(data.type === 'rpc' && data.id && rpcCallbacks[data.id]){
         rpcCallbacks[data.id](data.result);
         delete rpcCallbacks[data.id];
@@ -63,9 +72,9 @@ function subscribe(topic,callback) {
         subscriptions[topic] = [];
     }
     subscriptions[topic].push(callback);
-    if (ws && ws.readyState == 1) {
-        ws.send(JSON.stringify({subscribe:topic}));
-    }
+    // if (ws && ws.readyState == 1) {
+    //     ws.send(JSON.stringify({subscribe:topic}));
+    // }
 }
 
 function unsubscribe(topic,callback) {
@@ -101,7 +110,7 @@ function rpc(name, params, callback){
 
 function postMessage(message){
     var serverWindow = document.getElementById('serverFrame').contentWindow;
-    serverWindow.postMessage(message, CHILD_FRAME_LOCATION);
+    serverWindow.postMessage(JSON.stringify(message), CHILD_FRAME_LOCATION);
 }
 
 

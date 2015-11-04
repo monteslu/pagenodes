@@ -14,10 +14,12 @@
  * limitations under the License.
  **/
 
+//calling RED global
 module.exports = function(RED) {
     "use strict";
     var util = require("util");
-
+//Actual function passed here
+//n is the properties passed from the UI in order to do something
     function JSONNode(n) {
         RED.nodes.createNode(this,n);
         var node = this;

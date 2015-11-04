@@ -26,11 +26,13 @@
     <p>If the input is a JSON string it tries to parse it to a javascript object.</p>
     <p>If the input is a javascript object it creates a JSON string.</p>
 </script>
-
+<!-- defining values for the actual UI piece of a node -->
 <script type="text/javascript">
     RED.nodes.registerType('json',{
         category: 'function',
+        //color of node
         color:"#FFFF4B",
+        //default values for node
         defaults: {
             name: {value:""}
         },

@@ -43,6 +43,7 @@ var httpinHTML = require("raw!../../../../nodes/core/io/21-httpin.html");
 var socketioHTML = require("raw!../../../../nodes/core/io/15-socketio.html");
 var peer2peerHTML = require("raw!../../../../nodes/core/io/16-peer2peer.html");
 var JSONHTML = require("raw!../../../../nodes/core/parsers/70-JSON.html");
+var indexeddbHTML = require("raw!../../../../nodes/core/storage/33-indexeddb.html");
 
 var nodeContents = {
     "function.html": functionHTML,
@@ -57,7 +58,8 @@ var nodeContents = {
     "httpin.html": httpinHTML,
     "socketio.html": socketioHTML,
     "peer2peer.html": peer2peerHTML,
-    "JSON.html": JSONHTML
+    "JSON.html": JSONHTML,
+    "indexeddb.html": indexeddbHTML
 };
 
 var functionNode = require("../../../../nodes/core/core/80-function");
@@ -73,6 +75,7 @@ var httpinNode = require("../../../../nodes/core/io/21-httpin");
 var socketioNode = require("../../../../nodes/core/io/15-socketio");
 var peer2peerNode = require("../../../../nodes/core/io/16-peer2peer");
 var JSONNode = require("../../../../nodes/core/parsers/70-JSON");
+var indexeddbNode = require("../../../../nodes/core/storage/33-indexeddb");
 
 var requiredNodes = {
     "function.js": functionNode,
@@ -87,7 +90,8 @@ var requiredNodes = {
     "httpin.js": httpinNode,
     "socketio.js": socketioNode,
     "peer2peer.js": peer2peerNode,
-    "JSON.js": JSONNode
+    "JSON.js": JSONNode,
+    "indexeddb.js": indexeddbNode
 };
 
 

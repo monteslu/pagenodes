@@ -1,0 +1,31 @@
+<script type="text/x-red" data-template-name="indexeddb">
+//TODO remove sentiment data, put in indexedDB
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> <span data-i18n="common.label.name"></span></label>
+        <input type="text" id="node-input-name" data-i18n="[placeholder]common.label.name">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="indexeddb">
+<p>This is a node using indexedDb and localforage</p>
+<p><a href="http://mozilla.github.io/localForage">localforage</a></p>
+</script>
+
+<script type="text/javascript">
+    RED.nodes.registerType('indexeddb',{
+        category: 'analysis-function',
+        color:"#F6E0F9",
+        defaults: {
+            name: {value:""},
+        },
+        inputs:1,
+        outputs:1,
+        icon: "arrow-in.png",
+        label: function() {
+            return this.name||"indexeddb";
+        },
+        labelStyle: function() {
+            return this.name?"node_label_italic":"";
+        }
+    });
+</script>

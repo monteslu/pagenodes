@@ -155,10 +155,16 @@ module.exports = function(RED) {
             node.serverConfig.on('opened', function(n) {
                 node.status({fill:"green",shape:"dot",text:"connected "+n});
                 node.serverConfig.server.on(node.topic, function(data){
-                    node.send({
-                        topic: node.topic,
-                        payload: data
-                    });
+                    console.log('p2p on input', data);
+                    try{
+                        data = JSON.parse(data);
+                        data.topic = node.topic;
+                        node.send(data);
+                    }catch(err){
+                        console.log('p2p error on msg reciev', err);
+                        node.error(err);
+                    }
+
                 });
             });
             node.serverConfig.on('launched', function(n) {
@@ -194,7 +200,14 @@ module.exports = function(RED) {
         }
         this.on("input", function(msg) {
             if(msg.topic && node.serverConfig && node.serverConfig.server){
-                node.serverConfig.server.emit(msg.topic, msg.payload);
+                try{
+                    var sendMsg = JSON.stringify(msg);
+                    console.log('p2p emit', sendMsg);
+                    node.serverConfig.server.emit(msg.topic, sendMsg);
+                }catch(err){
+                    console.log('p2p emit err', err);
+                }
+
             }
         });
     }

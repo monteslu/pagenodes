@@ -130,10 +130,16 @@ module.exports = function(RED) {
             node.serverConfig.on('opened', function(n) {
                 node.status({fill:"green",shape:"dot",text:"connected "+n});
                 node.serverConfig.server.on(node.topic, function(data){
-                    node.send({
-                        topic: node.topic,
-                        payload: data
-                    });
+                    if(typeof data === 'object'){
+                        data.topic = node.topic;
+                        node.send(data);
+                    }else{
+                        node.send({
+                            topic: node.topic,
+                            payload: data
+                        });
+                    }
+
                 });
             });
             node.serverConfig.on('launched', function(n) {
@@ -168,7 +174,7 @@ module.exports = function(RED) {
         }
         this.on("input", function(msg) {
             if(msg.topic && node.serverConfig){
-                node.serverConfig.server.emit(msg.topic, msg.payload);
+                node.serverConfig.server.emit(msg.topic, msg);
             }
         });
     }

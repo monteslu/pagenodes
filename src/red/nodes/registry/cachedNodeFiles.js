@@ -1,4 +1,8 @@
 module.exports = [
+  { file: 'localdb.js',
+    module: 'node-red',
+    name: 'localdb',
+    version: '0.11.2-git' },
   { file: 'sentiment.js',
     module: 'node-red',
     name: 'sentiment',

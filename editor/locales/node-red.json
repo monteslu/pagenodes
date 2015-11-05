@@ -5,7 +5,9 @@
             "topic": "Topic",
             "name": "Name",
             "username": "Username",
-            "password": "Password"
+            "password": "Password",
+            "key": "Key",
+            "url": "URL"
         },
         "status": {
             "connected": "connected",

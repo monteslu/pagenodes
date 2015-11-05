@@ -104,7 +104,7 @@ var requiredNodes = {
     "socketio.js": socketioNode,
     "peer2peer.js": peer2peerNode,
     "JSON.js": JSONNode,
-    "localdb.js": localwriteNode
+    "localdb.js": localdbNode
 };
 
 

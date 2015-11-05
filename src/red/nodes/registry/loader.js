@@ -45,7 +45,7 @@ var cameraHTML = require("raw!../../../../nodes/core/io/24-camera.html");
 var socketioHTML = require("raw!../../../../nodes/core/io/15-socketio.html");
 var peer2peerHTML = require("raw!../../../../nodes/core/io/16-peer2peer.html");
 var JSONHTML = require("raw!../../../../nodes/core/parsers/70-JSON.html");
-var localwriteHTML = require("raw!../../../../nodes/core/storage/27-localwrite.html");
+var localdbHTML = require("raw!../../../../nodes/core/storage/27-localdb.html");
 
 var nodeContents = {
     "function.html": functionHTML,
@@ -63,7 +63,7 @@ var nodeContents = {
     "socketio.html": socketioHTML,
     "peer2peer.html": peer2peerHTML,
     "JSON.html": JSONHTML,
-    "localwrite.html": localwriteHTML
+    "localdb.html": localdbHTML
 };
 
 var functionNode = require("../../../../nodes/core/core/80-function");
@@ -81,7 +81,7 @@ var cameraNode = require("../../../../nodes/core/io/24-camera");
 var socketioNode = require("../../../../nodes/core/io/15-socketio");
 var peer2peerNode = require("../../../../nodes/core/io/16-peer2peer");
 var JSONNode = require("../../../../nodes/core/parsers/70-JSON");
-var localwriteNode = require("../../../../nodes/core/storage/27-localwrite");
+var localdbNode = require("../../../../nodes/core/storage/27-localdb");
 
 
 var requiredNodes = {
@@ -100,7 +100,7 @@ var requiredNodes = {
     "socketio.js": socketioNode,
     "peer2peer.js": peer2peerNode,
     "JSON.js": JSONNode,
-    "localwrite.js": localwriteNode
+    "localdb.js": localwriteNode
 };
 
 

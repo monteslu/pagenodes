@@ -1,5 +1,5 @@
 module.exports = [
-  { file: 'localwrite.js',
+  { file: 'localdb.js',
     module: 'node-red',
     name: 'localwrite',
     version: '0.11.2-git' },

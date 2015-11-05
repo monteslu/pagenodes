@@ -111,8 +111,9 @@ RED.library = (function() {
                             var bcli = $('<li class="active"><span class="divider">/</span> <a href="#">'+dirName+'</a></li>');
                             $("a",bcli).click(function(e) {
                                 $(this).parent().nextAll().remove();
-                                $.getJSON("library/"+options.url+root+dirName,function(data) {
-                                    $("#node-select-library").children().first().replaceWith(buildFileList(root+dirName+"/",data));
+                                // $.getJSON("library/"+options.url+root+dirName,function(data) {
+                                RED.comms.rpc('saveLibrary', ["library/"+options.url+root+dirName], function(result){
+                                    $("#node-select-library").children().first().replaceWith(buildFileList(root+dirName+"/",result));
                                 });
                                 e.stopPropagation();
                             });
@@ -326,16 +327,25 @@ RED.library = (function() {
             }
 
             data.text = options.editor.getValue();
-            $.ajax({
-                url:"library/"+options.url+'/'+fullpath,
-                type: "POST",
-                data: JSON.stringify(data),
-                contentType: "application/json; charset=utf-8"
-            }).done(function(data,textStatus,xhr) {
-                RED.notify(RED._("library.savedType", {type:options.type}),"success");
-            }).fail(function(xhr,textStatus,err) {
-                RED.notify(RED._("library.saveFailed",{message:xhr.responseText}),"error");
+            RED.comms.rpc('saveLibrary', ["library/"+options.url+'/'+fullpath, data], function(result){
+                if(result === 204){
+                    RED.notify(RED._("library.savedType", {type:options.type}),"success");
+                }
+                else{
+                    RED.notify(RED._("library.saveFailed",{message:result.message}),"error");
+                }
+
             });
+            // $.ajax({
+            //     url:"library/"+options.url+'/'+fullpath,
+            //     type: "POST",
+            //     data: JSON.stringify(data),
+            //     contentType: "application/json; charset=utf-8"
+            // }).done(function(data,textStatus,xhr) {
+            //     RED.notify(RED._("library.savedType", {type:options.type}),"success");
+            // }).fail(function(xhr,textStatus,err) {
+            //     RED.notify(RED._("library.saveFailed",{message:xhr.responseText}),"error");
+            // });
         }
         $( "#node-dialog-library-save-confirm" ).dialog({
             title: RED._("library.saveToLibrary"),

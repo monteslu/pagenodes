@@ -101,14 +101,14 @@
                 mode: 'ace/mode/html',
                 value: $("#node-input-template").val()
             });
-            RED.library.create({
-                url:"functions", // where to get the data from
-                type:"function", // the type of object the library is for
-                editor:that.editor, // the field name the main text body goes to
-                fields:['name','outputs']
-            });
+            // RED.library.create({
+            //     url:"functions", // where to get the data from
+            //     type:"function", // the type of object the library is for
+            //     editor:that.editor, // the field name the main text body goes to
+            //     fields:['name','outputs']
+            // });
             this.editor.focus();
-            
+
             $("#node-input-format").change(function() {
                 var mod = "ace/mode/"+$("#node-input-format").val();
                 that.editor.getSession().setMode({

@@ -75,10 +75,17 @@ module.exports = {
     },
     register: createLibrary,
 
-    getAll: function(req,res) {
+    // getAll: function(req,res) {
+    //     storage.getAllFlows().then(function(flows) {
+    //         log.audit({event: "library.get.all",type:"flow"},req);
+    //         res.json(flows);
+    //     });
+    // },
+    getAll: function(data){
+        console.log('library getAllRpc()');
         storage.getAllFlows().then(function(flows) {
-            log.audit({event: "library.get.all",type:"flow"},req);
-            res.json(flows);
+            log.audit({event: "library.get.all",type:"flow"});
+            data.reply(flows);
         });
     },
     get: function(req,res) {
@@ -100,20 +107,31 @@ module.exports = {
             res.status(404).end();
         });
     },
-    post: function(req,res) {
-        var flow = JSON.stringify(req.body);
-        storage.saveFlow(req.params[0],flow).then(function() {
-            log.audit({event: "library.set",type:"flow",path:req.params[0]},req);
-            res.status(204).end();
+    save: function(data){
+        var flow = JSON.stringify(data.params[1]);
+        storage.saveFlow(data.params[0],flow).then(function() {
+            log.audit({event: "library.set",type:"flow",path:data.params[0]});
+            data.reply(204);
         }).otherwise(function(err) {
-            log.warn(log._("api.library.error-save-flow",{path:req.params[0],message:err.toString()}));
-            if (err.code === 'forbidden') {
-                log.audit({event: "library.set",type:"flow",path:req.params[0],error:"forbidden"},req);
-                res.status(403).end();
-                return;
-            }
-            log.audit({event: "library.set",type:"flow",path:req.params[0],error:"unexpected_error",message:err.toString()},req);
-            res.status(500).send({error:"unexpected_error", message:err.toString()});
+            log.warn(log._("api.library.error-save-flow",{path:data.params[0],message:err.toString()}));
+            log.audit({event: "library.set",type:"flow",path:data.params[0],error:"unexpected_error",message:err.toString()});
+            data.reply({error:"unexpected_error", message:err.toString()});
         });
-    }
+    },
+    // post: function(req,res) {
+    //     var flow = JSON.stringify(req.body);
+    //     storage.saveFlow(req.params[0],flow).then(function() {
+    //         log.audit({event: "library.set",type:"flow",path:req.params[0]},req);
+    //         res.status(204).end();
+    //     }).otherwise(function(err) {
+    //         log.warn(log._("api.library.error-save-flow",{path:req.params[0],message:err.toString()}));
+    //         if (err.code === 'forbidden') {
+    //             log.audit({event: "library.set",type:"flow",path:req.params[0],error:"forbidden"},req);
+    //             res.status(403).end();
+    //             return;
+    //         }
+    //         log.audit({event: "library.set",type:"flow",path:req.params[0],error:"unexpected_error",message:err.toString()},req);
+    //         res.status(500).send({error:"unexpected_error", message:err.toString()});
+    //     });
+    // }
 }

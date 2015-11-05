@@ -35,6 +35,7 @@ var injectHTML = require("raw!../../../../nodes/core/core/20-inject.html");
 var debugHTML = require("raw!../../../../nodes/core/core/58-debug.html");
 var templateHTML = require("raw!../../../../nodes/core/core/80-template.html");
 var notifyHTML = require("raw!../../../../nodes/core/core/59-notify.html");
+var espeakHTML = require("raw!../../../../nodes/core/core/60-espeak.html");
 var sentimentHTML = require("raw!../../../../nodes/core/analysis/72-sentiment.html");
 var switchHTML = require("raw!../../../../nodes/core/logic/10-switch.html");
 var changeHTML = require("raw!../../../../nodes/core/logic/15-change.html");
@@ -51,6 +52,7 @@ var nodeContents = {
     "debug.html":  debugHTML,
     "template.html": templateHTML,
     "notify.html": notifyHTML,
+    "espeak.html": espeakHTML,
     "inject.html":  injectHTML,
     "sentiment.html": sentimentHTML,
     "switch.html": switchHTML,
@@ -69,6 +71,7 @@ var injectNode = require("../../../../nodes/core/core/20-inject");
 var debugNode = require("../../../../nodes/core/core/58-debug");
 var templateNode = require("../../../../nodes/core/core/80-template");
 var notifyNode = require("../../../../nodes/core/core/59-notify");
+var espeakNode = require("../../../../nodes/core/core/60-espeak");
 var sentimentNode = require("../../../../nodes/core/analysis/72-sentiment");
 var switchNode = require("../../../../nodes/core/logic/10-switch");
 var changeNode = require("../../../../nodes/core/logic/15-change");
@@ -85,6 +88,7 @@ var requiredNodes = {
     "debug.js" : debugNode,
     "template.js": templateNode,
     "notify.js" : notifyNode,
+    "espeak.js" : espeakNode,
     "inject.js" : injectNode,
     "sentiment.js": sentimentNode,
     "switch.js": switchNode,

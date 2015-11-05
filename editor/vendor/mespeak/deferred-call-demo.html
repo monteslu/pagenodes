@@ -1,0 +1,68 @@
+<html>
+<head>
+  <title>meSpeak.js: Deferred Call Demo</title>
+  <link href="http://fonts.googleapis.com/css?family=Open+Sans&amp;subset=latin" rel="stylesheet" type="text/css" />
+  <link href="http://fonts.googleapis.com/css?family=Lato:300&amp;subset=latin" rel="stylesheet" type="text/css" />
+
+  <script>
+    // This demo is licensed under the GNU GPL.
+  </script>
+  <script type="text/javascript" src="mespeak.js"></script>
+  <script type="text/javascript">
+    meSpeak.speak("Configuration and voice definition loaded.");
+    meSpeak.loadConfig("mespeak_config.json");
+    meSpeak.loadVoice("voices/en/en-us.json");
+  </script>
+
+<style type="text/css">
+	html
+	{
+		margin: 0;
+		padding: 2em 1.5em 4.5em 1.5em;
+		background-color: #e2e3e4;
+	}
+	body
+	{
+		max-width: 900px;
+		padding: 2px 40px 60px 40px;
+		margin: 0 auto 0 auto;
+		background-color: #fafafb;
+		color: #111;
+		font-family: 'Open Sans',sans-serif;
+		font-size: 13px;
+		line-height: 19px;
+	}
+	h1,h2,h3
+	{
+		font-family: 'Lato',sans-serif;
+		font-weight: 300;
+	}
+	h1 {
+		font-size: 46px;
+		line-height: 46px;
+		color: #2681a7;
+		margin-top: 0.5em;
+		margin-bottom: 0.5em;
+		padding: 0;
+	}
+	h2
+	{
+		font-size: 36px;
+		color: #111;
+		margin-top: 0;
+		margin-bottom: 1.5em;
+		clear: both;
+	}
+	h1 span.pict { font-size: 38px; color: #ccc; margin-left: 0.5em; letter-spacing: -2px; }
+	a { color: #006f9e; }
+	a:hover,a:focus { color: #2681a7; }
+	a:active { color: #cd360e; }
+</style>
+</head>
+<body>
+  <h1>meSpeak.js <span class="pict">(( &bull; ))</span></h1>
+  <h2>Defererred Call Demo</h2>
+  <p>This page demonstrates a call to speak() that will be deferred and will be executed instantly after the configuration and any voice definition has been set up.</p>
+</body>
+</html>
+

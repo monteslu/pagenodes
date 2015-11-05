@@ -21,7 +21,7 @@
 // var ui = require("./ui");
 var nodes = require("./nodes");
 var flows = require("./flows");
-// var library = require("./library");
+var library = require("./library");
 // var info = require("./info");
 // var theme = require("./theme");
 // var locales = require("./locales");
@@ -88,8 +88,10 @@ function init(adminApp,storage) {
 
     // Library
     // library.init(adminApp);
-    // adminApp.post(new RegExp("/library/flows\/(.*)"),needsPermission("library.write"),library.post);
-    // adminApp.get("/library/flows",needsPermission("library.read"),library.getAll);
+    events.on('rpc_saveLibrary', library.save);
+    // // adminApp.get("/library/flows",needsPermission("library.read"),library.getAll);
+    events.on('rpc_getLibraryFlows', library.getAll);
+
 
     // adminApp.get(new RegExp("/library/flows\/(.*)"),needsPermission("library.read"),library.get);
     events.on('rpc_getFlows', function(data){

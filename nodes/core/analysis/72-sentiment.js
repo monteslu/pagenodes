@@ -19,6 +19,7 @@ module.exports = function(RED) {
     var sentiment = require('sentiment');
 
     function SentimentNode(n) {
+      console.log('test');
         RED.nodes.createNode(this,n);
         var node = this;
 

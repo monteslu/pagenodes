@@ -45,6 +45,7 @@ var cameraHTML = require("raw!../../../../nodes/core/io/24-camera.html");
 var socketioHTML = require("raw!../../../../nodes/core/io/15-socketio.html");
 var peer2peerHTML = require("raw!../../../../nodes/core/io/16-peer2peer.html");
 var JSONHTML = require("raw!../../../../nodes/core/parsers/70-JSON.html");
+var indexeddbHTML = require("raw!../../../../nodes/core/analysis/27-indexeddb.html");
 
 var nodeContents = {
     "function.html": functionHTML,
@@ -61,7 +62,8 @@ var nodeContents = {
     "camera.html": cameraHTML,
     "socketio.html": socketioHTML,
     "peer2peer.html": peer2peerHTML,
-    "JSON.html": JSONHTML
+    "JSON.html": JSONHTML,
+    "indexeddb.html": indexeddbHTML
 };
 
 var functionNode = require("../../../../nodes/core/core/80-function");
@@ -79,6 +81,7 @@ var cameraNode = require("../../../../nodes/core/io/24-camera");
 var socketioNode = require("../../../../nodes/core/io/15-socketio");
 var peer2peerNode = require("../../../../nodes/core/io/16-peer2peer");
 var JSONNode = require("../../../../nodes/core/parsers/70-JSON");
+var indexeddbNode = require("../../../../nodes/core/analysis/27-indexeddb");
 
 var requiredNodes = {
     "function.js": functionNode,
@@ -95,7 +98,8 @@ var requiredNodes = {
     "camera.js": cameraNode,
     "socketio.js": socketioNode,
     "peer2peer.js": peer2peerNode,
-    "JSON.js": JSONNode
+    "JSON.js": JSONNode,
+    "indexeddb.js": indexeddbNode
 };
 
 

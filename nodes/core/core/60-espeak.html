@@ -47,8 +47,8 @@
 </script>
 
 <script type="text/x-red" data-help-name="espeak">
-    <p>The espeak node can be connected to the output of any node. It can be used to display the output of a <b>msg.payload</b> .</p>
-    <p>Each message will also display the title, <b>msg.topic</b> .</p>
+    <p>The espeak node can be connected to the output of any node. It can be used to play a text-to-speech version of the <b>msg.payload</b> .</p>
+    <p>Each message can also modify the playback <b>msg.amplitude</b> <b>msg.wordgap</b> <b>msg.pitch</b> and <b>msg.speed</b> .</p>
 </script>
 
 <script type="text/javascript">
@@ -81,9 +81,9 @@
                 var node = this;
                 RED.comms.rpc('espeak', [this.id, (this.active?"enable":"disable")], function(result){
                     if (result == 200) {
-                        RED.espeak(node._("debug.notification.activated",{label:label}),"success");
+                        RED.notify(node._("debug.notification.activated",{label:label}),"success");
                     } else if (result == 201) {
-                        RED.espeak(node._("debug.notification.deactivated",{label:label}),"success");
+                        RED.notify(node._("debug.notification.deactivated",{label:label}),"success");
                     }
                 });
             }

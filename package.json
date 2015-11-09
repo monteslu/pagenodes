@@ -11,7 +11,7 @@
   "main": "red/red.js",
   "scripts": {
     "test": "grunt test",
-    "build": "babel ./src --out-dir ./build && webpack && grunt build",
+    "build": "babel ./src/ --out-dir ./build && webpack && grunt build",
     "server": "ecstatic public --port 1337"
   },
   "bin": {
@@ -40,10 +40,9 @@
   "dependencies": {},
   "optionalDependencies": {},
   "devDependencies": {
-    "babel": "^6.0.15",
-    "babel-cli": "^6.0.15",
-    "babel-core": "^6.0.18",
-    "babel-loader": "^6.0.1",
+    "babel": "^5.8.23",
+    "babel-core": "^5.8.25",
+    "babel-loader": "^5.3.2",
     "bcryptjs": "^2.3.0",
     "body-parser": "1.14.1",
     "cheerio": "0.19.0",

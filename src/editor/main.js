@@ -14,6 +14,7 @@
  * limitations under the License.
  **/
 
+require('babel-core/polyfill'); //@#$! safari
 
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('service-worker.bundle.js')

@@ -87,7 +87,6 @@ var localfilesystem = {
     },
 
     getFlows: function() {
-        console.log('getFlows from localstorage');
         return localforage.getItem(flowsFullPath).then(val =>{
             return val || [];
         });
@@ -130,7 +129,6 @@ var localfilesystem = {
     },
 
     getLibraryEntry: function(type,path) {
-        //TODO read from localstorage
         var name = 'PN_LIB_' + type + '_' + path;
         return localforage.getItem(name).then(val =>{
             return val || [];

@@ -1471,7 +1471,7 @@ RED.view = (function() {
                             });
 
                             if (d._def.icon) {
-                                icon = thisNode.select(".node_icon");
+                                var icon = thisNode.select(".node_icon");
                                 var current_url = icon.attr("xlink:href");
                                 var icon_url;
                                 if (typeof d._def.icon == "function") {

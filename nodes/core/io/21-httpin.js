@@ -15,7 +15,6 @@
  **/
 
 module.exports = function(RED) {
-    "use strict";
     var urllib = require("url");
     var mustache = require("mustache");
     var querystring = require("querystring");
@@ -105,7 +104,7 @@ module.exports = function(RED) {
             .catch(function(err) {
                 var payload = err.toString() + " : " + url;
                 var statusCode = err.code;
-                node.send({payload, statusCode});
+                node.send({payload: payload, statusCode: statusCode});
                 node.status({fill:"red",shape:"ring",text:err.code});
             });
 

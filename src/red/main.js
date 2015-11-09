@@ -13,10 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-var nopt = require("nopt");
-var path = require("path");
-var RED = require("./red");
-var log = require("./log");
+
+require('babel-core/polyfill'); //@#$! safari
+
+const nopt = require("nopt");
+const path = require("path");
+const RED = require("./red");
+const log = require("./log");
+
 
 
 nopt.invalidHandler = function(k,v,t) {

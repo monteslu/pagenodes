@@ -20,6 +20,8 @@ var keys = require('when/keys');
 
 var log = require("../log");
 
+var localforage = require('localforage');
+
 
 var settings;
 var flowsFile;
@@ -55,10 +57,7 @@ function getFileBody(root,path) {
 function writeFile(path,content) {
 
     console.log('writeFile', path, content);
-    return when.promise(function(resolve,reject) {
-        localStorage[path] = content;
-        resolve('ok');
-    });
+    return localforage.setItem(path, content);
 }
 
 var localfilesystem = {
@@ -66,7 +65,7 @@ var localfilesystem = {
         settings = _settings;
 
         console.log('localfilesystem init', _settings);
-        settings.userDir = 'NODE_RED_HOME';
+        settings.userDir = 'PAGENODES';
         flowsFile = 'flows.json';
         flowsFullPath = settings.userDir + '_' + flowsFile;
 
@@ -89,28 +88,15 @@ var localfilesystem = {
 
     getFlows: function() {
         console.log('getFlows from localstorage');
-        return when.promise(function(resolve) {
-
-            if (localStorage[flowsFullPath]) {
-                resolve(JSON.parse(localStorage[flowsFullPath]));
-            } else {
-                log.info(log._("storage.localfilesystem.create"));
-                resolve([]);
-            }
-
+        return localforage.getItem(flowsFullPath).then(val =>{
+            return val || [];
         });
     },
 
     saveFlows: function(flows) {
 
         var flowData;
-
-        if (settings.flowFilePretty) {
-            flowData = JSON.stringify(flows,null,4);
-        } else {
-            flowData = JSON.stringify(flows);
-        }
-        return writeFile(flowsFullPath, flowData);
+        return writeFile(flowsFullPath, flows);
     },
 
     getCredentials: function() {
@@ -118,42 +104,26 @@ var localfilesystem = {
     },
 
     saveCredentials: function(credentials) {
-        var credentialData;
-        if (settings.flowFilePretty) {
-            credentialData = JSON.stringify(credentials,null,4);
-        } else {
-            credentialData = JSON.stringify(credentials);
-        }
-        return writeFile(credentialsFile, credentialData);
+        return writeFile(credentialsFile, credentials);
     },
 
     getSettings: function() {
         console.log('getSettings');
-        return when.promise(function(resolve) {
-
-          if (localStorage[globalSettingsFile]) {
-              resolve(JSON.parse(localStorage[globalSettingsFile]));
-          } else {
-              resolve({});
-          }
-
+        return localforage.getItem(globalSettingsFile).then(val =>{
+            return val || {};
         });
+
     },
     saveSettings: function(settings) {
         console.log('saveSettings', settings);
-        return writeFile(globalSettingsFile,JSON.stringify(settings,null,1));
+        return writeFile(globalSettingsFile,settings);
     },
     getSessions: function() {
         console.log('getSessions');
-        return when.promise(function(resolve) {
-
-          if (localStorage[sessionsFile]) {
-              resolve(JSON.parse(localStorage[sessionsFile]));
-          } else {
-              resolve({});
-          }
-
+        return localforage.getItem(globalSettingsFile).then(val =>{
+            return val || {};
         });
+
     },
     saveSessions: function(sessions) {
         return writeFile(sessionsFile,JSON.stringify(sessions));
@@ -161,7 +131,10 @@ var localfilesystem = {
 
     getLibraryEntry: function(type,path) {
         //TODO read from localstorage
-        return when.resolve([]);
+        var name = 'PN_LIB_' + type + '_' + path;
+        return localforage.getItem(name).then(val =>{
+            return val || [];
+        });
     },
 
     saveLibraryEntry: function(type,path,meta,body) {

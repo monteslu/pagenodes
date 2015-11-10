@@ -122,6 +122,12 @@
         <label for="node-input-once" style="width: 70%;" data-i18n="inject.onstart"></label>
     </div>
 
+    <div class="form-row" id="node-allowDebugInput">
+        <label>&nbsp;</label>
+        <input type="checkbox" id="node-input-allowDebugInput" style="display: inline-block; width: auto; vertical-align: top;">
+        <label for="node-input-allowDebugInput" style="width: 70%;">allow debug panel input</label>
+    </div>
+
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> <span data-i18n="common.label.name"></span></label>
         <input type="text" id="node-input-name" data-i18n="[placeholder]common.label.name">
@@ -191,7 +197,8 @@
             payloadType: {value:"date"},
             repeat: {value:""},
             crontab: {value:""},
-            once: {value:false}
+            once: {value:false},
+            allowDebugInput: {value:false}
         },
         inputs:0,
         outputs:1,

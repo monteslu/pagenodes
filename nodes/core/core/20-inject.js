@@ -30,8 +30,10 @@ module.exports = function(RED) {
         this.crontab = n.crontab;
         this.once = n.once;
         var node = this;
+        this.type = 'inject';
         this.interval_id = null;
         this.cronjob = null;
+        this.allowDebugInput = n.allowDebugInput;
 
         if (this.repeat && !isNaN(this.repeat) && this.repeat > 0) {
             this.repeat = this.repeat * 1000;
@@ -93,5 +95,18 @@ module.exports = function(RED) {
             // res.sendStatus(404);
             data.reply('not ok');
         }
+    });
+
+    RED.events.on("rpc_inject_text", function(data) {
+        RED.nodes.eachNode(function(n){
+            console.log('each node', n);
+            if(n.type === 'inject' && n.allowDebugInput){
+                n.send({
+                    topic: n.topic,
+                    payload: data.params[0]
+                });
+            }
+        });
+        data.reply('ok');
     });
 }

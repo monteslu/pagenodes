@@ -44,6 +44,7 @@ var commentHTML = require("raw!../../../../nodes/core/core/90-comment.html");
 var httpinHTML = require("raw!../../../../nodes/core/io/21-httpin.html");
 var cameraHTML = require("raw!../../../../nodes/core/io/24-camera.html");
 var socketioHTML = require("raw!../../../../nodes/core/io/15-socketio.html");
+var eventsourceHTML = require("raw!../../../../nodes/core/io/17-eventsource.html");
 var peer2peerHTML = require("raw!../../../../nodes/core/io/16-peer2peer.html");
 var JSONHTML = require("raw!../../../../nodes/core/parsers/70-JSON.html");
 var localdbHTML = require("raw!../../../../nodes/core/storage/27-localdb.html");
@@ -63,6 +64,7 @@ var nodeContents = {
     "httpin.html": httpinHTML,
     "camera.html": cameraHTML,
     "socketio.html": socketioHTML,
+    "eventsource.html": eventsourceHTML,
     "peer2peer.html": peer2peerHTML,
     "JSON.html": JSONHTML,
     "localdb.html": localdbHTML
@@ -83,6 +85,7 @@ var httpinNode = require("../../../../nodes/core/io/21-httpin");
 var cameraNode = require("../../../../nodes/core/io/24-camera");
 var socketioNode = require("../../../../nodes/core/io/15-socketio");
 var peer2peerNode = require("../../../../nodes/core/io/16-peer2peer");
+var eventsourceNode = require("../../../../nodes/core/io/17-eventsource");
 var JSONNode = require("../../../../nodes/core/parsers/70-JSON");
 var localdbNode = require("../../../../nodes/core/storage/27-localdb");
 
@@ -102,6 +105,7 @@ var requiredNodes = {
     "httpin.js": httpinNode,
     "camera.js": cameraNode,
     "socketio.js": socketioNode,
+    "eventsource.js": eventsourceNode,
     "peer2peer.js": peer2peerNode,
     "JSON.js": JSONNode,
     "localdb.js": localdbNode

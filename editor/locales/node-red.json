@@ -7,7 +7,8 @@
             "username": "Username",
             "password": "Password",
             "key": "Key",
-            "url": "URL"
+            "url": "URL",
+            "append": "Append?"
         },
         "status": {
             "connected": "connected",

@@ -34,35 +34,41 @@ module.exports = function(RED) {
 
             try{
                 console.log('starting eventsource', node.path);
-                node.eventSource = new EventSource(node.path, {"withCredentials": true});
+                node.eventSource = new EventSource(node.path);
 
                 node.emit('launched','');
 
-                node.eventSource.addEventListener('error', function(e) {
+                node.errorListener = function(e) {
                     console.log('error connecting to EventSource', e);
                     node.emit('erro', e);
                     node.connected = false;
-                });
-                node.eventSource.addEventListener('open', function(e) {
+                };
+
+                node.openListener = function(e) {
                     console.log('onopen connecting to EventSource', e);
                     //node.emit('erro', e);
                     node.connected = true;
-                });
+                };
+
+                node.messageListener = function(e){
+                    //console.log('eventSource on message', e, node);
+                    node.emit('message', e);
+                };
+
+                node.eventSource.addEventListener('error', node.errorListnener);
+                node.eventSource.addEventListener('open', node.openListener);
+                node.eventSource.addEventListener('message', node.messageListener);
+
                 setTimeout(function(){ //stupid timing problem
                     if(node.connected){
                         node.emit('opened','');
                     }
-                },500);
-                node.eventSource.onmessage = function(e) {
-                  console.log('eventSource on message', e);
-                  //node.emit('message', e);
-                }
+                },200);
+
             }catch(err){
                 console.log('caught error connecting to EventSource', err);
                 node.emit('erro', err);
             }
-
-
 
 
 
@@ -79,10 +85,18 @@ module.exports = function(RED) {
 
 
         node.on("close", function() {
-            console.log('eventsource-client closing', node);
+            //console.log('eventsource-client closing', node);
             node.closing = true;
+            if(node.openListener){
+                node.eventSource.removeEventListener('open', node.openListener);
+            }
+            if(node.messageListener){
+                node.eventSource.removeEventListener('message', node.messageListener);
+            }
+            if(node.errorListener){
+                node.eventSource.removeEventListener('error', node.errorListener);
+            }
             node.emit('closed','');
-
         });
     }
     RED.nodes.registerType("eventsource-client",EventSourceListenNode);
@@ -100,24 +114,30 @@ module.exports = function(RED) {
                 node.status({fill:"green",shape:"dot",text:"connected "+n});
 
                 if(node.topic){
-                    node.serverConfig.eventSource.addEventListener(node.topic, function(e) {
+                    node.topicListener = function(e){
                       var msg = {
                         topic: node.topic,
                         payload: e.data
                       }
-                      node.send(data);
-                    });
+                      node.send(msg);
+                    };
+                    node.serverConfig.eventSource.addEventListener(node.topic, node.topicListener);
                 }else{
                     node.serverConfig.on('message', function(e){
                         var msg = {
                          topic: 'message',
                          payload: e.data
                         }
-                        node.send(data);
+                        node.send(msg);
                     });
                 }
 
+            });
 
+            node.on("close", function() {
+                if(node.topicListener){
+                    node.serverConfig.eventSource.removeEventListener(node.topic, node.topicListener);
+                }
             });
 
             node.serverConfig.on('erro', function() { node.status({fill:"red",shape:"ring",text:"error"}); });

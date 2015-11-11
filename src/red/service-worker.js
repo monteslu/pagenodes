@@ -37,6 +37,11 @@ self.addEventListener('install', function(event) {
 
 self.addEventListener('fetch', function(event) {
 
+  const requestURL = new URL(event.request.url);
+  if (requestURL.origin != location.origin){
+    return;
+  }
+
   var cacheRequest = event.request.clone();
   var inspectRequest = event.request.clone();
 

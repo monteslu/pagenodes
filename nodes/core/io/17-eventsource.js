@@ -30,10 +30,6 @@ module.exports = function(RED) {
         node.connected = true;
 
 
-
-
-
-
         function startconn() {
 
             try{

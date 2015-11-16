@@ -14,7 +14,7 @@
  * limitations under the License.
  **/
 
-//var babel = require('babel-core');
+//var babel = require('babel');
 var _ = require('lodash');
 
 module.exports = function(RED) {

@@ -110,7 +110,7 @@ Node.prototype.send = function(msg) {
             if (!msg._msgid) {
                 msg._msgid = redUtil.generateId();
             }
-            this.metric("send",msg);
+            // this.metric("send",msg);
             node = flows.get(this._wire);
             /* istanbul ignore else */
             if (node) {
@@ -239,7 +239,7 @@ Node.prototype.metric = function(eventname, msg, metricValue) {
     metrics.event = "node."+this.type+"."+eventname;
     metrics.msgid = msg._msgid;
     metrics.value = metricValue;
-    Log.log(metrics);
+    // Log.log(metrics);
 }
 
 /**

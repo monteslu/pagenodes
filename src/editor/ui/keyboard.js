@@ -21,7 +21,7 @@ RED.keyboard = (function() {
     var active = true;
     var handlers = {};
 
-    d3.select(window).on("keydown",function() {
+    d3.select($('#workspace')[0]).on("keydown",function() {
         if (!active) { return; }
         var handler = handlers[d3.event.keyCode];
         if (handler && handler.ondown) {
@@ -34,7 +34,7 @@ RED.keyboard = (function() {
         }
     });
 
-    d3.select(window).on("keyup",function() {
+    d3.select($('#workspace')[0]).on("keyup",function() {
         if (!active) { return; }
         var handler = handlers[d3.event.keyCode];
         if (handler && handler.onup) {

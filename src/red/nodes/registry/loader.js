@@ -44,6 +44,7 @@ var commentHTML = require("raw!../../../../nodes/core/core/90-comment.html");
 var httpinHTML = require("raw!../../../../nodes/core/io/21-httpin.html");
 var cameraHTML = require("raw!../../../../nodes/core/io/24-camera.html");
 var socketioHTML = require("raw!../../../../nodes/core/io/15-socketio.html");
+var meshbluHTML = require("raw!../../../../nodes/core/io/meshblu.html");
 var eventsourceHTML = require("raw!../../../../nodes/core/io/17-eventsource.html");
 var peer2peerHTML = require("raw!../../../../nodes/core/io/16-peer2peer.html");
 var gpioHTML = require("raw!../../../../nodes/core/io/gpio.html");
@@ -65,6 +66,7 @@ var nodeContents = {
     "httpin.html": httpinHTML,
     "camera.html": cameraHTML,
     "socketio.html": socketioHTML,
+    "meshblu.html": meshbluHTML,
     "eventsource.html": eventsourceHTML,
     "peer2peer.html": peer2peerHTML,
     "gpio.html": gpioHTML,
@@ -86,6 +88,7 @@ var commentNode = require("../../../../nodes/core/core/90-comment");
 var httpinNode = require("../../../../nodes/core/io/21-httpin");
 var cameraNode = require("../../../../nodes/core/io/24-camera");
 var socketioNode = require("../../../../nodes/core/io/15-socketio");
+var meshbluNode = require("../../../../nodes/core/io/meshblu");
 var peer2peerNode = require("../../../../nodes/core/io/16-peer2peer");
 var gpioNode = require("../../../../nodes/core/io/gpio");
 var eventsourceNode = require("../../../../nodes/core/io/17-eventsource");
@@ -108,6 +111,7 @@ var requiredNodes = {
     "httpin.js": httpinNode,
     "camera.js": cameraNode,
     "socketio.js": socketioNode,
+    "meshblu.js": meshbluNode,
     "eventsource.js": eventsourceNode,
     "peer2peer.js": peer2peerNode,
     "gpio.js": gpioNode,
@@ -347,7 +351,7 @@ function loadNodeSet(node) {
                     node.enabled = true;
                     node.loaded = true;
                     return node;
-                }).otherwise(function (err) {
+                }).catch(function (err) {
                     node.err = err;
                     return node;
                 });

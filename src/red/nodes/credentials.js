@@ -75,7 +75,7 @@ module.exports = {
     load: function () {
         return storage.getCredentials().then(function (creds) {
             credentialCache = creds;
-        }).otherwise(function (err) {
+        }).catch(function (err) {
             log.warn(log._("nodes.credentials.error",{message: err}));
         });
     },

@@ -16,6 +16,9 @@
 
 require('babel-core/polyfill'); //@#$! safari
 
+var loadPackedNodes = require('./nodeDefs/js');
+// var templateText = require('./nodeDefs/html');
+
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('service-worker.bundle.js')
   .then(function(reg) {
@@ -31,6 +34,7 @@ var RED = (function() {
 
     function loadNodeList() {
         RED.comms.rpc('getNodeList', [], function(data){
+            console.log('getNodeList', data);
             RED.nodes.setNodeList(data);
 
             var nsCount = 0;
@@ -54,9 +58,11 @@ var RED = (function() {
 
     function loadNodes() {
         RED.comms.rpc('getNodeConfigs', [], function(data){
+            console.log('getNodeConfigs', data.length);
             $("body").append(data);
+            // $("body").append(templateText);
+            loadPackedNodes(RED);
             $("body").i18n();
-
 
             $(".palette-spinner").hide();
             $(".palette-scroll").show();
@@ -90,7 +96,10 @@ var RED = (function() {
                 var typeList;
                 var info;
 
+
+
                 if (topic == "node/added") {
+                    console.log('node/added', topic, msg);
                     var addedTypes = [];
                     for (i=0;i<msg.length;i++) {
                         m = msg[i];

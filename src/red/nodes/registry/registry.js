@@ -160,6 +160,7 @@ function loadNodeConfigs() {
 }
 
 function addNodeSet(id,set,version) {
+    // console.log('addNodeSet', id, set, version);
     if (!set.err) {
         set.types.forEach(function(t) {
             nodeTypeToId[t] = id;

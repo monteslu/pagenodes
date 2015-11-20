@@ -93,7 +93,7 @@ function start() {
                         if (missingModules.hasOwnProperty(i)) {
                             log.warn(" - "+i+": "+missingModules[i].join(", "));
                             if (settings.autoInstallModules && i != "node-red") {
-                                serverAPI.installModule(i).otherwise(function(err) {
+                                serverAPI.installModule(i).catch(function(err) {
                                     // Error already reported. Need the otherwise handler
                                     // to stop the error propagating any further
                                 });
@@ -108,7 +108,7 @@ function start() {
                 log.info(log._("runtime.paths.settings",{path:settings.settingsFile}));
                 redNodes.loadFlows();
                 //comms.start();
-            }).otherwise(function(err) {
+            }).catch(function(err) {
                 console.log(err);
             });
     });

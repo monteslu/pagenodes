@@ -257,13 +257,18 @@
 
             }
             $("#debug-tab-input-send").click(sendText);
+            console.log('adding debug input handlers');
             $('#debug-tab-input').keyup(function(e){
+
                 // console.log('event ', e);
-                e.preventDefault();
                 e.stopPropagation();
+                e.preventDefault();
+                e.returnValue = false;
+                e.cancelBubble = true;
                 if(e.keyCode == 13){
                     sendText();
                 }
+                return false;
             });
         },
         onpaletteremove: function() {

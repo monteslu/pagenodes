@@ -21,31 +21,37 @@ RED.keyboard = (function() {
     var active = true;
     var handlers = {};
 
-    d3.select($('#workspace')[0]).on("keydown",function() {
-        if (!active) { return; }
-        var handler = handlers[d3.event.keyCode];
-        if (handler && handler.ondown) {
-            if (!handler.modifiers ||
-                ((!handler.modifiers.shift || d3.event.shiftKey) &&
-                 (!handler.modifiers.ctrl  || d3.event.ctrlKey || d3.event.metaKey) &&
-                 (!handler.modifiers.alt   || d3.event.altKey) )) {
-                handler.ondown();
+    //TODO fix this horrible, horrible timing problem, need keyhandling last:
+    setTimeout(function(){
+        console.log('add keyboard handlers');
+        d3.select(document.body).on("keydown",function() {
+            if (!active) { return; }
+            var handler = handlers[d3.event.keyCode];
+            if (handler && handler.ondown) {
+                if (!handler.modifiers ||
+                    ((!handler.modifiers.shift || d3.event.shiftKey) &&
+                     (!handler.modifiers.ctrl  || d3.event.ctrlKey || d3.event.metaKey) &&
+                     (!handler.modifiers.alt   || d3.event.altKey) )) {
+                    handler.ondown();
+                }
             }
-        }
-    });
+        });
 
-    d3.select($('#workspace')[0]).on("keyup",function() {
-        if (!active) { return; }
-        var handler = handlers[d3.event.keyCode];
-        if (handler && handler.onup) {
-            if (!handler.modifiers ||
-                ((!handler.modifiers.shift || d3.event.shiftKey) &&
-                 (!handler.modifiers.ctrl  || d3.event.ctrlKey || d3.event.metaKey) &&
-                 (!handler.modifiers.alt   || d3.event.altKey) )) {
-                handler.onup();
+        d3.select(document.body).on("keyup",function() {
+            if (!active) { return; }
+            var handler = handlers[d3.event.keyCode];
+            if (handler && handler.onup) {
+                if (!handler.modifiers ||
+                    ((!handler.modifiers.shift || d3.event.shiftKey) &&
+                     (!handler.modifiers.ctrl  || d3.event.ctrlKey || d3.event.metaKey) &&
+                     (!handler.modifiers.alt   || d3.event.altKey) )) {
+                    handler.onup();
+                }
             }
-        }
-    });
+        });
+    },2000);
+
+
     function addHandler(key,modifiers,ondown,onup) {
         var mod = modifiers;
         var cbdown = ondown;

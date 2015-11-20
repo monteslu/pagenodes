@@ -74,7 +74,7 @@ module.exports = {
                 log.audit({event: "nodes.install",file:node.file},req);
                 res.json(info.nodes[0]);
             }
-        }).otherwise(function(err) {
+        }).catch(function(err) {
             if (err.code === 404) {
                 log.audit({event: "nodes.install",module:node.module,file:node.file,error:"not_found"},req);
                 res.status(404).end();
@@ -109,7 +109,7 @@ module.exports = {
             promise.then(function() {
                 log.audit({event: "nodes.remove",module:mod},req);
                 res.status(204).end();
-            }).otherwise(function(err) {
+            }).catch(function(err) {
                 log.audit({event: "nodes.remove",module:mod,error:err.code||"unexpected_error",message:err.toString()},req);
                 res.status(400).json({error:err.code||"unexpected_error", message:err.toString()});
             });

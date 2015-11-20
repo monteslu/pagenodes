@@ -57,7 +57,7 @@ var flowNodes = module.exports = {
                 activeFlow = new Flow(flows);
                 flowNodes.startFlows();
             });
-        }).otherwise(function(err) {
+        }).catch(function(err) {
             log.warn(log._("nodes.flows.error",{message:err.toString()}));
             console.log(err.stack);
         });

@@ -59,7 +59,7 @@ RED.start().then(function() {
     //post message back to parent
     console.log('started');
     RED.comms.publishReady();
-}).otherwise(function(err) {
+}).catch(function(err) {
     RED.log.error(log._("server.failed-to-start"));
     if (err.stack) {
         RED.log.error(err.stack);

@@ -34,7 +34,7 @@ module.exports = {
         log.audit({event: "flows.set",type:deploymentType},req);
         redNodes.setFlows(flows,deploymentType).then(function() {
             res.status(204).end();
-        }).otherwise(function(err) {
+        }).catch(function(err) {
             log.warn(log._("api.flows.error-save",{message:err.message}));
             log.warn(err.stack);
             res.status(500).json({error:"unexpected_error", message:err.message});
@@ -47,7 +47,7 @@ module.exports = {
         redNodes.setFlows(flows,deploymentType).then(function() {
             // res.status(204).end();
             data.reply('ok');
-        }).otherwise(function(err) {
+        }).catch(function(err) {
             log.warn(log._("api.flows.error-save",{message:err.message}));
             log.warn(err.stack);
             // res.status(500).json({error:"unexpected_error", message:err.message});

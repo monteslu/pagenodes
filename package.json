@@ -11,8 +11,8 @@
   "main": "red/red.js",
   "scripts": {
     "test": "grunt test",
-    "build": "babel ./src/ --out-dir ./build && webpack && grunt build",
-    "server": "ecstatic public --port 1337"
+    "build": "babel ./src --out-dir ./build && webpack && grunt build",
+    "start": "ecstatic public --port 1337"
   },
   "bin": {
     "node-red": "./red.js",
@@ -70,6 +70,7 @@
     "level-fs-browser": "^1.0.0",
     "localforage": "^1.3.0",
     "lodash": "^3.10.1",
+    "meshblu": "^1.31.0",
     "mocha": "2.3.3",
     "mqtt": "^1.5.0",
     "mqtt-serial": "^0.5.0",

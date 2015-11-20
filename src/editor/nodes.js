@@ -108,9 +108,12 @@ RED.nodes = (function() {
                 }
             },
             registerNodeType: function(nt,def) {
+                try{
+
                 nodeDefinitions[nt] = def;
                 if (def.category != "subflows") {
                     def.set = nodeSets[typeToId[nt]];
+
                     nodeSets[typeToId[nt]].added = true;
 
                     var ns;
@@ -132,6 +135,10 @@ RED.nodes = (function() {
                 RED.palette.add(nt,def);
                 if (def.onpaletteadd && typeof def.onpaletteadd === "function") {
                     def.onpaletteadd.call(def);
+                }
+
+                }catch(exp){
+                    console.log('error registering', exp);
                 }
             },
             removeNodeType: function(nt) {

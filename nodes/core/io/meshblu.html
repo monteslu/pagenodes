@@ -1,0 +1,110 @@
+
+<script type="text/x-red" data-template-name="meshblu in">
+
+  <div class="form-row">
+    <label for="node-input-server"><i class="fa fa-globe"></i> server</label>
+    <input type="text" id="node-input-server">
+  </div>
+  <div class="form-row">
+    <label for="node-input-directToMe"><i class="fa fa-user"></i> Direct to Me?</label>
+    <input type="checkbox" id="node-input-directToMe" style="width: 30px; height: 1.7em;"> <span id="node-spand-directToMe-uuid" class="selectable"></span>
+  </div>
+  <div class="form-row" id="node-div-deviceRow">
+    <label for="node-input-uuid"><i class="fa fa-asterisk"></i> A broadcast from</label>
+    <input type="text" id="node-input-uuid" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" style="width: 62%;"><a id="node-input-lookup-uuid" class="btn"><i class="icon icon-search" id="node-input-lookup-uuid-icon"></i></a>
+  </div>
+  <div class="form-row">
+    <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+    <input type="text" id="node-input-name" placeholder="Name">
+  </div>
+  <div id="uuidListDialog" title="Searching devices..." class="hide">
+    <div class="form-row">
+      <span id="serverName"></span>
+    </div>
+    <div class="form-row">
+      <select id="uuidDevices" size="7" style="width:50em; font-family:  Courier, monospace;">
+      </select>
+    </div>
+    <div class="form-row">
+      <a id="node-input-claim-uuid" class="btn" style="display: none;">claim</a> <span id="claimOutput"> </span>
+    </div>
+  </div>
+</script>
+
+<script type="text/x-red" data-help-name="meshblu in">
+  <p>meshblu input node. Connects to a server and either receives messages sent directly to the connected uuid or subscribes to broadcasts from a specified uuid.</p>
+</script>
+
+<script type="text/x-red" data-template-name="meshblu out">
+  <div class="form-row">
+    <label for="node-input-server"><i class="fa fa-globe"></i> server</label>
+    <input type="text" id="node-input-server">
+  </div>
+  <div class="form-row">
+    <label for="node-input-broadcast"><i class="fa fa-asterisk"></i> broadcast?</label>
+    <input type="checkbox" id="node-input-broadcast" style="width: 30px; height: 1.7em;">
+  </div>
+  <div class="form-row" id="node-div-deviceRow">
+    <label for="node-input-uuid"><i class="fa fa-user"></i> To a specific uuid</label>
+    <input type="text" id="node-input-uuid" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" style="width: 62%;"><a id="node-input-lookup-uuid" class="btn"><i class="icon icon-search" id="node-input-lookup-uuid-icon"></i></a>
+  </div>
+  <div class="form-row"  id="node-div-outputsRow">
+    <label for="node-input-forwards"><i class="icon-share-alt"></i> Forward Response?</label>
+    <input type="checkbox" id="node-input-forwards" style="width: 30px; height: 1.7em;">
+  </div>
+  <div class="form-row">
+    <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+    <input type="text" id="node-input-name" placeholder="Name">
+  </div>
+
+  <div id="uuidListDialog" title="Searching devices..." class="hide">
+    <div class="form-row">
+      <span id="serverName"></span>
+    </div>
+    <div class="form-row">
+      <select id="uuidDevices" size="7" style="width:50em; font-family:  Courier, monospace;">
+      </select>
+    </div>
+    <div class="form-row">
+      <a id="node-input-claim-uuid" class="btn" style="display: none;">claim</a> <span id="claimOutput"> </span>
+    </div>
+  </div>
+</script>
+
+<script type="text/x-red" data-help-name="meshblu out">
+  <p>Connects to a meshblu server and either broadcasts out the <b>msg</b> to any subscribers or sends the <b>msg</b> to a specific device.</p>
+</script>
+
+
+<script type="text/x-red" data-template-name="meshblu-server">
+  <div class="form-row node-input-server">
+    <label for="node-config-input-server"><i class="fa fa-globe"></i> server</label>
+    <input class="input-append-left" type="text" id="node-config-input-server" placeholder="localhost" style="width: 40%;" >
+    <label for="node-config-input-port" style="margin-left: 10px; width: 35px; "> Port</label>
+    <input type="text" id="node-config-input-port" placeholder="Port" style="width:45px">
+  </div>
+  <div class="form-row">
+    <label for="node-config-input-uuid"><i class="fa fa-user"></i> UUID</label>
+    <input type="text" id="node-config-input-uuid">
+  </div>
+  <div class="form-row">
+    <label for="node-config-input-token"><i class="fa fa-lock"></i> token</label>
+    <input type="text" id="node-config-input-token">
+  </div>
+  <div class="form-row">
+    &nbsp;&nbsp;&nbsp;<a href="#" class="btn" id="node-config-input-generate">Create UUID/Token</a> <span id="node-config-input-messageArea"></span>
+  </div>
+</script>
+
+
+<style>
+ .meshbluNode {
+  color: #1f3d7c;
+  fill: #1f3d7c;
+ }
+</style>
+
+<script>
+ console.log('MESHBLU TEMPLATES !!!');
+</script>
+

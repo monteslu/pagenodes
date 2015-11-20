@@ -37,39 +37,71 @@ self.addEventListener('install', function(event) {
 
 self.addEventListener('fetch', function(event) {
 
+  if(event.request.method !== 'GET'){
+    return;
+  }
+
   const requestURL = new URL(event.request.url);
   if (requestURL.origin != location.origin){
     return;
   }
 
   var cacheRequest = event.request.clone();
-  var inspectRequest = event.request.clone();
+  // var inspectRequest = event.request.clone();
 
   // console.log('inspectRequest', inspectRequest);
 
+  var myCache;
+
   event.respondWith(
 
-
-
-    fetch(event.request)
-      .then(function(response){
-
-        var responseToCache = response.clone();
-
-
-        caches.open(CACHE_NAME)
-          .then(function(cache) {
-            if(event.request.method === 'GET'){
-              cache.put(event.request, responseToCache);
-            }
-          });
-        return response;
-
-      })
-      .catch(function(err){
-        console.log('couldnt fetch', err);
+    caches.open(CACHE_NAME)
+      .then(function(cache){
+        myCache = cache;
         return caches.match(cacheRequest);
       })
+      .then(function(cacheResult){
+        //cache ok, but async store the latest.
+        fetch(event.request)
+          .then(function(response){
+
+            var responseToCache = response.clone();
+
+            myCache.put(event.request, responseToCache);
+            return response;
+          });
+        return cacheResult;
+      })
+      .catch(function(err){
+        //not in cache
+        return fetch(event.request)
+          .then(function(response){
+
+            var responseToCache = response.clone();
+
+            myCache.put(event.request, responseToCache);
+            return response;
+          });
+      })
+
+
+    // fetch(event.request)
+    //   .then(function(response){
+
+    //     var responseToCache = response.clone();
+
+
+    //     caches.open(CACHE_NAME)
+    //       .then(function(cache) {
+    //         cache.put(event.request, responseToCache);
+    //       });
+    //     return response;
+
+    //   })
+    //   .catch(function(err){
+    //     console.log('couldnt fetch', err);
+    //     return caches.match(cacheRequest);
+    //   })
   );
 
 });

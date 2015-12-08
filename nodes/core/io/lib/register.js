@@ -14,7 +14,7 @@ function register(req){
     client({
       path: getPath(req, '/devices'),
       method: 'POST',
-      params: {type: req.query.type || 'pagenodes', name: req.query.name || 'pagenodes'}
+      params: {type: req.query.type || 'pagenodes', name: req.query.name || 'pagenodes', receiveWhitelist: ['*'], sendWhitelist: ['*'], discoverWhitelist: ['*']}
     })
     .then(function(data){
       console.log('resp ok', data.entity);

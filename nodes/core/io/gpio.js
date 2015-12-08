@@ -16,6 +16,12 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 var serialport = require('serialport');
 var createNodebotNode = require('./lib/nodebotNode');
 
+var five = require('johnny-five');
+var vm = require('vm');
+var util = require('util');
+
+var cachedRequire = require('./lib/cachedRequire');
+
 function connectingStatus(n){
   n.status({fill:"red",shape:"ring",text:"connecting"});
 }
@@ -205,6 +211,169 @@ function init(RED) {
 
   RED.nodes.registerType("gpio out",gpioOutNode);
 
+
+  function johnny5Node(n) {
+    RED.nodes.createNode(this,n);
+
+    console.log('initializing johnny5Node', n);
+    this.nodebot = RED.nodes.getNode(n.board);
+    this.func = n.func;
+    var node = this;
+
+
+    if (typeof this.nodebot === "object") {
+        process.nextTick(function(){
+          connectingStatus(node);
+        });
+
+        console.log('launching johnny5Node', n);
+        node.nodebot.on('ioready', function() {
+          console.log('launching johnny5Node ioready', n);
+            connectedStatus(node);
+
+
+            function sendResults(node,msgs) {
+                var _msgid = (1 + Math.random() * 4294967295).toString(16);
+                if (msgs == null) {
+                    return;
+                } else if (!util.isArray(msgs)) {
+                    msgs = [msgs];
+                }
+                var msgCount = 0;
+                for (var m=0;m<msgs.length;m++) {
+                    if (msgs[m]) {
+                        if (util.isArray(msgs[m])) {
+                            for (var n=0; n < msgs[m].length; n++) {
+                                msgs[m][n]._msgid = _msgid;
+                                msgCount++;
+                            }
+                        } else {
+                            msgs[m]._msgid = _msgid;
+                            msgCount++;
+                        }
+                    }
+                }
+                if (msgCount>0) {
+                    node.send(msgs);
+                }
+            }
+
+            var functionText = "var results = null;"+
+                   "results = (function(){ "+
+                      "var node = {"+
+                         "log:__node__.log,"+
+                         "error:__node__.error,"+
+                         "warn:__node__.warn,"+
+                         "on:__node__.on,"+
+                         "status:__node__.status,"+
+                         "send:function(msgs){ __node__.send(msgs);}"+
+                      "};\n"+
+                      node.func+"\n"+
+                   "})();";
+
+            var sandbox = {
+                console:console,
+                util:util,
+                Buffer:Buffer,
+                __node__: {
+                    log: function() {
+                        node.log.apply(node, arguments);
+                    },
+                    error: function() {
+                        node.error.apply(node, arguments);
+                    },
+                    warn: function() {
+                        node.warn.apply(node, arguments);
+                    },
+                    send: function(msgs) {
+                        sendResults(node, msgs);
+                    },
+                    on: function() {
+                        node.on.apply(node, arguments);
+                    },
+                    status: function() {
+                        node.status.apply(node, arguments);
+                    }
+                },
+                context: {
+                    global:RED.settings.functionGlobalContext || {}
+                },
+                setTimeout: setTimeout,
+                clearTimeout: clearTimeout,
+                _:_,
+                five: five,
+                board: node.nodebot.board,
+                RED: RED,
+                require: cachedRequire
+            };
+            var context = vm.createContext(sandbox);
+
+
+            try {
+              node.script = vm.createScript(functionText);
+              try {
+                  var start = Date.now(); //process.hrtime();
+                  //context.msg = msg;
+                  node.script.runInContext(context);
+                  console.log('ran script', context);
+
+              } catch(err) {
+
+                  var line = 0;
+                  var errorMessage;
+                  var stack = err.stack.split(/\r?\n/);
+                  if (stack.length > 0) {
+                      while (line < stack.length && stack[line].indexOf("ReferenceError") !== 0) {
+                          line++;
+                      }
+
+                      if (line < stack.length) {
+                          errorMessage = stack[line];
+                          var m = /:(\d+):(\d+)$/.exec(stack[line+1]);
+                          if (m) {
+                              var lineno = Number(m[1])-1;
+                              var cha = m[2];
+                              errorMessage += " (line "+lineno+", col "+cha+")";
+                          }
+                      }
+                  }
+                  if (!errorMessage) {
+                      errorMessage = err.toString();
+                  }
+                  this.error(errorMessage);
+              }
+
+          } catch(err) {
+              // eg SyntaxError - which v8 doesn't include line number information
+              // so we can't do better than this
+              this.error(err);
+          }
+
+
+
+
+        });
+        node.nodebot.on('networkReady', function(){
+          networkReadyStatus(node);
+        });
+        node.nodebot.on('networkError', function(){
+          networkErrorStatus(node);
+        });
+        node.nodebot.on('ioError', function(err){
+          ioErrorStatus(node, err);
+        });
+    }
+    else {
+        this.warn("nodebot not configured");
+    }
+
+  }
+
+  RED.nodes.registerType("johnny5",johnny5Node);
+
+
+
+
   function handleRoute(req, res, handler){
     handler(req.query)
       .then(function(data){
@@ -236,6 +405,9 @@ function init(RED) {
   //         res.json(ports);
   //     });
   // });
+
+
+
 
 }
 

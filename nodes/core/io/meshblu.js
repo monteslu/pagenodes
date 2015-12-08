@@ -55,7 +55,7 @@ function init(RED) {
               self.directs.push(mnode);
             }else{
               self.subs.push(mnode);
-              self.conn.subscribe({ uuid: mnode.uuid }, function(err){
+              self.conn.subscribe({ uuid: mnode.uuid, types: ['broadcast'] }, function(err){
                 console.log('subscribed to', mnode.uuid, err);
               });
             }
@@ -134,7 +134,7 @@ function init(RED) {
       self.on("input",function(msg) {
         if(!msg.devices){
           if(self.broadcast){
-            msg.devices = ['*'];
+            msg.devices = '*';
           }else{
             if(self.uuid){
               msg.devices = [self.uuid];

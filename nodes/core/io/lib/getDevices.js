@@ -70,7 +70,18 @@ function getDevices(req){
         });
       }
 
-      return req.reply(_.values(allDeviceMap));
+      var retVal = _.values(allDeviceMap);
+      retVal.sort(function(a, b) {
+        if (a.uuid < b.uuid) {
+          return -1;
+        }
+        if (a.uuid > b.uuid) {
+          return 1;
+        }
+        // a must be equal to b
+        return 0;
+      });
+      return req.reply(retVal);
     })
     .otherwise(function(err){
       console.log('error', err);

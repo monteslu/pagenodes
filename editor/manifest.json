@@ -1,0 +1,21 @@
+{
+  "name": "Page Nodes",
+  "description": "Page Nodes browser-based Internet of Things",
+  "version": "0.1.0",
+  "manifest_version": 2,
+  "default_locale": "en",
+  "permissions": [
+    "serial",
+    "unlimitedStorage"
+  ],
+  "icons": {
+    "64": "launcher-icon-1x.png"
+  },
+  "app": {
+    "background": {
+      "scripts": [
+        "background.js"
+      ]
+    }
+  }
+}

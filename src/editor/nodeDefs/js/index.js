@@ -23,7 +23,10 @@ const nodeDefs = [
   require('./io/meshblu'),
   require('./io/gpio'),
   require('./io/peer2peer'),
-  require('./io/socketio')
+  require('./io/socketio'),
+  require('./logic/switch'),
+  require('./logic/range'),
+  require('./logic/change')
 ];
 
 module.exports = function(RED){

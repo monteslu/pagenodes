@@ -19,6 +19,7 @@ const nodeDefs = [
   //require('./io/watch'),
   //require('./io/tcpin'),
   //require('./io/udp'),
+  require('./io/camera'),
   require('./io/meshblu'),
   require('./io/gpio'),
   require('./io/peer2peer'),

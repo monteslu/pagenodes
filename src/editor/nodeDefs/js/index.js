@@ -8,7 +8,6 @@ const nodeDefs = [
   //require('./core/trigger'),
   //require('./core/unknown'),
   //require('./core/mqtt'),
-  require('./io/socketio'),
   require('./core/template'),
   require('./core/function'),
   require('./core/espeak'),
@@ -16,7 +15,9 @@ const nodeDefs = [
   require('./core/inject'),
   require('./core/comment'),
   require('./io/meshblu'),
-  require('./io/gpio')
+  require('./io/gpio'),
+  require('./io/peer2peer'),
+  require('./io/socketio')
 ];
 
 module.exports = function(RED){

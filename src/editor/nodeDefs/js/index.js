@@ -30,7 +30,10 @@ const nodeDefs = [
   //require('./parsers/xml'),
   //require('./parsers/html'),
   //require('./parsers/csv'),
-  require('./parsers/json')
+  require('./parsers/json'),
+  //require('./storage/file'),
+  //require('./storage/tail'),
+  require('./storage/localdb')
 ];
 
 module.exports = function(RED){

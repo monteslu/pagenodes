@@ -8,6 +8,7 @@ const nodeDefs = [
   //require('./core/trigger'),
   //require('./core/unknown'),
   //require('./core/mqtt'),
+  require('./io/socketio'),
   require('./core/template'),
   require('./core/function'),
   require('./core/espeak'),

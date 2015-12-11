@@ -26,7 +26,11 @@ const nodeDefs = [
   require('./io/socketio'),
   require('./logic/switch'),
   require('./logic/range'),
-  require('./logic/change')
+  require('./logic/change'),
+  //require('./parsers/xml'),
+  //require('./parsers/html'),
+  //require('./parsers/csv'),
+  require('./parsers/json')
 ];
 
 module.exports = function(RED){

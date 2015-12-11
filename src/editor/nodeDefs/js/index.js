@@ -3,6 +3,7 @@ const nodeDefs = [
   //require('./core/catch'),
   //require('./core/status'),
   //require('./core/debug'),
+  require('./core/espeak'),
   require('./core/notify'),
   require('./core/inject'),
   require('./core/comment'),

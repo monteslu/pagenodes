@@ -4,6 +4,8 @@ const nodeDefs = [
   //require('./core/status'),
   //require('./core/debug'),
   //require('./core/exec'),
+  require('./core/template'),
+  require('./core/function'),
   require('./core/espeak'),
   require('./core/notify'),
   require('./core/inject'),

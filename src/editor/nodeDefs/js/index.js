@@ -1,6 +1,7 @@
 const nodeDefs = [
   require('./analysis/sentiment'),
   require('./core/catch'),
+  require('./core/status'),
   require('./core/inject'),
   require('./core/comment'),
   require('./io/meshblu'),

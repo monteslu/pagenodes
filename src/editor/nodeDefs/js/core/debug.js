@@ -1,29 +1,4 @@
 module.exports = function(RED){
-    function oneditprepare() {
-        if (this.complete === "true" || this.complete === true) {
-            // show complete message object
-            $("#node-input-select-complete").val("true");
-            $("#node-prop-row").hide();
-        } else {
-            // show msg.[   ]
-            var property = (!this.complete||(this.complete === "false")) ? "payload" : this.complete+"";
-            $("#node-input-select-complete").val("false");
-            $("#node-input-complete").val(property);
-            $("#node-prop-row").show();
-        }
-        $("#node-input-select-complete").change(function() {
-            var v = $("#node-input-select-complete option:selected").val();
-            $("#node-input-complete").val(v);
-            if (v !== "true") {
-                $("#node-input-complete").val("payload");
-                $("#node-prop-row").show();
-                $("#node-input-complete").focus();
-            } else {
-                $("#node-prop-row").hide();
-            }
-        });
-    }
-
     RED.nodes.registerType('debug',{
         category: 'output',
         defaults: {
@@ -224,6 +199,31 @@ module.exports = function(RED){
             RED.sidebar.removeTab("debug");
             delete RED._debug;
         },
-        oneditprepare: oneditprepare
+        oneditprepare: function(){
+        console.log('oneditprepare is running now');
+        if (this.complete === "true" || this.complete === true) {
+            // show complete message object
+            $("#node-input-select-complete").val("true");
+            $("#node-prop-row").hide();
+        } else {
+            // show msg.[   ]
+            var property = (!this.complete||(this.complete === "false")) ? "payload" : this.complete+"";
+            $("#node-input-select-complete").val("false");
+            $("#node-input-complete").val(property);
+            $("#node-prop-row").show();
+        }
+        $("#node-input-select-complete").change(function() {
+            var v = $("#node-input-select-complete option:selected").val();
+            $("#node-input-complete").val(v);
+            if (v !== "true") {
+                $("#node-input-complete").val("payload");
+                $("#node-prop-row").show();
+                $("#node-input-complete").focus();
+            } else {
+                $("#node-prop-row").hide();
+            }
+        });
+
+        }
     });
 };

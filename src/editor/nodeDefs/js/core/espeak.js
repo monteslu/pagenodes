@@ -70,7 +70,6 @@ module.exports = function(RED){
             RED.comms.unsubscribe("espeak",this.handleDebugMessage);
             // RED.sidebar.removeTab("debug");
             // delete RED._debug;
-        },
-        oneditprepare: oneditprepare
+        }
     });
 };

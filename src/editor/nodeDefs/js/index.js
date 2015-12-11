@@ -2,7 +2,7 @@ const nodeDefs = [
   require('./analysis/sentiment'),
   //require('./core/catch'),
   //require('./core/status'),
-  //require('./core/debug'),
+  require('./core/debug'),
   //require('./core/exec'),
   //require('./core/delay'),
   //require('./core/trigger'),

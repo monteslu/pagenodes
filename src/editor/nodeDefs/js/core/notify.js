@@ -1,5 +1,5 @@
 module.exports = function(RED){
-  
+
     function createNotification(msg){
         return new Notification(msg.topic || 'PageNodes', {body: msg.payload || 'notify', icon: msg.image || 'red/images/node-red.png'});
     }
@@ -94,7 +94,6 @@ module.exports = function(RED){
             RED.comms.unsubscribe("notify",this.handleDebugMessage);
             // RED.sidebar.removeTab("debug");
             // delete RED._debug;
-        },
-        oneditprepare: oneditprepare
+        }
     });
 };

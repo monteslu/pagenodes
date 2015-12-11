@@ -7,6 +7,7 @@ const nodeDefs = [
   //require('./core/delay'),
   //require('./core/trigger'),
   //require('./core/unknown'),
+  //require('./core/mqtt'),
   require('./core/template'),
   require('./core/function'),
   require('./core/espeak'),

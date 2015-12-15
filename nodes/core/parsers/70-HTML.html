@@ -50,25 +50,3 @@
     <p>The result can be either a single message with a payload containing an array of the matched elements, or multiple
        messages that each contain a matched element.</p>
 </script>
-
-<script type="text/javascript">
-    RED.nodes.registerType('html',{
-        category: 'function',
-        color:"#DEBD5C",
-        defaults: {
-            name: {value:""},
-            tag: {value:""},
-            ret: {value:"html"},
-            as: {value:"single"}
-        },
-        inputs:1,
-        outputs:1,
-        icon: "jq.png",
-        label: function() {
-            return this.name||this.tag||"html";
-        },
-        labelStyle: function() {
-            return this.name?"node_label_italic":"";
-        }
-    });
-</script>

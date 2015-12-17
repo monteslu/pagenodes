@@ -1,6 +1,14 @@
 {
   "short_name": "Page Nodes",
   "name": "Page Nodes Internet of Things in a Browser",
+  "permissions": {
+    "audio-capture": {
+      "description": "Required to capture audio using getUserMedia()"
+    },
+    "video-capture": {
+      "description": "Required to capture video using getUserMedia()"
+    }
+  },
   "icons": [
     {
       "src": "launcher-icon-1x.png",

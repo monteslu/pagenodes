@@ -6,7 +6,9 @@
   "default_locale": "en",
   "permissions": [
     "serial",
-    "unlimitedStorage"
+    "unlimitedStorage",
+    "audio-capture",
+    "video-capture"
   ],
   "icons": {
     "64": "launcher-icon-1x.png"

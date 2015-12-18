@@ -1,5 +1,7 @@
 # Node-RED
 
+[![Join the chat at https://gitter.im/monteslu/pagenodes](https://badges.gitter.im/monteslu/pagenodes.svg)](https://gitter.im/monteslu/pagenodes?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 http://nodered.org
 
 [![Build Status](https://travis-ci.org/node-red/node-red.svg)](https://travis-ci.org/node-red/node-red)

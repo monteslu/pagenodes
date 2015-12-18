@@ -94,7 +94,7 @@
             context.drawImage(video, 0, 0, width, height);
             var data = canvas.toDataURL('image/png');
             // mediaStream.active = false;
-            mediaStream.stop();
+            mediaStream.getTracks().forEach(function(track){track.stop()});
             cb(data);
           }, 700);
           //photo.setAttribute('src', data);

@@ -1,71 +1,60 @@
-# Node-RED
+# Pagenodes
 
-[![Join the chat at https://gitter.im/monteslu/pagenodes](https://badges.gitter.im/monteslu/pagenodes.svg)](https://gitter.im/monteslu/pagenodes?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+Look what I did with an iframe!
 
-http://nodered.org
+You can check out a working example of pagenodes [here](https://pagenodes.com 'pagenodes').  Pagenodes is an in-browser fork of [node-red](http://www.node-red.org 'node-red').  It requires no back-end server and is 100% browser-based.  If you are going to host this, many modules will need to be hosted via https, or you can run it locally for full functionality.
 
-[![Build Status](https://travis-ci.org/node-red/node-red.svg)](https://travis-ci.org/node-red/node-red)
-[![Coverage Status](https://coveralls.io/repos/node-red/node-red/badge.svg?branch=master)](https://coveralls.io/r/node-red/node-red?branch=master)
+Pagenodes is currently in a heavy state of development, and we are working on a roadmap to follow for future implementations.  In its current form it offers a large amount of functionality with very little set up.
 
-A visual tool for wiring the Internet of Things.
+## Overview
 
-![Node-RED: A visual tool for wiring the Internet of Things](http://nodered.org/images/node-red-screenshot.png)
+With pagenodes our goal is to give the user a simple, browser-based IOT network.  This gives the development of the workflow to the user without relying on a third party network.  Basic functionality can be as simple as relaying an image from the camera to Chrome notification center, scaling up to allowing a robotics protocol like [johnny5](http://johnny-five.io 'johnny5') the ability to control robotics via the web-browser.
 
-## Quick Start
+## Install
 
-Check out http://nodered.org/docs/getting-started/ for full instructions on getting
-started.
+```
+git clone git@github.com:monteslu/pagenodes.git
+cd pagenodes
+npm install
+npm run build
+```
 
-1. `sudo npm install -g node-red`
-2. `node-red`
-3. Open <http://localhost:1880>
+## Running Locally
 
-## Getting Help
+```
+npm run build
+npm run start
+```
 
-More documentation can be found [here](http://nodered.org/docs).
+This will open up a webserver locally with ecstatic on port `1337`.
 
-For further help, or general discussion, please use the
-[mailing list](https://groups.google.com/forum/#!forum/node-red).
+## Requirements For Bluetooth Low Energy(BLE) Control
 
-## Developers
+[Click here](https://github.com/WebBluetoothCG/web-bluetooth/blob/gh-pages/implementation-status.md#chrome "requirements") to see what is currently supported for the BLE nodes in pagenodes.  Currently bluetooth is enabled for Chrome OS only, but other browsers are working to implement them as well.  This site has a list of devices currently compatible.
 
-If you want to run the latest code from git, here's how to get started:
+## Setting Up A Basic Flow
 
-1. Install grunt, the build tool
+Setting up a simple flow with pagenodes is pretty easy.  The UI is the standard drag and drop interface from node-red, however we implement a range of new functionality.
 
-        npm install -g grunt-cli
+**Setting up a timestamp delivery** 
 
-2. Clone the code:
+1. Drag the inject tab from the left column onto the sheet.
+2. Drag the debug tab onto the sheet.
+3. Click and drag from the node on the right side of the 'timestamp' module to the node on the left hand side of the 'msg.payload' module.  The flow should look like this:
+    ![base flow](http://snag.gy/2SkBF.jpg)
+4. Next Click on the ![deploy](http://snag.gy/sIIGx.jpg) button to start the flow.  Any time there is a change to the flow you must re-deploy.
+5. Click the grey square to the left of the timestamp node in order to activate it.  You can switch to the debug panel on the right side of the screen in order to see the actual results!
 
-        git clone https://github.com/node-red/node-red.git
-        cd node-red
+Almost all of the nodes in the left column will have a small readme in the info tab explaining how they work.
 
-3. Install the node-red dependencies
+This will give you the base functionality need in order to learn how the nodes work!
 
-        npm install
+## Credits & Contributors
 
-4. Build the code
+* [Node-Red Team](https://github.com/node-red/node-red 'node-red team')
+* [Iced Dev](http://www.iceddev.com 'Iced Dev')
 
-        grunt build
+## Copyright & License
 
-5. Run
+Copyright 2013, 2015 IBM Corp. under [the Apache 2.0 license](https://github.com/node-red/node-red/blob/master/LICENSE 'Apache 2.0 license').
 
-        node red.js
-
-## Contributing
-
-Before raising a pull-request, please read our
-[contributing guide](https://github.com/node-red/node-red/blob/master/CONTRIBUTING.md).
-
-## Authors
-
-Node-RED is a creation of [IBM Emerging Technology](http://ibm.com/blogs/et).
-
-* Nick O'Leary [@knolleary](http://twitter.com/knolleary)
-* Dave Conway-Jones [@ceejay](http://twitter.com/ceejay)
-
-For more open-source projects from IBM, head over [here](http://ibm.github.io).
-
-## Copyright and license
-
-Copyright 2013, 2015 IBM Corp. under [the Apache 2.0 license](LICENSE).

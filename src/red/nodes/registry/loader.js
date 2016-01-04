@@ -50,6 +50,7 @@ var peer2peerHTML = require("raw!../../../../nodes/core/io/16-peer2peer.html");
 var gpioHTML = require("raw!../../../../nodes/core/io/gpio.html");
 var JSONHTML = require("raw!../../../../nodes/core/parsers/70-JSON.html");
 var localdbHTML = require("raw!../../../../nodes/core/storage/27-localdb.html");
+// var geolocateHTML = require("raw!../../../../nodes/core/io/geolocate.html");
 
 var nodeContents = {
     "function.html": functionHTML,
@@ -72,6 +73,7 @@ var nodeContents = {
     "gpio.html": gpioHTML,
     "JSON.html": JSONHTML,
     "localdb.html": localdbHTML
+//    "geolocate.html": geolocateHTML
 };
 
 var functionNode = require("../../../../nodes/core/core/80-function");
@@ -94,6 +96,7 @@ var gpioNode = require("../../../../nodes/core/io/gpio");
 var eventsourceNode = require("../../../../nodes/core/io/17-eventsource");
 var JSONNode = require("../../../../nodes/core/parsers/70-JSON");
 var localdbNode = require("../../../../nodes/core/storage/27-localdb");
+// var geolocateNode = require("../../../../nodes/core/io/geolocate");
 
 
 var requiredNodes = {
@@ -117,6 +120,7 @@ var requiredNodes = {
     "gpio.js": gpioNode,
     "JSON.js": JSONNode,
     "localdb.js": localdbNode
+//    "geolocate.js": geolocateNode
 };
 
 

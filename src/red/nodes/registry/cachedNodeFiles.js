@@ -1,4 +1,8 @@
 module.exports = [
+//  { file: 'geolocate.js',
+//    module: 'node-red',
+//    name: 'geolocate',
+//    version: '0.11.2-git' },
   { file: 'localdb.js',
     module: 'node-red',
     name: 'localdb',

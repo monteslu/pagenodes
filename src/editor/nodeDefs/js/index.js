@@ -24,6 +24,7 @@ const nodeDefs = [
   require('./io/gpio'),
   require('./io/peer2peer'),
   require('./io/socketio'),
+  require('./io/geolocate'),
   require('./logic/switch'),
   require('./logic/range'),
   require('./logic/change'),

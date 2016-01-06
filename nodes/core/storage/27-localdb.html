@@ -1,5 +1,3 @@
-<!-- localwrite node -->
-
 <script type="text/x-red" data-template-name="localwrite">
     <div class="form-row">
       <label for="node-input-key"><i class="fa fa-tag"></i> <span data-i18n="common.label.key"></span></label>
@@ -17,41 +15,10 @@
     </div>
 </script>
 
-
 <script type="text/x-red" data-help-name="localwrite">
   <p>Writes to local storage utilizing localforage.</p>
   <p><a href="https://mozilla.github.io/localForage">https://mozilla.github.io/localForage</a></p>
 </script>
-
-<script type="text/javascript">
-  RED.nodes.registerType('localwrite', {
-    category: 'storage',
-    color: "Chartreuse",
-    defaults: {
-      name: {
-        value: ""
-      },
-      append: {
-        value: '',
-      },
-      key: {
-        value: "",
-        required:true
-      }
-    },
-    inputs: 1,
-    outputs: 0,
-    icon: "leveldb.png",
-    label: function() {
-      return this.name || "localwrite";
-    },
-    labelStyle: function() {
-      return this.name ? "node_label_italic" : "";
-    }
-  });
-</script>
-
-<!-- localread node -->
 
 <script type="text/x-red" data-template-name="localread">
     <div class="form-row">
@@ -70,30 +37,3 @@
 <p>Retrieves a payload based off of its key with localforage.  Output will be sent to console.log as well.</p>
   <p><a href="https://mozilla.github.io/localForage">https://mozilla.github.io/localForage</a></p>
 </script>
-
-<script type="text/javascript">
-  RED.nodes.registerType('localread', {
-    category: 'storage',
-    color: "Chartreuse",
-    defaults: {
-      name: {
-        value: ""
-      },
-      key: {
-        value: "",
-        required:true
-      }
-    },
-    inputs: 1,
-    outputs: 1,
-    icon: "leveldb.png",
-    label: function() {
-      return this.name || "localread";
-    },
-    labelStyle: function() {
-      return this.name ? "node_label_italic" : "";
-    }
-  });
-</script>
-
-

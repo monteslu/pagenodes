@@ -1,7 +1,8 @@
 module.exports = function(RED){
-  RED.nodes.registerType('camera',{
+  console.log('geolocate nodeRef');
+  RED.nodes.registerType('geolocate',{
         category: 'function',
-        color:"rgb(174, 174, 231)",
+        color: "#EF5350",
         defaults: {
             name: {value:""},
         },
@@ -9,13 +10,10 @@ module.exports = function(RED){
         outputs:1,
         icon: "white-globe.png",
         label: function() {
-            return this.name||'camera';
+            return this.name||'geolocate';
         },
         labelStyle: function() {
             return this.name?"node_label_italic":"";
         },
-        oneditprepare: function() {
-
-        },
-      });
+    });
 };

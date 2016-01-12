@@ -104,8 +104,7 @@ module.exports = function(grunt) {
                         "editor/vendor/marked/marked.min.js",
                         "editor/vendor/orion/built-editor.min.js",
                         "editor/vendor/d3/d3.v3.min.js",
-                        "editor/vendor/i18next/i18next.min.js",
-                        "editor/vendor/mespeak/mespeak.js"
+                        "editor/vendor/i18next/i18next.min.js"
                     ],
                     "public/vendor/vendor.css": [
                         "editor/vendor/orion/built-editor.css"
@@ -235,8 +234,7 @@ module.exports = function(grunt) {
                         //'bootstrap/css/**',
                         'bootstrap/img/**',
                         'jquery/css/**',
-                        'font-awesome/**',
-                        'mespeak/**'
+                        'font-awesome/**'
                     ],
                     expand: true,
                     dest: 'public/vendor/'

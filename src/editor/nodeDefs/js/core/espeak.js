@@ -3,10 +3,15 @@
 var _ = require('lodash');
 
 module.exports = function(RED) {
+  var errorMessage = 'Your browser does not support web speech. Please use Google Chrome for this feature.'
   var voices = [];
-  speechSynthesis.onvoiceschanged = function() {
-    voices = speechSynthesis.getVoices();
-  };
+  if(speechSynthesis){
+    speechSynthesis.onvoiceschanged = function() {
+      voices = speechSynthesis.getVoices();
+    };
+  } else {
+    RED.notify(errorMessage, 'error');
+  }
 
   RED.nodes.registerType('espeak',{
     category: 'output',
@@ -57,10 +62,9 @@ module.exports = function(RED) {
         dropdown.options.add(newVoice);
       });
     },
-
     onpaletteadd: function() {
 
-      this.handleDebugMessage = function(t,o) {
+      this.handleEspeakMessage = function(t,o) {
 
         if(typeof o.msg === 'string'){
           try{
@@ -75,17 +79,22 @@ module.exports = function(RED) {
         //do tts
 
         console.log('espeak', msg);
-        var phrase = new SpeechSynthesisUtterance(String(msg.payload));
         var voice = _.find(voices, { voiceURI: o.variant });
 
-        phrase.voice = voice;
-        phrase.pitch = parseInt(msg.pitch, 10) || 1;
-        phrase.speed = parseInt(msg.spped, 10) || 1;
+        if(SpeechSynthesisUtterance && speechSynthesis && voice){
+          console.log('everything is fine.. I promise.....', voice);
+          var phrase = new SpeechSynthesisUtterance(String(msg.payload));
 
-        speechSynthesis.speak(phrase);
+          phrase.voice = voice;
+          phrase.pitch = parseInt(msg.pitch, 10) || 1;
+          phrase.speed = parseInt(msg.spped, 10) || 1;
+
+          speechSynthesis.speak(phrase);
+        } else {
+          RED.notify(errorMessage, 'error');
+        }
       };
-      RED.comms.subscribe('espeak',this.handleDebugMessage);
-
+      RED.comms.subscribe('espeak',this.handleEspeakMessage);
 
     },
     onpaletteremove: function() {

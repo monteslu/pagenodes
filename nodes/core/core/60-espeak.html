@@ -18,26 +18,8 @@
 
     <div class="form-row">
         <label for="node-input-variant"><i class="fa fa-circle"></i> <span data-i18n="variant">variant</span></label>
+
         <select type="text" id="node-input-variant" style="width: 250px;">
-            <option value="" selected>None</option>
-            <option value="f1">f1 (female 1)</option>
-            <option value="f2">f2 (female 2)</option>
-            <option value="f3">f3 (female 3)</option>
-            <option value="f4">f4 (female 4)</option>
-            <option value="f5">f5 (female 5)</option>
-            <option value="m1">m1 (male 1)</option>
-            <option value="m2">m2 (male 2)</option>
-            <option value="m3">m3 (male 3)</option>
-            <option value="m4">m4 (male 4)</option>
-            <option value="m5">m5 (male 5)</option>
-            <option value="m6">m6 (male 6)</option>
-            <option value="m7">m7 (male 7)</option>
-            <option value="croak">croak</option>
-            <option value="klatt">klatt</option>
-            <option value="klatt2">klatt2</option>
-            <option value="klatt3">klatt3</option>
-            <option value="whisper">whisper</option>
-            <option value="whisperf">whisperf (female)</option>
         </select>
     </div>
     <div class="form-row">
@@ -48,5 +30,5 @@
 
 <script type="text/x-red" data-help-name="espeak">
     <p>The espeak node can be connected to the output of any node. It can be used to play a text-to-speech version of the <b>msg.payload</b> .</p>
-    <p>Each message can also modify the playback <b>msg.amplitude</b> <b>msg.wordgap</b> <b>msg.pitch</b> and <b>msg.speed</b> .</p>
+    <p>Each message can also modify the playback <b>msg.pitch</b> and <b>msg.speed</b>.</p>
 </script>

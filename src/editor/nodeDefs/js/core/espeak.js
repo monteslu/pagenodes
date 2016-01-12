@@ -1,7 +1,12 @@
+'use strict';
+
+var _ = require('lodash');
+
 module.exports = function(RED){
-  
-    meSpeak.loadConfig("vendor/mespeak/mespeak_config.json");
-    meSpeak.loadVoice("vendor/mespeak/voices/en/en-us.json");
+    var voices = [];
+    speechSynthesis.onvoiceschanged = function() {
+      voices = speechSynthesis.getVoices();
+    };
 
     RED.nodes.registerType('espeak',{
         category: 'output',
@@ -24,6 +29,7 @@ module.exports = function(RED){
         button: {
             toggle: 'active',
             onclick: function() {
+
                 var label = this.name||'espeak';
                 var node = this;
                 RED.comms.rpc('espeak', [this.id, (this.active?'enable':'disable')], function(result){
@@ -35,7 +41,25 @@ module.exports = function(RED){
                 });
             }
         },
+        oneditprepare: function() {
+          var selectedVariant = this.variant;
+          var dropdown = document.getElementById('node-input-variant');
+
+          voices.forEach(function(voice){
+            var newVoice = document.createElement('OPTION');
+            newVoice.text = voice.name;
+            newVoice.value = voice.voiceURI;
+
+            if(voice.voiceURI === selectedVariant){
+              newVoice.selected = true;
+            };
+
+            dropdown.options.add(newVoice);
+          });
+        },
+
         onpaletteadd: function() {
+
             this.handleDebugMessage = function(t,o) {
 
                 if(typeof o.msg === 'string'){
@@ -51,16 +75,14 @@ module.exports = function(RED){
                 //do tts
 
                 console.log('espeak', msg);
-                meSpeak.speak(String(msg.payload), {
-                  amplitude: parseInt(msg.amplitude, 10) || 100,
-                  wordgap: parseInt(msg.wordgap, 10) || 0,
-                  pitch: parseInt(msg.pitch, 10) || 50,
-                  speed: parseInt(msg.speed, 10) || 175,
-                  variant: o.variant || ''
-                });
+                var phrase = new SpeechSynthesisUtterance(String(msg.payload));
+                var voice = _.find(voices, { voiceURI: o.variant });
 
+                phrase.voice = voice;
+                phrase.pitch = parseInt(msg.pitch, 10) || 1;
+                phrase.speed = parseInt(msg.spped, 10) || 1;
 
-
+                speechSynthesis.speak(phrase);
             };
             RED.comms.subscribe('espeak',this.handleDebugMessage);
 

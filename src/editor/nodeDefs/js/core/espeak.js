@@ -5,12 +5,10 @@ var _ = require('lodash');
 module.exports = function(RED) {
   var errorMessage = 'Your browser does not support web speech. Please use Google Chrome for this feature.'
   var voices = [];
-  if(speechSynthesis){
+  if(window.speechSynthesis){
     speechSynthesis.onvoiceschanged = function() {
       voices = speechSynthesis.getVoices();
     };
-  } else {
-    RED.notify(errorMessage, 'error');
   }
 
   RED.nodes.registerType('espeak',{
@@ -49,12 +47,15 @@ module.exports = function(RED) {
     oneditprepare: function() {
       var selectedVariant = this.variant;
       var dropdown = document.getElementById('node-input-variant');
+      if (voices.length < 1) {
+        var voiceDiv = document.getElementById('voice-selection');
+        voiceDiv.style.display = 'none';
+      }
 
       voices.forEach(function(voice){
         var newVoice = document.createElement('OPTION');
         newVoice.text = voice.name;
         newVoice.value = voice.voiceURI;
-
         if(voice.voiceURI === selectedVariant){
           newVoice.selected = true;
         };
@@ -81,8 +82,7 @@ module.exports = function(RED) {
         console.log('espeak', msg);
         var voice = _.find(voices, { voiceURI: o.variant });
 
-        if(SpeechSynthesisUtterance && speechSynthesis && voice){
-          console.log('everything is fine.. I promise.....', voice);
+        if(window.SpeechSynthesisUtterance && window.speechSynthesis && voice){
           var phrase = new SpeechSynthesisUtterance(String(msg.payload));
 
           phrase.voice = voice;

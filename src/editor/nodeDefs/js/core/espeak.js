@@ -82,7 +82,7 @@ module.exports = function(RED) {
         console.log('espeak', msg);
         var voice = _.find(voices, { voiceURI: o.variant });
 
-        if(window.SpeechSynthesisUtterance && window.speechSynthesis && voice){
+        if(window.SpeechSynthesisUtterance && window.speechSynthesis){
           var phrase = new SpeechSynthesisUtterance(String(msg.payload));
 
           phrase.voice = voice;

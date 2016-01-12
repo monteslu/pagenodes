@@ -6,31 +6,31 @@ module.exports = function(RED){
     RED.nodes.registerType('espeak',{
         category: 'output',
         defaults: {
-            name: {value:""},
-            variant: {value:""},
+            name: {value:''},
+            variant: {value:''},
             active: {value:true}
         },
         label: function() {
-            return this.name || this.variant || "espeak";
+            return this.name || this.variant || 'espeak';
         },
         labelStyle: function() {
-            return this.name?"node_label_italic":"";
+            return this.name?'node_label_italic':'';
         },
-        color:"#ffb6c1",
+        color:'#ffb6c1',
         inputs:1,
         outputs:0,
-        icon: "debug.png",
-        align: "right",
+        icon: 'debug.png',
+        align: 'right',
         button: {
-            toggle: "active",
+            toggle: 'active',
             onclick: function() {
-                var label = this.name||"espeak";
+                var label = this.name||'espeak';
                 var node = this;
-                RED.comms.rpc('espeak', [this.id, (this.active?"enable":"disable")], function(result){
+                RED.comms.rpc('espeak', [this.id, (this.active?'enable':'disable')], function(result){
                     if (result == 200) {
-                        RED.notify(node._("debug.notification.activated",{label:label}),"success");
+                        RED.notify(node._('debug.notification.activated',{label:label}),'success');
                     } else if (result == 201) {
-                        RED.notify(node._("debug.notification.deactivated",{label:label}),"success");
+                        RED.notify(node._('debug.notification.deactivated',{label:label}),'success');
                     }
                 });
             }
@@ -62,12 +62,12 @@ module.exports = function(RED){
 
 
             };
-            RED.comms.subscribe("espeak",this.handleDebugMessage);
+            RED.comms.subscribe('espeak',this.handleDebugMessage);
 
 
         },
         onpaletteremove: function() {
-            RED.comms.unsubscribe("espeak",this.handleDebugMessage);
+            RED.comms.unsubscribe('espeak',this.handleDebugMessage);
             // RED.sidebar.removeTab("debug");
             // delete RED._debug;
         }

@@ -41,7 +41,7 @@ module.exports = function(RED) {
             handleConnection(socket);
         }
 
-        function handleConnection(/*socket*/socket) {
+        function handleConnection(socket) {
             var id = (1+Math.random()*4294967295).toString(16);
             if (node.isServer) { node._clients[id] = socket; node.emit('opened',Object.keys(node._clients).length); }
             socket.on('open',function() {
@@ -73,7 +73,7 @@ module.exports = function(RED) {
             // Listen for 'newListener' events from RED.server
             node._serverListeners = {};
 
-            var storeListener = function(/*String*/event,/*function*/listener){
+            var storeListener = function(event, listener){
                 if(event == "error" || event == "upgrade" || event == "listening"){
                     node._serverListeners[event] = listener;
                 }
@@ -122,11 +122,11 @@ module.exports = function(RED) {
     RED.nodes.registerType("websocket-listener",WebSocketListenerNode);
     RED.nodes.registerType("websocket-client",WebSocketListenerNode);
 
-    WebSocketListenerNode.prototype.registerInputNode = function(/*Node*/handler) {
+    WebSocketListenerNode.prototype.registerInputNode = function(handler) {
         this._inputNodes.push(handler);
     }
 
-    WebSocketListenerNode.prototype.removeInputNode = function(/*Node*/handler) {
+    WebSocketListenerNode.prototype.removeInputNode = function(handler) {
         this._inputNodes.forEach(function(node, i, inputNodes) {
             if (node === handler) {
                 inputNodes.splice(i, 1);
@@ -134,7 +134,7 @@ module.exports = function(RED) {
         });
     }
 
-    WebSocketListenerNode.prototype.handleEvent = function(id,/*socket*/socket,/*String*/event,/*Object*/data,/*Object*/flags){
+    WebSocketListenerNode.prototype.handleEvent = function(id, socket, event, data, flags){
         var msg;
         if (this.wholemsg) {
             try {
@@ -188,7 +188,6 @@ module.exports = function(RED) {
         this.serverConfig = RED.nodes.getNode(this.server);
         if (this.serverConfig) {
             this.serverConfig.registerInputNode(this);
-            // TODO: nls
             this.serverConfig.on('opened', function(n) { node.status({fill:"green",shape:"dot",text:"connected "+n}); });
             this.serverConfig.on('erro', function() { node.status({fill:"red",shape:"ring",text:"error"}); });
             this.serverConfig.on('closed', function() { node.status({fill:"red",shape:"ring",text:"disconnected"}); });
@@ -212,7 +211,6 @@ module.exports = function(RED) {
             this.error(RED._("websocket.errors.missing-conf"));
         }
         else {
-            // TODO: nls
             this.serverConfig.on('opened', function(n) { node.status({fill:"green",shape:"dot",text:"connected "+n}); });
             this.serverConfig.on('erro', function() { node.status({fill:"red",shape:"ring",text:"error"}); });
             this.serverConfig.on('closed', function() { node.status({fill:"red",shape:"ring",text:"disconnected"}); });

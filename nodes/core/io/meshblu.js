@@ -199,10 +199,6 @@ function init(RED) {
   RED.events.on("rpc_meshblu/register", register);
   RED.events.on("rpc_meshblu/getDevices", getDevices);
   RED.events.on("rpc_meshblu/claim", claim);
-
-  // RED.httpAdmin.get("/meshblu/register", register);
-  // RED.httpAdmin.get("/meshblu/getDevices", getDevices);
-  // RED.httpAdmin.get("/meshblu/claim", claim);
 }
 
 module.exports = init;

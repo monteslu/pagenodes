@@ -16,11 +16,8 @@
 
 module.exports = function(RED) {
     "use strict";
-    // var cron = require("cron");
 
     function InjectNode(n) {
-
-        // console.log('InjectNode created!', n);
 
         RED.nodes.createNode(this,n);
         this.topic = n.topic;
@@ -43,11 +40,6 @@ module.exports = function(RED) {
             }, this.repeat );
         } else if (this.crontab) {
             if (RED.settings.verbose) { this.log(RED._("inject.crontab",this)); }
-            // this.cronjob = new cron.CronJob(this.crontab,
-            //     function() {
-            //         node.emit("input",{});
-            //     },
-            //     null,true);
         }
 
         if (this.once) {
@@ -84,15 +76,9 @@ module.exports = function(RED) {
     RED.events.on("rpc_inject", function(data) {
         var node = RED.nodes.getNode(data.params[0]);
         if (node != null) {
-            // try {
-                node.receive();
-                data.reply('ok');
-            // } catch(err) {
-            //     res.sendStatus(500);
-            //     node.error(RED._("inject.failed",{error:err.toString()}));
-            // }
+            node.receive();
+            data.reply('ok');
         } else {
-            // res.sendStatus(404);
             data.reply('not ok');
         }
     });

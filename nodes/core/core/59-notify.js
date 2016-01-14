@@ -20,7 +20,6 @@ module.exports = function(RED) {
     var events = require("events");
     var debuglength = RED.settings.debugMaxLength||1000;
     var useColors = false;
-    // util.inspect.styles.boolean = "red";
 
     function NotifyNode(n) {
         RED.nodes.createNode(this,n);

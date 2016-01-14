@@ -5,7 +5,6 @@ module.exports = function(RED) {
   var events = require('events');
   var debuglength = RED.settings.debugMaxLength||1000;
   var useColors = false;
-  // util.inspect.styles.boolean = "red";
 
   function EspeakNode(n) {
     RED.nodes.createNode(this, n);

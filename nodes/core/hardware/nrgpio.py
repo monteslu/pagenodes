@@ -30,7 +30,6 @@ if len(sys.argv) > 1:
     GPIO.setwarnings(False)
 
     if cmd == "pwm":
-        #print "Initialised pin "+str(pin)+" to PWM"
         GPIO.setup(pin,GPIO.OUT)
         p = GPIO.PWM(pin, 100)
         p.start(0)
@@ -48,7 +47,6 @@ if len(sys.argv) > 1:
                 print "bad data: "+data
 
     elif cmd == "buzz":
-        #print "Initialised pin "+str(pin)+" to Buzz"
         GPIO.setup(pin,GPIO.OUT)
         p = GPIO.PWM(pin, 100)
         p.stop()
@@ -70,7 +68,6 @@ if len(sys.argv) > 1:
                 print "bad data: "+data
 
     elif cmd == "out":
-        #print "Initialised pin "+str(pin)+" to OUT"
         GPIO.setup(pin,GPIO.OUT)
         if len(sys.argv) == 4:
             GPIO.output(pin,int(sys.argv[3]))
@@ -91,7 +88,6 @@ if len(sys.argv) > 1:
             GPIO.output(pin,data)
 
     elif cmd == "in":
-        #print "Initialised pin "+str(pin)+" to IN"
         def handle_callback(chan):
             print GPIO.input(chan)
 
@@ -117,7 +113,6 @@ if len(sys.argv) > 1:
                 sys.exit(0)
 
     elif cmd == "byte":
-        #print "Initialised BYTE mode - "+str(pin)+
         list = [7,11,13,12,15,16,18,22]
         GPIO.setup(list,GPIO.OUT)
 
@@ -140,7 +135,6 @@ if len(sys.argv) > 1:
                 GPIO.output(list[bit], data & mask)
 
     elif cmd == "borg":
-        #print "Initialised BORG mode - "+str(pin)+
         GPIO.setup(11,GPIO.OUT)
         GPIO.setup(13,GPIO.OUT)
         GPIO.setup(15,GPIO.OUT)

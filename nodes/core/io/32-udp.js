@@ -92,7 +92,6 @@ module.exports = function(RED) {
     // The Output Node
     function UDPout(n) {
         RED.nodes.createNode(this,n);
-        //this.group = n.group;
         this.port = n.port;
         this.outport = n.outport||"";
         this.base64 = n.base64;

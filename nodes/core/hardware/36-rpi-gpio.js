@@ -23,7 +23,6 @@ module.exports = function(RED) {
     var gpioCommand = __dirname+'/nrgpio';
 
     if (!fs.existsSync("/dev/ttyAMA0")) { // unlikely if not on a Pi
-        //RED.log.info(RED._("rpi-gpio.errors.ignorenode"));
         throw "Info : "+RED._("rpi-gpio.errors.ignorenode");
     }
 

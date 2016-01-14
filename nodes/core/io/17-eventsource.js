@@ -46,12 +46,10 @@ module.exports = function(RED) {
 
                 node.openListener = function(e) {
                     console.log('onopen connecting to EventSource', e);
-                    //node.emit('erro', e);
                     node.connected = true;
                 };
 
                 node.messageListener = function(e){
-                    //console.log('eventSource on message', e, node);
                     node.emit('message', e);
                 };
 
@@ -85,7 +83,6 @@ module.exports = function(RED) {
 
 
         node.on("close", function() {
-            //console.log('eventsource-client closing', node);
             node.closing = true;
             if(node.openListener){
                 node.eventSource.removeEventListener('open', node.openListener);
@@ -145,9 +142,6 @@ module.exports = function(RED) {
         } else {
             this.error(RED._("websocket.errors.missing-conf"));
         }
-
-
-
     }
     RED.nodes.registerType("eventsource",EventSourceInNode);
 }

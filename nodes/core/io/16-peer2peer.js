@@ -85,7 +85,7 @@ module.exports = function(RED) {
                 }
             });
             socket.on('error', function(err) {
-                node.emit('erro');
+                node.emit('error');
                 node.error('error connecting socket.io', err);
                 if (!node.closing && !node.isServer) {
                     node.tout = setTimeout(function(){ startconn(); }, 3000); // try to reconnect every 3 secs... bit fast ?
@@ -169,7 +169,7 @@ module.exports = function(RED) {
 
             });
 
-            node.serverConfig.on('erro', function() { node.status({fill:"red",shape:"ring",text:"error"}); });
+            node.serverConfig.on('error', function() { node.status({fill:"red",shape:"ring",text:"error"}); });
             node.serverConfig.on('closed', function() { node.status({fill:"red",shape:"ring",text:"disconnected"}); });
         } else {
             this.error(RED._("websocket.errors.missing-conf"));
@@ -192,7 +192,7 @@ module.exports = function(RED) {
         else {
             node.serverConfig.on('initalconnect', function() { node.status({fill:"yellow",shape:"ring",text:"connecting..."}); });
             this.serverConfig.on('opened', function(n) { node.status({fill:"green",shape:"dot",text:"connected "+n}); });
-            this.serverConfig.on('erro', function() { node.status({fill:"red",shape:"ring",text:"error"}); });
+            this.serverConfig.on('error', function() { node.status({fill:"red",shape:"ring",text:"error"}); });
             this.serverConfig.on('closed', function() { node.status({fill:"red",shape:"ring",text:"disconnected"}); });
         }
         this.on("input", function(msg) {
@@ -202,7 +202,7 @@ module.exports = function(RED) {
                     console.log('p2p emit', sendMsg);
                     node.serverConfig.server.emit(msg.topic, sendMsg);
                 }catch(err){
-                    console.log('p2p emit err', err);
+                    console.log('p2p emit error', err);
                 }
 
             }

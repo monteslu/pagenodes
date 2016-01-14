@@ -1,8 +1,6 @@
 module.exports = function(RED) {
-  console.log('GeolocationNode');
 
   "use strict";
-  var _ = require('lodash');
 
   function GeolocationNode(n) {
     RED.nodes.createNode(this,n);

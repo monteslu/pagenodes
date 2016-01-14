@@ -1,5 +1,4 @@
 module.exports = function(RED){
-  console.log('geolocate nodeRef');
   RED.nodes.registerType('geolocate',{
         category: 'function',
         color: "#EF5350",

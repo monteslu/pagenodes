@@ -31,14 +31,11 @@ module.exports = function(RED) {
         var node = this;
 
         var err = "";
-        // TODO: rewrite to use node-tail
         var tail = spawn("tail", ["-F", "-n", "0", this.filename]);
         tail.stdout.on("data", function (data) {
             if (node.split) {
-                // TODO: allow customisation of the line break - as we do elsewhere
                 var strings = data.toString().split("\n");
                 for (var s in strings) {
-                    //TODO: should we really filter blanks? Is that expected?
                     if (strings[s] !== "") {
                         node.send({
                             topic: node.filename,

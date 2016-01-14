@@ -43,19 +43,16 @@ module.exports = function(RED) {
                 if (cmd.indexOf(" ") == -1) {
                     var ex = spawn(cmd,arg);
                     ex.stdout.on('data', function (data) {
-                        //console.log('[exec] stdout: ' + data);
                         if (isUtf8(data)) { msg.payload = data.toString(); }
                         else { msg.payload = data; }
                         node.send([msg,null,null]);
                     });
                     ex.stderr.on('data', function (data) {
-                        //console.log('[exec] stderr: ' + data);
                         if (isUtf8(data)) { msg.payload = data.toString(); }
                         else { msg.payload = new Buffer(data); }
                         node.send([null,msg,null]);
                     });
                     ex.on('close', function (code) {
-                        //console.log('[exec] result: ' + code);
                         msg.payload = code;
                         node.status({});
                         node.send([null,null,msg]);
@@ -80,11 +77,8 @@ module.exports = function(RED) {
                     }
                     var msg2 = {payload:stderr};
                     var msg3 = null;
-                    //console.log('[exec] stdout: ' + stdout);
-                    //console.log('[exec] stderr: ' + stderr);
                     if (error !== null) {
                         msg3 = {payload:error};
-                        //console.log('[exec] error: ' + error);
                     }
                     node.status({});
                     node.send([msg,msg2,msg3]);

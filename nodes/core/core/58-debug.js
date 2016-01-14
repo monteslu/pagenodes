@@ -20,7 +20,6 @@ module.exports = function(RED) {
     var events = require("events");
     var debuglength = RED.settings.debugMaxLength||1000;
     var useColors = false;
-    // util.inspect.styles.boolean = "red";
 
     function DebugNode(n) {
         RED.nodes.createNode(this,n);
@@ -124,8 +123,6 @@ module.exports = function(RED) {
         if (msg.msg.length > debuglength) {
             msg.msg = msg.msg.substr(0,debuglength) +" ....";
         }
-
-        //msg.image = msg.image;
 
         RED.comms.publish("debug",msg);
     }

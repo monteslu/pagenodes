@@ -27,7 +27,6 @@ module.exports = function(RED) {
 
 
     function HTTPRequest(n) {
-        //console.log('creating HTTPRequest node', n);
         RED.nodes.createNode(this,n);
         var nodeUrl = n.url;
         var isTemplatedUrl = (nodeUrl||"").indexOf("{{") != -1;

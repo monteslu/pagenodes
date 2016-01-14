@@ -132,7 +132,6 @@ function init(RED) {
                   try{io.pinMode(node.pin, io.MODES[state]);}catch(exp){ console.log(exp); }
                   msg.payload = msg.payload * 1;
                   if ((msg.payload >= 0) && (msg.payload <= 255)) {
-                      //console.log(msg.payload, node.pin);
                       io.analogWrite(node.pin, msg.payload);
                   }
                 }
@@ -140,7 +139,6 @@ function init(RED) {
                   try{io.pinMode(node.pin, io.MODES[state]);}catch(exp){ console.log(exp); }
                   msg.payload = msg.payload * 1;
                   if ((msg.payload >= 0) && (msg.payload <= 180)) {
-                      //console.log(msg.payload, node.pin);
                       io.servoWrite(node.pin, msg.payload);
                   }
                 }
@@ -312,8 +310,7 @@ function init(RED) {
             try {
               node.script = vm.createScript(functionText);
               try {
-                  var start = Date.now(); //process.hrtime();
-                  //context.msg = msg;
+                  var start = Date.now();
                   node.script.runInContext(context);
                   console.log('ran script', context);
 
@@ -349,9 +346,6 @@ function init(RED) {
               this.error(err);
           }
 
-
-
-
         });
         node.nodebot.on('networkReady', function(){
           networkReadyStatus(node);
@@ -370,9 +364,6 @@ function init(RED) {
   }
 
   RED.nodes.registerType("johnny5",johnny5Node);
-
-
-
 
   function handleRoute(req, res, handler){
     handler(req.query)
@@ -398,16 +389,6 @@ function init(RED) {
         return callback(null, devices);
       });
   }
-
-  //routes
-  // RED.httpAdmin.get("/gpioserialports", RED.auth.needsPermission("arduino.read"), function(req,res) {
-  //    listArduinoPorts(function (err, ports) {
-  //         res.json(ports);
-  //     });
-  // });
-
-
-
 
 }
 

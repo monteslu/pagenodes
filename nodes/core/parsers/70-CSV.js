@@ -129,7 +129,6 @@ module.exports = function(RED) {
                                 if (line[i] === node.quo) { // if it's a quote toggle inside or outside
                                     f = !f;
                                     if (line[i-1] === node.quo) { k[j] += '\"'; } // if it's a quotequote then it's actually a quote
-                                    //if ((line[i-1] !== node.sep) && (line[i+1] !== node.sep)) { k[j] += line[i]; }
                                 }
                                 else if ((line[i] === node.sep) && f) { // if we are outside of quote (ie valid separator
                                     if (!node.goodtmpl) { node.template[j] = "col"+(j+1); }
@@ -141,7 +140,6 @@ module.exports = function(RED) {
                                     k[j] = "";
                                 }
                                 else if (f && ((line[i] === "\n") || (line[i] === "\r"))) { // handle multiple lines
-                                    //console.log(j,k,o,k[j]);
                                     if (!node.goodtmpl) { node.template[j] = "col"+(j+1); }
                                     if ( node.template[j] && (node.template[j] !== "") && (k[j] !== "") ) {
                                         if ( (k[j].charAt(0) !== "+") && !isNaN(Number(k[j])) ) { k[j] = Number(k[j]); }
@@ -166,7 +164,6 @@ module.exports = function(RED) {
                             }
                         }
                         // Finished so finalize and send anything left
-                        //console.log(j,k,o,k[j]);
                         if (!node.goodtmpl) { node.template[j] = "col"+(j+1); }
                         if ( node.template[j] && (node.template[j] !== "") && (k[j] !== "") ) {
                             if ( (k[j].charAt(0) !== "+") && !isNaN(Number(k[j])) ) { k[j] = Number(k[j]); }

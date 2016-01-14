@@ -18,7 +18,6 @@ const P2P_SERVER = 'https://monteslu.iceddev.com';
 
 module.exports = function(RED) {
     "use strict";
-    // var ws = require("ws");
     var ioclient = require("socket.io-client");
     var Socketiop2p = require("socket.io-p2p");
     var inspect = require("util").inspect;
@@ -48,7 +47,6 @@ module.exports = function(RED) {
             var opts = {peerOpts: {trickle: false}, autoUpgrade: false};
             var p2psocket = new Socketiop2p(socket, opts, function (a) {
                 console.log('p2p callback', a);
-                // p2psocket.emit('peer-obj', 'Hello there. I am ' + p2psocket.peerId);
             });
             node.server = p2psocket; // keep for closing
             handleConnection(p2psocket);
@@ -192,7 +190,6 @@ module.exports = function(RED) {
             this.error(RED._("websocket.errors.missing-conf"));
         }
         else {
-            // TODO: nls
             node.serverConfig.on('initalconnect', function() { node.status({fill:"yellow",shape:"ring",text:"connecting..."}); });
             this.serverConfig.on('opened', function(n) { node.status({fill:"green",shape:"dot",text:"connected "+n}); });
             this.serverConfig.on('erro', function() { node.status({fill:"red",shape:"ring",text:"error"}); });

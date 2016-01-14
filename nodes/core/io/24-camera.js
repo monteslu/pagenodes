@@ -40,8 +40,6 @@
     var container = document.createElement('div');
     var video = document.createElement('video');
     var canvas = document.createElement('canvas');
-    //photo = document.getElementById('cameraphoto');
-    // startbutton = document.getElementById('startbutton');
 
     navigator.getMedia = ( navigator.getUserMedia ||
                            navigator.webkitGetUserMedia ||
@@ -84,7 +82,6 @@
         video.setAttribute('height', height);
         canvas.setAttribute('width', width);
         canvas.setAttribute('height', height);
-        //streaming = true;
         var context = canvas.getContext('2d');
         if (width && height) {
           canvas.width = width;
@@ -93,60 +90,17 @@
           setTimeout(function(){
             context.drawImage(video, 0, 0, width, height);
             var data = canvas.toDataURL('image/png');
-            // mediaStream.active = false;
             mediaStream.getTracks().forEach(function(track){track.stop()});
             cb(data);
           }, 700);
-          //photo.setAttribute('src', data);
-
         }
-
-
       }
     }, false);
-
-    // startbutton.addEventListener('click', function(ev){
-    //   takepicture();
-    //   ev.preventDefault();
-    // }, false);
-
-    // clearphoto();
   }
-
-  // Fill the photo with an indication that none has been
-  // captured.
-
-  // function clearphoto() {
-  //   var context = canvas.getContext('2d');
-  //   context.fillStyle = "#AAA";
-  //   context.fillRect(0, 0, canvas.width, canvas.height);
-
-  //   var data = canvas.toDataURL('image/png');
-  //   photo.setAttribute('src', data);
-  // }
-
-  // Capture a photo by fetching the current contents of the video
-  // and drawing it into a canvas, then converting that to a PNG
-  // format data URL. By drawing it on an offscreen canvas and then
-  // drawing that to the screen, we can change its size and/or apply
-  // other changes before drawing it.
-
-  // function takepicture(cb) {
-  //   startup(function(){
-  //       else {
-  //         clearphoto();
-  //       }
-  //   });
-
-  // }
-
-
-
 
 module.exports = function(RED) {
 
     function CamerNode(n) {
-        //console.log('creating CamerNode node', n);
         RED.nodes.createNode(this,n);
         var node = this;
 
@@ -157,10 +111,6 @@ module.exports = function(RED) {
                 msg.image = image;
                 node.send(msg);
             });
-
-            //msg.image = 'hello.gif';
-            //node.send(msg);
-            // sendCamera({id:this.id,name:this.name,topic:msg.topic,msg:msg});
         });
     }
 

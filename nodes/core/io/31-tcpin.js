@@ -27,8 +27,8 @@ module.exports = function(RED) {
         this.host = n.host;
         this.port = n.port * 1;
         this.topic = n.topic;
-        this.stream = (!n.datamode||n.datamode=='stream'); /* stream,single*/
-        this.datatype = n.datatype||'buffer'; /* buffer,utf8,base64 */
+        this.stream = (!n.datamode||n.datamode=='stream');
+        this.datatype = n.datatype||'buffer';
         this.newline = (n.newline||"").replace("\\n","\n").replace("\\r","\r");
         this.base64 = n.base64;
         this.server = (typeof n.server == 'boolean')?n.server:(n.server == "server");
@@ -398,14 +398,12 @@ module.exports = function(RED) {
             if (!node.connected) {
                 client = net.Socket();
                 if (socketTimeout) { client.setTimeout(socketTimeout); }
-                //node.status({});
                 var host = node.server || msg.host;
                 var port = node.port || msg.port;
                 var m;
 
                 if (host && port) {
                     client.connect(port, host, function() {
-                        //node.log(RED._("tcpin.errors.client-connected"));
                         node.status({fill:"green",shape:"dot",text:"common.status.connected"});
                         node.connected = true;
                         client.write(msg.payload);
@@ -436,7 +434,6 @@ module.exports = function(RED) {
                                         m = new Buffer(i+1);
                                         buf.copy(m,0,0,i+1);
                                         node.send({"payload":m});
-                                        //if (client) { client.end(); }
                                     }, node.splitc);
                                     i = 0;
                                     buf[0] = data[j];
@@ -450,7 +447,6 @@ module.exports = function(RED) {
                                     m = new Buffer(i);
                                     buf.copy(m,0,0,i);
                                     node.send({"payload":m});
-                                    //if (client) { client.end(); }
                                     i = 0;
                                 }
                             }
@@ -462,7 +458,6 @@ module.exports = function(RED) {
                                     m = new Buffer(i);
                                     buf.copy(m,0,0,i);
                                     node.send({"payload":m});
-                                    //if (client) { client.end(); }
                                     i = 0;
                                 }
                             }

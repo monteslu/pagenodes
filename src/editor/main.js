@@ -156,8 +156,9 @@ var RED = (function() {
         RED.view.status(statusEnabled);
     }
 
+// this corresponds with /src/editor/ui/menu.js
     function loadEditor() {
-        console.log('starting loadEditor()');
+        console.log('Loading Sidebar');
         RED.menu.init({id:"btn-sidemenu",
             options: [
                 {id:"menu-item-sidebar-menu",label:RED._("menu.label.sidebar.sidebar"),options:[
@@ -189,8 +190,8 @@ var RED = (function() {
                 null,
                 {id:"menu-item-keyboard-shortcuts",label:RED._("menu.label.keyboardShortcuts"),onselect:RED.keyboard.showHelp},
                 {id:"menu-item-help",
-                    label: RED.settings.theme("menu.menu-item-help.label","Node-RED Website"),
-                    href: RED.settings.theme("menu.menu-item-help.url","http://nodered.org/docs")
+                    label: RED.settings.theme("menu.menu-item-help.label","Pagenodes Website"),
+                    href: RED.settings.theme("menu.menu-item-help.url","http://www.pagenodes.com")
                 }
             ]
         });

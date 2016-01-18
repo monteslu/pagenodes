@@ -1,19 +1,4 @@
-/**
- * Copyright 2014 IBM Corp.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- **/
-
+//This whole file is configured in /src/editor/main.js
 module.exports = function(RED){
 
 RED.menu = (function() {
@@ -47,6 +32,14 @@ RED.menu = (function() {
                 opt.onselect.call(opt, opt.selected);
             }
         }
+        // 1. BASE FUNCTIONALITY
+        // Create an initial state that determines whether or not you are logged in or not
+        // Creates a button based off of logged in status to take them to auth0 login.
+        // If they are logged in it will give them an option to log out.
+
+        // 2. EXPAND FUNCTIONALITY
+        // If they are logged in console.log a connection to the database.
+        // Set up database to show their username as "Welcome Username"
 
         if (opt === null) {
             item = $('<li class="divider"></li>');
@@ -60,6 +53,7 @@ RED.menu = (function() {
             var linkContent = '<a '+(opt.id?'id="'+opt.id+'" ':'')+'tabindex="-1" href="#">';
             if (opt.toggle) {
                 linkContent += '<i class="fa fa-square pull-left"></i>';
+                //Display Node Status
                 linkContent += '<i class="fa fa-check-square pull-left"></i>';
 
             }

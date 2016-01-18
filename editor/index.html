@@ -46,10 +46,7 @@
           </a>
           <a href="https://github.com/monteslu/pagenodes" target="_blank">
             <img src="red/images/gh-icon.svg" style="height:22px; margin-bottom: 3px;"></a>
-          <!-- ... -->
-          <input id="btn-login" class="btn-login" type="submit" />
-          <!-- ... -->
-          <span>Welcome: <span id="auth0-name"></span></span>
+          <span><span id="auth0-name"></span><button id="btn-login" class="btn-login">Login</button><button id="btn-logout" class="btn-logout" onclick='logOut()'>Logout</button></span>
         </span>
       </span>
       <ul class="header-toolbar hide">
@@ -236,15 +233,22 @@ if (id_token) {
       return alert('There was an error geting the profile: ' + err.message);
     }
     console.log('Profile Name: '+profile.name);
-    document.getElementById('auth0-name').textContent = profile.name;
-  });
+    document.getElementById('auth0-name').textContent = 'Welcome: ' + profile.name;
+    document.getElementById('btn-logout').style.display = '';
+    document.getElementById('btn-login').style.display = 'none';
+  })
+} else if(!id_token) {
+  console.log('no login detected');
+  document.getElementById('auth0-name').style.display = 'none';
+  document.getElementById('btn-logout').style.display = 'none';
+  document.getElementById('btn-login').style.display = '';
 }
 
-document.getElementById('btn-logout').addEventListener('click'), function() {
+function logOut() {
+  console.log('logout happening');
   localStorage.removeItem('id_token');
-  window.location.href = "/";
+  window.location.href = '/';
 }
-
     </script>
 
   </body>

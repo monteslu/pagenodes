@@ -155,6 +155,20 @@ var RED = (function() {
         statusEnabled = state;
         RED.view.status(statusEnabled);
     }
+//This is the auth0 setup
+    var lock = new Auth0Lock('oEiNZJUMa7W5MlYMY1eIAjTcEftWelmn', 'samrocksc.auth0.com')
+
+    // login
+    function logIn(){
+      lock.show({ authParams: { scope: 'openid'  }  });
+    }
+
+    // Log Out
+    function logOut(){
+      console.log('logout happening');
+      localStorage.removeItem('id_token');
+      window.location.href = '/';
+    }
 
 // this corresponds with /src/editor/ui/menu.js
     function loadEditor() {
@@ -189,15 +203,46 @@ var RED = (function() {
                 ]},
                 null,
                 {id:"menu-item-keyboard-shortcuts",label:RED._("menu.label.keyboardShortcuts"),onselect:RED.keyboard.showHelp},
-                {id:"menu-item-help",
-                    label: RED.settings.theme("menu.menu-item-help.label","Pagenodes Website"),
-                    href: RED.settings.theme("menu.menu-item-help.url","http://www.pagenodes.com")
-                }
+                {id:"menu-item-help",label: RED.settings.theme("menu.menu-item-help.label","Pagenodes Website"),href: RED.settings.theme("menu.menu-item-help.url","http://www.pagenodes.com")},
+                {id:"auth0login",label:RED._("menu.label.login"),onselect: logIn,href: "#"},
+                {id:"auth0logout",label:RED._("menu.label.logout"),onselect: logOut,href: "/"}
             ]
         });
 
-        RED.user.init();
+       //Store the id with localStorage
+        var hash = lock.parseHash(window.location.hash);
+        if (hash) {
+          if (hash.error) {
+            console.log("There was an error logging in", hash.error);
+            alert('There was an error: ' + hash.error + '\n' + hash.error_description);
+          } else {
+            //save the token in the session:
+            localStorage.setItem('id_token', hash.id_token);
+          }
+        }
 
+        // Find out if there is an ID token
+        var id_token = localStorage.getItem('id_token');
+        if (id_token) {
+          lock.getProfile(id_token, function (err, profile) {
+            if (err) {
+              console.log('profile error: '+ err.message);
+              return alert('There was an error geting the profile: ' + err.message);
+            }
+            console.log('Profile Name: '+profile.name);
+            document.getElementById('auth0login').style.display = 'none';
+            document.getElementById('auth0logout').display = '';
+            document.getElementById('auth0-name').textContent = profile.name;
+          })
+        } else {
+          document.getElementById('auth0logout').style.display = 'none';
+          document.getElementById('auth0login').style.display = '';
+          console.log('No one logged in');
+        }
+
+
+
+        RED.user.init();
         RED.library.init();
         RED.palette.init();
         RED.sidebar.init();

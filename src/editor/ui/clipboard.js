@@ -81,7 +81,7 @@ RED.clipboard = (function() {
             $("#clipboard-dialog-ok").button("disable");
         }
     }
-
+//This is where the magic happens
     function importNodes() {
         dialogContainer.empty();
         dialogContainer.append($(importNodesDialog));

@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
   <meta charset="utf-8">
@@ -46,7 +45,10 @@
           </a>
           <a href="https://github.com/monteslu/pagenodes" target="_blank">
             <img src="red/images/gh-icon.svg" style="height:22px; margin-bottom: 3px;"></a>
-          <span><span id="auth0-name"></span><button id="btn-login" class="btn-login">Login</button><button id="btn-logout" class="btn-logout" onclick='logOut()'>Logout</button></span>
+          <span>
+            <span id="auth0-name"></span>
+            <a href='#' id='btn-login'></a>
+          </span>
         </span>
       </span>
       <ul class="header-toolbar hide">
@@ -204,52 +206,5 @@ ga('create', 'UA-69386913-2', 'auto');
 ga('send', 'pageview');
 
     </script>
-    <script>
-// Load the auth0 stuff
-var lock = new Auth0Lock('oEiNZJUMa7W5MlYMY1eIAjTcEftWelmn', 'samrocksc.auth0.com')
-
-//Listen for login to get clicked
-document.getElementById('btn-login').addEventListener('click', function() {
-  lock.show({ authParams: { scope: 'openid'  }  });
-});
-
-var hash = lock.parseHash(window.location.hash);
-if (hash) {
-  if (hash.error) {
-    console.log("There was an error logging in", hash.error);
-    alert('There was an error: ' + hash.error + '\n' + hash.error_description);
-  } else {
-    //save the token in the session:
-    localStorage.setItem('id_token', hash.id_token);
-  }
-}
-
-//retrieve the profile:
-var id_token = localStorage.getItem('id_token');
-if (id_token) {
-  lock.getProfile(id_token, function (err, profile) {
-    if (err) {
-      console.log('profile error: '+ err.message);
-      return alert('There was an error geting the profile: ' + err.message);
-    }
-    console.log('Profile Name: '+profile.name);
-    document.getElementById('auth0-name').textContent = 'Welcome: ' + profile.name;
-    document.getElementById('btn-logout').style.display = '';
-    document.getElementById('btn-login').style.display = 'none';
-  })
-} else if(!id_token) {
-  console.log('no login detected');
-  document.getElementById('auth0-name').style.display = 'none';
-  document.getElementById('btn-logout').style.display = 'none';
-  document.getElementById('btn-login').style.display = '';
-}
-
-function logOut() {
-  console.log('logout happening');
-  localStorage.removeItem('id_token');
-  window.location.href = '/';
-}
-    </script>
-
   </body>
 </html>

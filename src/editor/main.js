@@ -155,7 +155,7 @@ var RED = (function() {
         statusEnabled = state;
         RED.view.status(statusEnabled);
     }
-//This is the auth0 setup
+    //This is the auth0 setup
     var lock = new Auth0Lock('oEiNZJUMa7W5MlYMY1eIAjTcEftWelmn', 'samrocksc.auth0.com')
 
     // login
@@ -170,75 +170,75 @@ var RED = (function() {
       window.location.href = '/';
     }
 
-// this corresponds with /src/editor/ui/menu.js
+    // this corresponds with /src/editor/ui/menu.js
     function loadEditor() {
-        console.log('Loading Sidebar');
-        RED.menu.init({id:"btn-sidemenu",
-            options: [
-                {id:"menu-item-sidebar-menu",label:RED._("menu.label.sidebar.sidebar"),options:[
-                    {id:"menu-item-sidebar",label:RED._("menu.label.sidebar.show"),toggle:true,onselect:RED.sidebar.toggleSidebar, selected: true},
-                    null
-                ]},
-                {id:"menu-item-status",label:RED._("menu.label.displayStatus"),toggle:true,onselect:toggleStatus, selected: true},
-                null,
-                {id:"menu-item-import",label:RED._("menu.label.import"),options:[
-                    {id:"menu-item-import-clipboard",label:RED._("menu.label.clipboard"),onselect:RED.clipboard.import},
-                    {id:"menu-item-import-library",label:RED._("menu.label.library"),options:[]}
-                ]},
-                {id:"menu-item-export",label:RED._("menu.label.export"),disabled:true,options:[
-                    {id:"menu-item-export-clipboard",label:RED._("menu.label.clipboard"),disabled:true,onselect:RED.clipboard.export},
-                    {id:"menu-item-export-library",label:RED._("menu.label.library"),disabled:true,onselect:RED.library.export}
-                ]},
-                null,
-                {id:"menu-item-subflow",label:RED._("menu.label.subflows"), options: [
-                    {id:"menu-item-subflow-create",label:RED._("menu.label.createSubflow"),onselect:RED.subflow.createSubflow},
-                    {id:"menu-item-subflow-convert",label:RED._("menu.label.selectionToSubflow"),disabled:true,onselect:RED.subflow.convertToSubflow},
-                ]},
-                null,
-                {id:"menu-item-workspace",label:RED._("menu.label.flows"),options:[
-                    {id:"menu-item-workspace-add",label:RED._("menu.label.add"),onselect:RED.workspaces.add},
-                    {id:"menu-item-workspace-edit",label:RED._("menu.label.rename"),onselect:RED.workspaces.edit},
-                    {id:"menu-item-workspace-delete",label:RED._("menu.label.delete"),onselect:RED.workspaces.remove},
-                    null
-                ]},
-                null,
-                {id:"menu-item-keyboard-shortcuts",label:RED._("menu.label.keyboardShortcuts"),onselect:RED.keyboard.showHelp},
-                {id:"menu-item-help",label: RED.settings.theme("menu.menu-item-help.label","Pagenodes Website"),href: RED.settings.theme("menu.menu-item-help.url","http://www.pagenodes.com")},
-                {id:"auth0login",label:RED._("menu.label.login"),onselect: logIn,href: "#"},
-                {id:"auth0logout",label:RED._("menu.label.logout"),onselect: logOut,href: "/"}
-            ]
-        });
+      console.log('Loading Sidebar');
+      RED.menu.init({id:"btn-sidemenu",
+                    options: [
+                      {id:"menu-item-sidebar-menu",label:RED._("menu.label.sidebar.sidebar"),options:[
+                        {id:"menu-item-sidebar",label:RED._("menu.label.sidebar.show"),toggle:true,onselect:RED.sidebar.toggleSidebar, selected: true},
+                        null
+                      ]},
+                      {id:"menu-item-status",label:RED._("menu.label.displayStatus"),toggle:true,onselect:toggleStatus, selected: true},
+                      null,
+                      {id:"menu-item-import",label:RED._("menu.label.import"),options:[
+                        {id:"menu-item-import-clipboard",label:RED._("menu.label.clipboard"),onselect:RED.clipboard.import},
+                        {id:"menu-item-import-library",label:RED._("menu.label.library"),options:[]}
+                      ]},
+                      {id:"menu-item-export",label:RED._("menu.label.export"),disabled:true,options:[
+                        {id:"menu-item-export-clipboard",label:RED._("menu.label.clipboard"),disabled:true,onselect:RED.clipboard.export},
+                        {id:"menu-item-export-library",label:RED._("menu.label.library"),disabled:true,onselect:RED.library.export}
+                      ]},
+                      null,
+                      {id:"menu-item-subflow",label:RED._("menu.label.subflows"), options: [
+                        {id:"menu-item-subflow-create",label:RED._("menu.label.createSubflow"),onselect:RED.subflow.createSubflow},
+                        {id:"menu-item-subflow-convert",label:RED._("menu.label.selectionToSubflow"),disabled:true,onselect:RED.subflow.convertToSubflow},
+                      ]},
+                      null,
+                      {id:"menu-item-workspace",label:RED._("menu.label.flows"),options:[
+                        {id:"menu-item-workspace-add",label:RED._("menu.label.add"),onselect:RED.workspaces.add},
+                        {id:"menu-item-workspace-edit",label:RED._("menu.label.rename"),onselect:RED.workspaces.edit},
+                        {id:"menu-item-workspace-delete",label:RED._("menu.label.delete"),onselect:RED.workspaces.remove},
+                        null
+                      ]},
+                      null,
+                      {id:"menu-item-keyboard-shortcuts",label:RED._("menu.label.keyboardShortcuts"),onselect:RED.keyboard.showHelp},
+                      {id:"menu-item-help",label: RED.settings.theme("menu.menu-item-help.label","Pagenodes Website"),href: RED.settings.theme("menu.menu-item-help.url","http://www.pagenodes.com")},
+                      {id:"auth0login",label:RED._("menu.label.login"),onselect: logIn,href: "#"},
+                      {id:"auth0logout",label:RED._("menu.label.logout"),onselect: logOut,href: "/"}
+                    ]
+      });
 
-       //Store the id with localStorage
-        var hash = lock.parseHash(window.location.hash);
-        if (hash) {
-          if (hash.error) {
-            console.log("There was an error logging in", hash.error);
-            alert('There was an error: ' + hash.error + '\n' + hash.error_description);
-          } else {
-            //save the token in the session:
-            localStorage.setItem('id_token', hash.id_token);
-          }
-        }
-
-        // Find out if there is an ID token
-        var id_token = localStorage.getItem('id_token');
-        if (id_token) {
-          lock.getProfile(id_token, function (err, profile) {
-            if (err) {
-              console.log('profile error: '+ err.message);
-              return alert('There was an error geting the profile: ' + err.message);
-            }
-            console.log('Profile Name: '+profile.name);
-            document.getElementById('auth0login').style.display = 'none';
-            document.getElementById('auth0logout').display = '';
-            document.getElementById('auth0-name').textContent = profile.name;
-          })
+      //Store the id with localStorage
+      var hash = lock.parseHash(window.location.hash);
+      if (hash) {
+        if (hash.error) {
+          console.log("There was an error logging in", hash.error);
+          alert('There was an error: ' + hash.error + '\n' + hash.error_description);
         } else {
-          document.getElementById('auth0logout').style.display = 'none';
-          document.getElementById('auth0login').style.display = '';
-          console.log('No one logged in');
+          //save the token in the session:
+          localStorage.setItem('id_token', hash.id_token);
         }
+      }
+
+      // Find out if there is an ID token
+      var id_token = localStorage.getItem('id_token');
+      if (id_token) {
+        lock.getProfile(id_token, function (err, profile) {
+          if (err) {
+            console.log('profile error: '+ err.message);
+            return alert('There was an error geting the profile: ' + err.message);
+          }
+          console.log('Profile Name: '+profile.name);
+          document.getElementById('auth0login').style.display = 'none';
+          document.getElementById('auth0logout').display = '';
+          document.getElementById('auth0-name').textContent = profile.name;
+        })
+      } else {
+        document.getElementById('auth0logout').style.display = 'none';
+        document.getElementById('auth0login').style.display = '';
+        console.log('No one logged in');
+      }
 
 
 

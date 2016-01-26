@@ -15,8 +15,8 @@ var i18n = require("../../i18n");
 
 
 // put our module.exports here.  This is replacing the old method of having a giant long list here
-var nodeContents = require('./loader').nodeContents;
-var requiredNodes = require('./loader').requiredNodes;
+var nodeContents = require('./nodeList').nodeContents;
+var requiredNodes = require('./nodeList').requiredNodes;
 
 events.on("node-locales-dir", function (info) {
     i18n.registerMessageCatalog(info.namespace, info.dir, info.file);

@@ -14,6 +14,8 @@
  * limitations under the License.
  **/
 
+var getHTML = require('./getHTML');
+
 module.exports = function(RED){
 
 RED.editor = (function() {
@@ -638,7 +640,12 @@ RED.editor = (function() {
             });
             $( "#dialog" ).dialog("option","buttons",buttons);
         }
-        $("#dialog-form").html($("script[data-template-name='"+type+"']").html());
+        if(node._def.render){
+            $("#dialog-form").html(getHTML(node._def.render()));
+        }else{
+            $("#dialog-form").html($("script[data-template-name='"+type+"']").html());
+        }
+
         var ns;
         if (node._def.set.module === "node-red") {
             ns = "node-red";
@@ -701,7 +708,13 @@ RED.editor = (function() {
             configNode["_"] = node_def._;
         }
 
-        $("#node-config-dialog-edit-form").html($("script[data-template-name='"+type+"']").html());
+        if(node_def.render){
+            $("#node-config-dialog-edit-form").html(getHTML(node_def.render()));
+        }else{
+            $("#node-config-dialog-edit-form").html($("script[data-template-name='"+type+"']").html());
+        }
+
+
 
         $("#dialog-config-form").find('[data-i18n]').each(function() {
             var current = $(this).attr("data-i18n");

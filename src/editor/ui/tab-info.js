@@ -14,6 +14,8 @@
  * limitations under the License.
  **/
 
+var getHTML = require('./getHTML');
+
 module.exports = function(RED){
 
 RED.sidebar.info = (function() {
@@ -138,7 +140,10 @@ RED.sidebar.info = (function() {
             }
         }
         table += "</tbody></table><hr/>";
-        if (!subflowNode && node.type != "comment") {
+
+        if(node._def && node._def.renderHelp){
+            table  += '<div class="node-help">'+getHTML(node._def.renderHelp())+"</div>";
+        } else if (!subflowNode && node.type != "comment") {
             var helpText = $("script[data-help-name|='"+node.type+"']").html()||"";
             table  += '<div class="node-help">'+helpText+"</div>";
         }

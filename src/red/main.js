@@ -59,6 +59,7 @@ RED.start().then(function() {
     //post message back to parent
     console.log('started');
     RED.comms.publishReady();
+    // require('extras').loadServerExtras(RED);
 }).catch(function(err) {
     RED.log.error(log._("server.failed-to-start"));
     if (err.stack) {

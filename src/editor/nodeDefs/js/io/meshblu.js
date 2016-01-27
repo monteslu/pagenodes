@@ -340,6 +340,29 @@ RED.nodes.registerType('meshblu-server',{
           });
 
       });
+    },
+    render: function(){
+      return(
+      <div>
+      <div className="form-row node-input-server">
+        <label forHtml="node-config-input-server"><i className="fa fa-globe"></i> server</label>
+        <input className="input-append-left" type="text" id="node-config-input-server" placeholder="localhost" style={{width: "40%"}} />
+        <label forHtml="node-config-input-port" style={{marginLeft: "10px", width: "35px"}}> Port</label>
+        <input type="text" id="node-config-input-port" placeholder="Port" style={{width:"45px"}} />
+      </div>
+      <div className="form-row">
+        <label forHtml="node-config-input-uuid"><i className="fa fa-user"></i> UUID</label>
+        <input type="text" id="node-config-input-uuid" />
+      </div>
+      <div className="form-row">
+        <label forHtml="node-config-input-token"><i className="fa fa-lock"></i> token</label>
+        <input type="text" id="node-config-input-token" />
+      </div>
+      <div className="form-row">
+        &nbsp;&nbsp;&nbsp;<a href="#" className="btn" id="node-config-input-generate">Create UUID/Token</a> <span id="node-config-input-messageArea"></span>
+      </div>
+      </div>
+      );
     }
   });
 

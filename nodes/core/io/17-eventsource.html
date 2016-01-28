@@ -35,54 +35,6 @@
     If no topic is specified, the node will listen for unnamed messages.</p>
 </script>
 
-<script type="text/javascript">
-
-(function() {
-
-
-    function sse_label() {
-        return this.name || "[sse] " + (this.topic || "eventsource");
-    }
-
-
-    RED.nodes.registerType('eventsource',{
-        category: 'input',
-        defaults: {
-            name: {value:""},
-            topic: {value:"", required:false},
-            client: {type:"eventsource-client", required: true}
-        },
-        color:"rgb(255, 215, 180)",
-        inputs:0,
-        outputs:1,
-        icon: "white-globe.png",
-        labelStyle: function() {
-            return this.name?"node_label_italic":"";
-        },
-        label: sse_label
-    });
-
-
-    RED.nodes.registerType('eventsource-client',{
-        category: 'config',
-        defaults: {
-            path: {value:"",required:true }
-        },
-        inputs:0,
-        outputs:0,
-        label: function() {
-            if(this.path && this.path.length > 35){
-                return this.path.substring(0,33) + '...';
-            }
-            return this.path;
-        }
-    });
-
-})();
-</script>
-
-
-
 <!-- WebSocket Client configuration node -->
 <script type="text/x-red" data-template-name="eventsource-client">
     <div class="form-row">
@@ -97,4 +49,3 @@
 <script type="text/x-red" data-help-name="eventsource-client">
    <p>This configuration node connects an EventSource (Server Sent Events) client to the specified URL.</p>
 </script>
-

@@ -1,5 +1,5 @@
 module.exports = function(RED){
-  
+
 (function() {
 
     function ws_oneditprepare() {
@@ -64,7 +64,52 @@ module.exports = function(RED){
         },
         label: ws_label,
         oneditsave: ws_oneditsave,
-        oneditprepare: ws_oneditprepare
+        oneditprepare: ws_oneditprepare,
+        render: function () {
+          return (
+            <div>
+              <div
+                className="form-row"
+                id="websocket-client-row">
+                <label htmlFor="node-input-client">
+                  <i className="fa fa-bookmark" />
+                  <span data-i18n="websocket.label.url" />
+                </label>
+                <input type="text" id="node-input-client" />
+              </div>
+              <div className="form-row">
+                <label htmlFor="node-input-topic">
+                  <i className="fa fa-tag" />
+                  <span data-i18n="common.label.topic" />
+                </label>
+                <input
+                  type="text"
+                  id="node-input-topic"
+                  data-i18n="[placeholder]common.label.topic" />
+              </div>
+              <div className="form-row">
+                <label htmlFor="node-input-name">
+                  <i className="fa fa-tag" />
+                  <span data-i18n="common.label.name" />
+                </label>
+                <input
+                  type="text"
+                  id="node-input-name"
+                  data-i18n="[placeholder]common.label.name" />
+              </div>
+            </div>
+          )
+        },
+        renderHelp: function () {
+          return (
+            <div>
+              <p>Socket.io input node.</p>
+              <p>By default, the data received from the WebSocket will be in <b>msg.payload</b>.
+              The socket can be configured to expect a properly formed JSON string, in which
+              case it will parse the JSON and send on the resulting object as the entire message.</p>
+          </div>
+          )
+        }
     });
 
     RED.nodes.registerType('socketio out',{
@@ -83,7 +128,48 @@ module.exports = function(RED){
         },
         label: ws_label,
         oneditsave: ws_oneditsave,
-        oneditprepare: ws_oneditprepare
+        oneditprepare: ws_oneditprepare,
+        render: function () {
+          return (
+            <div>
+              <div
+                className="form-row"
+                id="websocket-client-row">
+                <label htmlFor="node-input-client">
+                  <i className="fa fa-bookmark" />
+                  <span data-i18n="websocket.label.url" />
+                </label>
+                <input type="text" id="node-input-client" />
+              </div>
+              <div className="form-row">
+                <label htmlFor="node-input-name">
+                  <i className="fa fa-tag" />
+                  <span data-i18n="common.label.name" />
+                </label>
+                <input
+                  type="text"
+                  id="node-input-name"
+                  data-i18n="[placeholder]common.label.name" />
+              </div>
+            </div>
+          )
+        },
+        renderHelp: function () {
+          return (
+            <div>
+              <p>Socket.io out node.</p>
+              <p>By default, <b>msg.payload</b> will be sent over the WebSocket. The socket
+              can be configured to encode the entire message object as a JSON string and send that
+              over the WebSocket.</p>
+
+              <p>If the message arriving at this node started at a WebSocket In node, the message
+              will be sent back to the client that triggered the flow. Otherwise, the message
+              will be broadcast to all connected clients.</p>
+              <p>If you want to broadcast a message that started at a WebSocket In node, you
+              should delete the <b>msg._session</b> property within the flow</p>.
+            </div>
+          )
+        }
     });
 
 
@@ -96,6 +182,35 @@ module.exports = function(RED){
         outputs:0,
         label: function() {
             return this.path;
+        },
+        render: function () {
+          return (
+            <div>
+              <div className="form-row">
+                <label htmlFor="node-config-input-path">
+                  <i className="fa fa-bookmark" />
+                  <span data-i18n="websocket.label.url" />
+                </label>
+                <input
+                  type="text"
+                  id="node-config-input-path"
+                  placeholder="ws://example.com/ws" />
+              </div>
+              <div className="form-tips">
+                <p>
+                  <span data-i18n="[html]websocket.tip.url1" />
+                </p>
+                <span data-i18n="[html]websocket.tip.url2" />
+              </div>
+            </div>
+          )
+        },
+        renderHelp: function () {
+          return (
+            <div>
+              <p>This configuration node connects a WebSocket client to the specified URL.</p>
+            </div>
+          )
         }
     });
 

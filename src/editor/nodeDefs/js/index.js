@@ -15,6 +15,7 @@ const nodeDefs = [
   require('./core/inject'),
   require('./core/comment'),
   require('./io/httpin'),
+  require('./io/eventsource'),
   //require('./io/websocket'),
   //require('./io/watch'),
   //require('./io/tcpin'),

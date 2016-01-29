@@ -15,24 +15,26 @@ module.exports = function(RED){
             return this.name?"node_label_italic":"";
         },
         render: function () {
-          <div>
-            <div className="form-row">
-              <label htmlFor="node-input-name">
-                <i className="fa fa-tag" />
-                <span data-i18n="common.label.name" />
-              </label>
-              <input
-                type="text"
-                id="node-input-name"
-                data-i18n="[placeholder]common.label.name" />
+          return (
+            <div>
+              <div className="form-row">
+                <label htmlFor="node-input-name">
+                  <i className="fa fa-tag" />
+                  <span data-i18n="common.label.name" />
+                </label>
+                <input
+                  type="text"
+                  id="node-input-name"
+                  data-i18n="[placeholder]common.label.name" />
+              </div>
+              <div className="form-tips" id="tip-json" hidden>
+                <span data-i18n="httpin.tip.req" />
+              </div>
             </div>
-            <div className="form-tips" id="tip-json" hidden>
-              <span data-i18n="httpin.tip.req" />
-            </div>
-          </div>
+          )
         },
         renderHelp: function () {
-          <div>
+          return (
             <div>
               <p>
                 This node gives the geolocation coordinates using the API from <a href="https://developer.mozilla.org/en-US/docs/Web/API/Geolocation/getCurrentPosition">navigator.GeoLocation</a>.
@@ -40,8 +42,8 @@ module.exports = function(RED){
               <p>
                 You can see the bulk of the location by looking at the msg.location. If you are using a debug mode, you can see this by looking at the entire msg object.
               </p>
-            </div>      
-          </div>
+            </div>
+          )
         }
     });
 };

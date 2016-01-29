@@ -138,8 +138,6 @@ module.exports = function(RED){
             ]
           });
         }
-
-
       });
 
 

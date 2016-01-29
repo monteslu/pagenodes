@@ -224,40 +224,76 @@ module.exports = function(RED){
     render: function () {
       return (
         <div>
-        <div className="form-row">
-        <label htmlFor="node-input-name"><i className="fa fa-tag"></i> <span data-i18n="common.label.name"></span></label>
-          <input type="text" id="node-input-name" data-i18n="[placeholder]common.label.name"/>
-        </div>
-        <div className="form-row">
-        <span data-i18n="switch.label.property"></span> msg.<input type="text" id="node-input-property" style={{ width: "200px" }}/>
-        </div>
-        <div className="form-row node-input-rule-container-row" style={{ marginBottom: "0px" }}>
-        <div id="node-input-rule-container-div" style={{ boxSizing: "border-box", borderRadius: "5px", height: "310px", padding: "5px", border: "1px solid #ccc", overflowY: "scrolls"}}>
-        <ol id="node-input-rule-container" style={{ listStyleType: "none", margin: "0"}}></ol>
-        </div>
-        </div>
-        <div className="form-row">
-        <a href="#" className="editor-button editor-button-small" id="node-input-add-rule" style={{ marginTop: "4px" }}><i className="fa fa-plus"></i> <span data-i18n="switch.label.rule"></span></a>
-        </div>
-        <div className="form-row">
-        <select id="node-input-checkall" style={{ width: "100%", marginRight: "5px" }}>
-        <option value="true" data-i18n="switch.checkall"></option>
-        <option value="false" data-i18n="switch.stopfirst"></option>
-        </select>
-        </div>
+          <div className="form-row">
+            <label htmlFor="node-input-name">
+              <i className="fa fa-tag">
+              </i>
+              <span data-i18n="common.label.name">
+              </span>
+            </label>
+            <input
+              type="text"
+              id="node-input-name"
+              data-i18n="[placeholder]common.label.name"/>
+          </div>
+          <div className="form-row">
+            <span data-i18n="switch.label.property">
+            </span> msg.<input type="text" id="node-input-property" style={{ width: "200px" }}/>
+          </div>
+          <div
+            className="form-row node-input-rule-container-row"
+            style={{ marginBottom: "0px" }}>
+            <div
+              id="node-input-rule-container-div"
+              style={{ boxSizing: "border-box", borderRadius: "5px", height: "310px", padding: "5px", border: "1px solid #ccc", overflowY: "scrolls"}}>
+              <ol
+                id="node-input-rule-container"
+                style={{ listStyleType: "none", margin: "0"}}>
+              </ol>
+            </div>
+          </div>
+          <div className="form-row">
+            <a
+              href="#"
+              className="editor-button editor-button-small"
+              id="node-input-add-rule"
+              style={{ marginTop: "4px" }}>
+              <i className="fa fa-plus">
+              </i>
+              <span data-i18n="switch.label.rule">
+              </span>
+            </a>
+          </div>
+          <div className="form-row">
+            <select
+              id="node-input-checkall"
+              style={{ width: "100%", marginRight: "5px" }}>
+              <option value="true" data-i18n="switch.checkall">
+              </option>
+              <option
+                value="false"
+                data-i18n="switch.stopfirst">
+              </option>
+            </select>
+          </div>
         </div>
       )
     },
     renderHelp: function () {
       return (
         <div>
-        <p>A simple function node to route messages based on its properties.</p>
-        <p>When a message arrives, the selected property is evaluated against each
-        of the defined rules. The message is then sent to the output of <i>all</i>
-        rules that pass.</p>
-        <p>Note: the <i>otherwise</i> rule applies as a "not any of" the rules preceding it.</p>
-
-        </div>
+          <p>
+            A simple function node to route messages based on its properties.
+          </p>
+          <p>
+            When a message arrives, the selected property is evaluated against each
+            of the defined rules. The message is then sent to the output of <i>all</i>
+          rules that pass.
+        </p>
+        <p>
+          Note: the <i>otherwise</i> rule applies as a "not any of" the rules preceding it.
+        </p>
+      </div>
       )
     }
   });

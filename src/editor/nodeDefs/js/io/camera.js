@@ -34,14 +34,13 @@ module.exports = function(RED){
                 <span data-i18n="httpin.tip.req" />
               </div>
             </div>
-
           )
         },
         renderHelp: function () {
           return (
             <div>
               <p>Attaches a base64 (dataURL) picture from your webcam to <code>msg.image</code>.</p>
-            </div>            
+            </div>
           )
         }
       });

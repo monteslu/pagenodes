@@ -303,7 +303,7 @@ repeat = count * 60 * 60;
     },
     button: {
       onclick: function() {
-        var label = (this.name||this.payload).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+        var label = (this.name||this.payload).replace(/&/g,/&/g,"&amp;").replace(/</g,/</g,"&lt;").replace(/>/g,/>/g,"&gt;");
         if (this.payloadType === "date") { label = this._("inject.timestamp"); }
         if (this.payloadType === "none") { label = this._("inject.blank"); }
         var node = this;
@@ -351,82 +351,171 @@ render: function () {
           width: 40px !important;
           }
           `}</style>
-              <div className="form-row node-input-payload">
-        <label htmlFor="node-input-payloadType"><i className="fa fa-envelope"></i> <span data-i18n="common.label.payload"></span></label>
-        <select id="node-input-payloadType" style={{width: "73%"}}>
-          <option value="date" data-i18n="inject.timestamp"></option>
-          <option value="string" data-i18n="inject.string"></option>
-          <option value="none" data-i18n="inject.blank"></option>
-        </select>
-    </div>
-
-    <div className="form-row" id="node-input-row-payload">
-        <label htmlFor="node-input-payload"></label>
-        <input type="text" id="node-input-payload" style={{ width: "70%" }} />
-    </div>
-
-    <div className="form-row">
-        <label htmlFor="node-input-topic"><i className="fa fa-tasks"></i> <span data-i18n="common.label.topic"></span></label>
-      <input type="text" id="node-input-topic" style={{ width: "70%x" }}/>
-    </div>
-
-    <div className="form-row">
-        <label htmlFor=""><i className="fa fa-repeat"></i> <span data-i18n="inject.label.repeat"></span></label>
-        <select id="inject-time-type-select" style={{ width: "73%" }}>
-            <option value="none" data-i18n="inject.none"></option>
-            <option value="interval" data-i18n="inject.interval"></option>
-        </select>
-        <input type="hidden" id="node-input-repeat"/>
-        <input type="hidden" id="node-input-crontab"/>
-    </div>
-
-    <div className="form-row inject-time-row hidden" id="inject-time-row-interval">
-        <span data-i18n="inject.every"></span>
-        <input id="inject-time-interval-count" className="inject-time-count" value="1"></input>
-        <select style={{ width: "100px" }} id="inject-time-interval-units">
-            <option value="s" data-i18n="inject.seconds"></option>
-            <option value="m" data-i18n="inject.minutes"></option>
-            <option value="h" data-i18n="inject.hours"></option>
-        </select><br/>
-    </div>
-
-    <div className="form-row" id="node-once">
-        <label>&nbsp;</label>
-        <input type="checkbox" id="node-input-once" style={{ display: "inlineBlock", width: "auto", "verticalAlign": "top" }}/>
-        <label htmlFor="node-input-once" style={{ width: "70%" }} data-i18n="inject.onstart"></label>
-    </div>
-
-    <div className="form-row" id="node-allowDebugInput">
-        <label>&nbsp;</label>
-        <input type="checkbox" id="node-input-allowDebugInput" style={{ display: "inlineBlock", width: "auto", "verticalAlign": "top" }}/>
-        <label htmlFor="node-input-allowDebugInput" style={{ width: "70%" }}>allow debug panel input</label>
-    </div>
-
-    <div className="form-row">
-        <label htmlFor="node-input-name"><i className="fa fa-tag"></i> <span data-i18n="common.label.name"></span></label>
-        <input type="text" id="node-input-name" data-i18n="[placeholder]common.label.name"/>
-    </div>
-
-    <div className="form-tips" data-i18n="[html]inject.tip"></div>
+        <div className="form-row node-input-payload">
+          <label htmlFor="node-input-payloadType">
+            <i className="fa fa-envelope">
+            </i>
+            <span data-i18n="common.label.payload">
+            </span>
+          </label>
+          <select
+            id="node-input-payloadType"
+            style={{width: "73%"}}>
+            <option value="date" data-i18n="inject.timestamp">
+            </option>
+            <option value="string" data-i18n="inject.string">
+            </option>
+            <option value="none" data-i18n="inject.blank">
+            </option>
+          </select>
         </div>
+
+        <div
+          className="form-row"
+          id="node-input-row-payload">
+          <label htmlFor="node-input-payload">
+          </label>
+          <input
+            type="text"
+            id="node-input-payload"
+            style={{ width: "70%" }} />
+        </div>
+
+        <div className="form-row">
+          <label htmlFor="node-input-topic">
+            <i className="fa fa-tasks">
+            </i>
+            <span data-i18n="common.label.topic">
+            </span>
+          </label>
+          <input
+            type="text"
+            id="node-input-topic"
+            style={{ width: "70%x" }}/>
+        </div>
+
+        <div className="form-row">
+          <label htmlFor="">
+            <i className="fa fa-repeat">
+            </i>
+            <span data-i18n="inject.label.repeat">
+            </span>
+          </label>
+          <select
+            id="inject-time-type-select"
+            style={{ width: "73%" }}>
+            <option value="none" data-i18n="inject.none">
+            </option>
+            <option
+              value="interval"
+              data-i18n="inject.interval">
+            </option>
+          </select>
+          <input type="hidden" id="node-input-repeat"/>
+          <input type="hidden" id="node-input-crontab"/>
+        </div>
+
+        <div
+          className="form-row inject-time-row hidden"
+          id="inject-time-row-interval">
+          <span data-i18n="inject.every">
+          </span>
+          <input
+            id="inject-time-interval-count"
+            className="inject-time-count"
+            value="1">
+          </input>
+          <select
+            style={{ width: "100px" }}
+            id="inject-time-interval-units">
+            <option value="s" data-i18n="inject.seconds">
+            </option>
+            <option value="m" data-i18n="inject.minutes">
+            </option>
+            <option value="h" data-i18n="inject.hours">
+            </option>
+          </select>
+          <br/>
+        </div>
+
+        <div className="form-row" id="node-once">
+          <label>&nbsp;</label>
+          <input
+            type="checkbox"
+            id="node-input-once"
+            style={{ display: "inlineBlock", width: "auto", "verticalAlign": "top" }}/>
+          <label
+            htmlFor="node-input-once"
+            style={{ width: "70%" }}
+            data-i18n="inject.onstart">
+          </label>
+        </div>
+
+        <div
+          className="form-row"
+          id="node-allowDebugInput">
+          <label>&nbsp;</label>
+          <input
+            type="checkbox"
+            id="node-input-allowDebugInput"
+            style={{ display: "inlineBlock", width: "auto", "verticalAlign": "top" }}/>
+          <label
+            htmlFor="node-input-allowDebugInput"
+            style={{ width: "70%" }}>
+            allow debug panel input
+          </label>
+        </div>
+
+        <div className="form-row">
+          <label htmlFor="node-input-name">
+            <i className="fa fa-tag">
+            </i>
+            <span data-i18n="common.label.name">
+            </span>
+          </label>
+          <input
+            type="text"
+            id="node-input-name"
+            data-i18n="[placeholder]common.label.name"/>
+        </div>
+
+        <div
+          className="form-tips"
+          data-i18n="[html]inject.tip">
+        </div>
+      </div>
       )
     },
     renderHelp: function () {
       return (
         <div>
-          <p>Pressing the button on the left side of the node allows a message on a topic
-           to be injected into the flow. This is mainly for test purposes.</p>
-        <p>The payload defaults to the current time in millisecs since 1970, but can
-           also be set to a String or left blank.</p>
-        <p>The repeat function allows the payload to be sent on the required schedule.</p>
-        <p>The <i>Fire once at start</i> option actually waits a short interval before firing
-           to give other nodes a chance to instantiate properly.</p>
-        <p><b>Note: </b>"Interval between times" and "at a specific time" uses cron.
-           This means that 20 minutes will be at the next hour, 20 minutes past and
-           40 minutes past - not in 20 minutes time. If you want every 20 minutes
-           from now - use the "interval" option.</p>
-        <p><b>Note: </b>all string input is escaped. To add a carriage return to a string
-        you should use a following function.</p>
+          <p>
+            Pressing the button on the left side of the node allows a message on a topic
+            to be injected into the flow. This is mainly for test purposes.
+          </p>
+          <p>
+            The payload defaults to the current time in millisecs since 1970, but can
+            also be set to a String or left blank.
+          </p>
+          <p>
+            The repeat function allows the payload to be sent on the required schedule.
+          </p>
+          <p>
+            The <i>Fire once at start</i> option actually waits a short interval before firing
+            to give other nodes a chance to instantiate properly.
+          </p>
+          <p>
+            <b>Note: </b>
+            "Interval between times" and "at a specific time" uses cron.
+            This means that 20 minutes will be at the next hour, 20 minutes past and
+            40 minutes past - not in 20 minutes time. If you want every 20 minutes
+            from now - use the "interval" option.
+          </p>
+          <p>
+            <b>Note: </b>
+            all string input is escaped. To add a carriage return to a string
+            you should use a following function.
+          </p>
         </div>
       )
     }

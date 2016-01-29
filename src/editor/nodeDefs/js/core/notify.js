@@ -98,18 +98,30 @@ module.exports = function(RED){
     render: function () {
       return (
         <div>
-        <div className="form-row">
-        <label htmlFor="node-input-name"><i className="fa fa-tag"></i> <span data-i18n="common.label.name"></span></label>
-        <input type="text" id="node-input-name" data-i18n="[placeholder]common.label.name"/>
-        </div>
+          <div className="form-row">
+            <label htmlFor="node-input-name">
+              <i className="fa fa-tag">
+              </i>
+              <span data-i18n="common.label.name">
+              </span>
+            </label>
+            <input
+              type="text"
+              id="node-input-name"
+              data-i18n="[placeholder]common.label.name"/>
+          </div>
         </div>
       )
     },
     renderHelp: function () {
       return (
         <div>
-        <p>The Notify node can be connected to the output of any node. It can be used to display the output of a <b>msg.payload</b> .</p>
-        <p>Each message will also display the title, <b>msg.topic</b> .</p>
+          <p>
+            The Notify node can be connected to the output of any node. It can be used to display the output of a <b>msg.payload</b> .
+          </p>
+          <p>
+            Each message will also display the title, <b>msg.topic</b> .
+          </p>
         </div>
       )
     }

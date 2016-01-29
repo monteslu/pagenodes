@@ -15,7 +15,6 @@ module.exports = [
     module: 'node-red',
     name: 'geolocate',
     version: '0.11.2-git' },
-
   { file: 'debug.js',
     module: 'node-red',
     name: 'debug',

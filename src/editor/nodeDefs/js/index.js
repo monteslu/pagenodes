@@ -1,13 +1,6 @@
 const nodeDefs = [
   require('./analysis/sentiment'),
-  //require('./core/catch'),
-  //require('./core/status'),
   require('./core/debug'),
-  //require('./core/exec'),
-  //require('./core/delay'),
-  //require('./core/trigger'),
-  //require('./core/unknown'),
-  //require('./core/mqtt'),
   require('./core/template'),
   require('./core/function'),
   require('./core/espeak'),
@@ -15,10 +8,6 @@ const nodeDefs = [
   require('./core/inject'),
   require('./core/comment'),
   require('./io/httpin'),
-  //require('./io/websocket'),
-  //require('./io/watch'),
-  //require('./io/tcpin'),
-  //require('./io/udp'),
   require('./io/camera'),
   require('./io/meshblu'),
   require('./io/gpio'),
@@ -28,12 +17,7 @@ const nodeDefs = [
   require('./logic/switch'),
   require('./logic/range'),
   require('./logic/change'),
-  //require('./parsers/xml'),
-  //require('./parsers/html'),
-  //require('./parsers/csv'),
   require('./parsers/json'),
-  //require('./storage/file'),
-  //require('./storage/tail'),
   require('./storage/localdb')
 ];
 

@@ -138,8 +138,6 @@ module.exports = function(RED){
             ]
           });
         }
-
-
       });
 
 
@@ -210,6 +208,91 @@ module.exports = function(RED){
         this.directToMe = false;
       }
       console.log('saving', this, a);
+    },
+    render: function () {
+      return (
+        <div>
+        <style>
+          {`.meshbluNode {
+           color: #1f3d7c;
+           fill: #1f3d7c;
+          } `}
+        </style>
+          <div>
+            <div className="form-row">
+              <label htmlFor="node-input-server">
+                <i className="fa fa-globe" /> server
+                </label>
+                <input type="text" id="node-input-server" />
+              </div>
+              <div className="form-row">
+                <label htmlFor="node-input-directToMe">
+                  <i className="fa fa-user" /> Direct to Me?
+                  </label>
+                  <input
+                    type="checkbox"
+                    id="node-input-directToMe"
+                    style={{width: 30, height: '1.7em'}} />
+                  <span
+                    id="node-spand-directToMe-uuid"
+                    className="selectable" />
+                </div>
+                <div className="form-row" id="node-div-deviceRow">
+                  <label htmlFor="node-input-uuid">
+                    <i className="fa fa-asterisk" /> A broadcast from
+                    </label>
+                    <input
+                      type="text"
+                      id="node-input-uuid"
+                      placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+                      style={{width: '62%'}} />
+                    <a id="node-input-lookup-uuid" className="btn">
+                      <i
+                        className="icon icon-search"
+                        id="node-input-lookup-uuid-icon" />
+                    </a>
+                  </div>
+                  <div className="form-row">
+                    <label htmlFor="node-input-name">
+                      <i className="fa fa-tag" /> Name
+                      </label>
+                      <input
+                        type="text"
+                        id="node-input-name"
+                        placeholder="Name" />
+                    </div>
+                    <div
+                      id="uuidListDialog"
+                      title="Searching devices..."
+                      className="hide">
+                      <div className="form-row">
+                        <span id="serverName" />
+                      </div>
+                      <div className="form-row">
+                        <select
+                          id="uuidDevices"
+                          size={7}
+                          style={{width: '50em', fontFamily: 'Courier, monospace'}}>
+                        </select>
+                      </div>
+                      <div className="form-row">
+                        <a
+                          id="node-input-claim-uuid"
+                          className="btn"
+                          style={{display: 'none'}}>claim</a>
+                        <span id="claimOutput">
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+      )
+    },
+    renderHelp: function () {
+      return (
+        <p>meshblu input node. Connects to a server and either receives messages sent directly to the connected uuid or subscribes to broadcasts from a specified uuid.</p>
+      )
     }
   });
 
@@ -297,6 +380,93 @@ RED.nodes.registerType('meshblu out',{
       }
 
       console.log('saving', this, a);
+    },
+    render: function () {
+      return (
+        <div>
+          <div className="form-row">
+            <label htmlFor="node-input-server">
+              <i className="fa fa-globe" /> server
+              </label>
+              <input type="text" id="node-input-server" />
+            </div>
+            <div className="form-row">
+              <label htmlFor="node-input-broadcast">
+                <i className="fa fa-asterisk" /> broadcast?
+                </label>
+                <input
+                  type="checkbox"
+                  id="node-input-broadcast"
+                  style={{width: 30, height: '1.7em'}} />
+              </div>
+              <div className="form-row" id="node-div-deviceRow">
+                <label htmlFor="node-input-uuid">
+                  <i className="fa fa-user" /> To a specific uuid
+                  </label>
+                  <input
+                    type="text"
+                    id="node-input-uuid"
+                    placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+                    style={{width: '62%'}} />
+                  <a id="node-input-lookup-uuid" className="btn">
+                    <i
+                      className="icon icon-search"
+                      id="node-input-lookup-uuid-icon" />
+                  </a>
+                </div>
+                <div
+                  className="form-row"
+                  id="node-div-outputsRow">
+                  <label htmlFor="node-input-forwards">
+                    <i className="icon-share-alt" /> Forward Response?
+                    </label>
+                    <input
+                      type="checkbox"
+                      id="node-input-forwards"
+                      style={{width: 30, height: '1.7em'}} />
+                  </div>
+                  <div className="form-row">
+                    <label htmlFor="node-input-name">
+                      <i className="fa fa-tag" /> Name
+                      </label>
+                      <input
+                        type="text"
+                        id="node-input-name"
+                        placeholder="Name" />
+                    </div>
+                    <div
+                      id="uuidListDialog"
+                      title="Searching devices..."
+                      className="hide">
+                      <div className="form-row">
+                        <span id="serverName" />
+                      </div>
+                      <div className="form-row">
+                        <select
+                          id="uuidDevices"
+                          size={7}
+                          style={{width: '50em', fontFamily: 'Courier, monospace'}}>
+                        </select>
+                      </div>
+                      <div className="form-row">
+                        <a
+                          id="node-input-claim-uuid"
+                          className="btn"
+                          style={{display: 'none'}}>claim</a>
+                        <span id="claimOutput">
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+      )
+    },
+    renderHelp: function () {
+      return (
+        <div>
+          <p>Connects to a meshblu server and either broadcasts out the <b>msg</b> to any subscribers or sends the <b>msg</b> to a specific device.</p>
+        </div>
+      )
     }
   });
 
@@ -344,23 +514,48 @@ RED.nodes.registerType('meshblu-server',{
     render: function(){
       return(
       <div>
-      <div className="form-row node-input-server">
-        <label forHtml="node-config-input-server"><i className="fa fa-globe"></i> server</label>
-        <input className="input-append-left" type="text" id="node-config-input-server" placeholder="localhost" style={{width: "40%"}} />
-        <label forHtml="node-config-input-port" style={{marginLeft: "10px", width: "35px"}}> Port</label>
-        <input type="text" id="node-config-input-port" placeholder="Port" style={{width:"45px"}} />
-      </div>
-      <div className="form-row">
-        <label forHtml="node-config-input-uuid"><i className="fa fa-user"></i> UUID</label>
-        <input type="text" id="node-config-input-uuid" />
-      </div>
-      <div className="form-row">
-        <label forHtml="node-config-input-token"><i className="fa fa-lock"></i> token</label>
-        <input type="text" id="node-config-input-token" />
-      </div>
-      <div className="form-row">
-        &nbsp;&nbsp;&nbsp;<a href="#" className="btn" id="node-config-input-generate">Create UUID/Token</a> <span id="node-config-input-messageArea"></span>
-      </div>
+        <div>
+          <div className="form-row node-input-server">
+            <label htmlFor="node-config-input-server">
+              <i className="fa fa-globe" /> server
+              </label>
+              <input
+                className="input-append-left"
+                type="text"
+                id="node-config-input-server"
+                placeholder="localhost"
+                style={{width: '40%'}} />
+              <label
+                htmlFor="node-config-input-port"
+                style={{marginLeft: 10, width: 35}}> Port</label>
+              <input
+                type="text"
+                id="node-config-input-port"
+                placeholder="Port"
+                style={{width: 45}} />
+            </div>
+            <div className="form-row">
+              <label htmlFor="node-config-input-uuid">
+                <i className="fa fa-user" /> UUID
+                </label>
+                <input type="text" id="node-config-input-uuid" />
+              </div>
+              <div className="form-row">
+                <label htmlFor="node-config-input-token">
+                  <i className="fa fa-lock" /> token
+                  </label>
+                  <input type="text" id="node-config-input-token" />
+                </div>
+                <div className="form-row">
+                  <a
+                    href="#"
+                    className="btn"
+                    id="node-config-input-generate">
+                    Create UUID/Token
+                  </a>
+                  <span id="node-config-input-messageArea" />
+                </div>
+              </div>
       </div>
       );
     }

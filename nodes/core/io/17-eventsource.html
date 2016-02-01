@@ -1,100 +1,14 @@
-<!--
-  Copyright 2013 IBM Corp.
 
-  Licensed under the Apache License, Version 2.0 (the "License");
-  you may not use this file except in compliance with the License.
-  You may obtain a copy of the License at
-
-  http://www.apache.org/licenses/LICENSE-2.0
-
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the License for the specific language governing permissions and
-  limitations under the License.
--->
 <!-- WebSocket Input Node -->
 <script type="text/x-red" data-template-name="eventsource">
-    <div class="form-row" id="websocket-client-row">
-        <label for="node-input-client"><i class="fa fa-bookmark"></i> <span data-i18n="websocket.label.url"></span></label>
-        <input type="text" id="node-input-client">
-    </div>
-    <div class="form-row">
-        <label for="node-input-topic"><i class="fa fa-tag"></i> <span data-i18n="common.label.topic"></span></label>
-        <input type="text" id="node-input-topic" data-i18n="[placeholder]common.label.topic">
-    </div>
-    <div class="form-row">
-        <label for="node-input-name"><i class="fa fa-tag"></i> <span data-i18n="common.label.name"></span></label>
-        <input type="text" id="node-input-name" data-i18n="[placeholder]common.label.name">
-    </div>
 </script>
 
 <script type="text/x-red" data-help-name="eventsource in">
-    <p>EventSource (Server Sent Events) input node.</p>
-    <p>The event data will be in <b>msg.payload</b>.
-    If no topic is specified, the node will listen for unnamed messages.</p>
 </script>
-
-<script type="text/javascript">
-
-(function() {
-
-
-    function sse_label() {
-        return this.name || "[sse] " + (this.topic || "eventsource");
-    }
-
-
-    RED.nodes.registerType('eventsource',{
-        category: 'input',
-        defaults: {
-            name: {value:""},
-            topic: {value:"", required:false},
-            client: {type:"eventsource-client", required: true}
-        },
-        color:"rgb(255, 215, 180)",
-        inputs:0,
-        outputs:1,
-        icon: "white-globe.png",
-        labelStyle: function() {
-            return this.name?"node_label_italic":"";
-        },
-        label: sse_label
-    });
-
-
-    RED.nodes.registerType('eventsource-client',{
-        category: 'config',
-        defaults: {
-            path: {value:"",required:true }
-        },
-        inputs:0,
-        outputs:0,
-        label: function() {
-            if(this.path && this.path.length > 35){
-                return this.path.substring(0,33) + '...';
-            }
-            return this.path;
-        }
-    });
-
-})();
-</script>
-
-
 
 <!-- WebSocket Client configuration node -->
 <script type="text/x-red" data-template-name="eventsource-client">
-    <div class="form-row">
-        <label for="node-config-input-path"><i class="fa fa-bookmark"></i> <span data-i18n="websocket.label.url"></span></label>
-        <input type="text" id="node-config-input-path" placeholder="https://example.com/sse">
-    </div>
-    <div class="form-tips">
-        <p><span>This will need to a be a CORS compliant HTTPS URL.</span></p>
-    </div>
 </script>
 
 <script type="text/x-red" data-help-name="eventsource-client">
-   <p>This configuration node connects an EventSource (Server Sent Events) client to the specified URL.</p>
 </script>
-

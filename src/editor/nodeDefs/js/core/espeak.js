@@ -101,6 +101,46 @@ module.exports = function(RED) {
       RED.comms.unsubscribe('espeak',this.handleDebugMessage);
       // RED.sidebar.removeTab("debug");
       // delete RED._debug;
+    },
+    render: function () {
+      return (
+        <div>
+          <div className="form-row" id="voice-selection">
+            <label htmlFor="node-input-variant">
+              <i className="fa fa-circle">
+              </i>
+              <span data-i18n="variant">variant</span>
+            </label>
+            <select
+              type="text"
+              id="node-input-variant"
+              style={{ width: "250px" }}>
+            </select>
+          </div>
+          <div className="form-row">
+            <label htmlFor="node-input-name">
+              <i className="fa fa-tag">
+              </i>
+              <span data-i18n="common.label.name">
+              </span>
+            </label>
+            <input
+              type="text"
+              id="node-input-name"
+              data-i18n="[placeholder]common.label.name"/>
+          </div>
+        </div>
+      )
+    },
+    renderHelp: function () {
+      return (
+        <div>
+          <p>
+            The espeak node can be connected to the output of any node. It can be used to play a text-to-speech version of the <b>msg.payload</b> .
+          </p>
+          <p>Each message can also modify the playback <b>msg.pitch</b> and <b>msg.speed</b>.</p>
+        </div>
+      )
     }
   });
 };

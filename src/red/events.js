@@ -14,6 +14,6 @@
  * limitations under the License.
  **/
 
-var events = require("events"); 
+var events = require("events");
 
-module.exports = new events.EventEmitter(); 
+module.exports = new events.EventEmitter();

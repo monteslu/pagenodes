@@ -112,6 +112,7 @@ module.exports = function(RED) {
 
         });
     }
+    P2PListenNode.groupName = 'peer2peer';
     RED.nodes.registerType("p2p-client",P2PListenNode);
 
 
@@ -178,6 +179,7 @@ module.exports = function(RED) {
 
 
     }
+    P2PInNode.groupName = 'peer2peer';
     RED.nodes.registerType("p2p in",P2PInNode);
 
     function P2pOutNode(n) {
@@ -208,5 +210,6 @@ module.exports = function(RED) {
             }
         });
     }
+    P2pOutNode.groupName = 'peer2peer';
     RED.nodes.registerType("p2p out",P2pOutNode);
 }

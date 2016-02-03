@@ -88,6 +88,7 @@ module.exports = function(RED) {
 
         });
     }
+    SocketIOListenNode.groupName = 'socketio';
     RED.nodes.registerType("socketio-client",SocketIOListenNode);
 
 
@@ -154,6 +155,7 @@ module.exports = function(RED) {
 
 
     }
+    SocketIOInNode.groupName = 'socketio';
     RED.nodes.registerType("socketio in",SocketIOInNode);
 
     function SocketIOOutNode(n) {
@@ -176,5 +178,6 @@ module.exports = function(RED) {
             }
         });
     }
+    SocketIOOutNode.groupName = 'socketio';
     RED.nodes.registerType("socketio out",SocketIOOutNode);
 }

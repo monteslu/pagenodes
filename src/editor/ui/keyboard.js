@@ -27,6 +27,11 @@ RED.keyboard = (function() {
         d3.select(document.body).on("keydown",function() {
             if (!active) { return; }
             var handler = handlers[d3.event.keyCode];
+
+            //HACK!!!!!! kill me now
+            if(d3.event.target.id === 'debug-tab-input'){
+                return;
+            }
             if (handler && handler.ondown) {
                 if (!handler.modifiers ||
                     ((!handler.modifiers.shift || d3.event.shiftKey) &&
@@ -38,6 +43,10 @@ RED.keyboard = (function() {
         });
 
         d3.select(document.body).on("keyup",function() {
+            //HACK!!!!!! kill me now
+            if(d3.event.target.id === 'debug-tab-input'){
+                return;
+            }
             if (!active) { return; }
             var handler = handlers[d3.event.keyCode];
             if (handler && handler.onup) {

@@ -47,5 +47,6 @@ module.exports = function(RED) {
             else { node.send(msg); } // If no payload - just pass it on.
         });
     }
+    JSONNode.groupName = 'JSON'; //hack!!!
     RED.nodes.registerType("json",JSONNode);
 }

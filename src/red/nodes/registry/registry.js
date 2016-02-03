@@ -35,14 +35,14 @@ var moduleNodes = {};
 function init(_settings,_loader) {
     settings = _settings;
     loader = _loader;
-    if (settings.available()) {
-        moduleConfigs = loadNodeConfigs();
-    } else {
+    // if (settings.available()) {
+    //     moduleConfigs = loadNodeConfigs();
+    // } else {
         moduleConfigs = {};
-    }
+    // }
     moduleNodes = {};
     nodeTypeToId = {};
-    nodeConstructors = {};
+    // nodeConstructors = {};
     nodeList = [];
     nodeConfigCache = null;
     Node = require("../Node");
@@ -105,7 +105,7 @@ function saveNodeList() {
         }
     }
     if (settings.available()) {
-        return settings.set("nodes",moduleList);
+        return when.resolve('ok'); //settings.set("nodes",moduleList);
     } else {
         return when.reject("Settings unavailable");
     }
@@ -114,49 +114,49 @@ function saveNodeList() {
 function loadNodeConfigs() {
 
 
-    var configs = settings.get("nodes");
+    var configs; // = settings.get("nodes");
 
     console.log('loadNodeConfigs configs', configs);
+    return {};
+    // if (!configs) {
 
-    if (!configs) {
-        return {};
-    } else if (configs['node-red']) {
-        return configs;
-    } else {
-        // Migrate from the 0.9.1 format of settings
-        var newConfigs = {};
-        for (var id in configs) {
-            /* istanbul ignore else */
-            if (configs.hasOwnProperty(id)) {
-                var nodeConfig = configs[id];
-                var moduleName;
-                var nodeSetName;
+    // } else if (configs['node-red']) {
+    //     return configs;
+    // } else {
+    //     // Migrate from the 0.9.1 format of settings
+    //     var newConfigs = {};
+    //     for (var id in configs) {
+    //         /* istanbul ignore else */
+    //         if (configs.hasOwnProperty(id)) {
+    //             var nodeConfig = configs[id];
+    //             var moduleName;
+    //             var nodeSetName;
 
-                if (nodeConfig.module) {
-                    moduleName = nodeConfig.module;
-                    nodeSetName = nodeConfig.name.split(":")[1];
-                } else {
-                    moduleName = "node-red";
-                    nodeSetName = nodeConfig.name.replace(/^\d+-/,"").replace(/\.js$/,"");
-                }
+    //             if (nodeConfig.module) {
+    //                 moduleName = nodeConfig.module;
+    //                 nodeSetName = nodeConfig.name.split(":")[1];
+    //             } else {
+    //                 moduleName = "node-red";
+    //                 nodeSetName = nodeConfig.name.replace(/^\d+-/,"").replace(/\.js$/,"");
+    //             }
 
-                if (!newConfigs[moduleName]) {
-                    newConfigs[moduleName] = {
-                        name: moduleName,
-                        nodes:{}
-                    };
-                }
-                newConfigs[moduleName].nodes[nodeSetName] = {
-                    name: nodeSetName,
-                    types: nodeConfig.types,
-                    enabled: nodeConfig.enabled,
-                    module: moduleName
-                };
-            }
-        }
-        settings.set("nodes",newConfigs);
-        return newConfigs;
-    }
+    //             if (!newConfigs[moduleName]) {
+    //                 newConfigs[moduleName] = {
+    //                     name: moduleName,
+    //                     nodes:{}
+    //                 };
+    //             }
+    //             newConfigs[moduleName].nodes[nodeSetName] = {
+    //                 name: nodeSetName,
+    //                 types: nodeConfig.types,
+    //                 enabled: nodeConfig.enabled,
+    //                 module: moduleName
+    //             };
+    //         }
+    //     }
+    //     settings.set("nodes",newConfigs);
+    //     return newConfigs;
+    // }
 }
 
 function addNodeSet(id,set,version) {
@@ -321,9 +321,9 @@ function getModuleInfo(module) {
 }
 
 function registerNodeConstructor(type,constructor) {
-    if (nodeConstructors[type]) {
-        throw new Error(type+" already registered");
-    }
+    // if (nodeConstructors[type]) {
+    //     throw new Error(type+" already registered");
+    // }
     //TODO: Ensure type is known - but doing so will break some tests
     //      that don't have a way to register a node template ahead
     //      of registering the constructor
@@ -394,7 +394,7 @@ function clear() {
     nodeConfigCache = null;
     moduleConfigs = {};
     nodeList = [];
-    nodeConstructors = {};
+    // nodeConstructors = {};
     nodeTypeToId = {};
 }
 
@@ -486,7 +486,7 @@ function cleanModuleList() {
     }
 }
 
-var registry = module.exports = {
+module.exports = {
     init: init,
     clear: clear,
 
@@ -498,7 +498,7 @@ var registry = module.exports = {
     disableNodeSet: disableNodeSet,
 
     removeModule: removeModule,
-
+    nodeConstructors: nodeConstructors,
     getNodeInfo: getNodeInfo,
     getFullNodeInfo: getFullNodeInfo,
     getNodeList: getNodeList,

@@ -37,6 +37,7 @@ var RED = {
         server.init(httpServer,settings);
         return server.app;
     },
+    backend: true,
     start: server.start,
     stop: server.stop,
     nodes: nodes,

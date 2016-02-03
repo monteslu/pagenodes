@@ -110,5 +110,7 @@ module.exports = function(RED) {
         });
     }
 
+    HTTPRequest.groupName = 'httpin';
+
     RED.nodes.registerType("http request",HTTPRequest);
 }

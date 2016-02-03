@@ -82,6 +82,7 @@ module.exports = {
     addFile: addFile,
     addModule: addModule,
     removeModule: registry.removeModule,
-    
-    cleanModuleList: registry.cleanModuleList
+
+    cleanModuleList: registry.cleanModuleList,
+    nodeConstructors: registry.nodeConstructors
 };

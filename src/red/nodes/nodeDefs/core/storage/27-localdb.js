@@ -42,6 +42,7 @@ module.exports = function(RED) {
       } // If no payload - just pass it on.
     });
   }
+  LocalWriteNode.groupName = 'localdb';
   RED.nodes.registerType("localwrite",LocalWriteNode);
   //LocalReadNode
   function LocalReadNode(n){
@@ -58,5 +59,6 @@ module.exports = function(RED) {
       }
     });
   }
+  LocalReadNode.groupName = 'localdb';
   RED.nodes.registerType('localread',LocalReadNode);
 }

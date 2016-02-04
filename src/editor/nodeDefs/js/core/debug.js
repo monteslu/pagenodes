@@ -44,7 +44,85 @@ module.exports = function(RED){
       inputbar.id = "input-toolbar";
       content.appendChild(inputbar);
 
-      inputbar.innerHTML = '<div><a id="debug-tab-input-send" title="send" class="button" href="#" style="margin: 5px;"><i class="fa fa-play"></i></a><span id="debug-tab-input-wrapper"><input id="debug-tab-input" type="text" /></span></div> ';
+      inputbar.innerHTML = '<div><a id="debug-tab-input-send" title="send" class="button" href="#" style="margin: 5px;"><i class="fa fa-play"></i></a><span id="debug-tab-input-wrapper"><input id="debug-tab-input" type="text" /></span></div>';
+
+      var styleTag = document.createElement("style");
+      content.appendChild(styleTag);
+
+      styleTag.innerHTML = `
+#debug-content {
+      position: absolute;
+      top: 70px;
+      bottom: 0px;
+      left:0px;
+      right: 0px;
+      overflow-y: scroll;
+      }
+      #debug-toolbar {
+      padding: 3px 10px;
+      height: 24px;
+      background: #f3f3f3;
+      }
+      #input-toolbar {
+      height: 34px;
+      background: #f3f3f3;
+      padding: 3px;
+      }
+      #debug-tab-input-wrapper {
+      display: block;
+      overflow: hidden;
+      padding-right: 5px;
+      }
+      #debug-tab-input-send {
+      float: right;
+      margin: 5px;
+      }
+      #debug-tab-input {
+      width: 95%;
+      }
+      .debug-message {
+      cursor: pointer;
+      border-bottom: 1px solid #eee;
+      border-left: 8px solid #eee;
+      border-right: 8px solid #eee;
+      padding: 2px;
+      }
+      .debug-message-date {
+      background: #fff;
+      font-size: 9px;
+      color: #aaa;
+      padding: 1px 5px 1px 1px;
+      }
+      .debug-message-topic {
+      display: block;
+      background: #fff;
+      padding: 1px;
+      font-size: 10px;
+      color: #a66;
+      }
+      .debug-message-name {
+      background: #fff;
+      padding: 1px 5px;
+      font-size: 9px;
+      color: #aac;
+      }
+      .debug-message-payload {
+      display: block;
+      padding: 2px;
+      background: #fff;
+      }
+      .debug-message-level-log {
+      border-left-color: #eee;
+      border-right-color: #eee;
+      }
+      .debug-message-level-30 {
+      border-left-color: #ffdf9d;
+      border-right-color: #ffdf9d;
+      }
+      .debug-message-level-20 {
+      border-left-color: #f99;
+      border-right-color: #f99;
+      }`
 
       var toolbar = document.createElement("div");
       toolbar.id = "debug-toolbar";
@@ -54,6 +132,7 @@ module.exports = function(RED){
 
       var messages = document.createElement("div");
       messages.id = "debug-content";
+
       content.appendChild(messages);
 
       RED.sidebar.addTab({
@@ -228,84 +307,7 @@ module.exports = function(RED){
     render: function () {
       return (
         <div>
-        <style>
-        {`
-          #debug-content {
-          position: absolute;
-          top: 70px;
-          bottom: 0px;
-          left:0px;
-          right: 0px;
-          overflow-y: scroll;
-          }
-          #debug-toolbar {
-          padding: 3px 10px;
-          height: 24px;
-          background: #f3f3f3;
-          }
-          #input-toolbar {
-          height: 34px;
-          background: #f3f3f3;
-          padding: 3px;
-          }
-          #debug-tab-input-wrapper {
-          display: block;
-          overflow: hidden;
-          padding-right: 5px;
-          }
-          #debug-tab-input-send {
-          float: right;
-          margin: 5px;
-          }
-          #debug-tab-input {
-          width: 95%;
-          }
-          .debug-message {
-          cursor: pointer;
-          border-bottom: 1px solid #eee;
-          border-left: 8px solid #eee;
-          border-right: 8px solid #eee;
-          padding: 2px;
-          }
-          .debug-message-date {
-          background: #fff;
-          font-size: 9px;
-          color: #aaa;
-          padding: 1px 5px 1px 1px;
-          }
-          .debug-message-topic {
-          display: block;
-          background: #fff;
-          padding: 1px;
-          font-size: 10px;
-          color: #a66;
-          }
-          .debug-message-name {
-          background: #fff;
-          padding: 1px 5px;
-          font-size: 9px;
-          color: #aac;
-          }
-          .debug-message-payload {
-          display: block;
-          padding: 2px;
-          background: #fff;
-          }
-          .debug-message-level-log {
-          border-left-color: #eee;
-          border-right-color: #eee;
-          }
-          .debug-message-level-30 {
-          border-left-color: #ffdf9d;
-          border-right-color: #ffdf9d;
-          }
-          .debug-message-level-20 {
-          border-left-color: #f99;
-          border-right-color: #f99;
-          }
-          `}
-          </style>
-          <div className="form-row">
+        <div className="form-row">
           <label htmlFor="node-input-select-complete"><i className="fa fa-list"></i> <span data-i18n="debug.output"></span></label>
           <select type="text" id="node-input-select-complete" style={{ display: "inline-block", width: "250px", verticalAlign: "top" }}>
           <option value="false" data-i18n="debug.msgprop"></option>

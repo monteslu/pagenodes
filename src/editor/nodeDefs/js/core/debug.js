@@ -50,7 +50,7 @@ module.exports = function(RED){
       content.appendChild(styleTag);
 
       styleTag.innerHTML = `
-#debug-content {
+      #debug-content {
       position: absolute;
       top: 70px;
       bottom: 0px;
@@ -308,27 +308,27 @@ module.exports = function(RED){
       return (
         <div>
         <div className="form-row">
-          <label htmlFor="node-input-select-complete"><i className="fa fa-list"></i> <span data-i18n="debug.output"></span></label>
-          <select type="text" id="node-input-select-complete" style={{ display: "inline-block", width: "250px", verticalAlign: "top" }}>
-          <option value="false" data-i18n="debug.msgprop"></option>
-          <option value="true" data-i18n="debug.msgobj"></option>
-          </select>
-          </div>
-          <div className="form-row" id="node-prop-row">
-          <label htmlFor="node-input-complete">&nbsp;</label>msg.<input type="text" style={{ width: "208px" }} id="node-input-complete"/>
-          </div>
-          <div className="form-row">
-          <label htmlFor="node-input-console"><i className="fa fa-random"></i> <span data-i18n="debug.to"></span></label>
-          <select type="text" id="node-input-console" style={{ display: "inline-block", width: "250px", verticalAlign: "top" }}>
-          <option value="false" data-i18n="debug.debtab"></option>
-          <option value="true" data-i18n="debug.tabcon"></option>
-          </select>
-          </div>
-          <div className="form-row">
-          <label htmlFor="node-input-name"><i className="fa fa-tag"></i> <span data-i18n="common.label.name"></span></label>
-          <input type="text" id="node-input-name" data-i18n="[placeholder]common.label.name"/>
-          </div>
-          </div>
+        <label htmlFor="node-input-select-complete"><i className="fa fa-list"></i> <span data-i18n="debug.output"></span></label>
+        <select type="text" id="node-input-select-complete" style={{ display: "inline-block", width: "250px", verticalAlign: "top" }}>
+        <option value="false" data-i18n="debug.msgprop"></option>
+        <option value="true" data-i18n="debug.msgobj"></option>
+        </select>
+        </div>
+        <div className="form-row" id="node-prop-row">
+        <label htmlFor="node-input-complete">&nbsp;</label>msg.<input type="text" style={{ width: "208px" }} id="node-input-complete"/>
+        </div>
+        <div className="form-row">
+        <label htmlFor="node-input-console"><i className="fa fa-random"></i> <span data-i18n="debug.to"></span></label>
+        <select type="text" id="node-input-console" style={{ display: "inline-block", width: "250px", verticalAlign: "top" }}>
+        <option value="false" data-i18n="debug.debtab"></option>
+        <option value="true" data-i18n="debug.tabcon"></option>
+        </select>
+        </div>
+        <div className="form-row">
+        <label htmlFor="node-input-name"><i className="fa fa-tag"></i> <span data-i18n="common.label.name"></span></label>
+        <input type="text" id="node-input-name" data-i18n="[placeholder]common.label.name"/>
+        </div>
+        </div>
       )
     },
     renderHelp: function () {

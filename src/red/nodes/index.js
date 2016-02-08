@@ -124,6 +124,7 @@ module.exports = {
     disableNode: disableNode,
 
     // Node type registry
+    registry: registry,
     registerType: registerType,
     getType: registry.get,
 
@@ -148,5 +149,6 @@ module.exports = {
     addCredentials: credentials.add,
     getCredentials: credentials.get,
     deleteCredentials: credentials.delete
+
 };
 

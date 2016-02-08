@@ -94,6 +94,7 @@ function init(RED) {
       this.warn("nodebot not configured");
     }
   }
+  gpioInNode.groupName = 'gpio';
   RED.nodes.registerType("gpio in",gpioInNode);
 
   function gpioOutNode(n) {
@@ -206,7 +207,7 @@ function init(RED) {
     }
 
   }
-
+  gpioOutNode.groupName = 'gpio';
   RED.nodes.registerType("gpio out",gpioOutNode);
 
 
@@ -362,7 +363,7 @@ function init(RED) {
     }
 
   }
-
+  johnny5Node.groupName = 'gpio';
   RED.nodes.registerType("johnny5",johnny5Node);
 
   function handleRoute(req, res, handler){

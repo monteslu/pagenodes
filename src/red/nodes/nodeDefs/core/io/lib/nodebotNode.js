@@ -275,6 +275,7 @@ function createNode(RED){
 
 
   }
+  nodebotNode.groupName = 'gpio';
   RED.nodes.registerType("nodebot", nodebotNode);
 
   return nodebotNode;

@@ -107,6 +107,7 @@ function init(RED) {
       }
     }
   }
+  meshbluserverNode.groupName = 'meshblu';
   RED.nodes.registerType("meshblu-server", meshbluserverNode);
 
   function meshbluInNode(n) {
@@ -118,6 +119,7 @@ function init(RED) {
     self.directToMe = n.directToMe;
     self.uuid = n.uuid;
   }
+  meshbluInNode.groupName = 'meshblu';
   RED.nodes.registerType("meshblu in",meshbluInNode);
 
   function meshbluOutNode(n) {
@@ -192,6 +194,7 @@ function init(RED) {
     }
   }
 
+  meshbluOutNode.groupName = 'meshblu';
   RED.nodes.registerType("meshblu out",meshbluOutNode);
 
   //routes

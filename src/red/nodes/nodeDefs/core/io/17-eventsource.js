@@ -96,6 +96,7 @@ module.exports = function(RED) {
             node.emit('closed','');
         });
     }
+    EventSourceListenNode.groupName = 'eventsource';
     RED.nodes.registerType("eventsource-client",EventSourceListenNode);
 
 
@@ -143,5 +144,6 @@ module.exports = function(RED) {
             this.error(RED._("websocket.errors.missing-conf"));
         }
     }
+    EventSourceInNode.groupName = 'eventsource';
     RED.nodes.registerType("eventsource",EventSourceInNode);
 }

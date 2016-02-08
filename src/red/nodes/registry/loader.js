@@ -2,6 +2,7 @@ var when = require("when");
 var fs = require("fs");
 var path = require("path");
 var semver = require("semver");
+var _ = require("lodash");
 
 var events = require("../../events");
 
@@ -13,99 +14,29 @@ var settings;
 
 var i18n = require("../../i18n");
 
-
-var functionHTML = require("raw!../../../../nodes/core/core/80-function.html");
-var injectHTML = require("raw!../../../../nodes/core/core/20-inject.html");
-var debugHTML = require("raw!../../../../nodes/core/core/58-debug.html");
-var templateHTML = require("raw!../../../../nodes/core/core/80-template.html");
-var notifyHTML = require("raw!../../../../nodes/core/core/59-notify.html");
-var espeakHTML = require("raw!../../../../nodes/core/core/60-espeak.html");
-var sentimentHTML = require("raw!../../../../nodes/core/analysis/72-sentiment.html");
-var switchHTML = require("raw!../../../../nodes/core/logic/10-switch.html");
-var changeHTML = require("raw!../../../../nodes/core/logic/15-change.html");
-var rangeHTML = require("raw!../../../../nodes/core/logic/16-range.html");
-var commentHTML = require("raw!../../../../nodes/core/core/90-comment.html");
-var httpinHTML = require("raw!../../../../nodes/core/io/21-httpin.html");
-var cameraHTML = require("raw!../../../../nodes/core/io/24-camera.html");
-var socketioHTML = require("raw!../../../../nodes/core/io/15-socketio.html");
-var meshbluHTML = require("raw!../../../../nodes/core/io/meshblu.html");
-var eventsourceHTML = require("raw!../../../../nodes/core/io/17-eventsource.html");
-var peer2peerHTML = require("raw!../../../../nodes/core/io/16-peer2peer.html");
-var gpioHTML = require("raw!../../../../nodes/core/io/gpio.html");
-var JSONHTML = require("raw!../../../../nodes/core/parsers/70-JSON.html");
-var localdbHTML = require("raw!../../../../nodes/core/storage/27-localdb.html");
-var geolocateHTML = require("raw!../../../../nodes/core/io/geolocate.html");
-
-var nodeContents = {
-    "function.html": functionHTML,
-    "debug.html":  debugHTML,
-    "template.html": templateHTML,
-    "notify.html": notifyHTML,
-    "espeak.html": espeakHTML,
-    "inject.html":  injectHTML,
-    "sentiment.html": sentimentHTML,
-    "switch.html": switchHTML,
-    "change.html": changeHTML,
-    "range.html": rangeHTML,
-    "comment.html": commentHTML,
-    "httpin.html": httpinHTML,
-    "camera.html": cameraHTML,
-    "socketio.html": socketioHTML,
-    "meshblu.html": meshbluHTML,
-    "eventsource.html": eventsourceHTML,
-    "peer2peer.html": peer2peerHTML,
-    "gpio.html": gpioHTML,
-    "JSON.html": JSONHTML,
-    "localdb.html": localdbHTML,
-    'geolocate.html': geolocateHTML
-};
-
-var functionNode = require("../../../../nodes/core/core/80-function");
-var injectNode = require("../../../../nodes/core/core/20-inject");
-var debugNode = require("../../../../nodes/core/core/58-debug");
-var templateNode = require("../../../../nodes/core/core/80-template");
-var notifyNode = require("../../../../nodes/core/core/59-notify");
-var espeakNode = require("../../../../nodes/core/core/60-espeak");
-var sentimentNode = require("../../../../nodes/core/analysis/72-sentiment");
-var switchNode = require("../../../../nodes/core/logic/10-switch");
-var changeNode = require("../../../../nodes/core/logic/15-change");
-var rangeNode = require("../../../../nodes/core/logic/16-range");
-var commentNode = require("../../../../nodes/core/core/90-comment");
-var httpinNode = require("../../../../nodes/core/io/21-httpin");
-var cameraNode = require("../../../../nodes/core/io/24-camera");
-var socketioNode = require("../../../../nodes/core/io/15-socketio");
-var meshbluNode = require("../../../../nodes/core/io/meshblu");
-var peer2peerNode = require("../../../../nodes/core/io/16-peer2peer");
-var gpioNode = require("../../../../nodes/core/io/gpio");
-var eventsourceNode = require("../../../../nodes/core/io/17-eventsource");
-var JSONNode = require("../../../../nodes/core/parsers/70-JSON");
-var localdbNode = require("../../../../nodes/core/storage/27-localdb");
-var geolocateNode = require("../../../../nodes/core/io/geolocate");
-
-
-var requiredNodes = {
-    "function.js": functionNode,
-    "debug.js" : debugNode,
-    "template.js": templateNode,
-    "notify.js" : notifyNode,
-    "espeak.js" : espeakNode,
-    "inject.js" : injectNode,
-    "sentiment.js": sentimentNode,
-    "switch.js": switchNode,
-    "change.js": changeNode,
-    "range.js": rangeNode,
-    "comment.js": commentNode,
-    "httpin.js": httpinNode,
-    "camera.js": cameraNode,
-    "socketio.js": socketioNode,
-    "meshblu.js": meshbluNode,
-    "eventsource.js": eventsourceNode,
-    "peer2peer.js": peer2peerNode,
-    "gpio.js": gpioNode,
-    "JSON.js": JSONNode,
-    "localdb.js": localdbNode,
-    "geolocate.js": geolocateNode
-};
+var requiredNodes = [
+  require("../nodeDefs/core/core/80-function"),
+  require("../nodeDefs/core/core/20-inject"),
+  require("../nodeDefs/core/core/58-debug"),
+  require("../nodeDefs/core/core/80-template"),
+  require("../nodeDefs/core/core/59-notify"),
+  require("../nodeDefs/core/core/60-espeak"),
+  require("../nodeDefs/core/analysis/72-sentiment"),
+  require("../nodeDefs/core/logic/10-switch"),
+  require("../nodeDefs/core/logic/15-change"),
+  require("../nodeDefs/core/logic/16-range"),
+  require("../nodeDefs/core/core/90-comment"),
+  require("../nodeDefs/core/io/21-httpin"),
+  require("../nodeDefs/core/io/24-camera"),
+  require("../nodeDefs/core/io/15-socketio"),
+  require("../nodeDefs/core/io/meshblu"),
+  require("../nodeDefs/core/io/16-peer2peer"),
+  require("../nodeDefs/core/io/gpio"),
+  require("../nodeDefs/core/io/17-eventsource"),
+  require("../nodeDefs/core/parsers/70-JSON"),
+  require("../nodeDefs/core/storage/27-localdb"),
+  require("../nodeDefs/core/io/geolocate")
+];
 
 
 events.on("node-locales-dir", function (info) {
@@ -115,7 +46,6 @@ events.on("node-locales-dir", function (info) {
 function init(_settings) {
     settings = _settings;
     localfilesystem.init(settings);
-
     RED = require('../../red');
 }
 
@@ -125,7 +55,27 @@ function load(defaultNodesDir, disableNodePathScan) {
     // performance gains are minimal.
     //return loadNodeFiles(registry.getModuleList());
 
-    var nodeFiles = localfilesystem.getNodeFiles(defaultNodesDir, disableNodePathScan);
+    for(var i in requiredNodes){
+        requiredNodes[i](RED);
+    }
+
+    console.log('constructors', RED.nodes.registry.nodeConstructors);
+
+    // var nodeFiles = localfilesystem.getNodeFiles(defaultNodesDir, disableNodePathScan);
+    var nodeGroups = {};
+    var nodeFiles = {
+        "node-red": {
+            name: "node-red",
+            version: "1.0.0",
+            nodes: nodeGroups
+        }
+    };
+
+    _.forEach(RED.nodes.registry.nodeConstructors, function(type, i){
+        var groupName = type.groupName || i;
+        nodeGroups[groupName] = nodeGroups[groupName] || {name: groupName, module: "node-red", types: [], file: groupName + '.js'};
+        nodeGroups[groupName].types.push(i);
+    });
     return loadNodeFiles(nodeFiles);
 }
 
@@ -143,26 +93,6 @@ function loadNodeFiles(nodeFiles) {
                 for (var node in nodeFiles[module].nodes) {
                     /* istanbul ignore else */
                     if (nodeFiles[module].nodes.hasOwnProperty(node)) {
-                        if (module != "node-red" && first) {
-                            // Check the module directory exists
-                            first = false;
-                            var fn = nodeFiles[module].nodes[node].file;
-                            var parts = fn.split("/");
-                            var i = parts.length - 1;
-                            for (; i >= 0; i--) {
-                                if (parts[i] == "node_modules") {
-                                    break;
-                                }
-                            }
-                            var moduleFn = parts.slice(0, i + 2).join("/");
-
-                            try {
-                                var stat = fs.statSync(moduleFn);
-                            } catch (err) {
-                                // Module not found, don't attempt to load its nodes
-                                break;
-                            }
-                        }
 
                         try {
                             promises.push(loadNodeConfig(nodeFiles[module].nodes[node]));
@@ -229,51 +159,52 @@ function loadNodeConfig(fileInfo) {
             //     resolve(node);
             // } else {
 
-                var content = nodeContents[node.template];
+                // var content = nodeContents[node.template];
 
-                var types = [];
+                // var types = [];
 
-                var regExp = /<script ([^>]*)data-template-name=['"]([^'"]*)['"]/gi;
-                var match = null;
+                // var regExp = /<script ([^>]*)data-template-name=['"]([^'"]*)['"]/gi;
+                // var match = null;
 
-                while ((match = regExp.exec(content)) !== null) {
-                    types.push(match[2]);
-                }
-                node.types = types;
+                // while ((match = regExp.exec(content)) !== null) {
+                //     types.push(match[2]);
+                // }
+                // node.types = types;
 
-                var langRegExp = /^<script[^>]* data-lang=['"](.+?)['"]/i;
-                regExp = /(<script[^>]* data-help-name=[\s\S]*?<\/script>)/gi;
-                match = null;
-                var mainContent = "";
-                var helpContent = {};
-                var index = 0;
-                while ((match = regExp.exec(content)) !== null) {
-                    mainContent += content.substring(index, regExp.lastIndex - match[1].length);
-                    index = regExp.lastIndex;
-                    var help = content.substring(regExp.lastIndex - match[1].length, regExp.lastIndex);
+                // var langRegExp = /^<script[^>]* data-lang=['"](.+?)['"]/i;
+                // regExp = /(<script[^>]* data-help-name=[\s\S]*?<\/script>)/gi;
+                // match = null;
+                // var mainContent = "";
+                // var helpContent = {};
+                // var index = 0;
+                // while ((match = regExp.exec(content)) !== null) {
+                //     mainContent += content.substring(index, regExp.lastIndex - match[1].length);
+                //     index = regExp.lastIndex;
+                //     var help = content.substring(regExp.lastIndex - match[1].length, regExp.lastIndex);
 
-                    var lang = "en-US";
-                    if ((match = langRegExp.exec(help)) !== null) {
-                        lang = match[1];
-                    }
-                    if (!helpContent.hasOwnProperty(lang)) {
-                        helpContent[lang] = "";
-                    }
+                //     var lang = "en-US";
+                //     if ((match = langRegExp.exec(help)) !== null) {
+                //         lang = match[1];
+                //     }
+                //     if (!helpContent.hasOwnProperty(lang)) {
+                //         helpContent[lang] = "";
+                //     }
 
-                    helpContent[lang] += help;
-                }
-                mainContent += content.substring(index);
+                //     helpContent[lang] += help;
+                // }
+                // mainContent += content.substring(index);
 
-                node.config = mainContent;
-                node.help = helpContent;
+                //node.config = mainContent;
+                //node.help = helpContent;
+                node.help = {"en-US": ""};
                 // TODO: parse out the javascript portion of the template
                 //node.script = "";
-                for (var i = 0; i < node.types.length; i++) {
-                    if (registry.getTypeId(node.types[i])) {
-                        node.err = node.types[i] + " already registered";
-                        break;
-                    }
-                }
+                // for (var i = 0; i < node.types.length; i++) {
+                //     if (registry.getTypeId(node.types[i])) {
+                //         node.err = node.types[i] + " already registered";
+                //         break;
+                //     }
+                // }
                 // fs.stat(path.join(path.dirname(file), "locales"), function (err, stat) {
                 //     if (!err) {
                 //         node.namespace = node.id;
@@ -333,7 +264,7 @@ function loadNodeSet(node) {
                 args[0] = node.namespace + ":" + args[0];
                 return i18n._.apply(null, args);
             };
-            var promise = r(red);
+            var promise = null; //r(red);
             if (promise != null && typeof promise.then === "function") {
                 loadPromise = promise.then(function () {
                     node.enabled = true;

@@ -21,7 +21,6 @@ var path = require("path");
 var events = require("../../events");
 var log = require("../../log");
 
-var cachedNodeFiles = require('./cachedNodeFiles');
 
 var settings;
 var defaultNodesDir = path.resolve(path.join(__dirname,"..","..","..","nodes"));
@@ -194,36 +193,14 @@ function getModuleNodeFiles(module) {
 
 function getNodeFiles(_defaultNodesDir,disableNodePathScan) {
 
-    if (_defaultNodesDir) {
-        defaultNodesDir = _defaultNodesDir;
-    }
-
-    var dir;
-    // Find all of the nodes to load
-    //console.log(defaultNodesDir);
-    var nodeFiles = cachedNodeFiles; //getLocalNodeFiles(path.resolve(defaultNodesDir));
-    //console.log(nodeFiles);
-
-    // var defaultLocalesPath = path.resolve(path.join(defaultNodesDir,"core","locales"));
-    // events.emit("node-locales-dir", {
-    //     namespace:"node-red",
-    //     dir: defaultLocalesPath,
-    //     file: "messages.json"
-    // });
-
-    // if (settings.userDir) {
-    //     dir = path.join(settings.userDir,"nodes");
-    //     nodeFiles = nodeFiles.concat(getLocalNodeFiles(dir));
+    // if (_defaultNodesDir) {
+    //     defaultNodesDir = _defaultNodesDir;
     // }
-    // if (settings.nodesDir) {
-    //     dir = settings.nodesDir;
-    //     if (typeof settings.nodesDir == "string") {
-    //         dir = [dir];
-    //     }
-    //     for (var i=0;i<dir.length;i++) {
-    //         nodeFiles = nodeFiles.concat(getLocalNodeFiles(dir[i]));
-    //     }
-    // }
+
+    // var dir;
+    // // Find all of the nodes to load
+    // //console.log(defaultNodesDir);
+    // var nodeFiles = cachedNodeFiles; //getLocalNodeFiles(path.resolve(defaultNodesDir));
 
     var nodeList = {
         "node-red": {
@@ -231,29 +208,12 @@ function getNodeFiles(_defaultNodesDir,disableNodePathScan) {
             version: settings.version,
             nodes: {}
         }
-    }
-    nodeFiles.forEach(function(node) {
-        nodeList["node-red"].nodes[node.name] = node;
-    });
+    };
+    // nodeFiles.forEach(function(node) {
+    //     nodeList["node-red"].nodes[node.name] = node;
+    // });
 
-    // if (!disableNodePathScan) {
-    //     var moduleFiles = scanTreeForNodesModules();
-    //     moduleFiles.forEach(function(moduleFile) {
-    //         var nodeModuleFiles = getModuleNodeFiles(moduleFile);
-    //         nodeList[moduleFile.package.name] = {
-    //             name: moduleFile.package.name,
-    //             version: moduleFile.package.version,
-    //             nodes: {}
-    //         };
-    //         if (moduleFile.package['node-red'].version) {
-    //             nodeList[moduleFile.package.name].redVersion = moduleFile.package['node-red'].version;
-    //         }
-    //         nodeModuleFiles.forEach(function(node) {
-    //             nodeList[moduleFile.package.name].nodes[node.name] = node;
-    //         });
-    //         nodeFiles = nodeFiles.concat(nodeModuleFiles);
-    //     });
-    // }
+
     return nodeList;
 }
 

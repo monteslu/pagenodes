@@ -1,10 +1,10 @@
-var when = require("when");
-var fs = require("fs");
-var path = require("path");
+const when = require("when");
+const fs = require("fs");
+const path = require("path");
 
-var events = require("../../events");
-var registry = require("./registry");
-var loader = require("./loader");
+const events = require("../../events");
+const registry = require("./registry");
+const loader = require("./loader");
 
 var settings;
 

@@ -1,20 +1,22 @@
-var when = require("when");
-var fs = require("fs");
-var path = require("path");
-var semver = require("semver");
-var _ = require("lodash");
+const when = require("when");
+const fs = require("fs");
+const path = require("path");
+const semver = require("semver");
+const _ = require("lodash");
 
-var events = require("../../events");
+const events = require("../../events");
 
-var localfilesystem = require("./localfilesystem");
-var registry = require("./registry");
+const localfilesystem = require("./localfilesystem");
+const registry = require("./registry");
 
 var RED;
 var settings;
 
-var i18n = require("../../i18n");
+const i18n = require("../../i18n");
 
-var requiredNodes = [
+const extras = require("extras");
+
+const requiredNodes = [
   require("../nodeDefs/core/core/80-function"),
   require("../nodeDefs/core/core/20-inject"),
   require("../nodeDefs/core/core/58-debug"),
@@ -58,6 +60,8 @@ function load(defaultNodesDir, disableNodePathScan) {
     for(var i in requiredNodes){
         requiredNodes[i](RED);
     }
+
+    extras.loadBackend(RED);
 
     console.log('constructors', RED.nodes.registry.nodeConstructors);
 

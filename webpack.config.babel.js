@@ -37,7 +37,8 @@ module.exports = {
       net: 'chrome-net',
       fs: 'level-fs-browser',
       serialport: 'browser-serialport',
-      bcrypt: 'bcryptjs'
+      bcrypt: 'bcryptjs',
+      extras: process.env.EXTRAS || 'pagenodes-extras'
     }
   },
   bail: false

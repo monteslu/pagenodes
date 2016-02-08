@@ -20,6 +20,7 @@ const nopt = require("nopt");
 const path = require("path");
 const RED = require("./red");
 const log = require("./log");
+const extras = require("extras");
 
 
 
@@ -58,6 +59,7 @@ try {
 RED.start().then(function() {
     //post message back to parent
     console.log('started');
+    extras.backendReady(RED);
     RED.comms.publishReady();
     // require('extras').loadServerExtras(RED);
 }).catch(function(err) {

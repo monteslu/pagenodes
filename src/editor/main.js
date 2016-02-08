@@ -1,7 +1,8 @@
 require('babel-core/polyfill'); //@#$! safari
 
+const extras = require('extras');
+
 var loadPackedNodes = require('./nodeDefs/js');
-// var templateText = require('./nodeDefs/html');
 
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('service-worker.bundle.js')
@@ -46,6 +47,8 @@ var RED = (function() {
       // $("body").append(data);
       // $("body").append(templateText);
       loadPackedNodes(RED);
+      extras.loadClient(RED);
+
       $("body").i18n();
 
       $(".palette-spinner").hide();
@@ -214,6 +217,7 @@ var RED = (function() {
       RED.settings.init(function(){
         RED.events.on('serverReady', function(){
           loadEditor();
+          extras.clientReady(RED);
         });
       });
     })
@@ -252,7 +256,3 @@ require('./ui/library')(RED);
 require('./ui/notifications')(RED);
 require('./ui/subflow')(RED);
 require('./ui/touch/radialMenu')(RED);
-
-
-
-// require('extras').loadClient(RED);

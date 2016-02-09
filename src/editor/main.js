@@ -2,7 +2,7 @@ require('babel-core/polyfill'); //@#$! safari
 
 const extras = require('extras');
 
-var loadPackedNodes = require('./nodeDefs/js');
+var loadPackedNodes = require('./nodeDefs');
 
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('service-worker.bundle.js')

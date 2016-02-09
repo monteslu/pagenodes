@@ -112,6 +112,19 @@ module.exports = function(grunt) {
                         //       bootstrap/FA/jquery
                     ]
                 }
+            },
+
+            html: {
+                options: {
+                    separator: "\n",
+                },
+                files: {
+                    "public/index.html": [
+                        "editor/header.html",
+                        "node_modules/" + (process.env.EXTRAS || "pagenodes-extras" )+ "/include.html",
+                        "editor/body.html"
+                    ]
+                }
             }
         },
         uglify: {
@@ -161,7 +174,7 @@ module.exports = function(grunt) {
             build: {
                 src: [
                     "public/red",
-                    // "public/index.html",
+                    "public/index.html",
                     "public/favicon.ico",
                     "public/icons",
                     "public/vendor"
@@ -247,7 +260,7 @@ module.exports = function(grunt) {
                 },
                 {
                     expand: true,
-                    src: ['editor/index.html','editor/backend.html','editor/favicon.ico', 'editor/*.png', 'editor/CNAME', 'editor/webmanifest.json'],
+                    src: ['editor/header.html', 'editor/body.html','editor/backend.html','editor/favicon.ico', 'editor/*.png', 'editor/CNAME', 'editor/webmanifest.json'],
                     dest: 'public/',
                     flatten: true
                 },
@@ -386,7 +399,7 @@ module.exports = function(grunt) {
 
     grunt.registerTask('build',
         'Builds editor content',
-        ['clean:build', 'concat:vendor','sass:build','jsonlint:messages','copy:build']);
+        ['clean:build', 'concat:vendor', 'concat:html','sass:build','jsonlint:messages','copy:build']);
         // ['clean:build','concat:build','concat:vendor','uglify:build','sass:build','jsonlint:messages','copy:build','attachCopyright']);
 
     grunt.registerTask('dev',

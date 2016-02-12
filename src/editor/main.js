@@ -131,7 +131,6 @@ var RED = (function() {
         }
       });
     });
-
   }
 
   var statusEnabled = false;

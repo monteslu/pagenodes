@@ -154,12 +154,11 @@ var RED = (function() {
                     {id:"menu-item-status",label:RED._("menu.label.displayStatus"),toggle:true,onselect:toggleStatus, selected: true},
                     null,
                     {id:"menu-item-import",label:RED._("menu.label.import"),options:[
-                      {id:"menu-item-import-clipboard",label:RED._("menu.label.clipboard"),onselect:RED.clipboard.import},
-                      {id:"menu-item-import-library",label:RED._("menu.label.library"),options:[]}
+                      {id:"menu-item-import-clipboard",label:RED._("menu.label.clipboard"),onselect:RED.clipboard.import}
                     ]},
                     {id:"menu-item-export",label:RED._("menu.label.export"),disabled:true,options:[
                       {id:"menu-item-export-clipboard",label:RED._("menu.label.clipboard"),disabled:true,onselect:RED.clipboard.export},
-                      {id:"menu-item-export-library",label:RED._("menu.label.library"),disabled:true,onselect:RED.library.export}
+                      //{id:"menu-item-export-library",label:RED._("menu.label.library"),disabled:true,onselect:RED.library.export}
                     ]},
                     null,
                     {id:"menu-item-subflow",label:RED._("menu.label.subflows"), options: [

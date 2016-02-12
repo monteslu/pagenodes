@@ -16,7 +16,6 @@ if ('serviceWorker' in navigator) {
 
 var RED = (function() {
 
-
   function loadNodeList() {
     RED.comms.rpc('getNodeList', [], function(data){
       console.log('getNodeList', data);
@@ -83,8 +82,6 @@ var RED = (function() {
         var typeList;
         var info;
 
-
-
         if (topic == "node/added") {
           console.log('node/added', topic, msg);
           var addedTypes = [];
@@ -134,7 +131,6 @@ var RED = (function() {
         }
       });
     });
-
   }
 
   var statusEnabled = false;
@@ -154,12 +150,11 @@ var RED = (function() {
                     {id:"menu-item-status",label:RED._("menu.label.displayStatus"),toggle:true,onselect:toggleStatus, selected: true},
                     null,
                     {id:"menu-item-import",label:RED._("menu.label.import"),options:[
-                      {id:"menu-item-import-clipboard",label:RED._("menu.label.clipboard"),onselect:RED.clipboard.import},
-                      {id:"menu-item-import-library",label:RED._("menu.label.library"),options:[]}
+                      {id:"menu-item-import-clipboard",label:RED._("menu.label.clipboard"),onselect:RED.clipboard.import}
                     ]},
                     {id:"menu-item-export",label:RED._("menu.label.export"),disabled:true,options:[
                       {id:"menu-item-export-clipboard",label:RED._("menu.label.clipboard"),disabled:true,onselect:RED.clipboard.export},
-                      {id:"menu-item-export-library",label:RED._("menu.label.library"),disabled:true,onselect:RED.library.export}
+                      //{id:"menu-item-export-library",label:RED._("menu.label.library"),disabled:true,onselect:RED.library.export}
                     ]},
                     null,
                     {id:"menu-item-subflow",label:RED._("menu.label.subflows"), options: [
@@ -175,15 +170,11 @@ var RED = (function() {
                     ]},
                     null,
                     {id:"menu-item-keyboard-shortcuts",label:RED._("menu.label.keyboardShortcuts"),onselect:RED.keyboard.showHelp},
-                    {id:"menu-item-help",
-                      label: RED.settings.theme("menu.menu-item-help.label","Node-RED Website"),
-                      href: RED.settings.theme("menu.menu-item-help.url","http://nodered.org/docs")
-                    }
+                    {id:"menu-item-help", label: "Pagenodes Website", href: RED.settings.theme("menu.menu-item-help.url","https://github.com/monteslu/pagenodes")}
                   ]
     });
 
     RED.user.init();
-
     RED.library.init();
     RED.palette.init();
     RED.sidebar.init();
@@ -204,7 +195,6 @@ var RED = (function() {
     loadNodeList();
   }
 
-
   $(function() {
 
     if ((window.location.hostname !== "localhost") && (window.location.hostname !== "127.0.0.1")) {
@@ -222,7 +212,6 @@ var RED = (function() {
       });
     })
   });
-
 
   return {
   };

@@ -16,7 +16,6 @@ if ('serviceWorker' in navigator) {
 
 var RED = (function() {
 
-
   function loadNodeList() {
     RED.comms.rpc('getNodeList', [], function(data){
       console.log('getNodeList', data);
@@ -82,8 +81,6 @@ var RED = (function() {
         var i,m;
         var typeList;
         var info;
-
-
 
         if (topic == "node/added") {
           console.log('node/added', topic, msg);
@@ -174,15 +171,11 @@ var RED = (function() {
                     ]},
                     null,
                     {id:"menu-item-keyboard-shortcuts",label:RED._("menu.label.keyboardShortcuts"),onselect:RED.keyboard.showHelp},
-                    {id:"menu-item-help",
-                      label: RED.settings.theme("menu.menu-item-help.label","Node-RED Website"),
-                      href: RED.settings.theme("menu.menu-item-help.url","http://nodered.org/docs")
-                    }
+                    {id:"menu-item-help", label: "Pagenodes Website", href: RED.settings.theme("menu.menu-item-help.url","https://github.com/monteslu/pagenodes")}
                   ]
     });
 
     RED.user.init();
-
     RED.library.init();
     RED.palette.init();
     RED.sidebar.init();
@@ -203,7 +196,6 @@ var RED = (function() {
     loadNodeList();
   }
 
-
   $(function() {
 
     if ((window.location.hostname !== "localhost") && (window.location.hostname !== "127.0.0.1")) {
@@ -221,7 +213,6 @@ var RED = (function() {
       });
     })
   });
-
 
   return {
   };

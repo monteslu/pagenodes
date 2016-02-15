@@ -32,7 +32,6 @@ const requiredNodes = [
   require("../nodeDefs/core/io/camera"),
   require("../nodeDefs/core/io/socketio"),
   require("../nodeDefs/core/io/meshblu"),
-  require("../nodeDefs/core/io/peer2peer"),
   require("../nodeDefs/core/io/gpio"),
   require("../nodeDefs/core/io/eventsource"),
   require("../nodeDefs/core/parsers/JSON"),

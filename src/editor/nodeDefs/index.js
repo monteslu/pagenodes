@@ -23,7 +23,6 @@ const nodeDefs = [
   require('./io/camera'),
   require('./io/meshblu'),
   require('./io/gpio'),
-  require('./io/peer2peer'),
   require('./io/socketio'),
   require('./io/geolocate'),
   require('./logic/switch'),

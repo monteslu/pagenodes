@@ -16,6 +16,7 @@ const nodeDefs = [
   require('./core/comment'),
   require('./io/httpin'),
   require('./io/eventsource'),
+  require('./io/gamepad'),
   //require('./io/websocket'),
   //require('./io/watch'),
   //require('./io/tcpin'),

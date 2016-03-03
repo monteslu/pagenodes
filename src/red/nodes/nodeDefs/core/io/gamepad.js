@@ -13,6 +13,7 @@ module.exports = function(RED) {
     var pollingInterval = parseInt(node.pollingInterval)
     var controllerId = parseInt(node.controllerId - 1);
     if(navigator.getGamepads) {
+      setTimeout(console.log('supdude'),3000);
       function gamepadData(controllerId) {
         navigator.getGamepads()[controllerId]
       }

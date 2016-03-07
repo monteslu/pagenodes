@@ -67,7 +67,7 @@ module.exports = function(RED){
       return (
         <div>
         <p>
-        This node was built for utilizing USB gamepads
+        This node was built for utilizing USB gamepads.  The primary package is still going to be <code>msg.payload</code>.  The easiest way to return is to create a function node and use an if statement to check if a button is set to "pressed".
           </p>
         </div>
       )

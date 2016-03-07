@@ -1,29 +1,26 @@
 module.exports = function(RED) {
-  // IF navigator.gamepads exists
-  // then run a function with setInterval
-  // that uses  navigator.getGamepads TO
-  // send the data in a variable THAT
-  // runs an if statement that iterates over buttons AND
-  // checks to see IF
-  // the button is pressed.
-  // IF that button is pressed then node.send(msg);
   function GamepadNode(n) {
     RED.nodes.createNode(this,n);
     var node = this;
-    var pollingInterval = parseInt(node.pollingInterval)
-    var controllerId = parseInt(node.controllerId - 1);
-    if(navigator.getGamepads) {
-      setTimeout(console.log('supdude'),3000);
-      function gamepadData(controllerId) {
-        navigator.getGamepads()[controllerId]
-      }
-      function parseGamepadData(getGamepadData, controllerId){
-        console.log('Gamepad Data Received...parsing>');
-        node.send(msg);
-      }
-      function sendGamepadData() {
-        console.log('blah');
-      }
+    var controllerId = parseInt(n.controllerId);
+    var refreshInterval = parseInt(n.refreshInterval);
+    console.log(navigator.getGamepads()[0]);
+    if(navigator.getGamepads){
+      setInterval(function(){
+        var msg = {};
+        var payload = navigator.getGamepads()[controllerId];
+        const { axes, buttons, connected, id, index, mapping, timestamp } = payload;
+        msg.payload = { axes, buttons, connected, id, index, mapping, timestamp };
+        msg.payload.buttons = buttons.map(
+          function(button){
+            return {pressed: button.pressed, value: button.value}
+          }
+        )
+        node.send(msg)
+      },refreshInterval)
+    }else{
+      console.log('gamepad is not available in this browser');
     }
   }
+  RED.nodes.registerType("gamepad",GamepadNode);
 }

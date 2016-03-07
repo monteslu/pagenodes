@@ -34,7 +34,7 @@ module.exports = function(RED){
 
         <label htmlFor="node-input-refreshInterval">
         <i className="fa fa-tag" />
-        <span>Interval(ms)</span>
+        <span>Interval</span>
         <span data-i18n="common.label.name" />
         </label>
         <input

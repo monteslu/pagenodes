@@ -19,7 +19,7 @@ module.exports = function(RED) {
         node.send(msg)
       },refreshInterval)
     }else{
-      console.log('gamepad is not available in this browser');
+      console.log('navigator.gamepad is not available in this browser');
     }
   }
   RED.nodes.registerType("gamepad",GamepadNode);

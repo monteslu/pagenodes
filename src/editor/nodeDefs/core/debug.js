@@ -259,7 +259,6 @@ module.exports = function(RED){
 
       }
       $("#debug-tab-input-send").click(sendText);
-      console.log('adding debug input handlers');
       $('#debug-tab-input').keyup(function(e){
 
         // console.log('event ', e);

@@ -18,9 +18,7 @@ var RED = (function() {
 
   function loadNodeList() {
     RED.comms.rpc('getNodeList', [], function(data){
-      console.log('getNodeList', data);
       RED.nodes.setNodeList(data);
-
       var nsCount = 0;
       for(var i=0;i<data.length;i++) {
         var ns = data[i];

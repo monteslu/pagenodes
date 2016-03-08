@@ -36,7 +36,8 @@ const requiredNodes = [
   require("../nodeDefs/core/io/eventsource"),
   require("../nodeDefs/core/parsers/JSON"),
   require("../nodeDefs/core/storage/localdb"),
-  require("../nodeDefs/core/io/geolocate")
+  require("../nodeDefs/core/io/geolocate"),
+  require("../nodeDefs/core/io/gamepad")
 ];
 
 

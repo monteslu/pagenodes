@@ -1,12 +1,12 @@
 {
-  "name": "node-red",
-  "version": "0.11.2",
-  "description": "A visual tool for wiring the Internet of Things",
-  "homepage": "http://nodered.org",
+  "name": "Pagenodes",
+  "version": "0.6.2",
+  "description": "A visual tool, built all in-browser to quickly scaffoled IoT Frameworks",
+  "homepage": "https://pagenodes.com",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/node-red/node-red.git"
+    "url": "https://github.com/monteslu/pagenodes.git"
   },
   "main": "red/red.js",
   "scripts": {
@@ -24,6 +24,9 @@
     },
     {
       "name": "Dave Conway-Jones"
+    },
+    {
+      "name": "IcedDev"
     }
   ],
   "keywords": [

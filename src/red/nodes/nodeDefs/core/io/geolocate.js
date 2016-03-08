@@ -2,8 +2,8 @@ module.exports = function(RED) {
 
   "use strict";
 
-  function GeolocationNode(n) {
-    RED.nodes.createNode(this,n);
+  function GeolocationNode(config) {
+    RED.nodes.createNode(this,config);
     var node = this;
     this.on("input", function(msg) {
       if (msg.hasOwnProperty("payload")) {
@@ -22,7 +22,6 @@ module.exports = function(RED) {
           var crd = pos.coords;
           const { accuracy, altitude, altitudeAccuracy, heading, latitude, longitude, speed } = crd;
           msg.location = { accuracy, altitude, altitudeAccuracy, heading, latitude, longitude, speed };
-          console.log(msg.location);
           node.send(msg);
         }
         navigator.geolocation.getCurrentPosition(success, error, options);

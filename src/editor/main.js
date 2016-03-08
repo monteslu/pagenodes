@@ -7,10 +7,10 @@ var loadPackedNodes = require('./nodeDefs');
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('service-worker.bundle.js')
   .then(function(reg) {
-    console.log('Yey serivceworker!', reg);
+    console.log('Service Worker Detected', reg);
 
   }).catch(function(err) {
-    console.log('Boo no serviceWorker!', err);
+    console.log('No Service Worker Detected', err);
   });
 }
 

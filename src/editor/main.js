@@ -138,7 +138,6 @@ var RED = (function() {
   }
 
   function loadEditor() {
-    console.log('starting loadEditor()');
     RED.menu.init({id:"btn-sidemenu",
                   options: [
                     {id:"menu-item-sidebar-menu",label:RED._("menu.label.sidebar.sidebar"),options:[

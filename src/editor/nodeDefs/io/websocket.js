@@ -1,9 +1,9 @@
 module.exports = function(RED){
-  
+
 (function() {
 
     function ws_oneditprepare() {
-        $("#websocket-client-row").hide();            
+        $("#websocket-client-row").hide();
         $("#node-input-mode").change(function(){
             if( $("#node-input-mode").val() === 'client') {
                 $("#websocket-server-row").hide();
@@ -14,7 +14,7 @@ module.exports = function(RED){
                 $("#websocket-client-row").hide();
             }
         });
-    
+
         if(this.client) {
             $("#node-input-mode").val('client').change();
         }
@@ -22,24 +22,24 @@ module.exports = function(RED){
             $("#node-input-mode").val('server').change();
         }
     }
-    
+
     function ws_oneditsave() {
         if($("#node-input-mode").val() === 'client') {
             $("#node-input-server").append('<option value="">Dummy</option>');
-            $("#node-input-server").val('');                
+            $("#node-input-server").val('');
         }
         else {
             $("#node-input-client").append('<option value="">Dummy</option>');
-            $("#node-input-client").val('');                
+            $("#node-input-client").val('');
         }
     }
-    
+
     function ws_label() {
         var nodeid = (this.client)?this.client:this.server;
         var wsNode = RED.nodes.node(nodeid);
         return this.name||(wsNode?"[ws] "+wsNode.label():"websocket");
     }
-    
+
     function ws_validateserver() {
         if($("#node-input-mode").val() === 'client' || (this.client && !this.server)) {
             return true;
@@ -48,7 +48,7 @@ module.exports = function(RED){
             return RED.nodes.node(this.server) != null;
         }
     }
-    
+
     function ws_validateclient() {
         if($("#node-input-mode").val() === 'client' || (this.client && !this.server)) {
             return RED.nodes.node(this.client) != null;
@@ -76,7 +76,7 @@ module.exports = function(RED){
         oneditsave: ws_oneditsave,
         oneditprepare: ws_oneditprepare
     });
-    
+
     RED.nodes.registerType('websocket out',{
         category: 'output',
         defaults: {
@@ -96,7 +96,7 @@ module.exports = function(RED){
         oneditsave: ws_oneditsave,
         oneditprepare: ws_oneditprepare
     });
-    
+
     RED.nodes.registerType('websocket-listener',{
         category: 'config',
         defaults: {
@@ -107,7 +107,7 @@ module.exports = function(RED){
         outputs:0,
         label: function() {
             var root = RED.settings.httpNodeRoot;
-            if (root.slice(-1) != "/") { 
+            if (root.slice(-1) != "/") {
                 root = root+"/";
             }
             if (this.path.charAt(0) == "/") {
@@ -119,7 +119,7 @@ module.exports = function(RED){
         },
         oneditprepare: function() {
             var root = RED.settings.httpNodeRoot;
-            if (root.slice(-1) == "/") { 
+            if (root.slice(-1) == "/") {
                 root = root.slice(0,-1);
             }
             if (root == "") {
@@ -143,6 +143,6 @@ module.exports = function(RED){
             return this.path;
         }
     });
-    
+
 })();
 };

@@ -63,7 +63,7 @@ function load(defaultNodesDir, disableNodePathScan) {
 
     extras.loadBackend(RED);
 
-    console.log('constructors', RED.nodes.registry.nodeConstructors);
+    console.log('Loaded Nodes', RED.nodes.registry.nodeConstructors);
 
     // var nodeFiles = localfilesystem.getNodeFiles(defaultNodesDir, disableNodePathScan);
     var nodeGroups = {};

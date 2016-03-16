@@ -30,7 +30,6 @@ RED.i18n = (function() {
                 fallbackLng: ['en-US'],
                 useCookie: false
             },function(data) {
-                console.log('done initing i18n', data);
                 done();
             });
             RED["_"] = function() {

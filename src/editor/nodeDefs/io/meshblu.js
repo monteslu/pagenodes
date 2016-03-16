@@ -1,7 +1,5 @@
 module.exports = function(RED){
 
-  console.log('registering meshblu nodes');
-
   function meshbluShortenName(input, length, defaultName){
     input = input || defaultName;
     if(input && input.length > length){

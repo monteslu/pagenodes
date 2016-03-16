@@ -1,7 +1,5 @@
 module.exports = function(RED){
 
-  console.log('registering comment node client code');
-
   RED.nodes.registerType('comment',{
     category: 'function',
     color:"#ffffff",

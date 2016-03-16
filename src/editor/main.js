@@ -7,10 +7,10 @@ var loadPackedNodes = require('./nodeDefs');
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('service-worker.bundle.js')
   .then(function(reg) {
-    console.log('Yey serivceworker!', reg);
+    console.log('Service Worker Detected', reg);
 
   }).catch(function(err) {
-    console.log('Boo no serviceWorker!', err);
+    console.log('No Service Worker Detected', err);
   });
 }
 
@@ -18,9 +18,7 @@ var RED = (function() {
 
   function loadNodeList() {
     RED.comms.rpc('getNodeList', [], function(data){
-      console.log('getNodeList', data);
       RED.nodes.setNodeList(data);
-
       var nsCount = 0;
       for(var i=0;i<data.length;i++) {
         var ns = data[i];
@@ -140,7 +138,6 @@ var RED = (function() {
   }
 
   function loadEditor() {
-    console.log('starting loadEditor()');
     RED.menu.init({id:"btn-sidemenu",
                   options: [
                     {id:"menu-item-sidebar-menu",label:RED._("menu.label.sidebar.sidebar"),options:[

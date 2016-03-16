@@ -95,7 +95,6 @@ function init(adminApp,storage) {
 
     // adminApp.get(new RegExp("/library/flows\/(.*)"),needsPermission("library.read"),library.get);
     events.on('rpc_getFlows', function(data){
-        console.log('rpc_getFlows', data);
         storage.getAllFlows().then(data.reply);
     });
 

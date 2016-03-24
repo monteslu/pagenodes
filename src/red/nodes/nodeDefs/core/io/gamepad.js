@@ -7,16 +7,19 @@ module.exports = function(RED) {
     console.log(navigator.getGamepads()[0]);
     if(navigator.getGamepads){
       node.interval = setInterval(function(){
-        var msg = {};
-        var payload = navigator.getGamepads()[controllerId];
-        const { axes, buttons, connected, id, index, mapping, timestamp } = payload;
-        msg.payload = { axes, buttons, connected, id, index, mapping, timestamp };
-        msg.payload.buttons = buttons.map(
-          function(button){
-            return {pressed: button.pressed, value: button.value}
-          }
-        )
-        node.send(msg)
+        if(navigator.getGamepads && navigator.getGamepads()[controllerId]){
+          var msg = {};
+          var payload = navigator.getGamepads()[controllerId];
+          const { axes, buttons, connected, id, index, mapping, timestamp } = payload;
+          msg.payload = { axes, buttons, connected, id, index, mapping, timestamp };
+          msg.payload.buttons = buttons.map(
+            function(button){
+              return {pressed: button.pressed, value: button.value}
+            }
+          )
+          node.send(msg);
+        }
+
       },refreshInterval)
     }else{
       console.log('navigator.gamepad is not available in this browser');

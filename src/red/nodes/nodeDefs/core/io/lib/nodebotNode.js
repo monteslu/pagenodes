@@ -32,7 +32,7 @@ function createNode(RED){
       node.io.on('connect', function(){
         node.emit('networkReady', node.io);
       });
-      node.board = new five.Board({io: node.io, id: node.id, repl: false});
+      node.board = new five.Board({io: node.io, id: node.id, repl: false, timeout: 2e4});
       node.board.on('ready', function(){
         if (RED.settings.verbose) { node.log('io ready'); }
         process.nextTick(function() {
@@ -113,7 +113,7 @@ function createNode(RED){
     RED.nodes.createNode(this,n);
     var node = this;
 
-    var boardModule;
+    var boardModule, sp;
     try{
       boardModule = boardTypes[n.boardType];
 
@@ -148,7 +148,7 @@ function createNode(RED){
             node.warn(err);
           });
 
-          var sp = new VirtualSerialPort({
+          sp = new VirtualSerialPort({
             client: client,
             transmitTopic: n.pubTopic,
             receiveTopic: n.subTopic
@@ -177,7 +177,7 @@ function createNode(RED){
 
           client.once('ready', function(data){
             console.log('client ready, creating virtual serial port');
-            var sp = new VirtualSerialPort(client, n.sendUuid);
+            sp = new VirtualSerialPort(client, n.sendUuid);
             node.io = new firmata.Board(sp, {samplingInterval: 500, reportVersionTimeout: 15000});
             start(node);
           });
@@ -185,6 +185,19 @@ function createNode(RED){
 
         }catch(exp){
           console.log('error initializing mqtt firmata', exp);
+          process.nextTick(function() {
+            node.emit('ioError', exp);
+          });
+        }
+      }
+      else if(n.connectionType === 'webusb-serial'){
+        try{
+          VirtualSerialPort = require('webusb-serial').SerialPort;
+          sp = new VirtualSerialPort();
+          node.io = new firmata.Board(sp,{ skipCapabilities: true, analogPins: [14,15,16,17,18,19] });
+          start(node);
+        }catch(exp){
+          console.log('error initializing webusb-serial firmata', exp);
           process.nextTick(function() {
             node.emit('ioError', exp);
           });

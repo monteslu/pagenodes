@@ -79,7 +79,7 @@ module.exports = function(RED) {
             }
 
 
-            if(method === 'POST'){
+            if(method === 'POST' ||  method === 'PUT'){
                 opts.entity = msg.payload;
             }
 
@@ -87,11 +87,11 @@ module.exports = function(RED) {
 
             console.log('SERVER httprequest', opts, msg);
 
-            var restCall = rest.chain(errorCodeInterceptor);
+            var restCall = rest.wrap(errorCodeInterceptor);
             if(typeof opts.entity === 'object'){
-                restCall = restCall.chain(mimeInterceptor, { mime: 'application/json' });
+                restCall = restCall.wrap(mimeInterceptor, { mime: 'application/json' });
             }else{
-                restCall = restCall.chain(mimeInterceptor);
+                restCall = restCall.wrap(mimeInterceptor);
             }
 
             opts.path = opts.href;

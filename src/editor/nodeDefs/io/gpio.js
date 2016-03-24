@@ -331,9 +331,10 @@ module.exports = function(RED){
         });
       }
 
-      var firmataRows = ['serial', 'mqtt', 'socketServer', 'username', 'password', 'pub', 'sub', 'tcpHost', 'tcpPort', 'meshbluServer', 'uuid', 'token', 'sendUuid'];
+      var firmataRows = ['serial', 'mqtt', 'socketServer', 'username', 'password', 'pub', 'sub', 'tcpHost', 'tcpPort', 'meshbluServer', 'uuid', 'token', 'sendUuid', 'usb'];
       var firmataToggles = {
         local: ['serial'],
+        "webusb-serial": ['usb'],
         mqtt: ['mqtt', 'username', 'password', 'pub', 'sub'],
         meshblu: ['meshbluServer', 'uuid', 'token', 'sendUuid'],
         socketio: ['socketServer', 'pub', 'sub'],
@@ -401,6 +402,44 @@ module.exports = function(RED){
           });
       });
 
+
+      var usbOutput = $("#node-config-lookup-usb-output");
+      //web usb handling
+      if(navigator.usb){
+        navigator.usb.getDevices().then(function(devices){
+          usbOutput.html('Authorized Devices: ' + devices.length);
+        })
+        .catch(function(err){
+          usbOutput.html(err);
+        });
+
+        $("#node-config-lookup-usb").click(function() {
+          var DEFAULT_FILTERS = [
+            { 'vendorId': 0x2341, 'productId': 0x8036 },
+            { 'vendorId': 0x2341, 'productId': 0x8037 }
+          ];
+
+          navigator.usb.requestDevice({filters: DEFAULT_FILTERS })
+          .then(function(device){
+            console.log('authorized device', device);
+            navigator.usb.getDevices().then(function(devices){
+              usbOutput.html('Authorized Devices: ' + devices.length);
+            })
+            .catch(function(err){
+              usbOutput.html(err);
+            });
+          })
+          .catch(function(err){
+            usbOutput.html(err);
+          });
+
+        });
+
+      }else{
+        usbOutput.html('Web USB API not enabled in this browser');
+      }
+
+
       console.log('prepped', self);
 
     },
@@ -439,23 +478,36 @@ module.exports = function(RED){
                     <option value="meshblu">
                       Meshblu (skynet)
                     </option>
+                    <option value="webusb-serial">WebUSB Serial</option>
                   </select>
                 </div>
                 <div className="form-row" id="node-div-serialRow">
                   <label htmlFor="node-config-input-serialportName">
-                    <i className="fa fa-random" /> Port
-                    </label>
-                    <input
-                      type="text"
-                      id="node-config-input-serialportName"
-                      style={{width: '60%'}}
-                      placeholder="e.g. /dev/ttyUSB0  COM1" />
-                    <a id="node-config-lookup-serial" className="btn">
-                      <i
-                        id="node-config-lookup-serial-icon"
-                        className="fa fa-search" />
-                    </a>
-                  </div>
+                  <i className="fa fa-random" /> Port
+                  </label>
+                  <input
+                    type="text"
+                    id="node-config-input-serialportName"
+                    style={{width: '60%'}}
+                    placeholder="e.g. /dev/ttyUSB0  COM1" />
+                  <a id="node-config-lookup-serial" className="btn">
+                    <i
+                      id="node-config-lookup-serial-icon"
+                      className="fa fa-search" />
+                  </a>
+                </div>
+                <div className="form-row" id="node-div-usbRow">
+                  <label htmlFor="node-config-input-usbName">
+                  Authorize USB
+                  </label>
+                  <span id="node-config-lookup-usb-output">...</span>
+                  <a id="node-config-lookup-usb" className="btn">
+                    <i
+                      id="node-config-lookup-usb-icon"
+                      className="fa fa-random" />
+                  </a>
+                </div>
+
                   <div
                     className="form-row"
                     id="node-div-tcpHostRow">

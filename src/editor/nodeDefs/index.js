@@ -35,7 +35,8 @@ const nodeDefs = [
   require('./parsers/json'),
   //require('./storage/file'),
   //require('./storage/tail'),
-  require('./storage/localdb')
+  require('./storage/localdb'),
+  require('./core/speech')
 ];
 
 module.exports = function(RED){

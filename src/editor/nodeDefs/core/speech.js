@@ -1,5 +1,5 @@
 module.exports = function(RED){
-  RED.nodes.registerType('speech',{
+  RED.nodes.registerType('voice rec',{
     category: 'input',
     color: "#ffb6c1",
     defaults: {
@@ -7,9 +7,9 @@ module.exports = function(RED){
     },
     inputs:0,
     outputs:1,
-    icon: "debug.png",
+    icon: "mouth.png",
     label: function() {
-      return this.name||'speech';
+      return this.name||'voice rec';
     },
     labelStyle: function() {
       return this.name?"node_label_italic":"";
@@ -18,7 +18,6 @@ module.exports = function(RED){
       return (
         <div>
         <div className="form-row">
-
         <label htmlFor="node-input-name">
         <i className="fa fa-tag" />
         <span data-i18n="common.label.name" />
@@ -27,7 +26,6 @@ module.exports = function(RED){
         type="text"
         id="node-input-name"
         data-i18n="[placeholder]common.label.name" />
-
         </div>
         <div className="form-tips" id="tip-json" hidden>
         <span data-i18n="httpin.tip.req" />

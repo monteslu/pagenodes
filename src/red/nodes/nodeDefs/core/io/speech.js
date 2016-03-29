@@ -1,13 +1,40 @@
 module.exports = function(RED) {
   function SpeechNode(config) {
-    RED.nodes.createNode(this,config);
+    RED.nodes.createNode(this,config)
     var node = this;
-    console.log("I'm the Speech Recognition Node!");
-    console.log('SpeechNode node>',node);
-    console.log('SpeechNode config>',config);
-    node.on('close', function(){
-      console.log('I closed!');
-    })
+    var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition
+    var recognition = new SpeechRecognition();
+    var msg = {};
+    recognition.lang = 'en-US';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    recognition.onerror = function(event) {
+      if(event.error === 'no-speech'){
+        console.log('No Speech Detected');
+      }
+    }
+
+    recognition.onend = function() {
+      if(node.isopen){
+        recognition.start();
+      }
+    }
+
+    recognition.onresult = function(event) {
+      msg.payload = event.results[0][0].transcript;
+      console.log('speech-recognition msg',msg);
+      node.send(msg);
+    }
+
+    recognition.start();
+    node.isopen = true;
+
+    node.on("close", () => {
+      node.isopen = false;
+      recognition.stop();
+    });
+
   }
-  RED.nodes.registerType("speech",SpeechNode);
+  RED.nodes.registerType("voice rec",SpeechNode);
 }

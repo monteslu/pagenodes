@@ -9,26 +9,31 @@ module.exports = function(RED) {
     recognition.interimResults = false;
     recognition.maxAlternatives = 1;
 
-    recognition.onerror = function(event) {
-      if(event.error === 'no-speech'){
-        console.log('No Speech Detected');
+    if(recognition){
+      recognition.onerror = function(event) {
+        if(event.error === 'no-speech'){
+          console.log('No Speech Detected');
+        }
       }
-    }
 
-    recognition.onend = function() {
-      if(node.isopen){
-        recognition.start();
+      recognition.onend = function() {
+        if(node.isopen){
+          recognition.start();
+        }
       }
-    }
 
-    recognition.onresult = function(event) {
-      msg.payload = event.results[0][0].transcript;
-      console.log('speech-recognition msg',msg);
-      node.send(msg);
-    }
+      recognition.onresult = function(event) {
+        msg.payload = event.results[0][0].transcript;
+        console.log('speech-recognition msg',msg);
+        node.send(msg);
+      }
 
-    recognition.start();
-    node.isopen = true;
+      recognition.start();
+      node.isopen = true;
+
+    }, else{
+      console.log('Your browser does not have the capability of voice recognition');
+    }
 
     node.on("close", () => {
       node.isopen = false;

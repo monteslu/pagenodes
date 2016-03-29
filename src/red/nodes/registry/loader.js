@@ -38,7 +38,7 @@ const requiredNodes = [
   require("../nodeDefs/core/storage/localdb"),
   require("../nodeDefs/core/io/geolocate"),
   require("../nodeDefs/core/io/gamepad"),
-  require("../nodeDefs/core/io/speech")
+  require("../nodeDefs/core/io/voicerec")
 ];
 
 

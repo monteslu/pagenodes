@@ -32,15 +32,15 @@ module.exports = function(RED) {
         recognition.start();
         node.isopen = true;
 
-      } else{
-        console.log('Your browser does not have the capability of voice recognition');
       }
-
       node.on("close", () => {
         node.isopen = false;
         recognition.stop();
       });
+    }else{
+      console.log('Your browser does not have the capability of voice recognition');
     }
+
   }
   RED.nodes.registerType("voice rec",SpeechNode);
 }

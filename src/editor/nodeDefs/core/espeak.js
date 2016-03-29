@@ -27,7 +27,7 @@ module.exports = function(RED) {
     color:'#ffb6c1',
     inputs:1,
     outputs:0,
-    icon: 'debug.png',
+    icon: 'mouth.png',
     align: 'right',
     button: {
       toggle: 'active',

@@ -1,8 +1,8 @@
-module.exports = function(RED) {
-  function SpeechNode(config) {
+module.exports = function(RED) { function SpeechNode(config) {
     RED.nodes.createNode(this,config)
     var node = this;
     var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+    console.log('voicerec config>',config);
     if(SpeechRecognition){
       var recognition = new SpeechRecognition();
       var msg = {};
@@ -24,7 +24,9 @@ module.exports = function(RED) {
         }
 
         recognition.onresult = function(event) {
+          console.log('onresult config',config)
           msg.payload = event.results[0][0].transcript;
+          msg.topic = config.topic;
           console.log('speech-recognition msg',msg);
           node.send(msg);
         }

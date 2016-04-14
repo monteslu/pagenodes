@@ -24,10 +24,8 @@ module.exports = function(RED) { function SpeechNode(config) {
         }
 
         recognition.onresult = function(event) {
-          console.log('onresult config',config)
           msg.payload = event.results[0][0].transcript;
           msg.topic = config.topic;
-          console.log('speech-recognition msg',msg);
           node.send(msg);
         }
 

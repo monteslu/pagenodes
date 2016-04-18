@@ -9,7 +9,7 @@ module.exports = function(RED){
       pin: {value:"",required:false},
       board: {type:"nodebot", required:true}
     },
-    color:"#f6de1d",
+    color:"#FFEE58",
     inputs:0,
     outputs:1,
     icon: "gpiowhite.png",
@@ -129,7 +129,7 @@ module.exports = function(RED){
       outputs: {value:0},
       board: {type:"nodebot", required:true}
     },
-    color:"#f6de1d",
+    color:"#FFEE58",
     inputs:1,
     outputs:0,
     icon: "gpiowhite.png",
@@ -678,7 +678,7 @@ module.exports = function(RED){
 
 
     RED.nodes.registerType('johnny5',{
-        color:"#f6de1d",
+        color:"#FFEE58",
         category: 'function',
         defaults: {
             name: {value:""},

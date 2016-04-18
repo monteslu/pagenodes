@@ -1,7 +1,7 @@
 module.exports = function(RED){
   RED.nodes.registerType('voice rec',{
     category: 'input',
-    color: "#ffb6c1",
+    color: "#FF7043",
     defaults: {
       name: {value:""}
     },

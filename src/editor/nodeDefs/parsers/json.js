@@ -1,7 +1,7 @@
 module.exports = function(RED){
       RED.nodes.registerType('json',{
         category: 'function',
-        color:"#DEBD5C",
+        color:"#9CCC65",
         defaults: {
             name: {value:""}
         },

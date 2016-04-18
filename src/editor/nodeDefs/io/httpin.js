@@ -1,7 +1,7 @@
 module.exports = function (RED) {
   RED.nodes.registerType('http request', {
     category: 'function',
-    color: "rgb(231, 231, 174)",
+    color: "#FF9100",
     defaults: {
       name: {
         value: ""

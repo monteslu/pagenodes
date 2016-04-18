@@ -22,7 +22,7 @@ module.exports = function(RED) {
         required: true
       }
     },
-    color: "rgb(255, 215, 180)",
+    color: "#FFCA28",
     inputs: 0,
     outputs: 1,
     icon: "white-globe.png",

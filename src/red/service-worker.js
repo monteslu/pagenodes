@@ -1,16 +1,5 @@
-var CACHE_NAME = 'static-v1';
-console.log('im the service worker ok!');
-
-
-self.addEventListener('activate', function(event) {
-  console.log('activate event', event);
-
-});
-
-
-self.addEventListener('install', function(event) {
-  console.log('install', event);
-});
+const CACHE_NAME = 'static-v1';
+const extras = require('extras');
 
 
 self.addEventListener('fetch', function(event) {
@@ -55,4 +44,7 @@ self.addEventListener('fetch', function(event) {
 
 
 });
+
+extras.loadServiceWorker(self);
+
 

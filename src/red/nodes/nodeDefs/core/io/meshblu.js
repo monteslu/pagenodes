@@ -44,7 +44,7 @@ function init(RED) {
     self.directs = [];
     self.subs = [];
 
-    self.conn.on('ready', function(data){
+    self.conn.once('ready', function(data){
       self.conn.connected = true;
 
       _.forEach(RED.nodes.getFlows(), function(n){

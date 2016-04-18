@@ -4,15 +4,9 @@ const extras = require('extras');
 
 var loadPackedNodes = require('./nodeDefs');
 
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('service-worker.bundle.js')
-  .then(function(reg) {
-    console.log('Service Worker Detected', reg);
 
-  }).catch(function(err) {
-    console.log('No Service Worker Detected', err);
-  });
-}
+extras.registerServiceWorker();
+
 
 var RED = (function() {
 

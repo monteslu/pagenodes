@@ -18,6 +18,7 @@ module.exports = function(RED) {
     var urllib = require("url");
     var mustache = require("mustache");
     var querystring = require("querystring");
+    var _ = require('lodash');
 
     var rest = require("rest");
     var errorCodeInterceptor = require('rest/interceptor/errorCode');
@@ -38,10 +39,7 @@ module.exports = function(RED) {
         this.on("input",function(msg) {
             console.log('sending http request', msg);
             node.status({fill:"blue",shape:"dot",text:"httpin.status.requesting"});
-            var url = nodeUrl || msg.url;
-            if (msg.url && nodeUrl && (nodeUrl !== msg.url)) {  // revert change below when warning is finally removed
-                node.warn(RED._("common.errors.nooverride"));
-            }
+            var url = msg.url || nodeUrl;
             if (isTemplatedUrl) {
                 url = mustache.render(nodeUrl,msg);
             }
@@ -54,15 +52,9 @@ module.exports = function(RED) {
                 url = "http://"+url;
             }
 
-            var method = nodeMethod.toUpperCase() || "GET";
-            if (msg.method && n.method && (n.method !== "use")) {     // warn if override option not set
-                node.warn(RED._("common.errors.nooverride"));
-            }
-            if (msg.method && n.method && (n.method === "use")) {
-                method = msg.method.toUpperCase();          // use the msg parameter
-            }
-            var opts = urllib.parse(url);
-            opts.method = method;
+            var method = msg.method || nodeMethod.toUpperCase() || "GET";
+
+            var opts =  {method: method}; //urllib.parse(url);
             opts.headers = {};
             if (msg.headers) {
                 for (var v in msg.headers) {
@@ -82,8 +74,7 @@ module.exports = function(RED) {
             if(method === 'POST' ||  method === 'PUT'){
                 opts.entity = msg.payload;
             }
-
-            var urltotest = url;
+            opts.params = msg.params;
 
             console.log('SERVER httprequest', opts, msg);
 
@@ -94,16 +85,14 @@ module.exports = function(RED) {
                 restCall = restCall.wrap(mimeInterceptor);
             }
 
-            opts.path = opts.href;
+            opts.path = url;
             restCall(opts).then(function(res) {
                 console.log('http response', res);
-                node.send({payload: res.entity, status: res.status, headers: res.headers});
+                node.send(_.assign(msg, {payload: res.entity, status: res.status, headers: res.headers}));
                 node.status({});
             })
             .catch(function(err) {
-                var payload = err.toString() + " : " + url;
-                var statusCode = err.code;
-                node.send({payload: payload, statusCode: statusCode});
+                node.error(err);
                 node.status({fill:"red",shape:"ring",text:err.code});
             });
 

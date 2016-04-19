@@ -5,7 +5,6 @@ module.exports = function(RED) {
     var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
     if(SpeechRecognition){
       var recognition = new SpeechRecognition();
-      var msg = {};
       recognition.lang = 'en-US';
       recognition.interimResults = false;
       recognition.maxAlternatives = 1;
@@ -24,6 +23,7 @@ module.exports = function(RED) {
         }
 
         recognition.onresult = function(event) {
+          var msg = {};
           msg.payload = event.results[0][0].transcript;
           console.log('speech-recognition msg',msg);
           node.send(msg);

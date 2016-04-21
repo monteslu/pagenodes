@@ -1,6 +1,6 @@
 module.exports = function(RED){
   RED.nodes.registerType('range', {
-    color: "#E2D96E",
+    color: "#FFEA00",
     category: 'function',
     defaults: {
       minin: {value:"",required:true,validate:RED.validators.number()},

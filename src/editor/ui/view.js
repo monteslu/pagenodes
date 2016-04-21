@@ -1364,6 +1364,9 @@ RED.view = (function() {
                             text.attr('text-anchor','end');
                         }
                     }
+                    if (d._def.textcolor) {
+                      text.style("fill", d._def.textcolor);
+                    }
 
                     var status = node.append("svg:g").attr("class","node_status_group").style("display","none");
 

@@ -1,6 +1,6 @@
 module.exports = function(RED){
   RED.nodes.registerType('change', {
-    color: "#E2D96E",
+    color: "#FFC400",
     category: 'function',
     defaults: {
       name: {value:""},

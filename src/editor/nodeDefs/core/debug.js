@@ -17,7 +17,7 @@ module.exports = function(RED){
     labelStyle: function() {
       return this.name?"node_label_italic":"";
     },
-    color:"#87a980",
+    color:"#9CCC65",
     inputs:1,
     outputs:0,
     icon: "debug.png",

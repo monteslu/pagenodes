@@ -2,7 +2,8 @@ module.exports = function(RED) {
 
   RED.nodes.registerType('localwrite', {
     category: 'storage',
-    color: "#7E57C2",
+    color: "#AB47BC",
+    textcolor: "white",
     defaults: {
       name: {
         value: ""
@@ -74,7 +75,8 @@ module.exports = function(RED) {
 
   RED.nodes.registerType('localread', {
     category: 'storage',
-    color: "#7E57C2",
+    color: "#AB47BC",
+    textcolor: "white",
     defaults: {
       name: {
         value: ""

@@ -55,7 +55,8 @@ module.exports = function(RED){
             topic: {value:"", required:true},
             client: {type:"socketio-client", validate: ws_validateclient}
         },
-        color:"rgb(215, 215, 160)",
+        color:"#26A69A",
+        textcolor: "white",
         inputs:0,
         outputs:1,
         icon: "white-globe.png",
@@ -118,7 +119,7 @@ module.exports = function(RED){
             name: {value:""},
             client: {type:"socketio-client", validate: ws_validateclient}
         },
-        color:"rgb(215, 215, 160)",
+        color:"#26C6DA",
         inputs:1,
         outputs:0,
         icon: "white-globe.png",

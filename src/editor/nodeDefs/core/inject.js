@@ -1,7 +1,8 @@
 module.exports = function(RED){
   RED.nodes.registerType('inject',{
     category: 'input',
-    color:"#a6bbcf",
+    color:"#8D6E63",
+    textcolor: "white",
     defaults: {
       name: {value:""},
       topic: {value:""},

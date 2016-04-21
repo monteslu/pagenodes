@@ -295,6 +295,11 @@ module.exports = function(RED){
         </p>
       </div>
       )
+    },
+    renderDescription: function () {
+      return(
+        <p>Route messages based off properties</p>
+      )
     }
   });
 };

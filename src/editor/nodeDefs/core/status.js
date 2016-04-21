@@ -269,6 +269,11 @@ module.exports = function(RED){
 
           </div>
       )
+    },
+    renderDescription: function () {
+      return(
+        <p>Send status messages from other nodes on the same tab.</p>
+      )
     }
   });
 };

@@ -107,8 +107,8 @@ RED.palette = (function() {
             }
             var helpContent = '';
             var node_def = RED.nodes.getType(type);
-            if(node_def && node_def.renderHelp){
-                helpContent = getHTML(node_def.renderHelp());
+            if(node_def && node_def.renderDescription){
+                helpContent = getHTML(node_def.renderDescription());
             }
 
             popOverContent = $(l+(info?info:helpContent||$("script[data-help-name|='"+type+"']").html()||"<p>"+RED._("palette.noInfo")+"</p>").trim())

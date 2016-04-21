@@ -182,6 +182,11 @@ module.exports = function(RED){
               </p>
             </div>
           )
+        },
+        renderDescription: function () {
+          return(
+            <p>Create functions for data with javascript</p>
+          )
         }
     });
 };

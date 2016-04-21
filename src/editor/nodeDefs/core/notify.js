@@ -124,6 +124,11 @@ module.exports = function(RED){
           </p>
         </div>
       )
+    },
+    renderDescription: function () {
+      return (
+        <p>Creates a browser notification</p>
+      )
     }
   });
 };

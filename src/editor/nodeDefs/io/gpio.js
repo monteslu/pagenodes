@@ -864,6 +864,11 @@ module.exports = function(RED){
               </ul>
           </div>
           )
+        },
+        renderDescription: function () {
+          return(
+            <p>Activate GPIO pins(Analog and Digital)</p>
+          )
         }
     });
 

@@ -44,6 +44,11 @@ module.exports = function(RED){
               </p>
             </div>
           )
+        },
+        renderDescription: function () {
+          return (
+                  <p>Returns the geolocation of your current device</p>
+                 )
         }
-    });
+  });
 };

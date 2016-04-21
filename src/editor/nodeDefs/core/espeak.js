@@ -141,6 +141,9 @@ module.exports = function(RED) {
           <p>Each message can also modify the playback <b>msg.pitch</b> and <b>msg.speed</b>.</p>
         </div>
       )
+    },
+    renderDescription: function () {
+      return (<p>TTS node for serving output to speech</p>)
     }
   });
 };

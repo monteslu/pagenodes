@@ -1,7 +1,6 @@
 module.exports = function(RED) {
   (function () {
 
-
   function sse_label() {
     return this.name || "[sse] " + (this.topic || "eventsource");
   }
@@ -129,6 +128,11 @@ module.exports = function(RED) {
         <div>
           <p>This configuration node connects an EventSource (Server Sent Events) client to the specified URL.</p>
         </div>
+      )
+    },
+    renderDescription: function () {
+      return (
+        <p>Delivers an Eventsource(es) stream</p>
       )
     }
   });

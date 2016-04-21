@@ -1,6 +1,5 @@
 module.exports = function(RED){
-  RED.nodes.registerType('change', {
-    color: "#E2D96E",
+  RED.nodes.registerType('change', { color: "#E2D96E",
     category: 'function',
     defaults: {
       name: {value:""},
@@ -251,6 +250,11 @@ module.exports = function(RED){
         </ul>
 
         </div>
+      )
+    },
+    renderDescription: function () {
+      return (
+        <p>Set, change or delete properties of a message.</p>
       )
     }
   });

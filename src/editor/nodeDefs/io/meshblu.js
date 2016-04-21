@@ -556,6 +556,11 @@ RED.nodes.registerType('meshblu-server',{
               </div>
       </div>
       );
+    },
+    renderDescription: function () {
+      return (
+        <p>Enable Octoblu meshblu server connection with a UUID</p>
+      )
     }
   });
 

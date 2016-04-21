@@ -211,6 +211,11 @@ module.exports = function(RED){
               <p>This configuration node connects a WebSocket client to the specified URL.</p>
             </div>
           )
+        },
+        renderDescription: function () {
+          return(
+            <p>Connect to a WebSocket Server as a client</p>
+          )
         }
     });
 

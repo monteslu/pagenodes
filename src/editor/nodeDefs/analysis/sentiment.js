@@ -35,6 +35,9 @@ module.exports = function(RED){
 
         </div>
       )
+    },
+    renderDescription: function () {
+      <p>Returns a numerical value based off of sentiment analysis</p>
     }
   });
 };

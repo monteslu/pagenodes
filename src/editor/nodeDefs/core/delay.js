@@ -176,6 +176,9 @@ module.exports = function(RED){
                 So each "topic" gets a turn - but the most recent value is always the one sent.</p>
             </div>
           )
+        },
+        renderDescription: function () {
+          <p>Introduces a delay into a flow or rate limits messages.</p>
         }
     });
 

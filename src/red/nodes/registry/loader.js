@@ -19,6 +19,7 @@ const extras = require("extras");
 const requiredNodes = [
   require("../nodeDefs/core/core/function"),
   require("../nodeDefs/core/core/inject"),
+  require("../nodeDefs/core/core/delay"),
   require("../nodeDefs/core/core/debug"),
   require("../nodeDefs/core/core/template"),
   require("../nodeDefs/core/core/notify"),

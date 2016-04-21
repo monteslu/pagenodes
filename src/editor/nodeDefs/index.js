@@ -4,7 +4,7 @@ const nodeDefs = [
   //require('./core/status'),
   require('./core/debug'),
   //require('./core/exec'),
-  //require('./core/delay'),
+  require('./core/delay'),
   //require('./core/trigger'),
   //require('./core/unknown'),
   //require('./core/mqtt'),

@@ -113,7 +113,8 @@ module.exports = function(RED){
           <p>gpio input node. A node for receiving data from General Purpose Input and Outputs (GPIOs) pins though the use of johnny-five I/O Plugins</p>
         </div>
       )
-    }
+    },
+    renderDescription: () => <p>GPIO Input Node</p>
   });
 
 
@@ -275,7 +276,8 @@ module.exports = function(RED){
           <p>gpio output node. A node for sending data to General Purpose Input and Outputs (GPIOs) pins though the use of johnny-five I/O Plugins</p>
         </div>
       )
-    }
+    },
+    renderDescription: () => <p>GPIO Output Node</p>
   });
 
 
@@ -865,12 +867,7 @@ module.exports = function(RED){
           </div>
           )
         },
-        renderDescription: function () {
-          return(
-            <p>Activate GPIO pins(Analog and Digital)</p>
-          )
-        }
+        renderDescription: () => <p>GPIO Output Node</p>
     });
-
 
 };

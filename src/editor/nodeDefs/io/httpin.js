@@ -159,11 +159,6 @@ module.exports = function (RED) {
           </div>
       )
     },
-    renderDescription: function () {
-      return (
-        <p>Makes http requests to CORS enabled servers</p>
-      )
-    }
-
+    renderDescription: () => <p>Makes http requests to CORS enabled servers</p>
   });
 };

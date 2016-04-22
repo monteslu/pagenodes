@@ -252,10 +252,6 @@ module.exports = function(RED){
         </div>
       )
     },
-    renderDescription: function () {
-      return (
-        <p>Set, change or delete properties of a message.</p>
-      )
-    }
+    renderDescription: () => <p>Set, change or delete properties of a message.</p>
   });
 };

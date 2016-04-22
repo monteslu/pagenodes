@@ -177,9 +177,7 @@ module.exports = function(RED){
             </div>
           )
         },
-        renderDescription: function () {
-          <p>Introduces a delay into a flow or rate limits messages.</p>
-        }
+        renderDescription: () => <p>Introduces a delay into a flow or rate limits messages.</p>
     });
 
 

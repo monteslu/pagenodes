@@ -291,7 +291,8 @@ module.exports = function(RED){
       return (
         <p>meshblu input node. Connects to a server and either receives messages sent directly to the connected uuid or subscribes to broadcasts from a specified uuid.</p>
       )
-    }
+    },
+    renderDescription: () => <p>meshblue input node.</p>
   });
 
 
@@ -465,6 +466,11 @@ RED.nodes.registerType('meshblu out',{
           <p>Connects to a meshblu server and either broadcasts out the <b>msg</b> to any subscribers or sends the <b>msg</b> to a specific device.</p>
         </div>
       )
+    },
+    renderDescription: function () {
+      return (
+        <p>Meshblu Out</p>
+      )
     }
   });
 
@@ -557,12 +563,7 @@ RED.nodes.registerType('meshblu-server',{
       </div>
       );
     },
-    renderDescription: function () {
-      return (
-        <p>Enable Octoblu meshblu server connection with a UUID</p>
-      )
-    }
+    renderDescription: () => <p>Meshblue output node</p>
   });
-
 
 };

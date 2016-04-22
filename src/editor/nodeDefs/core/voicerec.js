@@ -42,10 +42,6 @@ module.exports = function(RED){
         </div>
       )
     },
-    renderDescription: function () {
-      render (
-        <p>Creates a Speech Recognition Node that is always on</p>
-      )
-    }
+    renderDescription: () => <p>Creates a Speech Recognition Node that is always on</p>
   });
 }

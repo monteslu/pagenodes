@@ -519,10 +519,6 @@ render: function () {
         </div>
       )
     },
-    renderDescription: function () {
-      return (
-        <p>Inject the action of a node</p>
-      )
-    }
+    renderDescription: () => <p>Inject the action of a node</p>
   });
 };

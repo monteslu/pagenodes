@@ -344,10 +344,6 @@ module.exports = function(RED){
         </div>
       )
     },
-    renderDescription: function () {
-      return (
-        <p>Display the output of any node.</p>
-      )
-    }
-  });
+    renderDescription: () => <p>Display the output of any node.</p>
+   });
 };

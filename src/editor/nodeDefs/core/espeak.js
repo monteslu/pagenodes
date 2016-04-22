@@ -142,8 +142,6 @@ module.exports = function(RED) {
         </div>
       )
     },
-    renderDescription: function () {
-      return (<p>TTS node for serving output to speech</p>)
-    }
+    renderDescription: () => <p>TTS node for serving output to speech</p>
   });
 };

@@ -212,12 +212,8 @@ module.exports = function(RED){
             </div>
           )
         },
-        renderDescription: function () {
-          return(
-            <p>Connect to a WebSocket Server as a client</p>
-          )
-        }
-    });
+        renderDescription: () => <p>Connect to a WebSocket Server as a client</p>
+     });
 
 })();
 };

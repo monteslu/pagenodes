@@ -72,10 +72,6 @@ module.exports = function(RED){
         </div>
       )
     },
-    renderHelp: function () {
-      return(
-        <p>Receives Data from USB Gamepads</p>
-      )
-    }
-  });
+    renderDescription: () => <p>Receives Data from USB Gamepads</p>
+   });
 };

@@ -132,12 +132,6 @@ module.exports = function(RED){
             </div>
           )
         },
-        renderDescription: function () {
-          return (
-            <p>
-            Creates a new message based on the provided template.
-              </p>
-          )
-        }
+        renderDescription: () => <p>Creates a new message based on the provided template.</p>
   });
 };

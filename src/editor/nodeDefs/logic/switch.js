@@ -296,10 +296,6 @@ module.exports = function(RED){
       </div>
       )
     },
-    renderDescription: function () {
-      return(
-        <p>Route messages based off properties</p>
-      )
-    }
+    renderDescription: () => <p>Route messages based off properties</p>
   });
 };

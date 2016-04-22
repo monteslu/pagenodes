@@ -45,10 +45,6 @@ module.exports = function(RED){
             </div>
           )
         },
-        renderDescription: function () {
-          return (
-                  <p>Returns the geolocation of your current device</p>
-                 )
-        }
+        renderDescription: () => <p>Returns the geolocation of your current device</p>
   });
 };

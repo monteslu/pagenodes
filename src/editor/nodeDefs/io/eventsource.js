@@ -78,6 +78,13 @@ module.exports = function(RED) {
           </p>
         </div>
       )
+    },
+    renderDescription: function () {
+      return(
+        <p>
+          EventSource Input Node
+        </p>
+      )
     }
   });
 
@@ -130,12 +137,7 @@ module.exports = function(RED) {
         </div>
       )
     },
-    renderDescription: function () {
-      return (
-        <p>Delivers an Eventsource(es) stream</p>
-      )
-    }
-  });
-
+    renderDescription: () => <p>EventSource Output Node</p>
+   });
 })();
 }

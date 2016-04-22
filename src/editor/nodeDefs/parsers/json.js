@@ -14,10 +14,6 @@ module.exports = function(RED){
         labelStyle: function() {
             return this.name?"node_label_italic":"";
         },
-        renderDescription: function () {
-          return(
-            <p>Parses JSON</p>
-          )
-        }
+        renderDescription: () => <p>Parses JSON</p>
     });
 };

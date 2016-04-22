@@ -136,10 +136,6 @@ module.exports = function(RED) {
           </div>
       )
     },
-    renderDescription: function () {
-      return (
-        <p>Reads data in localStorage</p>
-      )
-    }
+    renderDescription: () => <p>Reads data in localStorage</p>  
   });
 }

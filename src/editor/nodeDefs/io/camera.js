@@ -43,10 +43,6 @@ module.exports = function(RED){
             </div>
           )
         },
-        renderDescription: function () {
-          return(
-            <p>Uses webcam to take a picture</p>
-          )
-        }
+        renderDescription: () => <p>Uses webcam to take a picture</p>
       });
 };

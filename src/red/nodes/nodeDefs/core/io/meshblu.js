@@ -46,50 +46,13 @@ function init(RED) {
 
     self.conn.once('ready', function(data){
       self.conn.connected = true;
-
-      _.forEach(RED.nodes.getFlows(), function(n){
-        if(n.server === self.id){
-          var mnode = RED.nodes.getNode(n.id);
-          if(n.type === 'meshblu in'){
-            if(mnode.directToMe){
-              self.directs.push(mnode);
-            }else{
-              self.subs.push(mnode);
-              self.conn.subscribe({ uuid: mnode.uuid, types: ['broadcast'] }, function(err){
-                console.log('subscribed to', mnode.uuid, err);
-              });
-            }
-          }
-
-          if(n.type === 'meshblu in' || n.type === 'meshblu out'){
-            mnode.status({fill:"green",shape:"dot",text:"connected"});
-          }
-        }
-      });
-
-    });
-
-    self.conn.on('message', function(data, fn){
-      if(data.devices){
-        if(!_.isArray(data.devices)){
-          data.devices = [data.devices];
-        }
-        if(isBroadcast(data)){
-          _.forEach(self.subs, function(sub){
-            if(sub.uuid === data.fromUuid){
-              sub.send(data);
-            }
-          });
-        }else{
-          _.forEach(self.directs, function(direct){
-            direct.send(data);
-          });
-        }
-      }
+      self.emit('connReady', self.conn);
     });
 
     self.conn.on('error', function(err){
        console.log('error in meshblu connection', err);
+       self.emit('connError', err);
+       self.error(err);
     });
 
     self.on('close', function() {
@@ -118,6 +81,32 @@ function init(RED) {
     self.serverConfig = RED.nodes.getNode(self.server);
     self.directToMe = n.directToMe;
     self.uuid = n.uuid;
+
+    self.status({fill:"yellow",shape:"dot",text:"connecting..."});
+
+    self.serverConfig.on('connReady', function(conn){
+      self.status({fill:"green",shape:"dot",text:"connected"});
+      if(!self.directToMe){
+        conn.subscribe({ uuid: self.uuid, types: ['broadcast'] }, function(err){
+          console.log('subscribed to', self.uuid, err);
+        });
+      }
+
+      conn.on('message', function(data, fn){
+        if(!self.directToMe && isBroadcast(data)){
+          if(self.uuid === data.fromUuid){
+            self.send(data);
+          }
+        }else if(self.directToMe && !isBroadcast(data)){
+          self.send(data);
+        }
+      });
+
+    });
+
+    self.serverConfig.on('connError', function(err){
+       self.status({fill:"red",shape:"dot",text:"error"});
+    });
   }
   meshbluInNode.groupName = 'meshblu';
   RED.nodes.registerType("meshblu in",meshbluInNode);
@@ -133,6 +122,13 @@ function init(RED) {
 
     if (self.serverConfig) {
       var node = self;
+
+      self.status({fill:"yellow",shape:"dot",text:"connecting..."});
+
+      self.serverConfig.on('connReady', function(conn){
+        self.status({fill:"green",shape:"dot",text:"connected"});
+      });
+
       self.on("input",function(msg) {
         if(!msg.devices){
           if(self.broadcast){

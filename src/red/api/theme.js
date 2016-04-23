@@ -17,7 +17,7 @@
 var util = require("util");
 var path = require("path");
 var fs = require("fs");
-var clone = require("clone");
+var clone = require("lodash").cloneDeep;
 
 var defaultContext = {
     page: {

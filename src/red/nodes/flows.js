@@ -14,7 +14,7 @@
  * limitations under the License.
  **/
 
-var clone = require("clone");
+var clone = require("lodash").cloneDeep;
 var when = require("when");
 
 var typeRegistry = require("./registry");

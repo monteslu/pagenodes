@@ -15,7 +15,7 @@
  **/
 
 var when = require("when");
-var clone = require("clone");
+var clone = require("lodash").cloneDeep;
 var assert = require("assert");
 var log = require("./log");
 

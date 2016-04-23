@@ -292,7 +292,7 @@ module.exports = function(RED){
         <p>meshblu input node. Connects to a server and either receives messages sent directly to the connected uuid or subscribes to broadcasts from a specified uuid.</p>
       )
     },
-    renderDescription: () => <p>meshblue input node.</p>
+    renderDescription: () => <p>meshblu input node.</p>
   });
 
 

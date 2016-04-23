@@ -14,7 +14,7 @@
  * limitations under the License.
  **/
 
-var clone = require("clone");
+var clone = require("lodash").cloneDeep;
 
 function generateId() {
     return (1+Math.random()*4294967295).toString(16);

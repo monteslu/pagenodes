@@ -68,6 +68,11 @@ module.exports = function(RED) {
         <p><a href="https://mozilla.github.io/localForage">https://mozilla.github.io/localForage</a></p>
         </div>
       )
+    },
+    renderDescription: function () {
+      return (
+        <p>Writes data to local storage</p>
+      )
     }
   });
 
@@ -130,6 +135,7 @@ module.exports = function(RED) {
           </p>
           </div>
       )
-    }
+    },
+    renderDescription: () => <p>Reads data in localStorage</p>  
   });
 }

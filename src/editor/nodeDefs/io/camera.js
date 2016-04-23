@@ -42,6 +42,7 @@ module.exports = function(RED){
               <p>Attaches a base64 (dataURL) picture from your webcam to <code>msg.image</code>.</p>
             </div>
           )
-        }
+        },
+        renderDescription: () => <p>Uses webcam to take a picture</p>
       });
 };

@@ -518,6 +518,7 @@ render: function () {
           </p>
         </div>
       )
-    }
+    },
+    renderDescription: () => <p>Inject the action of a node</p>
   });
 };

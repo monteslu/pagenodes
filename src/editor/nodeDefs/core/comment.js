@@ -77,7 +77,7 @@ module.exports = function(RED){
     },
     renderHelp: function(){
       return (<p>A node you can use to add comments to your flows.</p>);
-    }
+    },
+    renderDescription: () => <p>A node you can use to add comments to your flows.</p>
   });
-
 };

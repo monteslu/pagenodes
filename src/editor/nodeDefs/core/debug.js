@@ -343,6 +343,7 @@ module.exports = function(RED){
         <p>In addition any calls to node.warn or node.error will appear here.</p>
         </div>
       )
-    }
-  });
+    },
+    renderDescription: () => <p>Display the output of any node.</p>
+   });
 };

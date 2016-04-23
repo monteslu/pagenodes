@@ -131,6 +131,7 @@ module.exports = function(RED){
               </div>
             </div>
           )
-        }
-    });
+        },
+        renderDescription: () => <p>Creates a new message based on the provided template.</p>
+  });
 };

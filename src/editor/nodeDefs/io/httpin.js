@@ -109,6 +109,9 @@ module.exports = function (RED) {
   <p>
     Provides a node for making http requests.
   </p>
+  <p>
+    <i>*All addresses must be https:// and have CORS enabled</i>
+  </p>
   <p>The URL and HTTP method can be configured in the node, if they are left blank they should be set in an incoming message on <code>msg.url</code> and <code>msg.method</code>:</p>
   <ul>
     <li>
@@ -154,8 +157,8 @@ module.exports = function (RED) {
               : If you need to configure a proxy please add <b>http_proxy=...</b> to your environment variables and restart Node-RED.
             </p>
           </div>
-             )
-    }
-
+      )
+    },
+    renderDescription: () => <p>Makes http requests to CORS enabled servers</p>
   });
 };

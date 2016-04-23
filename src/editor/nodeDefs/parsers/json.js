@@ -13,6 +13,7 @@ module.exports = function(RED){
         },
         labelStyle: function() {
             return this.name?"node_label_italic":"";
-        }
+        },
+        renderDescription: () => <p>Parses JSON</p>
     });
 };

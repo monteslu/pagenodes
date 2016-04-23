@@ -280,6 +280,11 @@ module.exports = function(RED){
 
             </div>
       )
+    },
+    renderDescription: function () {
+      return (
+        <p>Catch errors thrown by nodes on the same tab.</p>
+      )
     }
   });
 }

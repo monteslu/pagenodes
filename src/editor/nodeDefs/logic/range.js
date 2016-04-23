@@ -67,6 +67,7 @@ module.exports = function(RED){
 
         </div>
       )
-    }
+    },
+    renderDescription: () => <p>A simple function node to remap numeric input values to another scale.</p>
   });
 };

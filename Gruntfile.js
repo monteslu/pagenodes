@@ -122,7 +122,9 @@ module.exports = function(grunt) {
                     "public/index.html": [
                         "editor/header.html",
                         "node_modules/" + (process.env.EXTRAS || "pagenodes-extras" )+ "/include.html",
-                        "editor/body.html"
+                        "editor/body.html",
+                        "node_modules/" + (process.env.EXTRAS || "pagenodes-extras" )+ "/footerInclude.html",
+                        "editor/footer.html"
                     ]
                 }
             }

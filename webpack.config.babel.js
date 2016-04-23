@@ -25,6 +25,17 @@ module.exports = {
       {
         test: /\.json$/,
         loader: "json"
+      },
+      {
+        test: /node_modules[\\\/]auth0-lock[\\\/].*\.js$/,
+        loaders: [
+          'transform-loader/cacheable?brfs',
+          'transform-loader/cacheable?packageify'
+        ]
+      },
+      {
+        test: /node_modules[\\\/]auth0-lock[\\\/].*\.ejs$/,
+        loader: 'transform-loader/cacheable?ejsify'
       }
     ]
   },

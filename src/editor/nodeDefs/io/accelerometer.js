@@ -1,7 +1,7 @@
 module.exports = function(RED){
   RED.nodes.registerType('accelerometer',{
     category: 'function',
-    color: "#26C6DA",
+    color: "green",
     defaults: {
       name: {value:""},
       controllerId: {value:"0",required:true},
@@ -9,7 +9,7 @@ module.exports = function(RED){
     },
     inputs:0,
     outputs:1,
-    icon: "gamepad.png",
+    icon: "white-globe.png",
     label: function() {
       return this.name||'accelerometer';
     },
@@ -66,9 +66,7 @@ module.exports = function(RED){
     renderHelp: function () {
       return (
         <div>
-        <p>
           This node is used to utilize the accelerometer on a phone.
-        </p>
         </div>
       )
     },

@@ -8,7 +8,7 @@ module.exports = function(RED){
     },
     inputs:0,
     outputs:1,
-    icon: "white-globe.png",
+    icon: "accelerometer.png",
     label: function() {
       return this.name||'accelerometer';
     },

@@ -1,17 +1,16 @@
 module.exports = function(RED){
-  RED.nodes.registerType('gamepad',{
+  RED.nodes.registerType('orientation',{
     category: 'function',
-    color: "#26C6DA",
+    color: "#DA523F",
     defaults: {
       name: {value:""},
-      controllerId: {value:"0",required:true},
       refreshInterval: {value: "300", required: false}
     },
     inputs:0,
     outputs:1,
-    icon: "gamepad.png",
+    icon: "white-globe.png",
     label: function() {
-      return this.name||'gamepad';
+      return this.name||'accelerometer';
     },
     labelStyle: function() {
       return this.name?"node_label_italic":"";
@@ -20,7 +19,6 @@ module.exports = function(RED){
       return (
         <div>
         <div className="form-row">
-
         <label htmlFor="node-input-name">
         <i className="fa fa-tag" />
         <span data-i18n="common.label.name" />
@@ -34,26 +32,13 @@ module.exports = function(RED){
 
         <label htmlFor="node-input-refreshInterval">
         <i className="fa fa-tag" />
-        <span>Interval(MS)</span>
+        <span>Interval(ms)</span>
         </label>
         <input
         type="text"
         style={{width:100}}
         id="node-input-refreshInterval"
         data-i18n="[placeholder]common.label.name" />
-
-        <br/>
-
-        <label htmlFor="node-input-controllerId">
-        <i className="fa fa-tag" />
-        <span>Controller ID:</span>
-        </label>
-        <select id="node-input-controllerId">
-        <option value="0">1</option>
-        <option value="1">2</option>
-        <option value="2">3</option>
-        <option value="3">4</option>
-        </select>
 
         </div>
         <div className="form-tips" id="tip-json" hidden>
@@ -65,15 +50,15 @@ module.exports = function(RED){
     renderHelp: function () {
       return (
         <div>
-        <p>
-        This node was built for utilizing USB gamepads.  The primary package is still going to be <code>msg.payload</code>.  The easiest way to return is to create a function node and use an if statement to check if a button is set to "pressed".
+          <p>
+            <b>This node will only work on devices with accelerometers</b>
           </p>
-        <p>
-          The library <code>navigator.gamepad</code> is located <a href="https://developer.mozilla.org/en-US/docs/Web/API/Gamepad/buttons">here</a>.
-        </p>
+          <p>
+            This node uses the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Detecting_device_orientation">Device Orientation</a> API in order to find out the accelerometers on your mobile device.  You can use this for situations where you need to control a devices hardware from the movement of an accelerometer
+          </p>
         </div>
       )
     },
-    renderDescription: () => <p>Gamepad Node</p>
+    renderDescription: () => <p>Accelerometer node</p>
    });
 };

@@ -1,10 +1,9 @@
 module.exports = function(RED){
-  RED.nodes.registerType('accelerometer',{
+  RED.nodes.registerType('orientation',{
     category: 'function',
     color: "green",
     defaults: {
       name: {value:""},
-      controllerId: {value:"0",required:true},
       refreshInterval: {value: "300", required: false}
     },
     inputs:0,
@@ -35,26 +34,12 @@ module.exports = function(RED){
         <label htmlFor="node-input-refreshInterval">
         <i className="fa fa-tag" />
         <span>Interval</span>
-        <span data-i18n="common.label.name" />
         </label>
         <input
         type="text"
         style={{width:100}}
         id="node-input-refreshInterval"
         data-i18n="[placeholder]common.label.name" />
-
-        <br/>
-
-        <label htmlFor="node-input-controllerId">
-        <i className="fa fa-tag" />
-        <span>Pick a controller</span>
-        </label>
-        <select id="node-input-controllerId">
-        <option value="0">1</option>
-        <option value="1">2</option>
-        <option value="2">3</option>
-        <option value="3">4</option>
-        </select>
 
         </div>
         <div className="form-tips" id="tip-json" hidden>
@@ -66,10 +51,15 @@ module.exports = function(RED){
     renderHelp: function () {
       return (
         <div>
-          This node is used to utilize the accelerometer on a phone.
+          <p>
+            <b>This node will only work on devices with accelerometers</b>
+          </p>
+          <p>
+            This node uses the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Detecting_device_orientation">Device Orientation</a> API in order to find out the accelerometers on your mobile device.  You can use this for situations where you need to control a devices hardware from the movement of an accelerometer
+          </p>
         </div>
       )
     },
-    renderDescription: () => <p>Phone only Accelerometer node</p>
+    renderDescription: () => <p>Accelerometer node</p>
    });
 };

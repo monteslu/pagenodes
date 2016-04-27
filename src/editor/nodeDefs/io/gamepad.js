@@ -34,8 +34,7 @@ module.exports = function(RED){
 
         <label htmlFor="node-input-refreshInterval">
         <i className="fa fa-tag" />
-        <span>Interval</span>
-        <span data-i18n="common.label.name" />
+        <span>Interval(MS)</span>
         </label>
         <input
         type="text"
@@ -47,7 +46,7 @@ module.exports = function(RED){
 
         <label htmlFor="node-input-controllerId">
         <i className="fa fa-tag" />
-        <span>Pick a controller</span>
+        <span>Controller ID:</span>
         </label>
         <select id="node-input-controllerId">
         <option value="0">1</option>
@@ -69,9 +68,12 @@ module.exports = function(RED){
         <p>
         This node was built for utilizing USB gamepads.  The primary package is still going to be <code>msg.payload</code>.  The easiest way to return is to create a function node and use an if statement to check if a button is set to "pressed".
           </p>
+        <p>
+          The library <code>navigator.gamepad</code> is located <a href="https://developer.mozilla.org/en-US/docs/Web/API/Gamepad/buttons">here</a>.
+        </p>
         </div>
       )
     },
-    renderDescription: () => <p>Receives Data from USB Gamepads</p>
+    renderDescription: () => <p>Gamepad Node</p>
    });
 };

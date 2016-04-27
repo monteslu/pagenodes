@@ -1,7 +1,7 @@
 module.exports = function(RED){
   RED.nodes.registerType('orientation',{
     category: 'function',
-    color: "green",
+    color: "#DA523F",
     defaults: {
       name: {value:""},
       refreshInterval: {value: "300", required: false}
@@ -19,7 +19,6 @@ module.exports = function(RED){
       return (
         <div>
         <div className="form-row">
-
         <label htmlFor="node-input-name">
         <i className="fa fa-tag" />
         <span data-i18n="common.label.name" />
@@ -33,7 +32,7 @@ module.exports = function(RED){
 
         <label htmlFor="node-input-refreshInterval">
         <i className="fa fa-tag" />
-        <span>Interval</span>
+        <span>Interval(ms)</span>
         </label>
         <input
         type="text"

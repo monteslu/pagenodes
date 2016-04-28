@@ -15,6 +15,17 @@ module.exports = function(RED) {
     labelStyle: function () {
       return this.name?"node_label_italic":"";
     },
+    button: {
+      onclick: function() {
+        var label = (this.name||this.payload).replace(/&/g,/&/g,"&amp;").replace(/</g,/</g,"&lt;").replace(/>/g,/>/g,"&gt;");
+        if (this.payloadType === "date") { label = this._("inject.timestamp"); }
+        if (this.payloadType === "none") { label = this._("inject.blank"); }
+        var node = this;
+        RED.comms.rpc('inject', [this.id], function(result){
+          RED.notify(node._("inject.success",{label:label}),"success");
+        });
+      }
+    }
     render: function () {
       return(
         <div>
@@ -29,16 +40,6 @@ module.exports = function(RED) {
         id="node-input-name"
         data-i18n="[placeholder]common.label.name" />
 
-        <br/>
-
-        <label htmlFor="node-input-refreshInterval">
-        <i className="fa fa-tag" />
-        <span>Interval(MS)</span>
-        </label>
-        <input
-        type="file"
-        id="node-input-file" />
-
         </div>
         </div>
       )
@@ -47,13 +48,18 @@ module.exports = function(RED) {
       return (
         <div>
         <p>
-        This node was built for utilizing USB gamepads.  The primary package is still going to be <code>msg.payload</code>.  The easiest way to return is to create a function node and use an if statement to check if a button is set to "pressed".
-            </p>
+          This button will inject a specified file into a stream
+          </p>
           <p>
           The library <code>navigator.gamepad</code> is located <a href="https://developer.mozilla.org/en-US/docs/Web/API/Gamepad/buttons">here</a>.
           </p>
           </div>
 
+      )
+    },
+    renderDescription: function () {
+      return (
+        <p>Inject a File</p>
       )
     }
   })

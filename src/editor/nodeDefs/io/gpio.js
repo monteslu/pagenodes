@@ -418,7 +418,8 @@ module.exports = function(RED){
         $("#node-config-lookup-usb").click(function() {
           var DEFAULT_FILTERS = [
             { 'vendorId': 0x2341, 'productId': 0x8036 },
-            { 'vendorId': 0x2341, 'productId': 0x8037 }
+            { 'vendorId': 0x2341, 'productId': 0x8037 },
+            { 'vendorId': 0x239a, 'productId': 0x8011 }
           ];
 
           navigator.usb.requestDevice({filters: DEFAULT_FILTERS })

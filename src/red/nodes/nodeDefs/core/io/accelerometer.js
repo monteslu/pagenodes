@@ -9,20 +9,16 @@ module.exports = function(RED) {
       orientation.alpha = event.alpha;
       orientation.beta = event.beta;
       orientation.gamma = event.gamma;
-    }, true)
+    }, true);
 
     if((window.DeviceMotionEvent)){
-      console.log('Accelerometer is here!',config);
       node.interval = setInterval(function(){
-        var msg = {};
-        msg.alpha = orientation.alpha;
-        msg.beta = orientation.beta;
-        msg.gamma = orientation.gamma;
-        console.log(msg)
+        var msg = {topic: 'orientation'};
+        msg.payload = orientation;
         node.send(msg);
       },refreshInterval)
     }else{
-      console.log('Accelerometer not available.');
+      node.error('Accelerometer not available.');
     }
 
     node.on('close', function(){

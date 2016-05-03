@@ -19,18 +19,18 @@ module.exports = function(RED) {
     button: {
       onclick: function() {
         var dialog2 = $(`<div id="uploadDialog">
-                          <input type="file" name="injectFile" id="node-input-injectFile" /> 
-                        </div>`)
-        dialog2.appendTo("body")
-        $( '#uploadDialog' ).dialog({
+                          <input type="file" name="injectFile" id="node-input-injectFile" />
+                        </div>`);
+        dialog2.appendTo("body");
+        $( "#uploadDialog" ).dialog({
           buttons: [
             {
-              text: "inject",
+              text: 'inject',
               click: function() {
                 var fileInfo = document.getElementById('node-input-injectFile');
-                console.log('injecting>',fileInfo.name);
-                console.log('files>',fileInfo.files);
-                console.log('files.length',fileInfo.files.length);;
+                RED.comms.rpc('file_upload', fileInfo, function(results){
+                  console.log('FE>file_upload>rpc results',results)
+                })
                 $( this  ).dialog( "close" );
               }
             }
@@ -61,7 +61,7 @@ module.exports = function(RED) {
           This button will inject a specified file into a stream
           </p>
           <p>
-          The library <code>navigator.gamepad</code> is located <a href="https://developer.mozilla.org/en-US/docs/Web/API/Gamepad/buttons">here</a>.
+          Using the <a href="https://developer.mozilla.org/en-US/docs/Web/API/File">File API</a> to deliver a file into a flow.  This could be used to parse XML or CSV with a function node.
           </p>
           </div>
       )

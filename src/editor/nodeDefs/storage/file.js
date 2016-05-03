@@ -4,7 +4,8 @@ module.exports = function(RED) {
     color: 'green',
     defaults: {
       name: {value:''},
-      file: {value:''}
+      file: {value:''},
+      injectFile: {value:''}
     },
     inputs: 0,
     outputs: 1,
@@ -17,20 +18,30 @@ module.exports = function(RED) {
     },
     button: {
       onclick: function() {
-        var label = (this.name||this.payload).replace(/&/g,/&/g,"&amp;").replace(/</g,/</g,"&lt;").replace(/>/g,/>/g,"&gt;");
-        if (this.payloadType === "date") { label = this._("inject.timestamp"); }
-        if (this.payloadType === "none") { label = this._("inject.blank"); }
-        var node = this;
-        RED.comms.rpc('inject', [this.id], function(result){
-          RED.notify(node._("inject.success",{label:label}),"success");
+        var dialog2 = $(`<div id="uploadDialog">
+                          <input type="file" name="injectFile" id="node-input-injectFile" /> 
+                        </div>`)
+        dialog2.appendTo("body")
+        $( '#uploadDialog' ).dialog({
+          buttons: [
+            {
+              text: "inject",
+              click: function() {
+                var fileInfo = document.getElementById('node-input-injectFile');
+                console.log('injecting>',fileInfo.name);
+                console.log('files>',fileInfo.files);
+                console.log('files.length',fileInfo.files.length);;
+                $( this  ).dialog( "close" );
+              }
+            }
+          ]
         });
       }
-    }
+    },
     render: function () {
       return(
         <div>
         <div className="form-row">
-
         <label htmlFor="node-input-name">
         <i className="fa fa-tag" />
         <span data-i18n="common.label.name" />
@@ -39,7 +50,6 @@ module.exports = function(RED) {
         type="text"
         id="node-input-name"
         data-i18n="[placeholder]common.label.name" />
-
         </div>
         </div>
       )
@@ -54,7 +64,6 @@ module.exports = function(RED) {
           The library <code>navigator.gamepad</code> is located <a href="https://developer.mozilla.org/en-US/docs/Web/API/Gamepad/buttons">here</a>.
           </p>
           </div>
-
       )
     },
     renderDescription: function () {

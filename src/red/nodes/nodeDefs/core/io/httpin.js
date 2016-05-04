@@ -47,9 +47,9 @@ module.exports = function(RED) {
                 node.error(RED._("httpin.errors.no-url"),msg);
                 return;
             }
-            // url must start http:// or https:// so assume http:// if not set
+            // url must start http:// or https:// so assume https:// if not set
             if (!((url.indexOf("http://") === 0) || (url.indexOf("https://") === 0))) {
-                url = "http://"+url;
+                url = "https://"+url;
             }
 
             var method = msg.method || nodeMethod.toUpperCase() || "GET";
@@ -75,26 +75,43 @@ module.exports = function(RED) {
                 opts.entity = msg.payload;
             }
             opts.params = msg.params;
+            opts.path = url;
 
             console.log('SERVER httprequest', opts, msg);
 
-            var restCall = rest.wrap(errorCodeInterceptor);
-            if(typeof opts.entity === 'object'){
-                restCall = restCall.wrap(mimeInterceptor, { mime: 'application/json' });
-            }else{
-                restCall = restCall.wrap(mimeInterceptor);
+
+            if(RED.plugin.isActive() && (_.startsWith(opts.path, 'http://') || msg.usePlugin)){
+                RED.plugin.rpc('rest', [opts], function(result){
+                    var res = result.res;
+                    if(result.error){
+                        node.status({fill:"red",shape:"ring",text:'error'});
+                        node.send(_.assign(msg, {payload: null, error: result.error}));
+                    }
+                    else{
+                        node.status({});
+                        node.send(_.assign(msg, {payload: res.entity, status: res.status, headers: res.headers}));
+                    }
+                });
+            }
+            else{
+                var restCall = rest.wrap(errorCodeInterceptor);
+                if(typeof opts.entity === 'object'){
+                    restCall = restCall.wrap(mimeInterceptor, { mime: 'application/json' });
+                }else{
+                    restCall = restCall.wrap(mimeInterceptor);
+                }
+
+                restCall(opts).then(function(res) {
+                    console.log('http response', res);
+                    node.status({});
+                    node.send(_.assign(msg, {payload: res.entity, status: res.status, headers: res.headers}));
+                })
+                .catch(function(err) {
+                    node.status({fill:"red",shape:"ring",text:'error'});
+                    node.send(_.assign(msg, {payload: null, error: err}));
+                });
             }
 
-            opts.path = url;
-            restCall(opts).then(function(res) {
-                console.log('http response', res);
-                node.send(_.assign(msg, {payload: res.entity, status: res.status, headers: res.headers}));
-                node.status({});
-            })
-            .catch(function(err) {
-                node.error(err);
-                node.status({fill:"red",shape:"ring",text:err.code});
-            });
 
         });
     }

@@ -18,6 +18,7 @@ var server = require("./server");
 var nodes = require("./nodes");
 var library = require("./api/library");
 var comms = require("./comms");
+var plugin = require("./plugin");
 var log = require("./log");
 var util = require("./util");
 // var fs = require("fs");
@@ -31,6 +32,7 @@ var events = require("./events");
 var RED = {
     init: function(httpServer,userSettings) {
         comms.start();
+        plugin.start();
         userSettings.version = this.version();
         log.init(userSettings);
         settings.init(userSettings);
@@ -46,6 +48,7 @@ var RED = {
     events: events,
     log: log,
     comms: comms,
+    plugin: plugin,
     settings:settings,
     util: util,
     auth: {

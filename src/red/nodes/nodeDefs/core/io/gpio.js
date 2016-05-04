@@ -13,7 +13,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 */
 
-var serialport = require('serialport');
 var createNodebotNode = require('./lib/nodebotNode');
 
 var five = require('johnny-five');
@@ -23,7 +22,7 @@ var util = require('util');
 var cachedRequire = require('./lib/cachedRequire');
 
 function connectingStatus(n){
-  n.status({fill:"red",shape:"ring",text:"connecting"});
+  n.status({fill:"yellow",shape:"ring",text:"initializing"});
 }
 
 function networkReadyStatus(n){
@@ -35,7 +34,11 @@ function networkErrorStatus(n){
 }
 
 function ioErrorStatus(n, err){
-  n.status({fill:"red",shape:"dot",text:"error"});
+  var errText = "error";
+  if(err && err.code){
+    errText = err.code;
+  }
+  n.status({fill:"red",shape:"dot",text: errText});
   n.warn(err);
 }
 
@@ -43,6 +46,22 @@ function connectedStatus(n){
   n.status({fill:"green",shape:"dot",text:"connected"});
 }
 
+
+function setupStatus(node){
+  console.log('setupStatus', node);
+  process.nextTick(function(){
+    connectingStatus(node);
+  });
+  node.nodebot.on('networkReady', function(){
+    networkReadyStatus(node);
+  });
+  node.nodebot.on('networkError', function(){
+    networkErrorStatus(node);
+  });
+  node.nodebot.on('ioError', function(err){
+    ioErrorStatus(node, err);
+  });
+}
 
 function init(RED) {
 
@@ -57,7 +76,7 @@ function init(RED) {
     if (typeof this.nodebot === "object") {
 
       var node = this;
-      connectingStatus(node);
+      setupStatus(node);
 
       node.nodebot.on('ioready', function() {
         var io = node.nodebot.io;
@@ -80,15 +99,7 @@ function init(RED) {
           });
         }
       });
-      node.nodebot.on('networkReady', function(){
-        networkReadyStatus(node);
-      });
-      node.nodebot.on('networkError', function(){
-        networkErrorStatus(node);
-      });
-      node.nodebot.on('ioError', function(err){
-        ioErrorStatus(node, err);
-      });
+
     }
     else {
       this.warn("nodebot not configured");
@@ -108,9 +119,7 @@ function init(RED) {
     this.i2cRegister = parseInt(n.i2cRegister, 10);
     if (typeof this.nodebot === "object") {
         var node = this;
-        process.nextTick(function(){
-          connectingStatus(node);
-        });
+        setupStatus(node);
 
         console.log('launching gpio out', n);
         node.nodebot.on('ioready', function() {
@@ -192,15 +201,6 @@ function init(RED) {
               }
             });
         });
-        node.nodebot.on('networkReady', function(){
-          networkReadyStatus(node);
-        });
-        node.nodebot.on('networkError', function(){
-          networkErrorStatus(node);
-        });
-        node.nodebot.on('ioError', function(err){
-          ioErrorStatus(node, err);
-        });
     }
     else {
         this.warn("nodebot not configured");
@@ -221,9 +221,7 @@ function init(RED) {
 
 
     if (typeof this.nodebot === "object") {
-        process.nextTick(function(){
-          connectingStatus(node);
-        });
+        setupStatus(node);
 
         console.log('launching johnny5Node', n);
         node.nodebot.on('ioready', function() {
@@ -348,15 +346,6 @@ function init(RED) {
           }
 
         });
-        node.nodebot.on('networkReady', function(){
-          networkReadyStatus(node);
-        });
-        node.nodebot.on('networkError', function(){
-          networkErrorStatus(node);
-        });
-        node.nodebot.on('ioError', function(err){
-          ioErrorStatus(node, err);
-        });
     }
     else {
         this.warn("nodebot not configured");
@@ -376,20 +365,13 @@ function init(RED) {
       });
   }
 
-  function listArduinoPorts(callback) {
-      return serialport.list(function(err, ports) {
-        if (err) {
-          return callback(err);
-        }
-        var devices = [];
-        for (var i = 0; i < ports.length; i++) {
-          if (/usb|acm|com\d+/i.test(ports[i].comName)) {
-            devices.push(ports[i].comName);
-          }
-        }
-        return callback(null, devices);
-      });
-  }
+
+  RED.events.on('rpc_gpio/listSerial', function(msg){
+    RED.plugin.rpc('listSerial', [], function(result){
+      msg.reply(result);
+    });
+  });
+
 
 }
 

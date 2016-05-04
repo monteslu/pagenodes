@@ -2,30 +2,12 @@ require('babel-core/polyfill'); //@#$! safari
 
 const nopt = require("nopt");
 const path = require("path");
-const RED = require("./red");
+const PN = require("./red");
 const log = require("./log");
 const extras = require("extras");
 
-nopt.invalidHandler = function(k,v,t) {
-    // TODO: console.log(k,v,t);
-}
-
-var settings = {};
-
-var server = {};
-
-function formatRoot(root) {
-    if (root[0] != "/") {
-        root = "/" + root;
-    }
-    if (root.slice(-1) != "/") {
-        root = root + "/";
-    }
-    return root;
-}
-
 try {
-    RED.init(server,settings);
+    PN.init({},{});
 } catch(err) {
     console.log("Failed to start server:");
     if (err.stack) {
@@ -36,20 +18,20 @@ try {
 }
 
 
-RED.start().then(function() {
+PN.start().then(function() {
     //post message back to parent
     console.log('backend started');
-    extras.backendReady(RED);
-    RED.comms.publishReady();
-    // require('extras').loadServerExtras(RED);
+    extras.backendReady(PN);
+    PN.comms.publishReady();
+    // require('extras').loadServerExtras(PN);
 }).catch(function(err) {
-    RED.log.error(log._("server.failed-to-start"));
+    PN.log.error(log._("server.failed-to-start"));
     if (err.stack) {
-        RED.log.error(err.stack);
+        PN.log.error(err.stack);
     } else {
-        RED.log.error(err);
+        PN.log.error(err);
     }
 });
 
-
+window.PN = PN;
 

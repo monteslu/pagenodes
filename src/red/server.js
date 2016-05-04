@@ -19,8 +19,6 @@ var runtimeMetricInterval = null;
 function init(_server,_settings) {
     server = _server;
     settings = _settings;
-
-    comms.init(_server,_settings);
 }
 
 function start() {

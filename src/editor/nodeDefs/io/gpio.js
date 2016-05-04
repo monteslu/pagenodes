@@ -290,7 +290,7 @@ module.exports = function(RED){
       password: {value:"", required:false},
       boardType: {value:"firmata", required:true},
       serialportName: {value:"", required:false},
-      connectionType: {value: "local", required:false},
+      connectionType: {value: "", required:false},
       mqttServer: {value:"", required:false},
       socketServer: {value:"", required:false},
       pubTopic: {value:"", required:false},
@@ -314,6 +314,19 @@ module.exports = function(RED){
 
       console.log('startup', self);
 
+      $('#needHardwareExtensionDiv').hide();
+      $('#hardwareExtensionOkDiv').hide();
+
+      RED.comms.rpc('pluginActive', [], function(result){
+        if(result.status){
+          $('#hardwareExtensionOkDiv').show();
+        }
+        else{
+          $('#needHardwareExtensionDiv').show();
+        }
+      });
+
+
       var boardRows = ['firmata', 'bean', 'spark', 'imp'];
       var boardToggles = {
         firmata: 'firmata',
@@ -333,15 +346,15 @@ module.exports = function(RED){
         });
       }
 
-      var firmataRows = ['serial', 'mqtt', 'socketServer', 'username', 'password', 'pub', 'sub', 'tcpHost', 'tcpPort', 'meshbluServer', 'uuid', 'token', 'sendUuid', 'usb'];
+      var firmataRows = ['serial', 'mqtt', 'socketServer', 'username', 'password', 'pub', 'sub', 'tcpHost', 'tcpPort', 'meshbluServer', 'uuid', 'token', 'sendUuid', 'usb', 'plugin'];
       var firmataToggles = {
-        local: ['serial'],
+        local: ['serial', 'plugin'],
         "webusb-serial": ['usb'],
         mqtt: ['mqtt', 'username', 'password', 'pub', 'sub'],
         meshblu: ['meshbluServer', 'uuid', 'token', 'sendUuid'],
         socketio: ['socketServer', 'pub', 'sub'],
-        tcp: ['tcpHost', 'tcpPort'],
-        udp: ['tcpHost', 'tcpPort']
+        tcp: ['tcpHost', 'tcpPort', 'plugin'],
+        udp: ['tcpHost', 'tcpPort', 'plugin']
       };
 
       function toggleFirmataOptions(type){
@@ -386,7 +399,12 @@ module.exports = function(RED){
           $("#node-config-lookup-serial-icon").addClass('spinner');
           $("#node-config-lookup-serial").addClass('disabled');
 
-          $.getJSON('gpioserialports',function(data) {
+          RED.comms.rpc('gpio/listSerial', [], function(data){
+              if(data.error){
+                console.log('error searching', data.error);
+                return;
+              }
+
               $("#node-config-lookup-serial-icon").addClass('fa-search');
               $("#node-config-lookup-serial-icon").removeClass('spinner');
               $("#node-config-lookup-serial").removeClass('disabled');
@@ -402,6 +420,7 @@ module.exports = function(RED){
                   }
               }).autocomplete("search","");
           });
+
       });
 
 
@@ -464,6 +483,7 @@ module.exports = function(RED){
                 <option value="tinker-io">Particle/Tinker</option>
               </select>
             </div>
+
             <div
               className="form-row"
               id="node-div-firmataRow">
@@ -472,17 +492,30 @@ module.exports = function(RED){
                 id="node-div-connectionTypeRow">
                 <label htmlFor="node-config-input-connectionType">
                   <i className="fa fa-wrench" /> Connection
+                </label>
+                <select
+                  type="text"
+                  id="node-config-input-connectionType"
+                  style={{width: 200}}>
+                  <option value="mqtt">MQTT</option>
+                  <option value="meshblu">
+                    Meshblu (skynet)
+                  </option>
+                  <option value="webusb-serial">WebUSB Serial</option>
+                  <option value="local">Serial Port (plugin)</option>
+                  <option value="tcp">TCP (plugin)</option>
+                </select>
+                </div>
+
+                <div className="form-row" id="node-div-pluginRow">
+                  <label htmlFor="node-config-input-serialportName">
                   </label>
-                  <select
-                    type="text"
-                    id="node-config-input-connectionType"
-                    style={{width: 200}}>
-                    <option value="mqtt">MQTT</option>
-                    <option value="meshblu">
-                      Meshblu (skynet)
-                    </option>
-                    <option value="webusb-serial">WebUSB Serial</option>
-                  </select>
+                  <div id="needHardwareExtensionDiv" className="form-tips">
+                    This option requires you to have the <a href="https://chrome.google.com/webstore/detail/hardware-extension-for-pa/knmappkjdfbfdomfnbfhchnaamokjdpj" target="_blank"><span className="hardwareExtension">Chrome Hardware Extension</span></a> installed.
+                  </div>
+                  <div id="hardwareExtensionOkDiv" className="form-tips">
+                    Hardware Extension is active <i className="fa fa-thumbs-up" />
+                  </div>
                 </div>
                 <div className="form-row" id="node-div-serialRow">
                   <label htmlFor="node-config-input-serialportName">
@@ -499,6 +532,7 @@ module.exports = function(RED){
                       className="fa fa-search" />
                   </a>
                 </div>
+
                 <div className="form-row" id="node-div-usbRow">
                   <label htmlFor="node-config-input-usbName">
                   Authorize USB
@@ -511,170 +545,188 @@ module.exports = function(RED){
                   </a>
                 </div>
 
-                  <div
-                    className="form-row"
-                    id="node-div-tcpHostRow">
-                    <label htmlFor="node-config-input-tcpHost">
-                      <i className="fa fa-globe" /> TCP Host
+                <div
+                  className="form-row"
+                  id="node-div-tcpHostRow">
+                  <label htmlFor="node-config-input-tcpHost">
+                    <i className="fa fa-globe" /> Host
+                    </label>
+                    <input
+                      type="text"
+                      id="node-config-input-tcpHost" />
+                </div>
+
+                <div
+                  className="form-row"
+                  id="node-div-tcpPortRow">
+                  <label htmlFor="node-config-input-tcpPort">
+                    <i className="fa fa-random" /> port number
+                    </label>
+                    <input
+                      type="text"
+                      id="node-config-input-tcpPort" />
+                </div>
+
+                <div className="form-row" id="node-div-mqttRow">
+                  <label htmlFor="node-config-input-mqttServer">
+                    <i className="fa fa-globe" />
+                    MQTT Server
+                  </label>
+                  <input
+                    type="text"
+                    id="node-config-input-mqttServer"
+                    placeholder="mqtt://my_mqtt_server:1883" />
+                </div>
+
+                <div
+                  className="form-row"
+                  id="node-div-socketServerRow">
+                  <label htmlFor="node-config-input-socketServer">
+                    <i className="fa fa-globe" />
+                    Websocket Server
+                  </label>
+                  <input
+                    type="text"
+                    id="node-config-input-socketServer"
+                    placeholder="wss://my_socket_server" />
+                </div>
+
+                <div
+                  className="form-row"
+                  id="node-div-meshbluServerRow">
+                  <label htmlFor="node-config-input-meshbluServer">
+                    <i className="fa fa-globe" />
+                    Meshblu Server
+                  </label>
+                  <input
+                    type="text"
+                    id="node-config-input-meshbluServer"
+                    placeholder="https://meshblu.octoblu.com" />
+                </div>
+
+                <div className="form-row" id="node-div-uuidRow">
+                  <label htmlFor="node-config-input-uuid"><i className="fa fa-globe" />UUID</label>
+                  <input
+                    type="text"
+                    id="node-config-input-uuid"
+                    placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" />
+                </div>
+
+                <div className="form-row" id="node-div-tokenRow">
+                  <label htmlFor="node-config-input-token"><i className="fa fa-globe" />token</label>
+                  <input type="text" id="node-config-input-token" />
+                </div>
+
+                <div
+                  className="form-row"
+                  id="node-div-usernameRow">
+                  <label htmlFor="node-config-input-username">
+                    <i className="fa fa-user" /> username
+                    </label>
+                    <input
+                      type="text"
+                      id="node-config-input-username" />
+                </div>
+
+                <div
+                  className="form-row"
+                  id="node-div-passwordRow">
+                <label htmlFor="node-config-input-password">
+                  <i className="fa fa-lock" /> password
+                  </label>
+                  <input
+                    type="text"
+                    id="node-config-input-password" />
+                </div>
+
+                <div
+                  className="form-row"
+                  id="node-div-sendUuidRow">
+                  <label htmlFor="node-config-input-sendUuid">
+                    <i className="fa fa-globe" />
+                    send UUID
+                  </label>
+                  <input
+                    type="text"
+                    id="node-config-input-sendUuid"
+                    placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" />
+                </div>
+
+                <div className="form-row" id="node-div-pubRow">
+                  <label htmlFor="node-config-input-pubTopic">
+                    <i className="fa fa-tag" />
+                    Publish Topic
+                  </label>
+                  <input
+                    type="text"
+                    id="node-config-input-pubTopic"
+                    placeholder="pubTopic" />
+                </div>
+
+                <div className="form-row" id="node-div-subRow">
+                  <label htmlFor="node-config-input-subTopic">
+                    <i className="fa fa-tag" />
+                    Subscribe Topic
+                  </label>
+                  <input
+                    type="text"
+                    id="node-config-input-subTopic"
+                    placeholder="subTopic" />
+                </div>
+
+              </div>
+
+              <div className="form-row" id="node-div-sparkRow">
+                <div className="form-row">
+                  <label htmlFor="node-config-input-sparkId">
+                    <i className="fa fa-user" /> Device Id
+                    </label>
+                    <input
+                      type="text"
+                      id="node-config-input-sparkId" />
+                  </div>
+
+                  <div className="form-row">
+                    <label htmlFor="node-config-input-sparkToken">
+                      <i className="fa fa-lock" /> Token
                       </label>
                       <input
                         type="text"
-                        id="node-config-input-tcpHost" />
+                        id="node-config-input-sparkToken" />
                     </div>
-                    <div
-                      className="form-row"
-                      id="node-div-tcpPortRow">
-                      <label htmlFor="node-config-input-tcpPort">
-                        <i className="fa fa-random" /> TCP port
-                        </label>
-                        <input
-                          type="text"
-                          id="node-config-input-tcpPort" />
+                </div>
+
+
+                    <div className="form-row" id="node-div-impRow">
+                      <div className="form-row">
+                        <label htmlFor="node-config-input-impId">
+                          <i className="fa fa-user" /> Agent Id
+                          </label>
+                          <input type="text" id="node-config-input-impId" />
+                        </div>
                       </div>
-                      <div className="form-row" id="node-div-mqttRow">
-                        <label htmlFor="node-config-input-mqttServer">
-                          <i className="fa fa-globe" />
-                          MQTT Server
-                        </label>
-                        <input
-                          type="text"
-                          id="node-config-input-mqttServer"
-                          placeholder="mqtt://my_mqtt_server:1883" />
-                      </div>
-                      <div
-                        className="form-row"
-                        id="node-div-socketServerRow">
-                        <label htmlFor="node-config-input-socketServer">
-                          <i className="fa fa-globe" />
-                          Websocket Server
-                        </label>
-                        <input
-                          type="text"
-                          id="node-config-input-socketServer"
-                          placeholder="wss://my_socket_server" />
-                      </div>
-                      <div
-                        className="form-row"
-                        id="node-div-meshbluServerRow">
-                        <label htmlFor="node-config-input-meshbluServer">
-                          <i className="fa fa-globe" />
-                          Meshblu Server
-                        </label>
-                        <input
-                          type="text"
-                          id="node-config-input-meshbluServer"
-                          placeholder="https://meshblu.octoblu.com" />
-                      </div>
-                      <div className="form-row" id="node-div-uuidRow">
-                        <label htmlFor="node-config-input-uuid"><i className="fa fa-globe" />UUID</label>
-                        <input
-                          type="text"
-                          id="node-config-input-uuid"
-                          placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" />
-                      </div>
-                      <div className="form-row" id="node-div-tokenRow">
-                        <label htmlFor="node-config-input-token"><i className="fa fa-globe" />token</label>
-                        <input type="text" id="node-config-input-token" />
-                      </div>
-                      <div
-                        className="form-row"
-                        id="node-div-usernameRow">
-                        <label htmlFor="node-config-input-username">
-                          <i className="fa fa-user" /> username
+
+                      <div className="form-row" id="node-div-beanRow">
+                        <div className="form-row">
+                          <label htmlFor="node-config-input-beanId">
+                          <i className="fa fa-user" /> UUID (optional)
                           </label>
                           <input
                             type="text"
-                            id="node-config-input-username" />
+                            id="node-config-input-beanId" />
                         </div>
-                        <div
-                          className="form-row"
-                          id="node-div-passwordRow">
-                          <label htmlFor="node-config-input-password">
-                            <i className="fa fa-lock" /> password
-                            </label>
-                            <input
-                              type="text"
-                              id="node-config-input-password" />
-                          </div>
-                          <div
-                            className="form-row"
-                            id="node-div-sendUuidRow">
-                            <label htmlFor="node-config-input-sendUuid">
-                              <i className="fa fa-globe" />
-                              send UUID
-                            </label>
-                            <input
-                              type="text"
-                              id="node-config-input-sendUuid"
-                              placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" />
-                          </div>
-                          <div className="form-row" id="node-div-pubRow">
-                            <label htmlFor="node-config-input-pubTopic">
-                              <i className="fa fa-tag" />
-                              Publish Topic
-                            </label>
-                            <input
-                              type="text"
-                              id="node-config-input-pubTopic"
-                              placeholder="pubTopic" />
-                          </div>
-                          <div className="form-row" id="node-div-subRow">
-                            <label htmlFor="node-config-input-subTopic">
-                              <i className="fa fa-tag" />
-                              Subscribe Topic
-                            </label>
-                            <input
-                              type="text"
-                              id="node-config-input-subTopic"
-                              placeholder="subTopic" />
-                          </div>
-                        </div>
-                        <div className="form-row" id="node-div-sparkRow">
-                          <div className="form-row">
-                            <label htmlFor="node-config-input-sparkId">
-                              <i className="fa fa-user" /> Device Id
-                              </label>
-                              <input
-                                type="text"
-                                id="node-config-input-sparkId" />
-                            </div>
-                            <div className="form-row">
-                              <label htmlFor="node-config-input-sparkToken">
-                                <i className="fa fa-lock" /> Token
-                                </label>
-                                <input
-                                  type="text"
-                                  id="node-config-input-sparkToken" />
-                              </div>
-                            </div>
-                            <div className="form-row" id="node-div-impRow">
-                              <div className="form-row">
-                                <label htmlFor="node-config-input-impId">
-                                  <i className="fa fa-user" /> Agent Id
-                                  </label>
-                                  <input type="text" id="node-config-input-impId" />
-                                </div>
-                              </div>
-                              <div className="form-row" id="node-div-beanRow">
-                                <div className="form-row">
-                                  <label htmlFor="node-config-input-beanId">
-                                    <i className="fa fa-user" /> UUID (optional)
-                                    </label>
-                                    <input
-                                      type="text"
-                                      id="node-config-input-beanId" />
-                                  </div>
-                                </div>
-                                <div className="form-row">
-                                  <label htmlFor="node-config-input-name">
-                                    <i className="fa fa-tag" /> Name
-                                    </label>
-                                    <input
-                                      type="text"
-                                      id="node-config-input-name"
-                                      placeholder="Name" />
-                                  </div>
-                                </div>
+                     </div>
+
+                    <div className="form-row">
+                      <label htmlFor="node-config-input-name">
+                      <i className="fa fa-tag" /> Name
+                      </label>
+                      <input
+                        type="text"
+                        id="node-config-input-name"
+                        placeholder="Name" />
+                    </div>
+                </div>
       )
     }
   });
@@ -747,20 +799,6 @@ module.exports = function(RED){
             }
             $("#node-input-func").val(this.editor.getValue());
             delete this.editor;
-        },
-        render: function () {
-          return (
-            <div>
-
-            </div>
-          )
-        },
-        renderHelp: function () {
-          return (
-            <div>
-
-            </div>
-          )
         },
         render: function () {
           return (

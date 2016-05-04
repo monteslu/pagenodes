@@ -16,7 +16,7 @@ var five = require('johnny-five');
 var firmata = require('firmata');
 
 //var net = require('net');
-var serialport = require('serialport');
+
 
 
 var boardTypes = {
@@ -26,6 +26,7 @@ var boardTypes = {
 
 function createNode(RED){
 
+  var PluginSerialPort = require('./pluginPort')(RED).SerialPort;
 
   function start(node){
     if(node.io){
@@ -129,7 +130,13 @@ function createNode(RED){
       var VirtualSerialPort, client;
       if(n.connectionType === 'local'){
         try{
-          node.io = new firmata.Board(n.serialportName);
+          sp = new PluginSerialPort('serial', n.serialportName, {portName: n.serialportName});
+          sp.on('error', function(err){
+            process.nextTick(function() {
+              node.emit('ioError', err);
+            });
+          });
+          node.io = new firmata.Board(sp);
           start(node);
         }catch(exp){
           process.nextTick(function() {
@@ -203,32 +210,33 @@ function createNode(RED){
           });
         }
       }
-    //   else if(n.connectionType === 'tcp'){
-    //     //console.log('trying', n.tcpHost, n.tcpPort);
-    //     var options = {
-    //       host: n.tcpHost,
-    //       port: parseInt(n.tcpPort, 10)
-    //     };
-    //     var client = net.connect(options, function() { //'connect' listener
-    //       //console.log('connected to server!');
-    //       node.io = new firmata.Board(this);
-    //       process.nextTick(function() {
-    //         node.emit('networkReady', node.io);
-    //       });
+      else if(n.connectionType === 'tcp' || n.connectionType === 'udp'){
+        //console.log('trying', n.tcpHost, n.tcpPort);
+        var options = {
+          host: n.tcpHost,
+          port: parseInt(n.tcpPort, 10)
+        };
 
-    //       start(node);
+        try{
+          sp = new PluginSerialPort(n.connectionType, options.host + ':' + options.port, options);
+          sp.on('error', function(err){
+            process.nextTick(function() {
+              node.emit('ioError', err);
+            });
+          });
+          node.io = new firmata.Board(sp);
+          sp.on('open', function(){
+            node.emit('networkReady', node.io);
+          });
+          start(node);
 
-    //     });
+        }catch(exp){
+          process.nextTick(function() {
+            node.emit('ioError', exp);
+          });
+        }
 
-    //     client.on('error', function(err){
-    //       console.log('tcp error', err);
-    //       node.warn(err);
-    //       process.nextTick(function() {
-    //         node.emit('networkError', err);
-    //       });
-    //     });
-
-    //   }
+      }
     }
     else if( 'raspi-io' === n.boardType ||
              'beaglebone-io' === n.boardType ||

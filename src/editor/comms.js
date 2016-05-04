@@ -1,13 +1,6 @@
 module.exports = function(RED){
 
-
-var errornotification = null;
-var clearErrorTimer = null;
-
 var subscriptions = {};
-var ws;
-var pendingAuth = false;
-var reconnectAttempts = 0;
 var rpcId = 0;
 
 var CHILD_FRAME_LOCATION = window.location;
@@ -41,14 +34,11 @@ window.addEventListener("message", function(evt){
     }
 }, false);
 
-function connectWS() {
+function connect() {
 
     RED.events.on('commsMessage', function(msg){
         // var msg = JSON.parse(event.data);
-        if (pendingAuth && msg.auth == "ok") {
-            pendingAuth = false;
-            completeConnection();
-        } else if (msg.topic) {
+        if (msg.topic) {
             for (var t in subscriptions) {
                 if (subscriptions.hasOwnProperty(t)) {
                     var re = new RegExp("^"+t.replace(/([\[\]\?\(\)\\\\$\^\*\.|])/g,"\\$1").replace(/\+/g,"[^/]+").replace(/\/#$/,"(\/.*)?")+"$");
@@ -72,9 +62,6 @@ function subscribe(topic,callback) {
         subscriptions[topic] = [];
     }
     subscriptions[topic].push(callback);
-    // if (ws && ws.readyState == 1) {
-    //     ws.send(JSON.stringify({subscribe:topic}));
-    // }
 }
 
 function unsubscribe(topic,callback) {
@@ -115,7 +102,7 @@ function postMessage(message){
 
 
 RED.comms = {
-        connect: connectWS,
+        connect: connect,
         subscribe: subscribe,
         unsubscribe:unsubscribe,
         rpc: rpc,

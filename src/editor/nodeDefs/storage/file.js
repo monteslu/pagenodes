@@ -18,24 +18,22 @@ module.exports = function(RED) {
     },
     button: {
       onclick: function() {
-        var dialog2 = $(`<div id="uploadDialog">
-                          <input type="file" name="injectFile" id="node-input-injectFile" />
-                        </div>`);
-        dialog2.appendTo("body");
-        $( "#uploadDialog" ).dialog({
-          buttons: [
-            {
-              text: 'inject',
-              click: function() {
-                var fileInfo = document.getElementById('node-input-injectFile');
-                RED.comms.rpc('file_upload', fileInfo, function(results){
-                  console.log('FE>file_upload>rpc results',results)
-                })
-                $( this  ).dialog( "close" );
-              }
-            }
-          ]
-        });
+        var inputDialog = document.createElement('input');
+        inputDialog.id = 'fileUpload';
+        inputDialog.type = "file";
+        inputDialog.click();
+        inputDialog.onchange = function (data) {
+          var fileInfo = data.path[0].files[0];
+          console.log('fileData>',fileInfo);
+          RED.comms.rpc('file_upload', fileInfo, function(results){
+            console.log('FE>file_upload>rpc results',results)
+          })
+        }
+        /*
+         *RED.comms.rpc('file_upload', fileInfo, function(results){
+         *  console.log('FE>file_upload>rpc results',results)
+         *})
+         */
       }
     },
     render: function () {
@@ -57,19 +55,15 @@ module.exports = function(RED) {
     renderHelp: function () {
       return (
         <div>
-        <p>
-          This button will inject a specified file into a stream
+          <p>
+            This button will inject a specified file into a stream
           </p>
           <p>
-          Using the <a href="https://developer.mozilla.org/en-US/docs/Web/API/File">File API</a> to deliver a file into a flow.  This could be used to parse XML or CSV with a function node.
+            Using the <a href="https://developer.mozilla.org/en-US/docs/Web/API/File">File API</a> to deliver a file into a flow.  This could be used to parse XML or CSV with a function node.
           </p>
-          </div>
+        </div>
       )
     },
-    renderDescription: function () {
-      return (
-        <p>Inject a File</p>
-      )
-    }
+    renderDescription: () => <p>Inject a File</p>
   })
 }

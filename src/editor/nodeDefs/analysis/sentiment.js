@@ -12,7 +12,7 @@ module.exports = function(RED){
       return this.name||"sentiment";
     },
     labelStyle: function() {
-      return this.name?"node_label_italic":"";
+      return this.name?"node_label_italic":"Sentiment Analysis";
     },
     render: function () {
       return (

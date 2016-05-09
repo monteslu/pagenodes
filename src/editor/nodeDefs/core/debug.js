@@ -194,9 +194,6 @@ module.exports = function(RED){
         var property = sanitize(o.property?o.property:'');
         var payload = sanitize((o.msg||"").toString());
         var format = sanitize((o.format||"").toString());
-        console.log('property is:',property);
-        console.log('payload is:',payload);
-
         if(payload = 'nodebot not configured') {
           RED.sidebar.show('config');
         }

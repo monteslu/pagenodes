@@ -197,6 +197,7 @@ module.exports = function(RED){
             showWarning = true;
             $( "#node-dialog-confirm-deploy-type" ).val("unusedConfig");
             $( "#node-dialog-confirm-deploy-unused" ).show();
+            RED.sidebar.show("config");
 
             unusedConfigNodes.sort(sortNodeInfo);
             $( "#node-dialog-confirm-deploy-unused-list" )

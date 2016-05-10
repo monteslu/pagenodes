@@ -1,7 +1,6 @@
 const CACHE_NAME = 'static-v1';
 const extras = require('extras');
 
-
 self.addEventListener('fetch', function(event) {
 
   if(event.request.method !== 'GET'){

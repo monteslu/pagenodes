@@ -3,7 +3,6 @@
 var rest = require('rest');
 var mime = require('rest/interceptor/mime');
 var errorCode = require('rest/interceptor/errorCode');
-var when = require('when');
 var getPath = require('./getPath');
 
 var client = rest.wrap(mime);

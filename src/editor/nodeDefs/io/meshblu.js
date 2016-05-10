@@ -563,7 +563,7 @@ RED.nodes.registerType('meshblu-server',{
       </div>
       );
     },
-    renderDescription: () => <p>Meshblue output node</p>
+    renderDescription: () => <p>Meshblu connection node</p>
   });
 
 };

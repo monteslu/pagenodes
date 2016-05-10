@@ -41,9 +41,6 @@ function init(RED) {
     };
     self.conn = meshblu.createConnection(options);
 
-    self.directs = [];
-    self.subs = [];
-
     self.conn.once('ready', function(data){
       self.conn.connected = true;
       self.emit('connReady', self.conn);

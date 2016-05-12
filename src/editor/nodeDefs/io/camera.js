@@ -3,7 +3,8 @@ module.exports = function(RED){
         category: 'function',
         color:"rgb(174, 174, 231)",
         defaults: {
-            name: {value:""},
+          name: {value:""},
+          animated: {value: false}
         },
         inputs:1,
         outputs:1,
@@ -20,6 +21,22 @@ module.exports = function(RED){
         render: function (){
           return (
             <div>
+
+              <div className="form-row" id="node-animated">
+                <label htmlFor="node-input-animated">
+                  <i className="fa fa-video-camera" />
+                  <span>Animated</span>
+                </label>
+                <input
+                  type="checkbox"
+                  id="node-input-animated"
+                  style={{ display: "inlineBlock", width: "auto", "verticalAlign": "top" }}/>
+                <label
+                  htmlFor="node-input-animated"
+                  style={{ width: "70%" }}> Gif
+                </label>
+              </div>
+
               <div className="form-row">
                 <label htmlFor="node-input-name">
                   <i className="fa fa-tag" />
@@ -30,9 +47,7 @@ module.exports = function(RED){
                   id="node-input-name"
                   data-i18n="[placeholder]common.label.name" />
               </div>
-              <div className="form-tips" id="tip-json" hidden>
-                <span data-i18n="httpin.tip.req" />
-              </div>
+
             </div>
           )
         },

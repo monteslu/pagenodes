@@ -1294,8 +1294,70 @@ RED.view = (function() {
 
                    //node.append("rect").attr("class", "node-gradient-top").attr("rx", 6).attr("ry", 6).attr("height",30).attr("stroke","none").attr("fill","url(#gradient-top)").style("pointer-events","none");
                    //node.append("rect").attr("class", "node-gradient-bottom").attr("rx", 6).attr("ry", 6).attr("height",30).attr("stroke","none").attr("fill","url(#gradient-bottom)").style("pointer-events","none");
+                    if(d._def.faChar){
+                        var icon_group = node.append("g")
+                            .attr("class","node_icon_group")
+                            .attr("x",0).attr("y",0);
 
-                    if (d._def.icon) {
+                        var icon_shade = icon_group.append("rect")
+                            .attr("x",0).attr("y",0)
+                            .attr("class","node_icon_shade")
+                            .attr("width","30")
+                            .attr("stroke","none")
+                            .attr("fill","#000")
+                            .attr("fill-opacity","0.1")
+                            .attr("height",function(d){return Math.min(50,d.h-4);});
+
+                        var textGroup = icon_group.append("g")
+                            .attr("x",0).attr("y",0);
+
+                        var text = textGroup.append('text')
+                          .attr('class','palette_faChar')
+                          .attr('x', 6)
+                          .attr('y', 22)
+                          // .attr('dy', '.35em')
+                          .attr('text-anchor','start')
+                          .html(function(){ return d._def.faChar});
+
+                        if(d._def.faColor){
+                            text.attr('fill', d._def.faColor);
+                            text.attr('stroke', d._def.faColor);
+                        }else{
+                            text.attr('fill', '#FFF');
+                            text.attr('stroke', '#FFF');
+                        }
+
+
+
+                        // var icon = icon_group.append("image")
+                        //     .attr("xlink:href","icons/"+d._def.icon)
+                        //     .attr("class","node_icon")
+                        //     .attr("x",0)
+                        //     .attr("width","30")
+                        //     .attr("height","30");
+
+
+
+
+                        var icon_shade_border = icon_group.append("path")
+                            .attr("d",function(d) { return "M 30 1 l 0 "+(d.h-2)})
+                            .attr("class","node_icon_shade_border")
+                            .attr("stroke-opacity","0.1")
+                            .attr("stroke","#000")
+                            .attr("stroke-width","1");
+
+                        if ("right" == d._def.align) {
+                            text.attr('x', 2);
+                            icon_group.attr('class','node_icon_group node_icon_group_'+d._def.align);
+                            icon_shade_border.attr("d",function(d) { return "M 0 1 l 0 "+(d.h-2)})
+                            //icon.attr('class','node_icon node_icon_'+d._def.align);
+                            //icon.attr('class','node_icon_shade node_icon_shade_'+d._def.align);
+                            //icon.attr('class','node_icon_shade_border node_icon_shade_border_'+d._def.align);
+                        }
+
+                        icon_group.style("pointer-events","none");
+                    }
+                    else if (d._def.icon) {
 
                         var icon_group = node.append("g")
                             .attr("class","node_icon_group")

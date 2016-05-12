@@ -8,9 +8,9 @@ module.exports = function(RED){
     },
     inputs:0,
     outputs:1,
-    icon: "accelerometer.png",
+    faChar: "&#xf079;", //retweet
     label: function() {
-      return this.name||'accelerometer';
+      return this.name||'orientation';
     },
     labelStyle: function() {
       return this.name?"node_label_italic":"";

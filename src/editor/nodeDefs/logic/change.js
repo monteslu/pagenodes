@@ -13,7 +13,7 @@ module.exports = function(RED){
     },
     inputs: 1,
     outputs: 1,
-    icon: "swap.png",
+    faChar: "&#xf074;", //random
     label: function() {
       if (this.name) {
         return this.name;

@@ -46,7 +46,7 @@ module.exports = function(RED){
     color:"#b7a990",
     inputs:1,
     outputs:0,
-    icon: "debug.png",
+    faChar: '&#xf024;', //flag
     align: "right",
     button: {
       toggle: "active",

@@ -24,7 +24,8 @@ module.exports = function(RED) {
     color: "rgb(255, 215, 180)",
     inputs: 0,
     outputs: 1,
-    icon: "white-globe.png",
+    //icon: "white-globe.png",
+    faChar: '&#xf0ac;', //globe
     labelStyle: function () {
       return this.name ? "node_label_italic" : "";
     },

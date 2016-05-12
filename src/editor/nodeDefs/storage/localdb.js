@@ -17,7 +17,8 @@ module.exports = function(RED) {
     },
     inputs: 1,
     outputs: 0,
-    icon: "leveldb.png",
+    //icon: "leveldb.png",
+    faChar: '&#xf1c0;', //database
     label: function() {
       return this.name || "localwrite";
     },
@@ -91,7 +92,7 @@ module.exports = function(RED) {
     },
     inputs: 1,
     outputs: 1,
-    icon: "leveldb.png",
+    faChar: '&#xf1c0;', //database
     label: function() {
       return this.name || "localread";
     },
@@ -136,6 +137,6 @@ module.exports = function(RED) {
           </div>
       )
     },
-    renderDescription: () => <p>Reads data in localStorage</p>  
+    renderDescription: () => <p>Reads data in localStorage</p>
   });
 }

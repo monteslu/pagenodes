@@ -20,7 +20,7 @@ module.exports = function(RED){
     color:"#87a980",
     inputs:1,
     outputs:0,
-    icon: "debug.png",
+    faChar: "&#xf03a;", //list
     align: "right",
     button: {
       toggle: "active",

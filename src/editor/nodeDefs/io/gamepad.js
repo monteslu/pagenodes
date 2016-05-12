@@ -9,7 +9,7 @@ module.exports = function(RED){
     },
     inputs:0,
     outputs:1,
-    icon: "gamepad.png",
+    faChar: '&#xf11b;', //gamepad
     label: function() {
       return this.name||'gamepad';
     },

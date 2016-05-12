@@ -14,7 +14,7 @@ module.exports = function(RED){
     },
     inputs:0,
     outputs:1,
-    icon: "inject.png",
+    faChar: '&#xf061;', //arrow-right
     label: function() {
       if (this.payloadType === "string") {
         if ((this.topic !== "") && ((this.topic.length + this.payload.length) <= 32)) {

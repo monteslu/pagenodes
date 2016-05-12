@@ -152,7 +152,8 @@ module.exports = function(RED){
     color:"#76be43",
     inputs:0,
     outputs:1,
-    icon: "meshblu.png",
+    faChar: "&#xf069;", //asterisk
+    faColor: '#172B6F',
     label: function() {
       return this.name||this.topic||"meshblu";
     },
@@ -310,7 +311,8 @@ RED.nodes.registerType('meshblu out',{
     color:"#76be43",
     inputs:1,
     outputs:0,
-    icon: "meshblu.png",
+    faChar: "&#xf069;", //asterisk
+    faColor: '#172B6F',
     align: "right",
     label: function() {
       return this.name||this.topic||"meshblu";

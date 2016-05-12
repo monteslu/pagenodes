@@ -7,7 +7,7 @@ module.exports = function(RED){
         },
         inputs:1,
         outputs:1,
-        icon: "white-globe.png",
+        faChar: '&#xf0ac;', //globe
         label: function() {
             return this.name||'geolocate';
         },

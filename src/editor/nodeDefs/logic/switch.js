@@ -11,7 +11,7 @@ module.exports = function(RED){
     },
     inputs: 1,
     outputs: 1,
-    icon: "switch.png",
+    faChar: "&#xf126;", //code-fork
     label: function() {
       return this.name||"switch";
     },

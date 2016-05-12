@@ -10,7 +10,7 @@ module.exports = function(RED){
         },
         inputs:1,
         outputs:1,
-        icon: "function.png",
+        faChar: 'ƒ',
         label: function() {
             return this.name;
         },

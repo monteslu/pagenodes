@@ -13,7 +13,7 @@ module.exports = function(RED){
     },
     inputs: 1,
     outputs: 1,
-    icon: "range.png",
+    faChar: "&#xf125;", //crop
     label: function() {
       return this.name || "range";
     },

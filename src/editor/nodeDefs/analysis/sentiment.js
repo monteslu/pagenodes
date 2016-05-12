@@ -7,7 +7,7 @@ module.exports = function(RED){
     },
     inputs:1,
     outputs:1,
-    icon: "arrow-in.png",
+    faChar: "&#xf11a;", //meh-o
     label: function() {
       return this.name||"sentiment";
     },

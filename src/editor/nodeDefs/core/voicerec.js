@@ -7,7 +7,7 @@ module.exports = function(RED){
     },
     inputs:0,
     outputs:1,
-    icon: "mouth.png",
+    faChar: '&#xf118;', //smile-o
     label: function() {
       return this.name||'voice rec';
     },

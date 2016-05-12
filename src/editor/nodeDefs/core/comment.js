@@ -9,7 +9,7 @@ module.exports = function(RED){
     },
     inputs:0,
     outputs:0,
-    icon: "comment.png",
+    faChar: "&#xf075;", //comment
     label: function() {
       return this.name||"";
     },

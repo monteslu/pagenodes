@@ -27,7 +27,7 @@ module.exports = function(RED) {
     color:'#ffb6c1',
     inputs:1,
     outputs:0,
-    icon: 'mouth.png',
+    faChar: '&#xf118;', //smile-o
     align: 'right',
     button: {
       toggle: 'active',

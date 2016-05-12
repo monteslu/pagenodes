@@ -157,8 +157,18 @@ RED.palette = (function() {
 
             d.className="palette_node";
 
+            if(def.faChar){
+                var icon_url = (typeof def.icon === "function" ? def.icon.call({}) : def.icon);
+                var iconContainer = $('<div/>',{class:"palette_icon_container"+(def.align=="right"?" palette_icon_container_right":"")}).appendTo(d);
+                var style = '';
 
-            if (def.icon) {
+                var iconElement = $('<div class=\"palette_faChar\">' + def.faChar + '</div>');
+                if(def.faColor){
+                    iconElement.css('color', def.faColor);
+                }
+                iconElement.appendTo(iconContainer);
+            }
+            else if (def.icon) {
                 var icon_url = (typeof def.icon === "function" ? def.icon.call({}) : def.icon);
                 var iconContainer = $('<div/>',{class:"palette_icon_container"+(def.align=="right"?" palette_icon_container_right":"")}).appendTo(d);
                 $('<div/>',{class:"palette_icon",style:"background-image: url(icons/"+icon_url+")"}).appendTo(iconContainer);

@@ -7,7 +7,7 @@ module.exports = function(RED){
         },
         inputs:1,
         outputs:1,
-        icon: "arrow-in.png",
+        faChar: "{",
         label: function() {
             return this.name||"json";
         },

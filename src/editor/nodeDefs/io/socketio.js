@@ -58,7 +58,8 @@ RED.nodes.registerType('socketio in',{
     color:"rgb(215, 215, 160)",
     inputs:0,
     outputs:1,
-    icon: "white-globe.png",
+    //icon: "white-globe.png",
+    faChar: '&#xf0ac;', //globe
     labelStyle: function() {
         return this.name?"node_label_italic":"";
     },
@@ -122,7 +123,8 @@ RED.nodes.registerType('socketio out',{
     color:"rgb(215, 215, 160)",
     inputs:1,
     outputs:0,
-    icon: "white-globe.png",
+    //icon: "white-globe.png",
+    faChar: '&#xf0ac;', //globe
     align: "right",
     labelStyle: function() {
         return this.name?"node_label_italic":"";

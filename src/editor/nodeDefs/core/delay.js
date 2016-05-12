@@ -17,7 +17,7 @@ module.exports = function(RED){
         },
         inputs:1,                // set the number of inputs - only 0 or 1
         outputs:1,               // set the number of outputs - 0 to n
-        icon: "timer.png",    // set the icon (held in public/icons)
+        faChar: "&#xf017;",//clock-o
         label: function() {      // sets the default label contents
             if (this.pauseType == "delay") {
               var units = this.timeoutUnits ? this.timeoutUnits.charAt(0) : "s";

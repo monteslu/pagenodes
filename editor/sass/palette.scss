@@ -157,7 +157,7 @@
     border: 1px solid #999;
     background-position: 5% 50%;
     background-repeat: no-repeat;
-    width: 108px;
+    width: 115px;
     background-size: contain;
     position: relative;
 }
@@ -192,9 +192,9 @@
     top:0;
     bottom:0;
     left:0;
-    width: 25px;
+    width: 34px;
     border-right: 1px solid rgba(0,0,0,0.1);
-    background-color: rgba(0,0,0,0.05);
+    background-color: rgba(0,0,0,0.1);
 }
 .palette_icon_container_right {
     left: auto;
@@ -210,3 +210,18 @@
     background-size: contain;
     background-repeat: no-repeat;
 }
+
+.palette_faChar {
+    display: inline-block;
+    width: 22px;
+    height: 100%;
+    background-position: 50% 50%;
+    background-size: contain;
+    background-repeat: no-repeat;
+    font: normal normal normal 22px/1 FontAwesome;
+    color: white;
+    margin-top: 3px;
+    stroke-width: 0px;
+    font-weight: normal;
+}
+

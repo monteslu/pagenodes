@@ -11,7 +11,7 @@ module.exports = function(RED) {
   RED.events.on('rpc_file_upload', function(data) {
     var node = RED.nodes.getNode(data.params[0]);
     if (node) {
-        node.send(_.assign({topic: 'file'}, data.params[1]));
+        node.send(_.assign({topic: 'file', payload: data.params[1].name}, data.params[1]));
         data.reply('ok');
     } else {
         data.reply('not ok');

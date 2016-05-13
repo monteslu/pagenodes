@@ -39,7 +39,7 @@ module.exports = function(RED) {
           reader.onload = function(theFile){
             console.log('file read finished', theFile);
 
-            RED.comms.rpc('file_upload', [self.id, {payload: theFile.target.result, fileInfo: {type: selectedFile.type, name: selectedFile.name, size: selectedFile.size} }], function(results){
+            RED.comms.rpc('file_upload', [self.id, {payload: selectedFile.name, fileInfo: {data: theFile.target.result, type: selectedFile.type, name: selectedFile.name, size: selectedFile.size} }], function(results){
               console.log('results', results);
             });
 

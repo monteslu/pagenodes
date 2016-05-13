@@ -225,7 +225,7 @@ module.exports = function(RED){
               var fileHTML = '';
               if(o.file){
                 var download = sanitize(o.file.fileInfo.name.replace(/\"/g,'').replace(/\'/g,''));
-                var dataURL = o.file.data.replace(/\"/g,'').replace(/\'/g,'');
+                var dataURL = o.file.fileInfo.data.replace(/\"/g,'').replace(/\'/g,'');
                 fileHTML = '<br><a href=\"' + dataURL + '\" download=\"'+ download + '\" target=\"_blank\">' + download + '</a>';
               }
               msg.innerHTML += '<span class="debug-message-payload">'+ payload + imgHTML + fileHTML + '</span>';

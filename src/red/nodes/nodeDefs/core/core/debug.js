@@ -21,8 +21,8 @@ module.exports = function(RED) {
 
         this.on("input",function(msg) {
             var file = null;
-            if(msg.fileInfo && msg.fileInfo.name && msg.fileInfo.size && msg.payload){
-                file = {fileInfo: msg.fileInfo, data: msg.payload};
+            if(msg.fileInfo && msg.fileInfo.name && msg.fileInfo.size && msg.fileInfo.data){
+                file = {fileInfo: msg.fileInfo};
             }
             if (this.complete === "true") {
             // debug complete msg object

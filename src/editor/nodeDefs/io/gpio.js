@@ -13,7 +13,6 @@ module.exports = function(RED){
     inputs:0,
     outputs:1,
     faChar: "&#xf135;", //rocket
-    faColor: '#000',
     label: function() {
       return this.name||"gpio"+this.pin;
     },
@@ -135,7 +134,6 @@ module.exports = function(RED){
     inputs:1,
     outputs:0,
     faChar: "&#xf135;", //rocket
-    faColor: '#000',
     align: "right",
     label: function() {
       console.log('name', "gpio"+(this.pin || this.i2cAddress || ''));
@@ -746,7 +744,6 @@ module.exports = function(RED){
         inputs:1,
         outputs:1,
         faChar: "&#xf135;", //rocket
-        faColor: '#000',
         label: function() {
             return this.name || 'johnny5';
         },

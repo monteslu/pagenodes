@@ -131,9 +131,19 @@
 
 
 .node_error {
-    stroke: #ff0000;
-    stroke-width: 2;
-    fill: #ff7f0e;
+    stroke: #dd0000;
+    stroke-width: 1;
+    fill: #fd6400;
+    font: normal normal normal 12px/1 FontAwesome;
+    font-weight: normal;
+}
+
+.node_changed {
+    fill: #00bcff;
+    stroke-width: 1;
+    stroke: #0000dd;
+    font: normal normal normal 12px/1 FontAwesome;
+    font-weight: normal;
 }
 
 .node_badge {

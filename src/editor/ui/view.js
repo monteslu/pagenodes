@@ -1437,11 +1437,17 @@ RED.view = (function() {
                         .attr("class","node_status_label")
                         .attr('x',20).attr('y',9);
 
-                    //node.append("circle").attr({"class":"centerDot","cx":0,"cy":0,"r":5});
+                    node.append("g").attr("class","node_error hidden")
+                        .attr("x",0).attr("y",-4).attr("width",10).attr("height",9)
+                    .append('text')
+                        .attr('class','node_error')
+                        .html(function(){ return '&#xf071;'});
 
-                    //node.append("path").attr("class","node_error").attr("d","M 3,-3 l 10,0 l -5,-8 z");
-                    node.append("image").attr("class","node_error hidden").attr("xlink:href","icons/node-error.png").attr("x",0).attr("y",-6).attr("width",10).attr("height",9);
-                    node.append("image").attr("class","node_changed hidden").attr("xlink:href","icons/node-changed.png").attr("x",12).attr("y",-6).attr("width",10).attr("height",10);
+                    node.append("g").attr("class","node_changed hidden")
+                        .attr("x",12).attr("y",-4).attr("width",10).attr("height",10)
+                    .append('text')
+                        .attr('class','node_changed')
+                        .html(function(){ return '&#xf111;'});
             });
 
             node.each(function(d,i) {

@@ -153,7 +153,12 @@ RED.palette = (function() {
             }
 
 
-            $('<div/>',{class:"palette_label"+(def.align=="right"?" palette_label_right":"")}).appendTo(d);
+            var paletteLabelDiv = $('<div/>',{class:"palette_label"+(def.align=="right"?" palette_label_right":"")});
+            paletteLabelDiv.appendTo(d);
+
+            if(def.fontColor){
+                paletteLabelDiv.css('color', def.fontColor);
+            }
 
             d.className="palette_node";
 

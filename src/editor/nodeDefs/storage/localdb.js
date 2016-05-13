@@ -19,6 +19,7 @@ module.exports = function(RED) {
     outputs: 0,
     //icon: "leveldb.png",
     faChar: '&#xf1c0;', //database
+    fontColor: "#FFF",
     label: function() {
       return this.name || "localwrite";
     },
@@ -93,6 +94,7 @@ module.exports = function(RED) {
     inputs: 1,
     outputs: 1,
     faChar: '&#xf1c0;', //database
+    fontColor: "#FFF",
     label: function() {
       return this.name || "localread";
     },

@@ -222,7 +222,13 @@ module.exports = function(RED){
                 var imgURL = o.image.replace(/\"/g,'').replace(/\'/g,'');
                 imgHTML = '<br><img src=\"' + imgURL + '\" style=\"width: 100%\">';
               }
-              msg.innerHTML += '<span class="debug-message-payload">'+ payload+ imgHTML+ '</span>';
+              var fileHTML = '';
+              if(o.file){
+                var download = sanitize(o.file.fileInfo.name.replace(/\"/g,'').replace(/\'/g,''));
+                var dataURL = o.file.data.replace(/\"/g,'').replace(/\'/g,'');
+                fileHTML = '<br><a href=\"' + dataURL + '\" download=\"'+ download + '\" target=\"_blank\">' + download + '</a>';
+              }
+              msg.innerHTML += '<span class="debug-message-payload">'+ payload + imgHTML + fileHTML + '</span>';
               var atBottom = (sbc.scrollHeight-messages.offsetHeight-sbc.scrollTop) < 5;
               messageCount++;
               $(messages).append(msg);

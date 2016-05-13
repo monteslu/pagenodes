@@ -8,6 +8,7 @@ module.exports = function(RED){
         inputs:1,
         outputs:1,
         faChar: '&#xf0ac;', //globe
+        fontColor: "#FFF",
         label: function() {
             return this.name||'geolocate';
         },

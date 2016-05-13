@@ -14,7 +14,8 @@ module.exports = function(RED) {
     },
     inputs: 0,
     outputs: 1,
-    icon: "white-globe.png",
+    faChar: "&#xf016;", //file-o
+    fontColor: "#FFF",
     label: function () {
       return this.name || 'file';
     },
@@ -23,22 +24,30 @@ module.exports = function(RED) {
     },
     button: {
       onclick: function() {
+        var self = this;
         var inputDialog = document.createElement('input');
         inputDialog.id = 'fileUpload';
         inputDialog.type = "file";
         inputDialog.click();
         inputDialog.onchange = function (data) {
-          var fileInfo = b64EncodeUnicode(data.path[0].files[0]);
-          console.log('fileInfo',fileInfo);
-          RED.comms.rpc('file_upload', fileInfo, function(results){
-            return results
-          })
+          var selectedFile = data.path[0].files[0];
+          console.log('fileInfo',selectedFile);
+
+          var reader = new FileReader();
+
+          // Closure to capture the file information.
+          reader.onload = function(theFile){
+            console.log('file read finished', theFile);
+
+            RED.comms.rpc('file_upload', [self.id, {payload: theFile.target.result, fileInfo: {type: selectedFile.type, name: selectedFile.name, size: selectedFile.size} }], function(results){
+              console.log('results', results);
+            });
+
+          };
+
+          reader.readAsDataURL(selectedFile);
+
         }
-        /*
-         *RED.comms.rpc('file_upload', fileInfo, function(results){
-         *  console.log('FE>file_upload>rpc results',results)
-         *})
-         */
       }
     },
     render: function () {

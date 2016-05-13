@@ -154,6 +154,7 @@ module.exports = function(RED){
     outputs:1,
     faChar: "&#xf069;", //asterisk
     faColor: '#172B6F',
+    fontColor: '#172B6F',
     label: function() {
       return this.name||this.topic||"meshblu";
     },
@@ -313,6 +314,7 @@ RED.nodes.registerType('meshblu out',{
     outputs:0,
     faChar: "&#xf069;", //asterisk
     faColor: '#172B6F',
+    fontColor: '#172B6F',
     align: "right",
     label: function() {
       return this.name||this.topic||"meshblu";

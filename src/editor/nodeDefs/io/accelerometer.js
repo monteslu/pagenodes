@@ -9,6 +9,7 @@ module.exports = function(RED){
     inputs:0,
     outputs:1,
     faChar: "&#xf079;", //retweet
+    fontColor: "#FFF",
     label: function() {
       return this.name||'orientation';
     },

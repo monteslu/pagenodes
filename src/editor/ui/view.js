@@ -1425,6 +1425,15 @@ RED.view = (function() {
                         if (d._def.align === "right") {
                             text.attr('text-anchor','end');
                         }
+
+                    }
+
+                    if(d._def.fontColor){
+                        text.attr('fill', d._def.fontColor);
+                        text.attr('stroke', d._def.fontColor);
+                    }else{
+                        text.attr('fill', '#333');
+                        text.attr('stroke', '#333');
                     }
 
                     var status = node.append("svg:g").attr("class","node_status_group").style("display","none");

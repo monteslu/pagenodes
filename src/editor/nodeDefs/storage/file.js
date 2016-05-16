@@ -30,22 +30,25 @@ module.exports = function(RED) {
         inputDialog.type = "file";
         inputDialog.click();
         inputDialog.onchange = function (data) {
-          var selectedFile = data.path[0].files[0];
+          var selectedFile = data.target.files[0];
+
           console.log('fileInfo',selectedFile);
 
-          var reader = new FileReader();
+          if(selectedFile){
+            var reader = new FileReader();
 
-          // Closure to capture the file information.
-          reader.onload = function(theFile){
-            console.log('file read finished', theFile);
+            // Closure to capture the file information.
+            reader.onload = function(theFile){
+              console.log('file read finished', theFile);
 
-            RED.comms.rpc('file_upload', [self.id, {payload: selectedFile.name, fileInfo: {data: theFile.target.result, type: selectedFile.type, name: selectedFile.name, size: selectedFile.size} }], function(results){
-              console.log('results', results);
-            });
+              RED.comms.rpc('file_upload', [self.id, {payload: selectedFile.name, fileInfo: {data: theFile.target.result, type: selectedFile.type, name: selectedFile.name, size: selectedFile.size} }], function(results){
+                console.log('results', results);
+              });
 
-          };
+            };
 
-          reader.readAsDataURL(selectedFile);
+            reader.readAsDataURL(selectedFile);
+          }
 
         }
       }

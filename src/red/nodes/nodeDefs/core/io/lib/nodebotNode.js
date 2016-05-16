@@ -12,15 +12,15 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 */
 'use strict';
 
-var five = require('johnny-five');
-var firmata = require('firmata');
+const five = require('johnny-five');
+const firmata = require('firmata');
+const _ = require('lodash');
 
-//var net = require('net');
-
-
+//for cleanup
+const eventTypes = ['data', 'change', 'up', 'down', 'hit', 'hold', 'press', 'release', 'start', 'stop', 'navigation', 'motionstart', 'motionend'];
 
 var boardTypes = {
-  firmata: require('firmata'),
+  firmata,
   "tinker-io": require('tinker-io')
 }
 
@@ -90,6 +90,11 @@ function createNode(RED){
               }
               component.io = null;
               component.board = null;
+              if(component.removeAllListeners){
+                eventTypes.forEach(function(et){
+                  component.removeAllListeners('data');
+                });
+              }
             }catch(compE){
               console.log('error trying to cleanup component', compE);
             }

@@ -1,4 +1,24 @@
 module.exports = function(RED){
+
+  //**dataURL to blob**
+  function dataURLtoBlob(dataurl) {
+      var arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
+          bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+      while(n--){
+          u8arr[n] = bstr.charCodeAt(n);
+      }
+      return new Blob([u8arr], {type:mime});
+  }
+
+  //**blob to dataURL**
+  function blobToDataURL(blob, callback) {
+      var a = new FileReader();
+      a.onload = function(e) {callback(e.target.result);}
+      a.readAsDataURL(blob);
+  }
+
+
+
   RED.nodes.registerType('debug',{
     category: 'output',
     defaults: {
@@ -225,8 +245,12 @@ module.exports = function(RED){
               var fileHTML = '';
               if(o.file){
                 var download = sanitize(o.file.fileInfo.name.replace(/\"/g,'').replace(/\'/g,''));
-                var dataURL = o.file.fileInfo.data.replace(/\"/g,'').replace(/\'/g,'');
-                fileHTML = '<br><a href=\"' + dataURL + '\" download=\"'+ download + '\" target=\"_blank\">' + download + '</a>';
+
+                // var dataURL = o.file.fileInfo.data.replace(/\"/g,'').replace(/\'/g,'');
+                var blob = dataURLtoBlob(o.file.fileInfo.data);
+                var url = URL.createObjectURL(blob);
+
+                fileHTML = '<br><a href=\"' + url + '\" download=\"'+ download + '\" target=\"_blank\">' + download + '</a>';
               }
               msg.innerHTML += '<span class="debug-message-payload">'+ payload + imgHTML + fileHTML + '</span>';
               var atBottom = (sbc.scrollHeight-messages.offsetHeight-sbc.scrollTop) < 5;

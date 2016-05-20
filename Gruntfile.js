@@ -102,15 +102,13 @@ module.exports = function(grunt) {
                         "editor/vendor/jquery/js/jquery-ui-1.10.3.custom.min.js",
                         "editor/vendor/jquery/js/jquery.ui.touch-punch.min.js",
                         "editor/vendor/marked/marked.min.js",
-                        "editor/vendor/orion/built-editor.min.js",
                         "editor/vendor/d3/d3.v3.min.js",
                         "editor/vendor/i18next/i18next.min.js"
                     ],
-                    "public/vendor/vendor.css": [
-                        "editor/vendor/orion/built-editor.css"
-                        // TODO: resolve relative resource paths in
-                        //       bootstrap/FA/jquery
-                    ]
+                    // "public/vendor/vendor.css": [
+                    //     // TODO: resolve relative resource paths in
+                    //     //       bootstrap/FA/jquery
+                    // ]
                 }
             },
 

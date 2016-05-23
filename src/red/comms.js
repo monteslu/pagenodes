@@ -1,30 +1,23 @@
 
 const log = require("./log");
 const events = require("./events");
+const globalEvents = require('../shared/global-events');
 
 
 
 function parentPost(message){
     // console.log('server parentPost', typeof message, message);
-    parent.postMessage(JSON.stringify(message), window.location);
+    // parent.postMessage(JSON.stringify(message), window.location);
+
+    globalEvents.emit('fromBackend', message);
 }
 
 
 function start() {
     console.log('starting server comms');
-    window.addEventListener("message", function(evt){
-        var data = evt.data;
 
-        // console.log('message received on server', data);
-        if(typeof data === 'string'){
-            try{
-                data = JSON.parse(data);
-            }
-            catch(err){
-                console.log('server err parsing comms message', err);
-            }
-        }
-        if(data.type === 'rpc'){
+    globalEvents.on('fromUI', function(data){
+       if(data.type === 'rpc'){
             if(data.id){
                 data.reply = function(result){
                     parentPost({
@@ -42,7 +35,7 @@ function start() {
 }
 
 
-function publish(topic,data,retain) {
+function publish(topic,data) {
     parentPost({
         topic: topic,
         data: data,
@@ -51,15 +44,23 @@ function publish(topic,data,retain) {
 }
 
 function publishReady(){
+    console.log('publishing server ready');
     parentPost({
         type: 'serverReady'
-    })
+    });
 }
 
+function publishNodeDefsLoaded(){
+    console.log('publishing node defs loaded');
+    parentPost({
+        type: 'nodeDefsLoaded'
+    });
+}
 
 module.exports = {
     start,
     stop,
     publish,
-    publishReady
+    publishReady,
+    publishNodeDefsLoaded
 };

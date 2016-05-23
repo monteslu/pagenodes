@@ -1,3 +1,5 @@
+const globalEvents = require('../shared/global-events');
+
 module.exports = function(RED){
 
 var subscriptions = {};
@@ -9,18 +11,8 @@ var rpcCallbacks = {};
 
 console.log('starting client comms');
 
-window.addEventListener("message", function(evt){
-    var data = evt.data;
-    if(typeof data === 'string'){
-        try{
-            data = JSON.parse(data);
-            // console.log('typeof evt.data', typeof data, data);
-        }
-        catch(err){
-            console.log('client parsing comms message', err);
-        }
-    }
 
+globalEvents.on('fromBackend', function(data){
     // console.log('message received on client', data);
     if(data.type === 'rpc' && data.id && rpcCallbacks[data.id]){
         rpcCallbacks[data.id](data.result);
@@ -28,6 +20,9 @@ window.addEventListener("message", function(evt){
     }
     else if(data.type === 'serverReady'){
         RED.events.emit('serverReady', 'ok');
+    }
+    else if(data.type === 'nodeDefsLoaded'){
+        RED.events.emit('nodeDefsLoaded', 'ok');
     }
     else if(data.type === 'commsMessage'){
         RED.events.emit('commsMessage', data);
@@ -96,8 +91,7 @@ function rpc(name, params, callback){
 }
 
 function postMessage(message){
-    var serverWindow = document.getElementById('serverFrame').contentWindow;
-    serverWindow.postMessage(JSON.stringify(message), CHILD_FRAME_LOCATION);
+    globalEvents.emit('fromUI', message);
 }
 
 

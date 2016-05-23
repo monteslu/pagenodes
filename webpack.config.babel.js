@@ -2,9 +2,10 @@ const path = require('path');
 
 module.exports = {
   entry: {
-    ui: path.join(__dirname, './build/editor/main.js'),
-    backend: path.join(__dirname, './build/red/main.js'),
-    "service-worker": path.join(__dirname, './build/red/service-worker.js')
+    ui: path.join(__dirname, './build/main.js'),
+    // backend: path.join(__dirname, './build/red/main.js'),
+    "service-worker": path.join(__dirname, './build/red/service-worker.js'),
+    "function-worker": path.join(__dirname, './build/red/function-worker.js')
   },
   output: {
     filename: '[name].bundle.js',
@@ -49,7 +50,8 @@ module.exports = {
       fs: 'level-fs-browser',
       serialport: 'browser-serialport',
       bcrypt: 'bcryptjs',
-      extras: process.env.EXTRAS || 'pagenodes-extras'
+      extras: process.env.EXTRAS || 'pagenodes-extras',
+      vm: 'vm-browserify'
     }
   },
   bail: false

@@ -5,31 +5,24 @@ var redNodes = require("./nodes");
 var comms = require("./comms");
 var storage = require("./storage");
 var log = require("./log");
+var settings = require('./settings');
 
-var app = {};
-var nodeApp = null;
-var server = null;
-var settings = null;
+var server = {};
+
 
 var api = require('./api');
 
 var runtimeMetricInterval = null;
 
 
-function init(_server,_settings) {
-    server = _server;
-    settings = _settings;
-}
-
 function start() {
     return storage.init(settings)
-        .then(function() { return settings.load(storage)})
-        .then(function() {
-            console.log('inited', settings);
-
-            // if (settings.httpAdminRoot !== false) {
-            //     require("./api").init(app,storage);
-            // }
+        .then(function(settingsInited) {
+          console.log('settings inited', settingsInited);
+          return settings.load(storage)
+        })
+        .then(function(storageLoaded) {
+            console.log('storageLoaded', settings, storageLoaded);
 
             api.init({}, storage);
 
@@ -38,14 +31,18 @@ function start() {
                     reportMetrics();
                 }, settings.runtimeMetricInterval||15000);
             }
+
             console.log("\n\n"+log._("runtime.welcome")+"\n===================\n");
             if (settings.version) {
                 log.info(log._("runtime.version",{component:"Node-RED",version:"v"+settings.version}));
             }
+
             log.info(log._("runtime.version",{component:"Node.js ",version:process.version}));
             log.info(log._("server.loading"));
-            redNodes.init(settings,storage,app);
-            return redNodes.load().then(function() {
+            redNodes.init(settings,storage);
+
+            return redNodes.load().then(function(redNodesLoaded) {
+                console.log('redNodesLoaded', redNodesLoaded);
                 var i;
                 var nodeErrors = redNodes.getNodeList(function(n) { return n.err!=null;});
                 var nodeMissing = redNodes.getNodeList(function(n) { return n.module && n.enabled && !n.loaded && !n.err;});
@@ -86,10 +83,9 @@ function start() {
                     }
                 }
                 log.info(log._("runtime.paths.settings",{path:settings.settingsFile}));
-                redNodes.loadFlows();
-                //comms.start();
+                return redNodes.loadFlows();
             }).catch(function(err) {
-                console.log(err);
+                console.log('error starting backend', err);
             });
     });
 }
@@ -173,7 +169,6 @@ function stop() {
 }
 
 var serverAPI = module.exports = {
-    init: init,
     start: start,
     stop: stop,
 
@@ -182,7 +177,5 @@ var serverAPI = module.exports = {
     installModule: installModule,
     installNode: installNode,
 
-    get app() { return app },
-    get nodeApp() { return nodeApp },
     get server() { return server }
 }

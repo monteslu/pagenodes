@@ -150,9 +150,6 @@ module.exports = function(RED){
                   <code>node.error("Error")</code>
                 </li>
               </ul>
-              <p>The Catch node can also be used to handle errors. To invoke a Catch node,
-                pass <code>msg</code> as a second argument to <code>node.error</code>:</p>
-              <pre>node.error("Error",msg)</pre>
               <h4>
                 Sending messages
               </h4>
@@ -176,9 +173,6 @@ module.exports = function(RED){
               <p>
                 If null is returned, either by itself or as an element of the array, no
                 message is passed on.
-              </p>
-              <p>
-                See the <a target="_new" href="http://nodered.org/docs/writing-functions.html">online documentation</a> for more help.
               </p>
             </div>
           )

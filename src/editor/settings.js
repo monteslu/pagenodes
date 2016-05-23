@@ -52,28 +52,6 @@ module.exports = function(RED){
       loadedSettings = data;
     };
 
-    var init = function (done) {
-      var accessTokenMatch = /[?&]access_token=(.*?)(?:$|&)/.exec(window.location.search);
-      if (accessTokenMatch) {
-        var accessToken = accessTokenMatch[1];
-        RED.settings.set("auth-tokens",{access_token: accessToken});
-        window.location.search = "";
-      }
-
-      $.ajaxSetup({
-        beforeSend: function(jqXHR,settings) {
-          // Only attach auth header for requests to relative paths
-          if (!/^\s*(https?:|\/|\.)/.test(settings.url)) {
-            var auth_tokens = RED.settings.get("auth-tokens");
-            if (auth_tokens) {
-              jqXHR.setRequestHeader("Authorization","Bearer "+auth_tokens.access_token);
-            }
-          }
-        }
-      });
-
-      load(done);
-    }
 
     var load = function(done) {
       var data = {"httpNodeRoot":"/","version":"0.11.2-git"};
@@ -99,7 +77,6 @@ module.exports = function(RED){
     }
 
     return {
-      init: init,
       load: load,
       set: set,
       get: get,

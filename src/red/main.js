@@ -1,13 +1,12 @@
-require('babel-core/polyfill'); //@#$! safari
-
 const nopt = require("nopt");
 const path = require("path");
-const PN = require("./red");
+const PN = require("./pn");
 const log = require("./log");
 const extras = require("extras");
+const settings = require('./settings');
 
 try {
-    PN.init({},{});
+    PN.init();
 } catch(err) {
     console.log("Failed to start server:");
     if (err.stack) {
@@ -16,7 +15,6 @@ try {
         console.log(err);
     }
 }
-
 
 PN.start().then(function() {
     //post message back to parent

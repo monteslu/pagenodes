@@ -1,150 +1,72 @@
-/**
- * Copyright 2013,2015 IBM Corp.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- **/
+
 
 //var babel = require('babel');
-var _ = require('lodash');
+const _ = require('lodash');
+
+const WW_SCRIPT = '/function-worker.bundle.js';
 
 module.exports = function(RED) {
-    "use strict";
-    var util = require("util");
-    var vm = require("vm");
+  "use strict";
 
-    function sendResults(node,_msgid,msgs) {
-        if (msgs == null) {
-            return;
-        } else if (!util.isArray(msgs)) {
-            msgs = [msgs];
+
+  function FunctionNode(n) {
+    RED.nodes.createNode(this,n);
+    var node = this;
+    this.name = n.name;
+    this.func = n.func;
+    this.worker = new Worker(WW_SCRIPT);
+
+    this.topic = n.topic;
+    node.on('close', function(){
+      console.log('terminating worker for ', node.id);
+      this.worker.terminate();
+    });
+    node.worker.onmessage = function(evt){
+      // console.log('message recieved from worker', evt);
+      try{
+        var data = evt.data;
+        var type = data.type;
+
+        if(type === 'result' && data.results){
+            node.send(data.results);
         }
-        var msgCount = 0;
-        for (var m=0;m<msgs.length;m++) {
-            if (msgs[m]) {
-                if (util.isArray(msgs[m])) {
-                    for (var n=0; n < msgs[m].length; n++) {
-                        msgs[m][n]._msgid = _msgid;
-                        msgCount++;
-                    }
-                } else {
-                    msgs[m]._msgid = _msgid;
-                    msgCount++;
-                }
-            }
+        else if(type === 'error'){
+            node.error(new Error(data.message));
         }
-        if (msgCount>0) {
-            node.send(msgs);
+        else if (type === 'warn'){
+          node.warn(data.error)
         }
+        else if (type === 'log'){
+          node.log(data.msg)
+        }
+        else if (type === 'status'){
+          node.status(data.status);
+        }
+        else if (type === 'send' && data.msg){
+          node.send(data.msg);
+        }
+      }catch(exp){
+        node.error(exp);
+      }
+
     }
 
-    function FunctionNode(n) {
-        RED.nodes.createNode(this,n);
-        var node = this;
-        this.name = n.name;
-        this.func = n.func;
-        var functionText = "var results = null;"+
-                           "results = (function(msg){ "+
-                              "var __msgid__ = msg._msgid;"+
-                              "var node = {"+
-                                 "log:__node__.log,"+
-                                 "error:__node__.error,"+
-                                 "warn:__node__.warn,"+
-                                 "on:__node__.on,"+
-                                 "status:__node__.status,"+
-                                 "send:function(msgs){ __node__.send(__msgid__,msgs);}"+
-                              "};\n"+
-                              this.func+"\n"+
-                           "})(msg);";
-        this.topic = n.topic;
-        var sandbox = {
-            console:console,
-            util:util,
-            Buffer:Buffer,
-            __node__: {
-                log: function() {
-                    node.log.apply(node, arguments);
-                },
-                error: function() {
-                    node.error.apply(node, arguments);
-                },
-                warn: function() {
-                    node.warn.apply(node, arguments);
-                },
-                send: function(id, msgs) {
-                    sendResults(node, id, msgs);
-                },
-                on: function() {
-                    node.on.apply(node, arguments);
-                },
-                status: function() {
-                    node.status.apply(node, arguments);
-                }
-            },
-            context: {
-                global:RED.settings.functionGlobalContext || {}
-            },
-            setTimeout: setTimeout,
-            clearTimeout: clearTimeout,
-            _:_
-        };
-        var context = vm.createContext(sandbox);
+    try {
+      this.on("input", function(msg) {
         try {
-            this.script = vm.createScript(functionText);
-            this.on("input", function(msg) {
-                try {
-                    var start = Date.now(); 
-                    context.msg = msg;
-                    this.script.runInContext(context);
-                    sendResults(this,msg._msgid,context.results);
+          var execId = '_' + Math.random() + '_' + Date.now();
+          node.worker.postMessage({msg, execId, func: node.func, type: 'run'})
 
-                    var duration = Date.now() - start;
-                    var converted = duration;
-                    this.metric("duration", msg, converted);
-                    if (process.env.NODE_RED_FUNCTION_TIME) {
-                        this.status({fill:"yellow",shape:"dot",text:""+converted});
-                    }
-                } catch(err) {
-
-                    var line = 0;
-                    var errorMessage;
-                    var stack = err.stack.split(/\r?\n/);
-                    if (stack.length > 0) {
-                        while (line < stack.length && stack[line].indexOf("ReferenceError") !== 0) {
-                            line++;
-                        }
-
-                        if (line < stack.length) {
-                            errorMessage = stack[line];
-                            var m = /:(\d+):(\d+)$/.exec(stack[line+1]);
-                            if (m) {
-                                var lineno = Number(m[1])-1;
-                                var cha = m[2];
-                                errorMessage += " (line "+lineno+", col "+cha+")";
-                            }
-                        }
-                    }
-                    if (!errorMessage) {
-                        errorMessage = err.toString();
-                    }
-                    this.error(errorMessage, msg);
-                }
-            });
         } catch(err) {
-            // eg SyntaxError - which v8 doesn't include line number information
-            // so we can't do better than this
-            this.error(err);
+          node.error(err);
         }
+      });
+    } catch(err) {
+      // eg SyntaxError - which v8 doesn't include line number information
+      // so we can't do better than this
+      node.error(err);
     }
-    RED.nodes.registerType("function",FunctionNode);
-    RED.library.register("functions");
+  }
+  RED.nodes.registerType("function",FunctionNode);
+  RED.library.register("functions");
 }

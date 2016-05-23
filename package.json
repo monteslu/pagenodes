@@ -101,6 +101,7 @@
     "transform-loader": "^0.2.3",
     "uglify-js": "2.5.0",
     "vektor": "^0.3.0",
+    "vm-browserify": "0.0.4",
     "webpack": "^1.12.2",
     "webusb-serial": "^0.3.0",
     "when": "3.7.4",

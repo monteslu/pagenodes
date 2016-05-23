@@ -19,24 +19,13 @@ var clone = require("lodash").cloneDeep;
 var assert = require("assert");
 var log = require("./log");
 
-var userSettings = null;
-var globalSettings = null;
+var userSettings = {};
+var globalSettings = {};
 var storage = null;
 
 var persistentSettings = {
     init: function(settings) {
         userSettings = settings;
-        for (var i in settings) {
-            /* istanbul ignore else */
-            if (settings.hasOwnProperty(i)) {
-                (function() {
-                    var j = i;
-                    persistentSettings.__defineGetter__(j,function() { return userSettings[j]; });
-                    persistentSettings.__defineSetter__(j,function() { throw new Error("Property '"+j+"' is read-only"); });
-                })();
-            }
-        }
-        globalSettings = null;
     },
     load: function(_storage) {
         storage = _storage;

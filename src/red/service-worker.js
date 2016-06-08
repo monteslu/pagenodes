@@ -1,5 +1,5 @@
 const CACHE_NAME = 'static-v1';
-const extras = require('extras');
+const extras = require('extras/service-worker');
 
 
 self.addEventListener('fetch', function(event) {

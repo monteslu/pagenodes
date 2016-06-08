@@ -1,9 +1,10 @@
 const extras = require('extras');
+const extrasSW = require('extras/service-worker');
 
 var loadPackedNodes = require('./nodeDefs');
 
 
-extras.registerServiceWorker();
+extrasSW.registerServiceWorker();
 
 var RED = {};
 

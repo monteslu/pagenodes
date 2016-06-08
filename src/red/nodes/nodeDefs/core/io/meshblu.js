@@ -41,9 +41,17 @@ function init(RED) {
     };
     self.conn = meshblu.createConnection(options);
 
-    self.conn.once('ready', function(data){
+    self.conn.on('ready', function(data){
       self.conn.connected = true;
       self.emit('connReady', self.conn);
+    });
+
+    self.conn.on('message', function(data, fn){
+      if(data.fromUuid === self.uuid){
+        //dont allow inifinite loops
+        return;
+      }
+      self.emit('message', data, fn);
     });
 
     self.conn.on('error', function(err){
@@ -89,16 +97,16 @@ function init(RED) {
         });
       }
 
-      conn.on('message', function(data, fn){
-        if(!self.directToMe && isBroadcast(data)){
-          if(self.uuid === data.fromUuid){
-            self.send(data);
-          }
-        }else if(self.directToMe && !isBroadcast(data)){
+    });
+
+    self.serverConfig.on('message', function(data, fn){
+      if(!self.directToMe && isBroadcast(data)){
+        if(self.uuid === data.fromUuid){
           self.send(data);
         }
-      });
-
+      }else if(self.directToMe && !isBroadcast(data)){
+        self.send(data);
+      }
     });
 
     self.serverConfig.on('connError', function(err){

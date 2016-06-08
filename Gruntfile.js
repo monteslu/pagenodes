@@ -96,14 +96,16 @@ module.exports = function(grunt) {
             },
             vendor: {
                 files: {
-                    "public/vendor/vendor.js": [
+                    "public/vendor/bundle.js": [
                         "editor/vendor/jquery/js/jquery-1.11.1.min.js",
                         "editor/vendor/bootstrap/js/bootstrap.min.js",
                         "editor/vendor/jquery/js/jquery-ui-1.10.3.custom.min.js",
                         "editor/vendor/jquery/js/jquery.ui.touch-punch.min.js",
                         "editor/vendor/marked/marked.min.js",
                         "editor/vendor/d3/d3.v3.min.js",
-                        "editor/vendor/i18next/i18next.min.js"
+                        "editor/vendor/i18next/i18next.min.js",
+                        "public/ui.bundle.js"
+
                     ],
                     // "public/vendor/vendor.css": [
                     //     // TODO: resolve relative resource paths in
@@ -130,7 +132,7 @@ module.exports = function(grunt) {
         uglify: {
             build: {
                 files: {
-                    'public/red/red.min.js': 'public/red/red.bundle.js'
+                    'public/ui.min.js': 'public/ui.bundle.js'
                 }
             }
         },
@@ -243,7 +245,7 @@ module.exports = function(grunt) {
                 {
                     cwd: 'editor/vendor',
                     src: [
-                        'ace/**',
+                        // 'ace/**',
                         //'bootstrap/css/**',
                         'bootstrap/img/**',
                         'jquery/css/**',
@@ -260,7 +262,7 @@ module.exports = function(grunt) {
                 },
                 {
                     expand: true,
-                    src: ['editor/header.html', 'editor/body.html','editor/backend.html','editor/favicon.ico', 'editor/*.png', 'editor/CNAME', 'editor/webmanifest.json'],
+                    src: ['editor/header.html', 'editor/body.html','editor/backend.html','editor/favicon.ico', 'editor/*.png', 'editor/CNAME', 'editor/manifest.json'],
                     dest: 'public/',
                     flatten: true
                 },

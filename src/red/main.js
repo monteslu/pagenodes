@@ -21,6 +21,7 @@ PN.start().then(function() {
     console.log('backend started');
     extras.backendReady(PN);
     PN.comms.publishReady();
+    window.PN = PN;
     // require('extras').loadServerExtras(PN);
 }).catch(function(err) {
     PN.log.error(log._("server.failed-to-start"));
@@ -31,5 +32,5 @@ PN.start().then(function() {
     }
 });
 
-window.PN = PN;
+
 

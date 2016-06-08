@@ -1,5 +1,22 @@
 module.exports = function(RED){
 
+  const boardFirwares = {
+    "uno": "StandardFirmata.cpp.hex",
+    "micro": "StandardFirmata.cpp.hex",
+    "imuduino": "StandardFirmata.cpp.hex",
+    "leonardo": "StandardFirmata.cpp.hex",
+    "blend-micro": "StandardFirmata.cpp.hex",
+    "nano": "StandardFirmata.cpp.hex",
+    "duemilanove168": "StandardFirmata.cpp.hex",
+    "tinyduino": "StandardFirmata.cpp.hex",
+    "mega": "StandardFirmata.cpp.hex",
+    "sf-pro-micro": "StandardFirmata-5v.cpp.hex",
+    "pro-mini": "StandardFirmata-3v.cpp.hex",
+    "qduino": "StandardFirmata.cpp.hex",
+    "pinoccio": "StandardFirmata.cpp.hex"
+  };
+
+
   RED.nodes.registerType('gpio in',{
     category: 'input',
     defaults: {
@@ -316,10 +333,12 @@ module.exports = function(RED){
 
       $('#needHardwareExtensionDiv').hide();
       $('#hardwareExtensionOkDiv').hide();
+      $('#hardwareExtensionFirmwareDiv').hide();
 
       RED.comms.rpc('pluginActive', [], function(result){
         if(result.status){
           $('#hardwareExtensionOkDiv').show();
+          $('#hardwareExtensionFirmwareDiv').show();
         }
         else{
           $('#needHardwareExtensionDiv').show();
@@ -346,9 +365,9 @@ module.exports = function(RED){
         });
       }
 
-      var firmataRows = ['serial', 'mqtt', 'socketServer', 'username', 'password', 'pub', 'sub', 'tcpHost', 'tcpPort', 'meshbluServer', 'uuid', 'token', 'sendUuid', 'usb', 'plugin'];
+      var firmataRows = ['serial', 'mqtt', 'socketServer', 'username', 'password', 'pub', 'sub', 'tcpHost', 'tcpPort', 'meshbluServer', 'uuid', 'token', 'sendUuid', 'usb', 'plugin', 'firmware'];
       var firmataToggles = {
-        local: ['serial', 'plugin'],
+        local: ['serial', 'plugin', 'firmware'],
         "webusb-serial": ['usb'],
         mqtt: ['mqtt', 'username', 'password', 'pub', 'sub'],
         meshblu: ['meshbluServer', 'uuid', 'token', 'sendUuid'],
@@ -421,6 +440,18 @@ module.exports = function(RED){
               }).autocomplete("search","");
           });
 
+      });
+
+      $("#writeFirmwareButton").click(function(evt) {
+        evt.preventDefault(); //WhyTF is it reloading the page?
+        evt.stopPropagation();
+        $("#firmwareResults").html("writing...");
+        var serialBoardType = $("#serialBoardType").val();
+        var serialPortNameForFirmware = $("#node-config-input-serialportName").val();
+        console.log('writeFirmware', serialBoardType, serialPortNameForFirmware, boardFirwares[serialBoardType] );
+        RED.comms.rpc('gpio/writeFirmware', [serialBoardType, serialPortNameForFirmware, boardFirwares[serialBoardType]], function(result){
+          $("#firmwareResults").html(JSON.stringify(result));
+        });
       });
 
 
@@ -508,7 +539,7 @@ module.exports = function(RED){
                 </div>
 
                 <div className="form-row" id="node-div-pluginRow">
-                  <label htmlFor="node-config-input-serialportName">
+                  <label>
                   </label>
                   <div id="needHardwareExtensionDiv" className="form-tips">
                     This option requires you to have the <a href="https://chrome.google.com/webstore/detail/hardware-extension-for-pa/knmappkjdfbfdomfnbfhchnaamokjdpj" target="_blank"><span className="hardwareExtension">Chrome Hardware Extension</span></a> installed.
@@ -517,6 +548,7 @@ module.exports = function(RED){
                     Hardware Extension is active <i className="fa fa-thumbs-up" />
                   </div>
                 </div>
+
                 <div className="form-row" id="node-div-serialRow">
                   <label htmlFor="node-config-input-serialportName">
                   <i className="fa fa-random" /> Port
@@ -530,7 +562,31 @@ module.exports = function(RED){
                     <i
                       id="node-config-lookup-serial-icon"
                       className="fa fa-search" />
-                  </a>
+                  </a><br/>
+
+                </div>
+
+                <div id="node-div-firmwareRow" className="form-row" >
+                  <div id="hardwareExtensionFirmwareDiv" className="form-tips">
+                    You may optionally write the <a href="https://github.com/firmata/arduino" target="_blank">Firmata</a> sketch to the selected board:<br/><br/>
+                    <select id="serialBoardType">
+                      <option value="uno">Arduino Uno</option>
+                      <option value="micro">Arduino Micro</option>
+                      <option value="imuduino">Femtoduino IMUduino</option>
+                      <option value="leonardo">Arduino Leonardo</option>
+                      <option value="blend-micro">RedBearLab Blend Micro</option>
+                      <option value="nano">Arduino Nano</option>
+                      <option value="duemilanove168">Arduino Duemilanove (168)</option>
+                      <option value="tinyduino">Tinyduino</option>
+                      <option value="mega">Arduino Mega</option>
+                      <option value="sf-pro-micro">Sparkfun Pro Micro</option>
+                      <option value="pro-mini">Arduino Pro Mini</option>
+                      <option value="qduino">Qtechknow Qduino</option>
+                      <option value="pinoccio">Pinoccio Scout</option>
+                    </select>
+                    <button id="writeFirmwareButton" style={{margin: '5px'}}><i className="fa fa-upload" /> write</button><br/>
+                    <div id="firmwareResults"> </div>
+                  </div>
                 </div>
 
                 <div className="form-row" id="node-div-usbRow">

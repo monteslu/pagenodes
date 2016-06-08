@@ -372,6 +372,12 @@ function init(RED) {
     });
   });
 
+  RED.events.on('rpc_gpio/writeFirmware', function(msg){
+    RED.plugin.rpc('writeFirmware', msg.params, function(result){
+      msg.reply(result);
+    });
+  });
+
 
 }
 

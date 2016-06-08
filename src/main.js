@@ -35,8 +35,6 @@ $(function() {
       console.log('time4', passed);
       ui.loadNodeList();
       ui.extras.clientReady(ui);
-      //TODO kill this with fire:
-      ace.require("ace/ext/language_tools");
     });
 
   });

@@ -1,23 +1,40 @@
 {
-  "name": "Page Nodes",
-  "description": "Page Nodes browser-based Internet of Things",
-  "version": "0.1.0",
-  "manifest_version": 2,
-  "default_locale": "en",
-  "permissions": [
-    "serial",
-    "unlimitedStorage",
-    "audio-capture",
-    "video-capture"
-  ],
-  "icons": {
-    "64": "launcher-icon-1x.png"
-  },
-  "app": {
-    "background": {
-      "scripts": [
-        "background.js"
-      ]
+  "name": "Page Nodes Internet of Things in a Browser",
+  "short_name": "Page Nodes",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#32BFF9",
+  "background_color": "#4444ff",
+  "permissions": {
+    "audio-capture": {
+      "description": "Required to capture audio using getUserMedia()"
+    },
+    "video-capture": {
+      "description": "Required to capture video using getUserMedia()"
     }
-  }
+  },
+  "icons": [
+    {
+      "src": "launcher-icon-1x.png",
+      "sizes": "64x64",
+      "type": "image/png"
+    },
+    {
+      "src": "launcher-icon-2x.png",
+      "sizes": "96x96",
+      "type": "image/png"
+    },
+    {
+      "src": "launcher-icon-3x.png",
+      "sizes": "144x144",
+      "type": "image/png"
+    },
+    {
+      "src": "launcher-icon-4x.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ],
+  "gcm_sender_id": "755175528714",
+  "gcm_user_visible_only": true
 }

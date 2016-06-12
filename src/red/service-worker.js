@@ -26,7 +26,9 @@ self.addEventListener('fetch', function(event) {
       })
       .then(function(cacheResult){
         //cache ok, but async store the latest.
-        fetch(event.request)
+        // console.log('ok from cache', requestURL, cacheResult);
+        if(!cacheResult){
+          return fetch(event.request)
           .then(function(response){
 
             var responseToCache = response.clone();
@@ -34,10 +36,13 @@ self.addEventListener('fetch', function(event) {
             myCache.put(event.request, responseToCache);
             return response;
           });
+        }
+
         return cacheResult;
       })
       .catch(function(err){
         //not in cache
+        // console.log('not in cache', requestURL);
         return fetch(event.request)
           .then(function(response){
 
@@ -53,6 +58,6 @@ self.addEventListener('fetch', function(event) {
 });
 
 
-extras.loadServiceWorker(self);
+extras.loadServiceWorker(self, CACHE_NAME);
 
 

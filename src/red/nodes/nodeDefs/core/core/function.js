@@ -28,10 +28,10 @@ module.exports = function(RED) {
         var type = data.type;
 
         if(type === 'result' && data.results){
-            node.send(data.results);
+          node.send(data.results);
         }
         else if(type === 'error'){
-            node.error(new Error(data.message));
+          node.error(new Error(data.message));
         }
         else if (type === 'warn'){
           node.warn(data.error)

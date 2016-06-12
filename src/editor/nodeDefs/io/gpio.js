@@ -927,7 +927,9 @@ module.exports = function(RED){
                 You handle input and output messages to the node in your code with:
               </p>
               <p>
-                {`<code>node.on("input", function(msg)`}{`{ ... })</code> and <code>node.send({topic: "myTopic", payload: "myPayload"})</code>`}
+                <code>{`node.on("input", function(msg){ ... })`}</code><br/>
+                  and <br/>
+                <code>{`node.send({topic: "myTopic", payload: "myPayload"})`}</code>
               </p>
               <strong>
                 Using other modules

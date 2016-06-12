@@ -15,14 +15,20 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 var createNodebotNode = require('./lib/nodebotNode');
 
-var five = require('johnny-five');
+const WW_SCRIPT = '/j5-worker.bundle.js';
+const RemoteIO = require('remote-io');
+const WorkerSerialPort = require('../../../../worker-serial').SerialPort;
+
+var five = {}; //require('johnny-five');
 var vm = require('vm');
 var util = require('util');
 
-var cachedRequire = require('./lib/cachedRequire');
-
 function connectingStatus(n){
-  n.status({fill:"yellow",shape:"ring",text:"initializing"});
+  n.status({fill:"yellow",shape:"ring",text:"initializing..."});
+}
+
+function j5WorkerStatus(n){
+  n.status({fill:"yellow",shape:"dot",text:"j5 worker init..."});
 }
 
 function networkReadyStatus(n){
@@ -80,7 +86,6 @@ function init(RED) {
 
       node.nodebot.on('ioready', function() {
         var io = node.nodebot.io;
-
         connectedStatus(node);
         if (node.state == "ANALOG") {
           var samplingInterval = parseInt(n.samplingInterval, 10) || 300;
@@ -226,126 +231,56 @@ function init(RED) {
         console.log('launching johnny5Node', n);
         node.nodebot.on('ioready', function() {
           console.log('launching johnny5Node ioready', n);
-            connectedStatus(node);
 
-
-            function sendResults(node,msgs) {
-                var _msgid = (1 + Math.random() * 4294967295).toString(16);
-                if (msgs == null) {
-                    return;
-                } else if (!util.isArray(msgs)) {
-                    msgs = [msgs];
-                }
-                var msgCount = 0;
-                for (var m=0;m<msgs.length;m++) {
-                    if (msgs[m]) {
-                        if (util.isArray(msgs[m])) {
-                            for (var n=0; n < msgs[m].length; n++) {
-                                msgs[m][n]._msgid = _msgid;
-                                msgCount++;
-                            }
-                        } else {
-                            msgs[m]._msgid = _msgid;
-                            msgCount++;
-                        }
-                    }
-                }
-                if (msgCount>0) {
-                    node.send(msgs);
-                }
+          setTimeout(function(){
+            node.worker = new Worker(WW_SCRIPT);
+            node.tx = function(data){
+              node.worker.postMessage({type: 'serial', data});
             }
-
-            var functionText = "var results = null;"+
-                   "results = (function(){ "+
-                      "var node = {"+
-                         "log:__node__.log,"+
-                         "error:__node__.error,"+
-                         "warn:__node__.warn,"+
-                         "on:__node__.on,"+
-                         "status:__node__.status,"+
-                         "send:function(msgs){ __node__.send(msgs);}"+
-                      "};\n"+
-                      node.func+"\n"+
-                   "})();";
-
-            var sandbox = {
-                console:console,
-                util:util,
-                Buffer:Buffer,
-                __node__: {
-                    log: function() {
-                        node.log.apply(node, arguments);
-                    },
-                    error: function() {
-                        node.error.apply(node, arguments);
-                    },
-                    warn: function() {
-                        node.warn.apply(node, arguments);
-                    },
-                    send: function(msgs) {
-                        sendResults(node, msgs);
-                    },
-                    on: function() {
-                        node.on.apply(node, arguments);
-                    },
-                    status: function() {
-                        node.status.apply(node, arguments);
-                    }
-                },
-                context: {
-                    global:RED.settings.functionGlobalContext || {}
-                },
-                setTimeout: setTimeout,
-                clearTimeout: clearTimeout,
-                _:_,
-                five: five,
-                board: node.nodebot.board,
-                RED: RED,
-                require: cachedRequire
-            };
-            var context = vm.createContext(sandbox);
-
-
-            try {
-              node.script = vm.createScript(functionText);
-              try {
-                  var start = Date.now();
-                  node.script.runInContext(context);
-                  console.log('ran script', context);
-
-              } catch(err) {
-
-                  var line = 0;
-                  var errorMessage;
-                  var stack = err.stack.split(/\r?\n/);
-                  if (stack.length > 0) {
-                      while (line < stack.length && stack[line].indexOf("ReferenceError") !== 0) {
-                          line++;
-                      }
-
-                      if (line < stack.length) {
-                          errorMessage = stack[line];
-                          var m = /:(\d+):(\d+)$/.exec(stack[line+1]);
-                          if (m) {
-                              var lineno = Number(m[1])-1;
-                              var cha = m[2];
-                              errorMessage += " (line "+lineno+", col "+cha+")";
-                          }
-                      }
-                  }
-                  if (!errorMessage) {
-                      errorMessage = err.toString();
-                  }
-                  this.error(errorMessage);
+            node.worker.onmessage = function(evt){
+              try{
+                var data = evt.data;
+                var type = data.type;
+                // console.log('j5 node onmessage', type, data);
+                if(type === 'serial'){
+                  node.sp.emit('data', data.data);
+                }
+                else if(type === 'boardReady'){
+                  connectedStatus(node);
+                  node.worker.postMessage({type: 'run', data: node.func});
+                }
+                else if(type === 'error'){
+                  node.error(new Error(data.message));
+                }
+                else if (type === 'warn'){
+                  node.warn(data.error)
+                }
+                else if (type === 'log'){
+                  node.log(data.msg)
+                }
+                else if (type === 'status'){
+                  node.status(data.status);
+                }
+                else if (type === 'send' && data.msg){
+                  node.send(data.msg);
+                }
+              }catch(exp){
+                node.error(exp);
               }
-
-          } catch(err) {
-              // eg SyntaxError - which v8 doesn't include line number information
-              // so we can't do better than this
-              this.error(err);
-          }
+            };
+            node.sp = new WorkerSerialPort(node.tx);
+            node.remoteio = new RemoteIO({
+              serial: node.sp, //any virtual serial port instance
+              io: node.nodebot.io
+            });
+          }, 100);
 
         });
+        node.on('close', function(){
+          // console.log('terminating j5 worker for ', node.id);
+          this.worker.terminate();
+        });
+
     }
     else {
         this.warn("nodebot not configured");

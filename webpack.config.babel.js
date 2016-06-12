@@ -3,9 +3,9 @@ const path = require('path');
 module.exports = {
   entry: {
     ui: path.join(__dirname, './build/main.js'),
-    // backend: path.join(__dirname, './build/red/main.js'),
     "service-worker": path.join(__dirname, './build/red/service-worker.js'),
-    "function-worker": path.join(__dirname, './build/red/function-worker.js')
+    "function-worker": path.join(__dirname, './build/red/function-worker.js'),
+    "j5-worker": path.join(__dirname, './build/red/j5-worker.js')
   },
   output: {
     filename: '[name].bundle.js',

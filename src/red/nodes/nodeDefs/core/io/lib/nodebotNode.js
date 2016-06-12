@@ -12,9 +12,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 */
 'use strict';
 
-const five = require('johnny-five');
 const firmata = require('firmata');
+
 const _ = require('lodash');
+
+
 
 //for cleanup
 const eventTypes = ['data', 'change', 'up', 'down', 'hit', 'hold', 'press', 'release', 'start', 'stop', 'navigation', 'motionstart', 'motionend'];
@@ -30,18 +32,17 @@ function createNode(RED){
 
   function start(node){
     if(node.io){
+
       node.io.on('connect', function(){
         node.emit('networkReady', node.io);
       });
-      node.board = new five.Board({io: node.io, id: node.id, repl: false, timeout: 2e4});
-      node.board.on('ready', function(){
-        if (RED.settings.verbose) { node.log('io ready'); }
+
+      node.io.on('ready', function(){
         process.nextTick(function() {
           node.emit('ioready', node.io);
         });
       });
 
-      node.board.on('error', node.error.bind(node));
       node.on('close', function(done) {
 
         if (RED.settings.verbose) { node.log('closing nodebot'); }
@@ -64,43 +65,6 @@ function createNode(RED){
           if(node.client && node.client.close){
             node.client.close();
           }
-
-          var cachedBoards = [];
-          five.Board.cache.forEach(function(){
-            five.Board.cache.pop();
-          });
-
-          cachedBoards.forEach(function(board){
-            if(board !== node.board){
-              five.Board.cache.push(board);
-            }
-          });
-
-          //try and cleanup board
-          node.board.register.forEach(function(component){
-            try{
-              if(component.stop){
-                component.stop();
-              }
-              else if(component.state && component.state.intervalId){
-                clearInterval(component.state.intervalId);
-              }
-              else if(component.state && component.state.interval){
-                clearInterval(component.state.interval);
-              }
-              component.io = null;
-              component.board = null;
-              if(component.removeAllListeners){
-                eventTypes.forEach(function(et){
-                  component.removeAllListeners('data');
-                });
-              }
-            }catch(compE){
-              console.log('error trying to cleanup component', compE);
-            }
-
-          });
-          node.board.io = null;
 
           done();
           if (RED.settings.verbose) { node.log("port closed"); }

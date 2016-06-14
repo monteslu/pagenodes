@@ -1,6 +1,6 @@
 module.exports = function(RED){
   RED.nodes.registerType('camera',{
-        category: 'function',
+        category: 'hardware',
         color:"rgb(174, 174, 231)",
         defaults: {
           name: {value:""},

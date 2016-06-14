@@ -18,7 +18,7 @@ module.exports = function(RED){
 
 
   RED.nodes.registerType('gpio in',{
-    category: 'input',
+    category: 'hardware',
     defaults: {
       name: {value:""},
       state: {value:"INPUT",required:true},
@@ -136,7 +136,7 @@ module.exports = function(RED){
 
 
   RED.nodes.registerType('gpio out',{
-    category: 'output',
+    category: 'hardware',
     defaults: {
       name: {value:""},
       state: {value:"OUTPUT",required:true},
@@ -790,7 +790,7 @@ module.exports = function(RED){
 
     RED.nodes.registerType('johnny5',{
         color:"#f6de1d",
-        category: 'function',
+        category: 'hardware',
         defaults: {
             name: {value:""},
             func: {value:""},
@@ -950,6 +950,9 @@ module.exports = function(RED){
                 </li>
                 <li>
                   <code>oled-js</code>
+                </li>
+                <li>
+                  <code>oled-font-5x7</code>
                 </li>
                 <li>
                   <code>temporal</code>

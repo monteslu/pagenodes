@@ -1,6 +1,6 @@
 module.exports = function(RED){
   RED.nodes.registerType('orientation',{
-    category: 'function',
+    category: 'hardware',
     color: "#DA523F",
     defaults: {
       name: {value:""},

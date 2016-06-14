@@ -21,7 +21,7 @@ module.exports = function(RED){
 RED.palette = (function() {
 
     var exclusion = ['config','unknown','deprecated'];
-    var core = ['subflows', 'input', 'output', 'function', 'social', 'mobile', 'storage', 'analysis', 'advanced'];
+    var core = ['subflows', 'input', 'output', 'function', 'hardware', 'social', 'mobile', 'storage', 'analysis', 'advanced'];
 
     var categoryContainers = {};
 

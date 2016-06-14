@@ -1,14 +1,15 @@
 module.exports = function(RED){
   RED.nodes.registerType('geolocate',{
-        category: 'function',
-        color: "#EF5350",
+        category: 'hardware',
+        color: "lightblue",
         defaults: {
             name: {value:""},
         },
         inputs:1,
         outputs:1,
         faChar: '&#xf0ac;', //globe
-        fontColor: "#FFF",
+        fontColor: "darkblue",
+        faColor: 'darkblue',
         label: function() {
             return this.name||'geolocate';
         },

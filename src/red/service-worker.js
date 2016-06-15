@@ -25,7 +25,7 @@ self.addEventListener('fetch', function(event) {
         return caches.match(cacheRequest);
       })
       .then(function(cacheResult){
-        //cache ok, but async store the latest.
+
         // console.log('ok from cache', requestURL, cacheResult);
         if(!cacheResult){
           return fetch(event.request)
@@ -37,6 +37,12 @@ self.addEventListener('fetch', function(event) {
             return response;
           });
         }
+
+        //cache ok, but async store the latest anyway.
+        fetch(event.request)
+          .then(function(response){
+            myCache.put(event.request, response);
+          });
 
         return cacheResult;
       })

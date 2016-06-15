@@ -12,172 +12,63 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 */
 'use strict';
 
-const firmata = require('firmata');
 
 const _ = require('lodash');
-
+const WW_SCRIPT = '/j5-worker.bundle.js';
 
 
 //for cleanup
 const eventTypes = ['data', 'change', 'up', 'down', 'hit', 'hold', 'press', 'release', 'start', 'stop', 'navigation', 'motionstart', 'motionend'];
 
-var boardTypes = {
-  firmata,
-  "tinker-io": require('tinker-io')
-}
+
 
 function createNode(RED){
 
   var PluginSerialPort = require('./pluginPort')(RED).SerialPort;
 
-  function start(node){
-    if(node.io){
 
-      node.io.on('connect', function(){
-        node.emit('networkReady', node.io);
-      });
-
-      node.io.on('ready', function(){
-        process.nextTick(function() {
-          node.emit('ioready', node.io);
-        });
-      });
-
-      node.on('close', function(done) {
-
-        if (RED.settings.verbose) { node.log('closing nodebot'); }
-        try{
-
-          if(node.io && node.io.close){
-            node.io.close();
-          }
-          else if(node.io && node.io.sp){
-            if(node.io.sp.close){
-              node.io.sp.close();
-            }else if(node.io.sp.end){
-              node.io.sp.end();
-            }
-          }
-
-          if(node.client && node.client.stop){
-            node.client.stop();
-          }
-          if(node.client && node.client.close){
-            node.client.close();
-          }
-
-          done();
-          if (RED.settings.verbose) { node.log("port closed"); }
-        }catch(exp){
-          console.log('error closing', exp);
-          done();
-        }
-      });
-
-    }else{
-      node.emit('ioError', 'invalid IO class');
-    }
-  }
-
-  function nodebotNode(n) {
-    RED.nodes.createNode(this,n);
-    var node = this;
-
-    var boardModule, sp;
-    try{
-      boardModule = boardTypes[n.boardType];
-
-    }catch(exp){
-      node.log('error loading io class', n.boardType, exp);
-      process.nextTick(function() {
-        node.emit('ioError', exp);
-      });
-      return;
-    }
+  function connectSerial(node, n){
 
     if(n.boardType === 'firmata'){
       var VirtualSerialPort, client;
       if(n.connectionType === 'local'){
-        try{
-          sp = new PluginSerialPort('serial', n.serialportName, {portName: n.serialportName});
-          sp.on('error', function(err){
-            process.nextTick(function() {
-              node.emit('ioError', err);
-            });
-          });
-          node.io = new firmata.Board(sp);
-          start(node);
-        }catch(exp){
-          process.nextTick(function() {
-            node.emit('ioError', exp);
-          });
-        }
+        node.sp = new PluginSerialPort('serial', n.serialportName, {portName: n.serialportName});
       }
       else if(n.connectionType === 'mqtt'){
-        try{
-          var mqtt = require('mqtt');
-          VirtualSerialPort = require('mqtt-serial').SerialPort;
+        var mqtt = require('mqtt');
+        VirtualSerialPort = require('mqtt-serial').SerialPort;
 
-          client = mqtt.connect(n.mqttServer,
-          {username: n.username, password: n.password});
-          client.on('error', function(err){
-            node.warn(err);
-          });
-
-          sp = new VirtualSerialPort({
-            client: client,
-            transmitTopic: n.pubTopic,
-            receiveTopic: n.subTopic
-          });
-
-          node.io = new firmata.Board(sp, {samplingInterval: 300, reportVersionTimeout: 15000});
-          node.client = client;
-          start(node);
-        }catch(exp){
-          console.log('error initializing mqtt firmata', exp);
-          process.nextTick(function() {
-            node.emit('ioError', exp);
-          });
-        }
+        client = mqtt.connect(n.mqttServer,
+        {username: n.username, password: n.password});
+        client.on('error', function(err){
+          node.warn(err);
+        });
+        node.client = client;
+        node.sp = new VirtualSerialPort({
+          client: client,
+          transmitTopic: n.pubTopic,
+          receiveTopic: n.subTopic
+        });
       }
       else if(n.connectionType === 'meshblu'){
-        try{
-          var meshblu = require('meshblu');
-          VirtualSerialPort = require('skynet-serial').SerialPort;
+        var meshblu = require('meshblu');
+        VirtualSerialPort = require('skynet-serial').SerialPort;
 
-          client = meshblu.createConnection({
-            uuid: n.uuid,
-            token: n.token,
-            server: n.meshbluServer
-          });
+        client = meshblu.createConnection({
+          uuid: n.uuid,
+          token: n.token,
+          server: n.meshbluServer
+        });
 
-          client.once('ready', function(data){
-            console.log('client ready, creating virtual serial port');
-            sp = new VirtualSerialPort(client, n.sendUuid);
-            node.io = new firmata.Board(sp, {samplingInterval: 500, reportVersionTimeout: 15000});
-            start(node);
-          });
-          node.client = client;
-
-        }catch(exp){
-          console.log('error initializing mqtt firmata', exp);
-          process.nextTick(function() {
-            node.emit('ioError', exp);
-          });
-        }
+        client.once('ready', function(data){
+          node.sp.emit('connect', {});
+        });
+        node.sp = new VirtualSerialPort(client, n.sendUuid);
+        node.client = client;
       }
       else if(n.connectionType === 'webusb-serial'){
-        try{
-          VirtualSerialPort = require('webusb-serial').SerialPort;
-          sp = new VirtualSerialPort();
-          node.io = new firmata.Board(sp,{ skipCapabilities: true, analogPins: [14,15,16,17,18,19] });
-          start(node);
-        }catch(exp){
-          console.log('error initializing webusb-serial firmata', exp);
-          process.nextTick(function() {
-            node.emit('ioError', exp);
-          });
-        }
+        VirtualSerialPort = require('webusb-serial').SerialPort;
+        node.sp = new VirtualSerialPort();
       }
       else if(n.connectionType === 'tcp' || n.connectionType === 'udp'){
         //console.log('trying', n.tcpHost, n.tcpPort);
@@ -186,75 +77,14 @@ function createNode(RED){
           port: parseInt(n.tcpPort, 10)
         };
 
-        try{
-          sp = new PluginSerialPort(n.connectionType, options.host + ':' + options.port, options);
-          sp.on('error', function(err){
-            process.nextTick(function() {
-              node.emit('ioError', err);
-            });
-          });
-          node.io = new firmata.Board(sp);
-          sp.on('open', function(){
-            node.emit('networkReady', node.io);
-          });
-          start(node);
-
-        }catch(exp){
-          process.nextTick(function() {
-            node.emit('ioError', exp);
-          });
-        }
-
+        node.sp = new PluginSerialPort(n.connectionType, options.host + ':' + options.port, options);
       }
     }
-    else if( 'raspi-io' === n.boardType ||
-             'beaglebone-io' === n.boardType ||
-             'galileo-io' === n.boardType ||
-             'blend-micro-io' === n.boardType){
-
-      try{
-        node.io = new boardModule();
-        start(node);
-      }catch(exp){
-        console.log('error initializing io class', n.boardType, exp);
-        process.nextTick(function() {
-          node.emit('ioError', exp);
-        });
-      }
-    }
-    else if( 'bean-io' === n.boardType){
-
-      try{
-        var options = {};
-        if(n.beanId){
-          options.uuid = n.beanId;
-        }
-        node.io = new boardModule.Board(options);
-        start(node);
-      }catch(exp){
-        console.log('error initializing bean-io class', n.boardType, exp);
-        process.nextTick(function() {
-          node.emit('ioError', exp);
-        });
-      }
-    }
-    else if( 'imp-io' === n.boardType){
-
-      try{
-        node.io = new boardModule({agent: n.impId});
-        start(node);
-      }catch(exp){
-        console.log('error initializing imp-io class', n.boardType, exp);
-        process.nextTick(function() {
-          node.emit('ioError', exp);
-        });
-      }
-    }
-    else if( 'spark-io' === n.boardType || 'tinker-io' === n.boardType){
+    else if('tinker-io' === n.boardType){
 
       try{
         node.io = new boardModule({deviceId: n.sparkId, token: n.sparkToken, username: n.particleUsername, password: n.particlePassword});
-        start(node);
+        // start(node);
       }catch(exp){
         console.log('error initializing spark-io class', n.boardType, exp);
         process.nextTick(function() {
@@ -262,6 +92,99 @@ function createNode(RED){
         });
       }
     }
+
+    if(node.sp){
+      node.sp.on('open', function(){
+        // console.log('serial open');
+        node.emit('networkReady', node.io);
+        node.worker.postMessage({type: 'startJ5', options: _.clone(n)});
+      });
+
+      node.sp.on('data', function(data){
+        node.worker.postMessage({type: 'serial', data});
+      });
+
+      node.sp.on('error', function(err){
+        node.emit('ioError', err);
+      });
+    }
+
+  }
+
+
+
+  function nodebotNode(n) {
+    RED.nodes.createNode(this,n);
+    var node = this;
+
+
+    node.worker = new Worker(WW_SCRIPT);
+    node.worker.onmessage = function(evt){
+      try{
+        var data = evt.data;
+        var type = data.type;
+        // console.log('j5 node onmessage', type, data);
+        if(type === 'serial' && data.data && node.sp){
+          node.sp.write(data.data);
+        }
+        else if(type === 'workerReady'){
+          node.emit('workerReady', node);
+          connectSerial(node, n);
+        }
+        else if(type === 'boardReady'){
+          // connectedStatus(node);
+          // node.worker.postMessage({type: 'run', data: node.func});
+          node.emit('boardReady', {});
+        }
+        else if(type === 'error'){
+          node.error(new Error(data.message));
+        }
+        else if (type === 'warn'){
+          node.warn(data.error)
+        }
+        else if (type === 'log'){
+          node.log(data.msg)
+        }
+        else if (type === 'status'){
+          node.status(data.status);
+        }
+        else if (type === 'send' && data.msg){
+          // console.log('send from worker', data, 'send_' + data.nodeId);
+          node.emit('send_' + data.nodeId, data.msg);
+
+        }
+        else if(type === 'inputSubscription'){
+          node.emit('inputSubscription_' + data.nodeId, data.value);
+        }
+      }catch(exp){
+        node.error(exp);
+      }
+    };
+
+    node.on('close', function(){
+      // console.log('terminating j5 worker for ', node.id);
+      node.worker.terminate();
+
+      try{
+        if(node.sp.sp){
+          if(node.sp.close){
+            node.sp.close();
+          }else if(node.sp.end){
+            node.sp.end();
+          }
+        }
+
+        if(node.client && node.client.stop){
+          node.client.stop();
+        }
+        if(node.client && node.client.close){
+          node.client.close();
+        }
+
+      }catch(exp){
+        console.log('error closing', exp);
+      }
+    });
 
 
   }

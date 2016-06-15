@@ -15,9 +15,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 var createNodebotNode = require('./lib/nodebotNode');
 
-const WW_SCRIPT = '/j5-worker.bundle.js';
-const RemoteIO = require('remote-io');
-const WorkerSerialPort = require('../../../../worker-serial').SerialPort;
+
 
 var five = {}; //require('johnny-five');
 var vm = require('vm');
@@ -61,6 +59,9 @@ function setupStatus(node){
   node.nodebot.on('networkReady', function(){
     networkReadyStatus(node);
   });
+  node.nodebot.on('workerReady', function(){
+    networkReadyStatus(node);
+  });
   node.nodebot.on('networkError', function(){
     networkErrorStatus(node);
   });
@@ -84,25 +85,18 @@ function init(RED) {
       var node = this;
       setupStatus(node);
 
-      node.nodebot.on('ioready', function() {
+      node.nodebot.on('boardReady', function() {
         var io = node.nodebot.io;
         connectedStatus(node);
-        if (node.state == "ANALOG") {
-          var samplingInterval = parseInt(n.samplingInterval, 10) || 300;
-          try{io.setSamplingInterval(samplingInterval);}catch(exp){ console.log(exp); }
-          try{io.pinMode(node.pin, io.MODES.ANALOG);}catch(exp){ console.log(exp); }
-          io.analogRead(node.pin, function(data) {
-            var msg = {payload:data, topic:node.pin};
-            node.send(msg);
-          });
-        }
-        else {
-          try{io.pinMode(node.pin, io.MODES.INPUT);}catch(exp){ console.log(exp); }
-            io.digitalRead(node.pin, function(data) {
-            var msg = {payload:data, topic:node.pin};
-            node.send(msg);
-          });
-        }
+        var samplingInterval = parseInt(samplingInterval, 10) || 300;
+        node.nodebot.worker.postMessage({type: 'inputSubscribe', state: node.state, pin: node.pin, nodeId: node.id, samplingInterval});
+        node.nodebot.on('inputSubscription_' + node.id, function(value){
+          var msg = {payload:value, topic:node.pin};
+          node.send(msg);
+        });
+
+
+
       });
 
     }
@@ -120,92 +114,21 @@ function init(RED) {
     this.state = n.state;
     this.arduino = n.arduino;
     this.nodebot = RED.nodes.getNode(n.board);
-    this.i2cAddress = parseInt(n.i2cAddress, 10);
-    this.i2cRegister = parseInt(n.i2cRegister, 10);
     if (typeof this.nodebot === "object") {
-        var node = this;
-        setupStatus(node);
+      var node = this;
+      setupStatus(node);
 
-        console.log('launching gpio out', n);
-        node.nodebot.on('ioready', function() {
-            connectedStatus(node);
+      console.log('launching gpio out', n);
+      node.nodebot.on('boardReady', function() {
+        connectedStatus(node);
 
-            node.on('input', function(msg) {
-              try{
-                var state = msg.state || node.state;
-                var io = node.nodebot.io;
-                if (state === 'OUTPUT') {
-                  try{io.pinMode(node.pin, io.MODES[state]);}catch(exp){ console.log(exp); }
-                  if ((msg.payload == true)||(msg.payload == 1)||(msg.payload.toString().toLowerCase() === "on")) {
-                      io.digitalWrite(node.pin, 1);
-                  }
-                  if ((msg.payload == false)||(msg.payload == 0)||(msg.payload.toString().toLowerCase() === "off")) {
-                      io.digitalWrite(node.pin, 0);
-                  }
-                }
-                else if (state === 'PWM') {
-                  try{io.pinMode(node.pin, io.MODES[state]);}catch(exp){ console.log(exp); }
-                  msg.payload = msg.payload * 1;
-                  if ((msg.payload >= 0) && (msg.payload <= 255)) {
-                      io.analogWrite(node.pin, msg.payload);
-                  }
-                }
-                else if (state === 'SERVO') {
-                  try{io.pinMode(node.pin, io.MODES[state]);}catch(exp){ console.log(exp); }
-                  msg.payload = msg.payload * 1;
-                  if ((msg.payload >= 0) && (msg.payload <= 180)) {
-                      io.servoWrite(node.pin, msg.payload);
-                  }
-                }
-                else if(node.state === 'I2C_READ_REQUEST'){
-                  var register = parseInt(msg.i2cRegister, 10) || parseInt(node.i2cRegister, 10);
-                  var i2cAddress = parseInt(msg.i2cAddress, 10) || parseInt(node.i2cAddress, 10);
-                  var numBytes = parseInt(msg.payload, 10);
-                  if(io.i2cReadOnce && i2cAddress && numBytes){
-                    if(register){
-                      io.i2cReadOnce(i2cAddress, register, numBytes, function(data){
-                        node.send({
-                          payload: data,
-                          register: register,
-                          i2cAddress: i2cAddress,
-                          numBytes: numBytes
-                        });
-                      });
-                    }else{
-                      io.i2cReadOnce(i2cAddress, numBytes, function(data){
-                        node.send({
-                          payload: data,
-                          i2cAddress: i2cAddress,
-                          numBytes: numBytes
-                        });
-                      });
-                    }
-                  }
-                }
-                else if(node.state === 'I2C_WRITE_REQUEST'){
-                  var register = parseInt(msg.i2cRegister, 10) || parseInt(node.i2cRegister, 10);
-                  var i2cAddress = parseInt(msg.i2cAddress, 10) || parseInt(node.i2cAddress, 10);
-                  if(io.i2cWrite && i2cAddress && msg.payload){
-                    if(register){
-                      io.i2cWrite(i2cAddress, register, msg.payload);
-                    }else{
-                      io.i2cWrite(i2cAddress, msg.payload);
-                    }
-                  }
-                }
-                else if(node.state === 'I2C_DELAY'){
-                  if(io.i2cConfig){
-                    if(register){
-                      io.i2cConfig(parseInt(msg.payload, 10));
-                    }
-                  }
-                }
-              }
-              catch(inputExp){
-                node.warn(inputExp);
-              }
-            });
+        node.on('input', function(msg) {
+          var state = msg.state || node.state;
+          var pin = msg.pin || node.pin;
+          node.nodebot.worker.postMessage({type: 'output', state, pin, nodeId: node.id, msg});
+
         });
+      });
     }
     else {
         this.warn("nodebot not configured");
@@ -227,63 +150,58 @@ function init(RED) {
 
     if (typeof this.nodebot === "object") {
         setupStatus(node);
+        node.nodebot.on('boardReady', function() {
+          connectedStatus(node);
+          console.log('launching johnny5Node boardReady', n);
+          node.nodebot.worker.postMessage({type: 'run', data: node.func, nodeId: node.id});
 
-        console.log('launching johnny5Node', n);
-        node.nodebot.on('ioready', function() {
-          console.log('launching johnny5Node ioready', n);
+            // node.worker.onmessage = function(evt){
+            //   try{
+            //     var data = evt.data;
+            //     var type = data.type;
+            //     // console.log('j5 node onmessage', type, data);
+            //     if(type === 'serial'){
+            //       node.wsp.emit('data', data.data);
+            //     }
+            //     else if(type === 'boardReady'){
+            //       connectedStatus(node);
+            //       node.worker.postMessage({type: 'run', data: node.func});
+            //     }
+            //     else if(type === 'error'){
+            //       node.error(new Error(data.message));
+            //     }
+            //     else if (type === 'warn'){
+            //       node.warn(data.error)
+            //     }
+            //     else if (type === 'log'){
+            //       node.log(data.msg)
+            //     }
+            //     else if (type === 'status'){
+            //       node.status(data.status);
+            //     }
+            //     else if (type === 'send' && data.msg){
+            //       node.send(data.msg);
+            //     }
+            //   }catch(exp){
+            //     node.error(exp);
+            //   }
+            // };
 
-          setTimeout(function(){
-            node.worker = new Worker(WW_SCRIPT);
-            node.tx = function(data){
-              node.worker.postMessage({type: 'serial', data});
-            }
-            node.worker.onmessage = function(evt){
-              try{
-                var data = evt.data;
-                var type = data.type;
-                // console.log('j5 node onmessage', type, data);
-                if(type === 'serial'){
-                  node.sp.emit('data', data.data);
-                }
-                else if(type === 'boardReady'){
-                  connectedStatus(node);
-                  node.worker.postMessage({type: 'run', data: node.func});
-                }
-                else if(type === 'error'){
-                  node.error(new Error(data.message));
-                }
-                else if (type === 'warn'){
-                  node.warn(data.error)
-                }
-                else if (type === 'log'){
-                  node.log(data.msg)
-                }
-                else if (type === 'status'){
-                  node.status(data.status);
-                }
-                else if (type === 'send' && data.msg){
-                  node.send(data.msg);
-                }
-              }catch(exp){
-                node.error(exp);
-              }
-            };
-            node.sp = new WorkerSerialPort(node.tx);
-            node.remoteio = new RemoteIO({
-              serial: node.sp, //any virtual serial port instance
-              io: node.nodebot.io
-            });
-          }, 100);
 
         });
-        node.on('close', function(){
-          // console.log('terminating j5 worker for ', node.id);
-          this.worker.terminate();
+
+        node.nodebot.on('send_' + node.id, function(msg){
+          node.send(msg);
         });
+
+        node.on('input', function(msg){
+          node.nodebot.worker.postMessage({type: 'input', msg, nodeId: node.id});
+        });
+
 
     }
     else {
-        this.warn("nodebot not configured");
+        node.warn("nodebot not configured");
     }
 
   }

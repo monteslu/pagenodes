@@ -15,7 +15,7 @@ module.exports = function(RED){
     self.options = options;
 
     RED.events.on('data_' + type + '_' + name, function(data){
-      // console.log('PluginSerialPort data in', data);
+      // console.log('data from wire', new Buffer(data).toString('hex'));
       self.emit('data', new Buffer(data));
     });
 
@@ -50,6 +50,7 @@ module.exports = function(RED){
       data = new Buffer(data);
     }
 
+    // console.log('data to wire', data.toString('hex'));
     RED.plugin.postMessage({type: 'data', conType: self.type, name: self.name, data});
 
   };

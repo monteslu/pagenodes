@@ -141,9 +141,6 @@ module.exports = function(RED){
       name: {value:""},
       state: {value:"OUTPUT",required:true},
       pin: {value:"",required:false},
-      i2cDelay: {value:"0",required:false},
-      i2cAddress: {value:"",required:false},
-      i2cRegister: {value:"",required:false},
       outputs: {value:0},
       board: {type:"nodebot", required:true}
     },
@@ -160,48 +157,16 @@ module.exports = function(RED){
 
       var self = this;
 
-      function showI2C(){
-        $( "#node-div-i2cAddressRow" ).show();
-        $( "#node-div-i2cRegisterRow" ).show();
-        $( "#node-div-i2cDelayRow" ).show();
-        $( "#node-div-pinRow" ).hide();
-        $( "#node-div-formTipRow" ).hide();
-      }
-      function hideI2C(){
-        $( "#node-div-i2cAddressRow" ).hide();
-        $( "#node-div-i2cRegisterRow" ).hide();
-        $( "#node-div-i2cDelayRow" ).hide();
-        $( "#node-div-pinRow" ).show();
-        $( "#node-div-formTipRow" ).show();
-      }
-
-      if(self.state === 'I2C_READ_REQUEST' || self.state === 'I2C_WRITE_REQUEST' || self.state === 'I2C_DELAY'){
-        showI2C();
-      }
-      else{
-        hideI2C();
-      }
-
       var stateInput = $( "#node-input-state" );
       stateInput.change(function(){
         console.log('stateInput changed', this.value);
-        if(this.value === 'I2C_READ_REQUEST' || this.value === 'I2C_WRITE_REQUEST' || this.value === 'I2C_DELAY'){
-          showI2C();
-        }
-        else{
-          hideI2C();
-        }
+
       });
 
     },
     oneditsave: function(a) {
       var stateInput = $( "#node-input-state" );
-      if(stateInput.val() === 'I2C_READ_REQUEST'){
-        this.outputs = 1;
-      }
-      else{
-        this.outputs = 0;
-      }
+      this.outputs = 0;
       console.log('saving', this, a, stateInput.val());
     },
     render: function () {
@@ -231,15 +196,6 @@ module.exports = function(RED){
                     <option value="SERVO">
                       Servo (0-180)
                     </option>
-                    <option value="I2C_READ_REQUEST">
-                      I2C Read Request
-                    </option>
-                    <option value="I2C_WRITE_REQUEST">
-                      I2C Write Request
-                    </option>
-                    <option value="I2C_DELAY">
-                      I2C Delay
-                    </option>
                   </select>
                 </div>
                 <div className="form-row" id="node-div-pinRow">
@@ -251,39 +207,22 @@ module.exports = function(RED){
                       id="node-input-pin"
                       placeholder={13} />
                   </div>
-                  <div
-                    className="form-row"
-                    id="node-div-i2cAddressRow">
-                    <label htmlFor="node-input-i2cAddress">
-                      <i className="fa fa-circle" /> I2C Address
-                      </label>
-                      <input
-                        type="text"
-                        id="node-input-i2cAddress"
-                        placeholder={13} />
-                    </div>
-                    <div
-                      className="form-row"
-                      id="node-div-i2cRegisterRow">
-                      <label htmlFor="node-input-i2cRegister">
-                        <i className="fa fa-circle" /> Register (optional)
-                        </label>
-                        <input type="text" id="node-input-i2cRegister" />
-                      </div>
-                      <div className="form-row">
-                        <label htmlFor="node-input-name">
-                          <i className="fa fa-tag" /> Name
-                          </label>
-                          <input
-                            type="text"
-                            id="node-input-name"
-                            placeholder="Name" />
-                        </div>
-                        <div
-                          className="form-tips"
-                          id="node-div-formTipRow"><b>Note:</b> You cannot use the same pin for both output and input.
-                        </div>
-                      </div>
+
+            <div className="form-row">
+              <label htmlFor="node-input-name">
+              <i className="fa fa-tag" /> Name
+              </label>
+              <input
+                type="text"
+                id="node-input-name"
+                placeholder="Name" />
+            </div>
+
+            <div
+              className="form-tips"
+              id="node-div-formTipRow"><b>Note:</b> You cannot use the same pin for both output and input.
+            </div>
+          </div>
         </div>
       )
     },

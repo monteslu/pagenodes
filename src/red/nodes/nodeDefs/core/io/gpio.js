@@ -95,8 +95,6 @@ function init(RED) {
           node.send(msg);
         });
 
-
-
       });
 
     }

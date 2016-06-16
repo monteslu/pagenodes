@@ -1,6 +1,6 @@
 const _ = require('lodash');
 const EventEmitter = require('events');
-const toRemove = ['XMLHttpRequest', 'XMLHttpRequestEventTarget', 'XMLHttpRequestUpload', 'fetch', 'Request', 'EventSource', 'WebSocket', 'localStorage'];
+const toRemove = ['XMLHttpRequest', 'XMLHttpRequestEventTarget', 'XMLHttpRequestUpload', 'fetch', 'Request', 'EventSource', 'WebSocket', 'localStorage', 'IDBCursor', 'IDBCursorWithValue', 'IDBDatabase', 'IDBFactor', 'IDBIndex', 'IDBKeyRange', 'IDBObjectStore', 'IDBCursor', 'IDBOpenDBRequest', 'IDBRequest', 'IDBTransaction', 'IDBVersionChangeEvent', 'indexedDB'];
 
 const events = new EventEmitter();
 
@@ -10,7 +10,18 @@ events.on('input', function(data){
 
 function init(context){
   _.forEach(toRemove, function(rem){
-    context[rem] = '';
+    try{
+      if(context[rem]){
+        context[rem] = '';
+      }
+      ['webkit', 'moz', 'o', 'ms'].forEach(function(p){
+        if(context[p + rem]){
+          context[p + rem] = '';
+        }
+      })
+    }catch(exp){
+      console.log('err removing',rem, exp);
+    }
   });
 
   context.Buffer = Buffer;

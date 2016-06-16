@@ -39,7 +39,8 @@ const nodeDefs = [
   require('./storage/localdb'),
   require('./core/voicerec'),
   require('./io/accelerometer'),
-  require('./storage/file')
+  require('./storage/file'),
+  require('./storage/firebase')
 ];
 
 module.exports = function(RED){

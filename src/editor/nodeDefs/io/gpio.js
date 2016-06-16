@@ -236,7 +236,6 @@ module.exports = function(RED){
     faChar: "&#xf135;", //rocket
     align: "right",
     label: function() {
-      console.log('name', "gpio"+(this.pin || this.i2cAddress || ''));
       return this.name||"gpio"+(this.pin || this.i2cAddress || '');
     },
     oneditprepare: function() {

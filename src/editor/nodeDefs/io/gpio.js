@@ -1,3 +1,5 @@
+var _ = require('lodash');
+
 module.exports = function(RED){
 
   const boardFirwares = {
@@ -15,6 +17,90 @@ module.exports = function(RED){
     "qduino": "StandardFirmata.cpp.hex",
     "pinoccio": "StandardFirmata.cpp.hex"
   };
+
+  const DEFAULT_SELECTED_EXAMPLE = 'led-blink.js';
+
+
+  function loadExamples(j5Node){
+
+    var exampleFiles;
+
+    $('#node-config-examples').click(function(){
+      console.log('examples button clicked');
+
+      try{
+
+        $("#scriptTextarea").val('');
+
+        RED.comms.rpc('gpio/getExamples', [], function(data){
+            if(data.error){
+              console.log('error retrieving examples', data.error);
+              return;
+            }
+
+            console.log('getExamples', data);
+
+            var exampleScriptsSelect = $('#exampleScripts');
+            exampleScriptsSelect.find('option').remove();
+            exampleFiles = data.entity.files || {};
+            _.forEach(exampleFiles, function(file){
+              var op = $("<option></option>")
+               .attr("value", file.filename)
+               .text(file.filename);
+
+               exampleScriptsSelect.append(op);
+            });
+
+            exampleScriptsSelect.change(function(a){
+              var selectedFile = exampleFiles[exampleScriptsSelect.val()];
+              console.log('selected file', selectedFile);
+              $("#scriptTextarea").val(selectedFile.content);
+            });
+
+            exampleScriptsSelect.val(DEFAULT_SELECTED_EXAMPLE);
+            try{
+              $("#scriptTextarea").val(exampleFiles[DEFAULT_SELECTED_EXAMPLE].content);
+            }catch(exp){}
+
+            launchDialog();
+        });
+
+      }catch(ex){
+        console.log('error loading j5 examples', ex);
+      }
+
+      function launchDialog(){
+        var dialog = $( "#examplesListDialog" );
+        dialog.dialog({
+          modal: true,
+          width:'auto',
+          buttons: [
+          {
+            text: "USE SCRIPT",
+            click: function() {
+              var selectedVal = $("#exampleScripts").val();
+              console.log('selectedVal', selectedVal);
+              if(selectedVal && exampleFiles[selectedVal] && exampleFiles[selectedVal].content){
+
+                console.log('selected val from dialog', selectedVal);
+                j5Node.editor.setValue(exampleFiles[selectedVal].content);
+              }
+              $( this ).dialog( "close" );
+            }
+          },
+          {
+            text: "CANCEL",
+            click: function() {
+              $( this ).dialog( "close" );
+            }
+          }
+          ]
+        });
+      }
+    });
+
+
+  }
 
 
   RED.nodes.registerType('gpio in',{
@@ -759,6 +845,7 @@ module.exports = function(RED){
                 $(".node-text-editor").css("height",height+"px");
                 that.editor.resize();
             }
+
             $( "#dialog" ).on("dialogresize", functionDialogResize);
             $( "#dialog" ).one("dialogopen", function(ev) {
                 var size = $( "#dialog" ).dialog('option','sizeCache-function');
@@ -780,6 +867,8 @@ module.exports = function(RED){
             });
 
             this.editor.focus();
+
+            loadExamples(this);
         },
         oneditsave: function() {
             var annot = this.editor.getSession().getAnnotations();
@@ -801,41 +890,66 @@ module.exports = function(RED){
               <div className="form-row">
                 <label htmlFor="node-input-board">
                   <i className="fa fa-tasks" /> Board
-                  </label>
-                  <input type="text" id="node-input-board" />
+                </label>
+                <input type="text" id="node-input-board" />
+              </div>
+
+              <div className="form-row">
+                <label htmlFor="node-input-name">
+                  <i className="fa fa-tag" />
+                  <span> name</span>
+                </label>
+                <input type="text" id="node-input-name" style={{width: '40%'}} />
+                <a
+                  href="#"
+                  className="btn"
+                  id="node-config-examples"
+                  style={{float: 'right'}}>
+                  <i className="fa fa-file-o" /> examples
+                </a>
+              </div>
+
+              <div
+                className="form-row"
+                style={{marginBottom: 0}}>
+                <label htmlFor="node-input-func">
+                  <i className="fa fa-wrench" />
+                  <span> board on 'ready' function content:</span>
+                </label>
+                <input
+                  type="hidden"
+                  id="node-input-func"
+                  autofocus="autofocus" />
+                <input type="hidden" id="node-input-noerr" />
+              </div>
+
+              <div className="form-row node-text-editor-row">
+                <div
+                  style={{height: 250}}
+                  className="node-text-editor"
+                  id="node-input-func-editor" />
+              </div>
+
+              <div className="form-tips">
+                <span>
+                  See the Info tab for help writing johnny-five functions.
+                </span>
+              </div>
+
+              <div
+                id="examplesListDialog"
+                title="Code examples"
+                className="hide">
+                <div className="form-row">
+                  <select id="exampleScripts">
+                  </select>
                 </div>
                 <div className="form-row">
-                  <label htmlFor="node-input-name">
-                    <i className="fa fa-tag" />
-                    <span>name</span>
-                  </label>
-                  <input type="text" id="node-input-name" />
-                </div>
-                <div
-                  className="form-row"
-                  style={{marginBottom: 0}}>
-                  <label htmlFor="node-input-func">
-                    <i className="fa fa-wrench" />
-                    <span>onReady</span>
-                  </label>
-                  <input
-                    type="hidden"
-                    id="node-input-func"
-                    autofocus="autofocus" />
-                  <input type="hidden" id="node-input-noerr" />
-                </div>
-                <div className="form-row node-text-editor-row">
-                  <div
-                    style={{height: 250}}
-                    className="node-text-editor"
-                    id="node-input-func-editor" />
-                </div>
-                <div className="form-tips">
-                  <span>
-                    See the Info tab for help writing johnny-five functions.
-                  </span>
+                  <textarea id="scriptTextarea" style={{height: '150px', width: '250px'}}></textarea>
                 </div>
               </div>
+
+            </div>
           )
         },
         renderHelp: function () {

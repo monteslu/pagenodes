@@ -20,6 +20,11 @@ var createNodebotNode = require('./lib/nodebotNode');
 var five = {}; //require('johnny-five');
 var vm = require('vm');
 var util = require('util');
+var rest = require('rest');
+var mimeInterceptor = require('rest/interceptor/mime');
+var errorCodeInterceptor = require('rest/interceptor/errorCode');
+
+var restCall = rest.wrap(mimeInterceptor).wrap(errorCodeInterceptor);
 
 function connectingStatus(n){
   n.status({fill:"yellow",shape:"ring",text:"initializing..."});
@@ -226,6 +231,18 @@ function init(RED) {
   RED.events.on('rpc_gpio/writeFirmware', function(msg){
     RED.plugin.rpc('writeFirmware', msg.params, function(result){
       msg.reply(result);
+    });
+  });
+
+  RED.events.on('rpc_gpio/getExamples', function(msg){
+    restCall({
+      path: 'https://api.github.com/gists/f6f272f8998fd98e59ff131359ccf5ac'
+    })
+    .then(function(result){
+      msg.reply({entity: result.entity});
+    })
+    .catch(function(err){
+      msg.reply({error: err});
     });
   });
 

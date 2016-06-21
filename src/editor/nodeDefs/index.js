@@ -22,6 +22,7 @@ const nodeDefs = [
   //require('./io/udp'),
   require('./io/camera'),
   require('./io/meshblu'),
+  require('./io/vibrate'),
   require('./io/gamepad'),
   require('./io/gpio'),
   require('./io/socketio'),

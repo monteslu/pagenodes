@@ -8,7 +8,7 @@ const tinkerIO = require('tinker-io');
 
 
 process.hrtime = require('browser-process-hrtime');
-common.init(self);
+// common.init(self);
 
 const THROTTLE_TIME = 59;
 
@@ -146,7 +146,7 @@ self.onmessage = function(evt){
     common.events.emit('input', data);
   }
   else if(type === 'startJ5' && data.options){
-    // console.log('startJ5');
+    console.log('startJ5', data);
     startJ5(data.options);
   }
   else if(type === 'serialOpen' && data.options){

@@ -914,7 +914,7 @@ module.exports = function(RED){
                 style={{marginBottom: 0}}>
                 <label htmlFor="node-input-func">
                   <i className="fa fa-wrench" />
-                  <span> board on 'ready' function content:</span>
+                  <span> onReady</span>
                 </label>
                 <input
                   type="hidden"

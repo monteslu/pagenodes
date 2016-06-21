@@ -116,6 +116,7 @@ function createNode(RED){
   function nodebotNode(n) {
     RED.nodes.createNode(this,n);
     var node = this;
+    node.boardType = n.boardType;
 
 
     node.worker = new Worker(WW_SCRIPT);
@@ -129,7 +130,12 @@ function createNode(RED){
         }
         else if(type === 'workerReady'){
           node.emit('workerReady', node);
-          connectSerial(node, n);
+          if(node.boardType === 'firmata'){
+            connectSerial(node, n);
+          }
+          else{
+            node.worker.postMessage({type: 'startJ5', options: _.clone(n)});
+          }
         }
         else if(type === 'boardReady'){
           // connectedStatus(node);

@@ -52,7 +52,7 @@ events.on("node-locales-dir", function (info) {
 function init(_settings) {
     settings = _settings;
     localfilesystem.init(settings);
-    RED = require('../../red');
+    RED = require('../../pn');
 }
 
 function load(defaultNodesDir, disableNodePathScan) {

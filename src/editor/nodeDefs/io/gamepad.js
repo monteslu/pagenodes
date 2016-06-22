@@ -1,6 +1,6 @@
 module.exports = function(RED){
   RED.nodes.registerType('gamepad',{
-    category: 'input',
+    category: 'hardware',
     color: "#26C6DA",
     defaults: {
       name: {value:""},

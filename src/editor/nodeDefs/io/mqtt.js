@@ -1,160 +1,220 @@
 module.exports = function(RED){
-      RED.nodes.registerType('mqtt in',{
-        category: 'input',
-        defaults: {
-            name: {value:""},
-            topic: {value:"",required:true},
-            broker: {type:"mqtt-broker", required:true}
-        },
-        color:"#d8bfd8",
-        inputs:0,
-        outputs:1,
-        icon: "bridge.png",
-        label: function() {
-            return this.name||this.topic||"mqtt";
-        },
-        labelStyle: function() {
-            return this.name?"node_label_italic":"";
-        }
-    });
 
-      RED.nodes.registerType('mqtt out',{
-        category: 'output',
-        defaults: {
-            name: {value:""},
-            topic: {value:""},
-            qos: {value:""},
-            retain: {value:""},
-            broker: {type:"mqtt-broker", required:true}
-        },
-        color:"#d8bfd8",
-        inputs:1,
-        outputs:0,
-        icon: "bridge.png",
-        align: "right",
-        label: function() {
-            return this.name||this.topic||"mqtt";
-        },
-        labelStyle: function() {
-            return this.name?"node_label_italic":"";
-        }
-    });
 
-        RED.nodes.registerType('mqtt-broker',{
-        category: 'config',
-        defaults: {
-            broker: {value:"",required:true},
-            port: {value:1883,required:true,validate:RED.validators.number()},
-            clientid: { value:"", validate: function(v) {
-                if ($("#node-config-input-clientid").length) {
-                    // Currently editing the node
-                    return $("#node-config-input-cleansession").is(":checked") || v.length > 0;
-                } else {
-                    return this.cleansession || v.length > 0;
-                }
-            }},
-            usetls: {value: false},
-            verifyservercert: { value: false},
-            compatmode: { value: true},
-            keepalive: {value:15,validate:RED.validators.number()},
-            cleansession: {value: true},
-            willTopic: {value:""},
-            willQos: {value:"0"},
-            willRetain: {value:false},
-            willPayload: {value:""},
-            birthTopic: {value:""},
-            birthQos: {value:"0"},
-            birthRetain: {value:false},
-            birthPayload: {value:""}
-        },
-        credentials: {
-            user: {type:"text"},
-            password: {type: "password"}
-        },
-        label: function() {
-            if (this.broker == "") { this.broker = "localhost"; }
-            return (this.clientid?this.clientid+"@":"")+this.broker+":"+this.port;
-        },
-        oneditprepare: function () {
-            var tabs = RED.tabs.create({
-                id: "node-config-mqtt-broker-tabs",
-                onchange: function(tab) {
-                    $("#node-config-mqtt-broker-tabs-content").children().hide();
-                    $("#" + tab.id).show();
-                }
-            });
-            tabs.addTab({
-                id: "mqtt-broker-tab-connection",
-                label: this._("mqtt.tabs-label.connection")
-            });
-            tabs.addTab({
-                id: "mqtt-broker-tab-security",
-                label: this._("mqtt.tabs-label.security")
-            });
-            tabs.addTab({
-                id: "mqtt-broker-tab-birth",
-                label: this._("mqtt.tabs-label.birth")
-            });
-            tabs.addTab({
-                id: "mqtt-broker-tab-will",
-                label: this._("mqtt.tabs-label.will")
-            });
-            setTimeout(function() { tabs.resize()},0);
-            if (typeof this.cleansession === 'undefined') {
-                this.cleansession = true;
-                $("#node-config-input-cleansession").prop("checked",true);
-            }
-            if (typeof this.usetls  === 'undefined'){
-                this.usetls = false;
-                $("#node-config-input-usetls").prop("checked",false);
-            }
-            if (typeof this.verifyservercert  === 'undefined'){
-                this.verifyservercert = true;
-                $("#node-config-input-verifyservercert").prop("checked",true);
-            }
-            if (typeof this.compatmode  === 'undefined'){
-                this.compatmode = true;
-                $("#node-config-input-compatmode").prop('checked', true);
-            }
-            if (typeof this.keepalive  === 'undefined'){
-                this.keepalive = 15;
-                $("#node-config-input-keepalive").val(this.keepalive);
-            }
-            if (typeof this.willQos === 'undefined') {
-                this.willQos = "0";
-                $("#node-config-input-willQos").val("0");
-            }
-            if (typeof this.birthQos === 'undefined') {
-                this.birthQos = "0";
-                $("#node-config-input-birthQos").val("0");
-            }
+  RED.nodes.registerType('mqtt in',{
+    category: 'input',
+    defaults: {
+      name: {value:""},
+      topic: {value: "", required: true},
+      broker: {type:"mqtt-broker", required: true}
+    },
+    color:"#D8BFD8",
+    inputs:0,
+    outputs:1,
+    faChar: "M",
+    label: function() {
+      return this.name||this.topic||"mqtt";
+    },
+    oneditprepare: function() {
 
-            function updateTLSOptions() {
-                if ($("#node-config-input-usetls").is(':checked')) {
-                    $("#node-config-input-verifyservercert").prop("disabled", false);
-                    $("#node-config-input-verifyservercert").next().css("color","");
-                } else {
-                    $("#node-config-input-verifyservercert").prop("disabled", true);
-                    $("#node-config-input-verifyservercert").next().css("color","#aaa");
-                }
-            }
-            updateTLSOptions();
-            $("#node-config-input-usetls").on("click",function() {
-                updateTLSOptions();
-            });
-            var node = this;
-            function updateClientId() {
-                if ($("#node-config-input-cleansession").is(":checked")) {
-                    $("#node-config-input-clientid").attr("placeholder",node._("mqtt.placeholder.clientid"));
-                } else {
-                    $("#node-config-input-clientid").attr("placeholder",node._("mqtt.placeholder.clientid-nonclean"));
-                }
-                $("#node-config-input-clientid").change();
-            }
-            setTimeout(updateClientId,0);
-            $("#node-config-input-cleansession").on("click",function() {
-                updateClientId();
-            });
-        }
-    });
+    },
+    oneditsave: function(a) {
+
+      console.log('saving', this, a);
+    },
+    render: function () {
+      return (
+        <div>
+
+          <div>
+            <div className="form-row">
+              <label htmlFor="node-input-broker">
+                <i className="fa fa-globe" /> Broker
+              </label>
+              <input type="text" id="node-input-broker" />
+            </div>
+
+            <div className="form-row">
+              <label htmlFor="node-input-topic">
+                <i className="fa fa-tag" /> Topic
+              </label>
+              <input
+                type="text"
+                id="node-input-topic"
+                placeholder="topic" />
+            </div>
+
+            <div className="form-row">
+              <label htmlFor="node-input-name">
+                <i className="fa fa-tag" /> Name
+              </label>
+              <input
+                type="text"
+                id="node-input-name"
+                placeholder="Name" />
+            </div>
+
+          </div>
+
+        </div>
+      )
+    },
+    renderHelp: function () {
+      return (
+        <p>mqtt input node. Connects to a server and either receives messages sent directly to the connected uuid or subscribes to broadcasts from a specified uuid.</p>
+      )
+    },
+    renderDescription: () => <p>mqtt input node.</p>
+  });
+
+
+
+RED.nodes.registerType('mqtt out',{
+    category: 'output',
+    defaults: {
+      name: {value:""},
+      topic: {value: "", required: false},
+      broker: {type:"mqtt-broker", required: true}
+    },
+    color:"#D8BFD8",
+    inputs:1,
+    outputs:0,
+    faChar: "M",
+    align: "right",
+    label: function() {
+      return this.name||this.topic||"mqtt";
+    },
+    labelStyle: function() {
+      return this.name?"node_label_italic mqttNode":"mqttNode";
+    },
+    oneditprepare: function() {
+
+
+
+    },
+    oneditsave: function(a) {
+
+
+      console.log('saving', this, a);
+    },
+    render: function () {
+      return (
+        <div>
+
+          <div>
+            <div className="form-row">
+              <label htmlFor="node-input-broker">
+                <i className="fa fa-globe" /> Broker
+              </label>
+              <input type="text" id="node-input-broker" />
+            </div>
+
+            <div className="form-row">
+              <label htmlFor="node-input-topic">
+                <i className="fa fa-tag" /> Topic
+              </label>
+              <input
+                type="text"
+                id="node-input-topic"
+                placeholder="topic" />
+            </div>
+
+            <div className="form-row">
+              <label htmlFor="node-input-name">
+                <i className="fa fa-tag" /> Name
+              </label>
+              <input type="text"
+                id="node-input-name"
+                placeholder="Name" />
+            </div>
+
+          </div>
+
+        </div>
+
+      )
+    },
+    renderHelp: function () {
+      return (
+        <div>
+          <p>Connects to a mqtt server and either broadcasts out the <b>msg</b> to any subscribers or sends the <b>msg</b> to a specific device.</p>
+        </div>
+      )
+    },
+    renderDescription: function () {
+      return (
+        <p>mqtt Out</p>
+      )
+    }
+  });
+
+RED.nodes.registerType('mqtt-broker',{
+    category: 'config',
+    defaults: {
+      server: {value:"",required:true},
+      port: {value:443,required:true,validate:RED.validators.number()},
+      username: {value:"",required:false},
+      password: {value:"",required:false}
+    },
+    label: function() {
+      return this.name || this.server || 'mqtt broker';
+    },
+    oneditprepare: function(a) {
+
+    },
+    render: function(){
+      return(
+      <div>
+        <div>
+
+          <div className="form-row node-input-server">
+            <label htmlFor="node-config-input-server">
+              <i className="fa fa-globe" /> server
+            </label>
+            <input
+              className="input-append-left"
+              type="text"
+              id="node-config-input-server"
+              placeholder="wss://my_mqtt_broker"
+              style={{width: '40%'}} />
+            <label
+              htmlFor="node-config-input-port"
+              style={{marginLeft: 10, width: 35}}> Port</label>
+            <input
+              type="text"
+              id="node-config-input-port"
+              placeholder="Port"
+              style={{width: 45}} />
+          </div>
+
+          <div className="form-row">
+            <label htmlFor="node-config-input-username">
+              <i className="fa fa-user" /> username
+            </label>
+            <input type="text" id="node-config-input-username" />
+          </div>
+
+          <div className="form-row">
+            <label htmlFor="node-config-input-password">
+              <i className="fa fa-lock" /> password
+            </label>
+            <input type="password" id="node-config-input-password" />
+          </div>
+
+          <div className="form-row">
+            <label htmlFor="node-input-name">
+              <i className="fa fa-tag" /> Name
+            </label>
+            <input type="text"
+              id="node-input-name"
+              placeholder="Name" />
+          </div>
+
+        </div>
+      </div>
+      );
+    },
+    renderDescription: () => <p>mqtt connection node</p>
+  });
+
 };

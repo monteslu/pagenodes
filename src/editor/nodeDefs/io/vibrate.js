@@ -1,27 +1,21 @@
 'use strict';
 
-var _ = require('lodash');
-
 module.exports = function(RED) {
   var errorMessage = 'Your browser does not support vibrate. Please use Google Chrome for this feature.'
 
   RED.nodes.registerType('vibrate',{
     category: 'hardware',
     defaults: {
-      name: {value: ''},
-      duration: {value: ''},
+      duration: {value:200, required:true, validate:RED.validators.number()},
       active: {value: true}
     },
     label: function() {
       return this.name || this.duration || 'vibrate';
     },
-    labelStyle: function() {
-      return this.name ? 'node_label_italic' : '';
-    },
-    color:'#ff00ff', //purple
+    color:'#C7E9C0', //Light-green
     inputs:1,
     outputs:0,
-    faChar: '&#xf1a8;', //PiedPiper-snack
+    faChar: 'V', //'&#xf127;', //Chain-broken
     align: 'right',
     button: {
       toggle: 'active',
@@ -37,15 +31,6 @@ module.exports = function(RED) {
           }
         });
       }
-    },
-    onpaletteadd: function() {
-      this.handleVibrateMessage = function(t,o) {
-        console.log('vibrate', msg);
-      };
-      RED.comms.subscribe('vibrate',this.handleVibrateMessage);
-    },
-    onpaletteremove: function() {
-      RED.comms.unsubscribe('vibrate',this.handleDebugMessage);
     },
     render: function () {
       return (

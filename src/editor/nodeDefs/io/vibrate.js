@@ -15,7 +15,7 @@ module.exports = function(RED) {
     color:'#C7E9C0', //Light-green
     inputs:1,
     outputs:0,
-    faChar: 'V', //'&#xf127;', //Chain-broken
+    faChar: '&#xf127;', //Chain-broken
     align: 'right',
     button: {
       toggle: 'active',

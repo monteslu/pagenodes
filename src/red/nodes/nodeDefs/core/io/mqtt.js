@@ -9,13 +9,10 @@ function init(RED) {
     RED.nodes.createNode(self,n);
     self.server = n.server;
 
-    self.port = n.port || 443;
     self.username = n.username;
     self.password = n.password;
 
     var options = {
-      // server: self.server,
-      // port: self.port,
       username: self.username,
       password: self.password
     };

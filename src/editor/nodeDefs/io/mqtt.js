@@ -61,7 +61,15 @@ module.exports = function(RED){
     },
     renderHelp: function () {
       return (
-        <p>mqtt input node. Connects to a server and either receives messages sent directly to the connected uuid or subscribes to broadcasts from a specified uuid.</p>
+        <div>
+          <p>Connects to a broker and subscribes to the specified topic.</p>
+          <p>Outputs a message with the properties:</p>
+          <ul>
+             <li><code>msg.topic</code></li>
+             <li><code>msg.payload</code></li>
+          </ul>
+          <p><code>msg.payload</code> will be a String, unless it is detected as a binary buffer.</p>
+        </div>
       )
     },
     renderDescription: () => <p>mqtt input node.</p>
@@ -137,7 +145,14 @@ RED.nodes.registerType('mqtt out',{
     renderHelp: function () {
       return (
         <div>
-          <p>Connects to a mqtt server and either broadcasts out the <b>msg</b> to any subscribers or sends the <b>msg</b> to a specific device.</p>
+          <p>Connects to a MQTT broker and publishes messages.</p>
+          <p>The topic used can be configured in the node or, if left blank, can be set
+             by <code>msg.topic</code>.</p>
+          <p>Likewise the QoS and retain values can be configured in the node or, if left
+             blank, set by <code>msg.qos</code> and <code>msg.retain</code> respectively.
+             By default, messages are published at QoS 0 with the retain flag set to false.</p>
+          <p>If <code>msg.payload</code> contains an object it will be converted to JSON
+             before being sent.</p>
         </div>
       )
     },
@@ -152,7 +167,6 @@ RED.nodes.registerType('mqtt-broker',{
     category: 'config',
     defaults: {
       server: {value:"",required:true},
-      port: {value:443,required:true,validate:RED.validators.number()},
       username: {value:"",required:false},
       password: {value:"",required:false}
     },
@@ -175,16 +189,7 @@ RED.nodes.registerType('mqtt-broker',{
               className="input-append-left"
               type="text"
               id="node-config-input-server"
-              placeholder="wss://my_mqtt_broker"
-              style={{width: '40%'}} />
-            <label
-              htmlFor="node-config-input-port"
-              style={{marginLeft: 10, width: 35}}> Port</label>
-            <input
-              type="text"
-              id="node-config-input-port"
-              placeholder="Port"
-              style={{width: 45}} />
+              placeholder="wss://my_mqtt_broker:443" />
           </div>
 
           <div className="form-row">

@@ -39,7 +39,7 @@ module.exports = function(RED) {
             <label htmlFor="node-input-duration">
               <i className="fa fa-clock-o">
               </i>
-              <span>Duration
+              <span> Duration
               </span>
             </label>
             <input
@@ -71,6 +71,6 @@ module.exports = function(RED) {
         </div>
       )
     },
-    renderDescription: () => <p>This node will allow web tools to make a device (like a phone) vibrate.</p>
+    renderDescription: () => <p>This node will make a device (like a phone) vibrate.</p>
   });
 };

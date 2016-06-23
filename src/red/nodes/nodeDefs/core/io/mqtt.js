@@ -1,4 +1,5 @@
 var mqtt = require('mqtt');
+var isUtf8 = require('is-utf8');
 var _ = require('lodash');
 
 function init(RED) {
@@ -25,6 +26,10 @@ function init(RED) {
     }, 100)
 
     self.conn.on('message', function(topic, payload){
+      // console.log('mqtt message received', topic, payload);
+      if (isUtf8(payload)) {
+        payload = payload.toString();
+      }
       self.emit('message_' + topic, payload);
     });
 
@@ -88,10 +93,22 @@ function init(RED) {
         self.status({fill:"green",shape:"dot",text:"connected"});
       });
 
-      self.on("input",function(msg) {
+      self.on('input',function(msg) {
         var topic = msg.topic || self.topic;
         if(topic){
-          self.brokerConfig.conn.publish(topic, msg.payload);
+          if (!Buffer.isBuffer(msg.payload)) {
+            if (typeof msg.payload === 'object') {
+              msg.payload = JSON.stringify(msg.payload);
+            } else if (typeof msg.payload !== 'string') {
+              msg.payload = '' + msg.payload;
+            }
+          }
+
+          var options = {
+              qos: msg.qos || 0,
+              retain: msg.retain || false
+          };
+          self.brokerConfig.conn.publish(topic, msg.payload, options);
         }
         else{
           self.error("must publish on a topic");

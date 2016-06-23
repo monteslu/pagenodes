@@ -63,7 +63,7 @@ function init(RED) {
     self.on('close', function() {
       if (self.conn.connected) {
         console.log('close meshblu connection');
-        self.conn.close();
+        self.conn.close(function(){});
       }
     });
 

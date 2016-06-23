@@ -11,7 +11,7 @@ module.exports = function(RED){
     color:"#D8BFD8",
     inputs:0,
     outputs:1,
-    faChar: "M",
+    faChar: "&#xf09e;", //rss
     label: function() {
       return this.name||this.topic||"mqtt";
     },
@@ -79,7 +79,7 @@ RED.nodes.registerType('mqtt out',{
     color:"#D8BFD8",
     inputs:1,
     outputs:0,
-    faChar: "M",
+    faChar: "&#xf09e;", //rss
     align: "right",
     label: function() {
       return this.name||this.topic||"mqtt";

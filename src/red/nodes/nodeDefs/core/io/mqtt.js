@@ -16,25 +16,36 @@ function init(RED) {
       username: self.username,
       password: self.password
     };
-    self.conn = mqtt.connect(self.server, options);
 
-    setTimeout(function(){
-      self.emit('connReady', self.conn);
-    }, 100)
+    try{
+      self.conn = mqtt.connect(self.server, options);
 
-    self.conn.on('message', function(topic, payload){
-      // console.log('mqtt message received', topic, payload);
-      if (isUtf8(payload)) {
-        payload = payload.toString();
-      }
-      self.emit('message_' + topic, payload);
-    });
+      self.conn('connect', function () {
+        process.nextTick(function(){
+          self.emit('connReady', self.conn);
+        });
+      });
 
-    self.conn.on('error', function(err){
-       console.log('error in mqtt connection', err);
-       self.emit('connError', err);
-       self.error(err);
-    });
+      self.conn.on('message', function(topic, payload){
+        // console.log('mqtt message received', topic, payload);
+        if (isUtf8(payload)) {
+          payload = payload.toString();
+        }
+        self.emit('message_' + topic, payload);
+      });
+
+      self.conn.on('error', function(err){
+         console.log('error in mqtt connection', err);
+         self.emit('connError', err);
+         self.error(err);
+      });
+    }catch(exp){
+      console.log('error creating mqtt connection', exp);
+      setTimeout(function(){
+        self.emit('connError', {});
+      }, 100)
+      self.error(exp);
+    }
 
     self.on('close', function() {
       self.conn.end();
@@ -91,27 +102,34 @@ function init(RED) {
       });
 
       self.on('input',function(msg) {
-        var topic = msg.topic || self.topic;
-        if(topic){
-          if (!Buffer.isBuffer(msg.payload)) {
-            if (typeof msg.payload === 'object') {
-              msg.payload = JSON.stringify(msg.payload);
-            } else if (typeof msg.payload !== 'string') {
-              msg.payload = '' + msg.payload;
+        if(self.brokerConfig.conn){
+          var topic = msg.topic || self.topic;
+          if(topic){
+            if (!Buffer.isBuffer(msg.payload)) {
+              if (typeof msg.payload === 'object') {
+                msg.payload = JSON.stringify(msg.payload);
+              } else if (typeof msg.payload !== 'string') {
+                msg.payload = '' + msg.payload;
+              }
             }
+
+            var options = {
+                qos: msg.qos || 0,
+                retain: msg.retain || false
+            };
+
+            self.brokerConfig.conn.publish(topic, msg.payload, options);
           }
-
-          var options = {
-              qos: msg.qos || 0,
-              retain: msg.retain || false
-          };
-          self.brokerConfig.conn.publish(topic, msg.payload, options);
+          else{
+            self.error("must publish on a topic");
+          }
         }
-        else{
-          self.error("must publish on a topic");
-        }
-
       });
+
+      self.brokerConfig.on('connError', function(err){
+        self.status({fill:"red",shape:"dot",text:"error"});
+      });
+
     } else {
       self.error("missing broker configuration");
     }

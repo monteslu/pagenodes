@@ -11,16 +11,18 @@ function init(RED) {
 
     self.username = n.username;
     self.password = n.password;
+    self.clientId = n.clientId;
 
     var options = {
       username: self.username,
-      password: self.password
+      password: self.password,
+      clientId: self.clientId
     };
 
     try{
       self.conn = mqtt.connect(self.server, options);
 
-      self.conn('connect', function () {
+      self.conn.on('connect', function () {
         process.nextTick(function(){
           self.emit('connReady', self.conn);
         });

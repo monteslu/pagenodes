@@ -167,6 +167,7 @@ RED.nodes.registerType('mqtt-broker',{
     category: 'config',
     defaults: {
       server: {value:"",required:true},
+      clientId: {value:"",required:false},
       username: {value:"",required:false},
       password: {value:"",required:false}
     },
@@ -190,6 +191,13 @@ RED.nodes.registerType('mqtt-broker',{
               type="text"
               id="node-config-input-server"
               placeholder="wss://my_mqtt_broker:443" />
+          </div>
+
+          <div className="form-row">
+            <label htmlFor="node-config-input-clientId">
+              <i className="fa fa-tag" /> client Id
+            </label>
+            <input type="text" id="node-config-input-clientId" />
           </div>
 
           <div className="form-row">

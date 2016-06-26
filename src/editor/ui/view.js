@@ -49,6 +49,7 @@ RED.view = (function() {
         moving_set = [],
         lasso = null,
         showStatus = false,
+        showRemote = false,
         lastClickNode = null,
         dblClickPrimed = null,
         clickTime = 0,
@@ -1888,6 +1889,16 @@ RED.view = (function() {
                 //TODO: subscribe/unsubscribe here
                 redraw();
             }
+        },
+        remoteControl: function(s){
+          if(s){
+            $("#main-container").hide();
+            $("#remote-control").css('display', 'flex');
+          }
+          else{
+            $("#remote-control").css('display', 'none');
+            $("#main-container").show();
+          }
         },
         calculateTextWidth: calculateTextWidth,
         select: function(selection) {

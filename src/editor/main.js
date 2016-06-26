@@ -125,9 +125,14 @@ function loadFlows() {
 }
 
 var statusEnabled = false;
+var remoteEnabled = false;
 function toggleStatus(state) {
   statusEnabled = state;
   RED.view.status(statusEnabled);
+}
+function toggleRemote(state) {
+  remoteEnabled = state;
+  RED.view.remoteControl(remoteEnabled);
 }
 
 function loadEditor() {
@@ -160,7 +165,8 @@ function loadEditor() {
                   ]},
                   null,
                   {id:"menu-item-keyboard-shortcuts",label:RED._("menu.label.keyboardShortcuts"),onselect:RED.keyboard.showHelp},
-                  {id:"menu-item-help", label: "Pagenodes Website", href: RED.settings.theme("menu.menu-item-help.url","https://github.com/monteslu/pagenodes")}
+                  {id:"menu-item-help", label: "Pagenodes Website", href: RED.settings.theme("menu.menu-item-help.url","https://github.com/monteslu/pagenodes")},
+                  {id:"menu-item-remote",label:"IoT Remote Buttons",toggle:true,onselect:toggleRemote, selected: false}
                 ]
   });
 
@@ -173,6 +179,7 @@ function loadEditor() {
   RED.clipboard.init();
   RED.view.init();
   RED.editor.init();
+  RED.remoteControl.init();
 
   RED.deploy.init(RED.settings.theme("deployButton",null));
 
@@ -220,5 +227,6 @@ require('./ui/library')(RED);
 require('./ui/notifications')(RED);
 require('./ui/subflow')(RED);
 require('./ui/touch/radialMenu')(RED);
+require('./ui/remote-control')(RED);
 
 module.exports = RED;

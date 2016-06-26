@@ -59,6 +59,117 @@ body {
     overflow:hidden;
 }
 
+@media (max-width: 500px) {
+  .media-links-header {
+    display: none;
+  }
+}
+
+@media (max-width: 450px) {
+
+  .url-header {
+    display: none;
+  }
+}
+
+
+#remote-control {
+  position: absolute;
+  top:40px; left:0; bottom: 0; right:0;
+  overflow:hidden;
+  display: none;
+  margin: 0;
+  background: black;
+}
+
+.remote-block {
+  flex-grow: 1;
+}
+
+.remote-row{
+  position: relative;
+}
+
+.remote-button{
+  font-size: 3em;
+  border-radius: 8px;
+  margin: 0;
+  padding: 0 16px;
+  font-family: "Roboto","Helvetica","Arial",sans-serif;
+  font-weight: 500;
+  overflow: hidden;
+  will-change: box-shadow;
+  transition: box-shadow .2s cubic-bezier(.4,0,1,1),background-color .2s cubic-bezier(.4,0,.2,1),color .2s cubic-bezier(.4,0,.2,1);
+  outline: none;
+  cursor: pointer;
+  text-decoration: none;
+  text-align: center;
+  vertical-align: middle;
+}
+
+
+
+@media (orientation: landscape) {
+  #remote-control {
+    flex-direction: row;
+  }
+
+  .remote-block {
+    height: 100%;
+    display: flex;
+  }
+
+  .remote-row{
+    width: 50%
+  }
+
+  .remote-button {
+    height: 50%;
+    width: 100%;
+  }
+
+  .remote-slider {
+    /* transform: rotate(-90deg); */
+    width: 80%;
+    height: 50%;
+  }
+
+  .remote-slider-container {
+    height: 50%;
+    width: 100%;
+  }
+
+}
+
+@media (orientation: portrait) {
+  #remote-control {
+    flex-direction: column;
+  }
+
+  .remote-block {
+    height: 50%;
+  }
+
+  .remote-row{
+    height: 50%;
+  }
+
+  .remote-button {
+    height: 100%;
+    width: 50%;
+  }
+
+  .remote-slider {
+    width: 40%;
+    height: 100%
+  }
+
+  .remote-slider-container {
+    height: 100%;
+    width: 50%;
+  }
+}
+
 i.spinner {
     display: inline-block;
     width: 14px;
@@ -112,4 +223,96 @@ pre code {
 
 .hardwareExtension{
   color: blue;
+}
+
+
+
+
+/* slider stuff */
+
+input[type=range] {
+  -webkit-appearance: none;
+  /* width: 100%; */
+  margin: 13.6px 0;
+  background: black;
+}
+input[type=range]:focus {
+  outline: none;
+}
+input[type=range]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 7.8px;
+  cursor: pointer;
+  box-shadow: 2.5px 2.5px 2.9px #002633, 0px 0px 2.5px #00394d;
+  background: #3091b8;
+  border-radius: 2.3px;
+  border: 0.7px solid #010101;
+}
+input[type=range]::-webkit-slider-thumb {
+  box-shadow: 2.7px 2.7px 2px #24526b, 0px 0px 2.7px #2a617e;
+  border: 2px solid #ebe9ec;
+  height: 35px;
+  width: 20px;
+  border-radius: 10px;
+  background: #32bff9;
+  cursor: pointer;
+  -webkit-appearance: none;
+  margin-top: -14.3px;
+}
+input[type=range]:focus::-webkit-slider-runnable-track {
+  background: #5fb3d5;
+}
+input[type=range]::-moz-range-track {
+  width: 100%;
+  height: 7.8px;
+  cursor: pointer;
+  box-shadow: 2.5px 2.5px 2.9px #002633, 0px 0px 2.5px #00394d;
+  background: #3091b8;
+  border-radius: 2.3px;
+  border: 0.7px solid #010101;
+}
+input[type=range]::-moz-range-thumb {
+  box-shadow: 2.7px 2.7px 2px #24526b, 0px 0px 2.7px #2a617e;
+  border: 2px solid #ebe9ec;
+  height: 35px;
+  width: 20px;
+  border-radius: 10px;
+  background: #32bff9;
+  cursor: pointer;
+}
+input[type=range]::-ms-track {
+  width: 100%;
+  height: 7.8px;
+  cursor: pointer;
+  background: transparent;
+  border-color: transparent;
+  color: transparent;
+}
+input[type=range]::-ms-fill-lower {
+  background: #20617b;
+  border: 0.7px solid #010101;
+  border-radius: 4.6px;
+  box-shadow: 2.5px 2.5px 2.9px #002633, 0px 0px 2.5px #00394d;
+}
+input[type=range]::-ms-fill-upper {
+  background: #3091b8;
+  border: 0.7px solid #010101;
+  border-radius: 4.6px;
+  box-shadow: 2.5px 2.5px 2.9px #002633, 0px 0px 2.5px #00394d;
+}
+input[type=range]::-ms-thumb {
+  box-shadow: 2.7px 2.7px 2px #24526b, 0px 0px 2.7px #2a617e;
+  border: 2px solid #ebe9ec;
+  height: 35px;
+  width: 20px;
+  border-radius: 10px;
+  background: #32bff9;
+  cursor: pointer;
+  height: 7.8px;
+}
+input[type=range]:focus::-ms-fill-lower {
+  background: #3091b8;
+}
+input[type=range]:focus::-ms-fill-upper {
+  background: #5fb3d5;
 }

@@ -12,6 +12,7 @@ const nodeDefs = [
   require('./core/espeak'),
   require('./core/notify'),
   require('./core/inject'),
+  require('./core/remote'),
   require('./core/comment'),
   require('./io/httpin'),
   require('./io/eventsource'),

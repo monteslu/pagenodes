@@ -28,7 +28,7 @@ const requiredNodes = [
   require("../nodeDefs/analysis/sentiment"),
   require("../nodeDefs/logic/switch"),
   require("../nodeDefs/logic/change"),
-  require("../nodeDefs/logic/range"),
+  // require("../nodeDefs/logic/range"),
   require("../nodeDefs/core/comment"),
   require("../nodeDefs/io/httpin"),
   require("../nodeDefs/io/camera"),

@@ -29,7 +29,7 @@ const nodeDefs = [
   require('./io/socketio'),
   require('./io/geolocate'),
   require('./logic/switch'),
-  require('./logic/range'),
+  // require('./logic/range'),
   require('./logic/change'),
   //require('./parsers/xml'),
   //require('./parsers/html'),

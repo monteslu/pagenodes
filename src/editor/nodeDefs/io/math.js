@@ -26,7 +26,7 @@ module.exports = function(RED){
                 <option value="-">x - y</option>
                 <option value="*">x * y</option>
                 <option value="/">x / y</option>
-                <option value="%">x % y</option>
+                <option value="%">x modulo y</option>
                 <option value="^">x^y</option>
                 <option value="log">log_x_(y)</option>
                 <option value="round">round x</option>
@@ -46,7 +46,7 @@ module.exports = function(RED){
                 // Reverse (r) applicable options
                 <option value="-r">y - x</option>
                 <option value="/r">y / x</option>
-                <option value="%r">y % x</option>
+                <option value="%r">y modulo x</option>
                 <option value="^r">y^x</option>
                 <option value="logr">log_y_(x)</option>
                 <option value="roundr">round y</option>

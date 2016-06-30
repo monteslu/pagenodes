@@ -21,43 +21,43 @@ module.exports = function(RED){
                 <label htmlFor="node-input-operator"><i className="fa fa-tasks"></i> <span>Operator</span></label>
                 <select id="node-input-operator">
 
-                  // General options
-                  <option value="+">add y</option>
-                  <option value="-">subtract x by y</option>
-                  <option value="*">multiply with y</option>
-                  <option value="/">divide x by y</option>
-                  <option value="%">modulo divide x by y</option>
-                  <option value="^">raise x to the power of y</option>
-                  <option value="log">log based x of y</option>
-                  <option value="round">round x</option>
+                // General options
+                <option value="+">x + y</option>
+                <option value="-">x - y</option>
+                <option value="*">x * y</option>
+                <option value="/">x / y</option>
+                <option value="%">x % y</option>
+                <option value="^">x^y</option>
+                <option value="log">log_x_(y)</option>
+                <option value="round">round x</option>
 
-                  // Special rounding options
-                  <option value="floor">floor of x</option>
-                  <option value="ceil">ceiling of x</option>
+                // Special rounding options
+                <option value="floor">floor of x</option>
+                <option value="ceil">ceiling of x</option>
 
-                  // Trig Options
-                  <option value="sin">sin(x)</option>
-                  <option value="cos">cos(x)</option>
-                  <option value="tan">tan(x)</option>
-                  <option value="csc">csc(x)</option>
-                  <option value="sec">sec(x)</option>
-                  <option value="cot">cot(x)</option>
+                // Trig Options
+                <option value="sin">sin(x)</option>
+                <option value="cos">cos(x)</option>
+                <option value="tan">tan(x)</option>
+                <option value="csc">csc(x)</option>
+                <option value="sec">sec(x)</option>
+                <option value="cot">cot(x)</option>
 
-                  // Reverse (r) applicable options
-                  <option value="-r">subtract y by x</option>
-                  <option value="/r">divide y by x</option>
-                  <option value="%r">modulo divide y by x</option>
-                  <option value="^r">raise y to the power of x</option>
-                  <option value="logr">log based y of x</option>
-                  <option value="roundr">round y</option>
-                  <option value="floorr">floor of y</option>
-                  <option value="ceilr">ceiling of y</option>
-                  <option value="sinr">sin(y)</option>
-                  <option value="cosr">cos(y)</option>
-                  <option value="tanr">tan(y)</option>
-                  <option value="cscr">csc(y)</option>
-                  <option value="secr">sec(y)</option>
-                  <option value="cotr">cot(y)</option>
+                // Reverse (r) applicable options
+                <option value="-r">y - x</option>
+                <option value="/r">y / x</option>
+                <option value="%r">y % x</option>
+                <option value="^r">y^x</option>
+                <option value="logr">log_y_(x)</option>
+                <option value="roundr">round y</option>
+                <option value="floorr">floor of y</option>
+                <option value="ceilr">ceiling of y</option>
+                <option value="sinr">sin(y)</option>
+                <option value="cosr">cos(y)</option>
+                <option value="tanr">tan(y)</option>
+                <option value="cscr">csc(y)</option>
+                <option value="secr">sec(y)</option>
+                <option value="cotr">cot(y)</option>
 
                 </select>
               </div>

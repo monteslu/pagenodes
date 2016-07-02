@@ -144,8 +144,6 @@ function init(RED) {
 
   function johnny5Node(n) {
     RED.nodes.createNode(this,n);
-
-    console.log('initializing johnny5Node', n);
     this.nodebot = RED.nodes.getNode(n.board);
     this.func = n.func;
     var node = this;
@@ -157,40 +155,6 @@ function init(RED) {
           connectedStatus(node);
           console.log('launching johnny5Node boardReady', n);
           node.nodebot.worker.postMessage({type: 'run', data: node.func, nodeId: node.id});
-
-            // node.worker.onmessage = function(evt){
-            //   try{
-            //     var data = evt.data;
-            //     var type = data.type;
-            //     // console.log('j5 node onmessage', type, data);
-            //     if(type === 'serial'){
-            //       node.wsp.emit('data', data.data);
-            //     }
-            //     else if(type === 'boardReady'){
-            //       connectedStatus(node);
-            //       node.worker.postMessage({type: 'run', data: node.func});
-            //     }
-            //     else if(type === 'error'){
-            //       node.error(new Error(data.message));
-            //     }
-            //     else if (type === 'warn'){
-            //       node.warn(data.error)
-            //     }
-            //     else if (type === 'log'){
-            //       node.log(data.msg)
-            //     }
-            //     else if (type === 'status'){
-            //       node.status(data.status);
-            //     }
-            //     else if (type === 'send' && data.msg){
-            //       node.send(data.msg);
-            //     }
-            //   }catch(exp){
-            //     node.error(exp);
-            //   }
-            // };
-
-
         });
 
         node.nodebot.on('send_' + node.id, function(msg){

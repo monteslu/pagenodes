@@ -4,6 +4,8 @@
 
 You can check out a working example of pagenodes [here](https://pagenodes.com 'pagenodes').  Pagenodes is an in-browser fork of [node-red](http://www.node-red.org 'node-red').  It requires no back-end server and is 100% browser-based.  If you are going to host this, many modules will need to be hosted via https, or you can run it locally for full functionality.
 
+![screenshot](screenshot.png)
+
 Pagenodes is currently in a heavy state of development, and we are working on a roadmap to follow for future implementations.  In its current form it offers a large amount of functionality with very little set up.
 
 ## Overview

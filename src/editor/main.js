@@ -165,7 +165,7 @@ function loadEditor() {
                   ]},
                   null,
                   {id:"menu-item-keyboard-shortcuts",label:RED._("menu.label.keyboardShortcuts"),onselect:RED.keyboard.showHelp},
-                  {id:"menu-item-help", label: "Pagenodes Website", href: RED.settings.theme("menu.menu-item-help.url","https://github.com/monteslu/pagenodes")},
+                  // {id:"menu-item-help", label: "Pagenodes Website", href: RED.settings.theme("menu.menu-item-help.url","https://github.com/monteslu/pagenodes")},
                   {id:"menu-item-remote",label:"IoT Remote Buttons",toggle:true,onselect:toggleRemote, selected: false}
                 ]
   });

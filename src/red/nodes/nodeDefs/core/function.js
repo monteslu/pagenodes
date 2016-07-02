@@ -2,6 +2,7 @@
 
 //var babel = require('babel');
 const _ = require('lodash');
+const globalContext = require('../globalContext');
 
 const WW_SCRIPT = '/function-worker.bundle.js';
 
@@ -12,14 +13,14 @@ module.exports = function(RED) {
   function FunctionNode(n) {
     RED.nodes.createNode(this,n);
     var node = this;
-    this.name = n.name;
-    this.func = n.func;
-    this.worker = new Worker(WW_SCRIPT);
-
-    this.topic = n.topic;
+    node.name = n.name;
+    node.func = n.func;
+    node.context = {};
+    node.worker = new Worker(WW_SCRIPT);
+    node.topic = n.topic;
     node.on('close', function(){
       console.log('terminating worker for ', node.id);
-      this.worker.terminate();
+      node.worker.terminate();
     });
     node.worker.onmessage = function(evt){
       // console.log('message recieved from worker', evt);
@@ -45,6 +46,22 @@ module.exports = function(RED) {
         else if (type === 'send' && data.msg){
           node.send(data.msg);
         }
+        else if (type === 'contextSet' && data.rpcId){
+          node.context[data.key] = data.value;
+          node.worker.postMessage({rpcId: data.rpcId, type: 'rpc'});
+        }
+        else if (type === 'contextGet' && data.rpcId){
+          const value = node.context[data.key];
+          node.worker.postMessage({rpcId: data.rpcId, type: 'rpc', value: value});
+        }
+        else if (type === 'globalSet' && data.rpcId){
+          globalContext[data.key] = data.value;
+          node.worker.postMessage({rpcId: data.rpcId, type: 'rpc'});
+        }
+        else if (type === 'globalGet' && data.rpcId){
+          const value = globalContext[data.key];
+          node.worker.postMessage({rpcId: data.rpcId, type: 'rpc', value: value});
+        }
       }catch(exp){
         node.error(exp);
       }
@@ -52,7 +69,7 @@ module.exports = function(RED) {
     }
 
     try {
-      this.on("input", function(msg) {
+      node.on("input", function(msg) {
         try {
           var execId = '_' + Math.random() + '_' + Date.now();
           node.worker.postMessage({msg, execId, func: node.func, type: 'run'})

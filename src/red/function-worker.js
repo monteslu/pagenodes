@@ -3,6 +3,8 @@ const _ = require('lodash');
 const common = require('./ww-common');
 
 common.init(self);
+const localStore = common.createStore(self, 'context');
+const globalStore = common.createStore(self, 'global');
 
 const THROTTLE_TIME = 59;
 
@@ -19,6 +21,8 @@ self.onmessage = function(evt){
     var msg = evt.data.msg;
     var results;
     var postMessage = '';
+    var global = globalStore;
+    var context = localStore;
     var functionText = `
       results = (function(msg){
 
@@ -36,6 +40,8 @@ self.onmessage = function(evt){
     }
 
   }
+
+  common.dispatch(evt);
 
 
 };

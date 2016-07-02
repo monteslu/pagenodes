@@ -160,6 +160,8 @@ self.onmessage = function(evt){
     handleGPIOOut(data);
   }
 
+  common.dispatch(evt);
+
 };
 
 self.postMessage({type: 'workerReady'});

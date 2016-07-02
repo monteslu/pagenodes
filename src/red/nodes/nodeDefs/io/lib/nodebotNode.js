@@ -15,6 +15,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 const _ = require('lodash');
 const WW_SCRIPT = '/j5-worker.bundle.js';
+const globalContext = require('../../globalContext');
 
 
 //for cleanup
@@ -161,6 +162,14 @@ function createNode(RED){
         }
         else if(type === 'inputSubscription'){
           node.emit('inputSubscription_' + data.nodeId, data.value);
+        }
+        else if (type === 'globalSet' && data.rpcId){
+          globalContext[data.key] = data.value;
+          node.worker.postMessage({rpcId: data.rpcId, type: 'rpc'});
+        }
+        else if (type === 'globalGet' && data.rpcId){
+          const value = globalContext[data.key];
+          node.worker.postMessage({rpcId: data.rpcId, type: 'rpc', value: value});
         }
       }catch(exp){
         node.error(exp);

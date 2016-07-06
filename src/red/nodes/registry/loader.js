@@ -42,6 +42,8 @@ const requiredNodes = [
   require("../nodeDefs/io/geolocate"),
   require('../nodeDefs/io/vibrate'),
   require("../nodeDefs/io/math"),
+  require("../nodeDefs/io/split"),
+  require("../nodeDefs/io/join"),
   require("../nodeDefs/io/gamepad"),
   require("../nodeDefs/io/voicerec"),
   require('../nodeDefs/io/accelerometer'),

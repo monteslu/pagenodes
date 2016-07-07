@@ -52,7 +52,7 @@ module.exports = function(RED){
           </div>
         )
       },
-      renderDescription: () => <p>Splits a string into multiple objects</p>
+      renderDescription: () => <p>A function that splits <code>msg.payload</code> into multiple messages.</p>
   });
 
 

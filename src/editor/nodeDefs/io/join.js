@@ -133,7 +133,6 @@ module.exports = function(RED) {
         </div>
       )
     },
-    renderDescription: () => <p>Splits a string into multiple objects</p>
-
+    renderDescription: () => <p>A function that joins the a sequence of messages into a single message.</p>
   })
 }

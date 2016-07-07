@@ -228,5 +228,6 @@ require('./ui/notifications')(RED);
 require('./ui/subflow')(RED);
 require('./ui/touch/radialMenu')(RED);
 require('./ui/remote-control')(RED);
+require('./ui/typedInput')(RED);
 
 module.exports = RED;

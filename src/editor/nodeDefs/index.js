@@ -23,6 +23,8 @@ const nodeDefs = [
   require('./io/camera'),
   require('./io/meshblu'),
   require('./io/math'),
+  require('./io/split'),
+  require('./io/join'),
   require('./io/vibrate'),
   require('./io/mqtt'),
   require('./io/gamepad'),

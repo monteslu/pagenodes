@@ -49,7 +49,8 @@ const requiredNodes = [
   require("../nodeDefs/io/voicerec"),
   require('../nodeDefs/io/accelerometer'),
   require('../nodeDefs/storage/file'),
-  require("../nodeDefs/parsers/XML")
+  require("../nodeDefs/parsers/XML"),
+  require('../nodeDefs/io/serial')
 ];
 
 

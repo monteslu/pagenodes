@@ -44,7 +44,8 @@ const nodeDefs = [
   require('./storage/localdb'),
   require('./core/voicerec'),
   require('./io/accelerometer'),
-  require('./storage/file')
+  require('./storage/file'),
+  require('./io/serial')
 ];
 
 module.exports = function(RED){

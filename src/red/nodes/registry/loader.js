@@ -37,6 +37,7 @@ const requiredNodes = [
   require("../nodeDefs/io/mqtt"),
   require("../nodeDefs/io/gpio"),
   require("../nodeDefs/io/eventsource"),
+  require("../nodeDefs/io/buffer"),
   require("../nodeDefs/parsers/JSON"),
   require("../nodeDefs/storage/localdb"),
   require("../nodeDefs/io/geolocate"),

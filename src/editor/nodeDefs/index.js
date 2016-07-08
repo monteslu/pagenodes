@@ -38,6 +38,7 @@ const nodeDefs = [
   //require('./parsers/html'),
   //require('./parsers/csv'),
   require('./parsers/json'),
+  require('./io/buffer'),
   //require('./storage/file'),
   //require('./storage/tail'),
   require('./storage/localdb'),

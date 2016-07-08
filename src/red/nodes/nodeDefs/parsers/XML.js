@@ -25,25 +25,26 @@ module.exports = function(RED) {
         this.attrkey = n.attr;
         this.charkey = n.chr;
         var node = this;
+        node.propName = n.propName || "payload";
         this.on("input", function(msg) {
-            if (msg.hasOwnProperty("payload")) {
-                if (typeof msg.payload === "object") {
+            if (msg.hasOwnProperty(node.propName)) {
+                if (typeof msg[node.propName] === "object") {
                     var options = {};
                     if (msg.hasOwnProperty("options") && typeof msg.options === "object") { options = msg.options; }
                     options.async = false;
-                    msg.payload = builder.buildObject(msg.payload, options);
+                    msg[node.propName] = builder.buildObject(msg[node.propName], options);
                     node.send(msg);
                 }
-                else if (typeof msg.payload == "string") {
+                else if (typeof msg[node.propName] == "string") {
                     var options = {};
                     if (msg.hasOwnProperty("options") && typeof msg.options === "object") { options = msg.options; }
                     options.async = true;
                     options.attrkey = node.attrkey || options.attrkey || '$';
                     options.charkey = node.charkey || options.charkey || '_';
-                    parseString(msg.payload, options, function (err, result) {
+                    parseString(msg[node.propName], options, function (err, result) {
                         if (err) { node.error(err, msg); }
                         else {
-                            msg.payload = result;
+                            msg[node.propName] = result;
                             node.send(msg);
                         }
                     });

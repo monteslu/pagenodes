@@ -378,6 +378,7 @@ render: function () {
           <input
             type="text"
             id="node-input-payload"
+            placeholder="string"
             style={{ width: "70%" }} />
         </div>
 
@@ -391,6 +392,7 @@ render: function () {
           <input
             type="text"
             id="node-input-topic"
+            placeholder="topic"
             style={{ width: "70%x" }}/>
         </div>
 

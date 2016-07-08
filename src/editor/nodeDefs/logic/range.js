@@ -23,36 +23,38 @@ module.exports = function(RED){
     render: function () {
       return (
         <div>
-        <div className="form-row">
-        <label htmlFor="node-input-action"><i className="fa fa-dot-circle-o"></i> <span data-i18n="range.label.action"></span></label>
-          <select id="node-input-action" style={{ width: "70%", marginRight: "5px" }}>
-        <option value="scale" data-i18n="range.scale.payload"></option>
-        <option value="clamp" data-i18n="range.scale.limit"></option>
-        <option value="roll" data-i18n="range.scale.wrap"></option>
-        </select>
-        </div>
-        <br/>
-        <div className="form-row"><i className="fa fa-sign-in"></i> <span data-i18n="range.label.inputrange"></span>:</div>
-        <div className="form-row"><label></label>
-        <span data-i18n="range.label.from"></span>: <input type="text" id="node-input-minin" data-i18n="[placeholder]range.placeholder.min" style={{ width: "100px" }}/>
-        &nbsp;&nbsp;<span data-i18n="range.label.to"></span>: <input type="text" id="node-input-maxin" data-i18n="[placeholder]range.placeholder.maxin" style={{ width: "100px" }}/>
-        </div>
-        <div className="form-row"><i className="fa fa-sign-out"></i> <span data-i18n="range.label.resultrange"></span>:</div>
-        <div className="form-row"><label></label>
-        <span data-i18n="range.label.from"></span>: <input type="text" id="node-input-minout" data-i18n="[placeholder]range.placeholder.min" style={{ width: "100px" }}/>
-        &nbsp;&nbsp;<span data-i18n="range.label.to"></span>: <input type="text" id="node-input-maxout" data-i18n="[placeholder]range.placeholder.maxout" style={{ width: "100px" }}/>
-        </div>
-        <br/>
-        <div className="form-row"><label></label>
-        <input type="checkbox" id="node-input-round" style={{ display: "inline-block", width: "auto", verticalAlign: "top" }}>
-        <label style={{ width: "auto" }} htmlFor="node-input-round"><span data-i18n="range.label.roundresult"></span></label></input>
+          <div className="form-row">
+          <label htmlFor="node-input-action"><i className="fa fa-dot-circle-o"></i> <span> Action:</span></label>
+            <select id="node-input-action" style={{ width: "70%", marginRight: "5px" }}>
+              <option value="scale">Scale msg.payload</option>
+              <option value="clamp">Scale and limit to the target range</option>
+              <option value="roll">Scale and wrap within the target range</option>
+            </select>
           </div>
-        <br/>
-        <div className="form-row">
-        <label htmlFor="node-input-name"><i className="fa fa-tag"></i> <span data-i18n="common.label.name"></span></label>
-          <input type="text" id="node-input-name" data-i18n="[placeholder]common.label.name"/>
-        </div>
-        <div className="form-tips" id="node-tip"><span data-i18n="range.tip"></span></div>
+          <br/>
+          <div className="form-row"><i className="fa fa-sign-in"></i> <span> Map the input range:</span></div>
+          <div className="form-row"><label></label>
+            <span>from: </span><input type="text" id="node-input-minin" placeholder="e.g. 0" style={{ width: "100px", marginRight: "5px"}}></input>
+            <span> to: </span><input type="text" id="node-input-maxin" placeholder = "e.g. 99" style={{ width: "100px" }}></input>
+          </div>
+          <div className="form-row"><i className="fa fa-sign-out"></i> <span> to the result range:</span></div>
+          <div className="form-row"><label></label>
+            <span>from: </span><input type="text" id="node-input-minout" placeholder = "e.g. 0" style={{ width: "100px", marginRight: "5px" }}></input>
+            <span> to: </span><input type="text" id="node-input-maxout" placeholder="e.g. 255" style={{ width: "100px"}}></input>
+          </div>
+          <div className="form-row">
+          <input type="checkbox" id="node-input-round" style={{ display: "inlineBlock", width: "auto", verticalAlign: "top", marginRight: "5px" }}></input>
+          <label style={{ width: "auto" }} htmlFor="node-input-round"><span>Round to the nearest integer?</span></label>
+          </div>
+          <br/>
+          <div className="form-row">
+          <label htmlFor="node-input-name"><i className="fa fa-tag"></i><span> Name</span></label>
+          <input type="text" id="node-input-name" placeholder="Name"></input>
+          </div>
+          <br/>
+          <div className="form-tips" id="node-tip">
+            <span>This node ONLY works with numbers.</span>
+          </div>
         </div>
       )
     },

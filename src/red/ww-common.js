@@ -54,11 +54,7 @@ function createNode(self, throttleTime, nodeId){
        self.postMessage({type: 'status', status, nodeId});
      }, throttleTime),
      send: _.throttle(function(msg){
-      console.log('send', {type: 'send', msg, nodeId});
       self.postMessage({type: 'send', msg, nodeId});
-     }, throttleTime),
-     postResult: _.throttle(function(results, execId){
-       self.postMessage({type: 'result', results, execId, nodeId});
      }, throttleTime)
   });
   node.id = nodeId || '';
@@ -76,7 +72,7 @@ function createStore(self, type){
    const store = {
     set: _.throttle(function(key, value, callback){
       var rpcId = getId();
-      console.log('calling set', {key: key, value: value, rpcId: rpcId, type: type + 'Set'});
+      // console.log('calling set', {key: key, value: value, rpcId: rpcId, type: type + 'Set'});
       self.postMessage({key: key, value: value, rpcId: rpcId, type: type + 'Set'});
       if(callback && typeof callback === 'function'){
         events.once('rpc_' + rpcId, function(data){
@@ -93,7 +89,7 @@ function createStore(self, type){
     }, 10),
     get: _.throttle(function(key, callback){
       var rpcId = getId();
-      console.log('calling get', {key: key, rpcId: rpcId, type: type + 'Get'});
+      // console.log('calling get', {key: key, rpcId: rpcId, type: type + 'Get'});
       self.postMessage({key: key, rpcId: rpcId, type: type + 'Get'});
       if(callback && typeof callback === 'function'){
         events.once('rpc_' + rpcId, function(data){

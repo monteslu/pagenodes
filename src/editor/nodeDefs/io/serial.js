@@ -35,16 +35,6 @@ module.exports = function(RED){
             </div>
 
             <div className="form-row">
-              <label htmlFor="node-input-topic">
-                <i className="fa fa-tag" /> Topic
-              </label>
-              <input
-                type="text"
-                id="node-input-topic"
-                placeholder="topic" />
-            </div>
-
-            <div className="form-row">
               <label htmlFor="node-input-name">
                 <i className="fa fa-tag" /> Name
               </label>
@@ -118,16 +108,6 @@ RED.nodes.registerType('serial out',{
             </div>
 
             <div className="form-row">
-              <label htmlFor="node-input-topic">
-                <i className="fa fa-tag" /> Topic
-              </label>
-              <input
-                type="text"
-                id="node-input-topic"
-                placeholder="topic" />
-            </div>
-
-            <div className="form-row">
               <label htmlFor="node-input-name">
                 <i className="fa fa-tag" /> Name
               </label>
@@ -166,8 +146,8 @@ RED.nodes.registerType('serial out',{
 RED.nodes.registerType('serial-port',{
     category: 'config',
     defaults: {
-      server: {value:"",required:true},
-      clientId: {value:"",required:false},
+      connectionType: {value:"webusb",required:true},
+      serialportName: {value:"",required:false},
       username: {value:"",required:false},
       password: {value:"",required:false}
     },
@@ -180,50 +160,69 @@ RED.nodes.registerType('serial-port',{
     render: function(){
       return(
       <div>
-        <div>
 
-          <div className="form-row node-input-server">
-            <label htmlFor="node-config-input-server">
-              <i className="fa fa-globe" /> server
-            </label>
-            <input
-              className="input-append-left"
-              type="text"
-              id="node-config-input-server"
-              placeholder="wss://my_serial_connection:443" />
-          </div>
+        <div className="form-row" id="node-div-connectionTypeRow">
+          <label htmlFor="node-config-input-connectionType">
+            <i className="fa fa-wrench" /> Connection
+          </label>
+          <select id="node-config-input-connectionType">
+            <option value="webusb">WebUSB Serial</option>
+            <option value="serial">Serial Port (plugin)</option>
+            <option value="tcp">TCP (plugin)</option>
+          </select>
+        </div>
 
-          <div className="form-row">
-            <label htmlFor="node-config-input-clientId">
-              <i className="fa fa-tag" /> client Id
-            </label>
-            <input type="text" id="node-config-input-clientId" />
+        <div className="form-row" id="node-div-pluginRow">
+          <label>
+          </label>
+          <div id="needHardwareExtensionDiv" className="form-tips">
+            This option requires you to have the <a href="https://chrome.google.com/webstore/detail/hardware-extension-for-pa/knmappkjdfbfdomfnbfhchnaamokjdpj" target="_blank"><span className="hardwareExtension">Chrome Hardware Extension</span></a> installed.
           </div>
+          <div id="hardwareExtensionOkDiv" className="form-tips">
+            Hardware Extension is active <i className="fa fa-thumbs-up" />
+          </div>
+        </div>
 
-          <div className="form-row">
-            <label htmlFor="node-config-input-username">
-              <i className="fa fa-user" /> username
-            </label>
-            <input type="text" id="node-config-input-username" />
-          </div>
-
-          <div className="form-row">
-            <label htmlFor="node-config-input-password">
-              <i className="fa fa-lock" /> password
-            </label>
-            <input type="password" id="node-config-input-password" />
-          </div>
-
-          <div className="form-row">
-            <label htmlFor="node-input-name">
-              <i className="fa fa-tag" /> Name
-            </label>
-            <input type="text"
-              id="node-input-name"
-              placeholder="Name" />
-          </div>
+        <div className="form-row" id="node-div-serialRow">
+          <label htmlFor="node-config-input-serialportName">
+          <i className="fa fa-random" /> Port
+          </label>
+          <input
+            type="text"
+            id="node-config-input-serialportName"
+            style={{width: '60%'}}
+            placeholder="e.g. /dev/ttyUSB0  COM1" />
+          <a id="node-config-lookup-serial" className="btn">
+            <i
+              id="node-config-lookup-serial-icon"
+              className="fa fa-search" />
+          </a><br/>
 
         </div>
+
+
+        <div className="form-row" id="node-div-usbRow">
+          <label htmlFor="node-config-input-usbName">
+          Authorize USB
+          </label>
+          <span id="node-config-lookup-usb-output">...</span>
+          <a id="node-config-lookup-usb" className="btn">
+            <i
+              id="node-config-lookup-usb-icon"
+              className="fa fa-random" />
+          </a>
+        </div>
+
+
+        <div className="form-row">
+          <label htmlFor="node-input-name">
+            <i className="fa fa-tag" /> Name
+          </label>
+          <input type="text"
+            id="node-input-name"
+            placeholder="Name" />
+        </div>
+
       </div>
       );
     },

@@ -21,19 +21,20 @@ module.exports = function(RED) {
     function JSONNode(n) {
         RED.nodes.createNode(this,n);
         var node = this;
+        node.propName = n.propName || 'payload';
         this.on("input", function(msg) {
-            if (msg.hasOwnProperty("payload")) {
-                if (typeof msg.payload === "string") {
+            if (msg.hasOwnProperty(node.propName)) {
+                if (typeof msg[node.propName] === "string") {
                     try {
-                        msg.payload = JSON.parse(msg.payload);
+                        msg[node.propName] = JSON.parse(msg[node.propName]);
                         node.send(msg);
                     }
                     catch(e) { node.error(e.message,msg); }
                 }
-                else if (typeof msg.payload === "object") {
-                    if (!Buffer.isBuffer(msg.payload)) {
+                else if (typeof msg[node.propName] === "object") {
+                    if (!Buffer.isBuffer(msg[node.propName])) {
                         try {
-                            msg.payload = JSON.stringify(msg.payload);
+                            msg[node.propName] = JSON.stringify(msg[node.propName]);
                             node.send(msg);
                         }
                         catch(e) {

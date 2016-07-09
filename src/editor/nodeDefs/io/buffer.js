@@ -5,6 +5,7 @@ module.exports = function(RED){
         color:"#DEBD5C", //light red
         defaults: {             // defines the editable properties of the node
             name: {value:""},   //  along with default values.
+            propName:{value:"payload", required:true},
             encoding: {value:"utf8", required:true},
         },
         inputs:1,   // set the number of inputs - only 0 or 1
@@ -16,6 +17,13 @@ module.exports = function(RED){
         render: function (){
           return (
             <div>
+
+              <div className="form-row">
+                <label htmlFor="node-input-propName">
+                  <i className="fa fa-circle" /> Property
+                </label>
+                msg.<input type="text" style={{ width: "208px" }} id="node-input-propName" placeholder="payload" />
+              </div>
               <div className="form-row">
                 <label htmlFor="node-input-encoding"><i className="fa fa-tasks"></i> <span>Encoding</span></label>
                 <select id="node-input-encoding">

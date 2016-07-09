@@ -5,27 +5,27 @@ module.exports = function(RED) {
 
     var node = this;
     node.encoding = n.encoding;
-
+    node.propName = n.propName || "payload";
     this.on("input", function(msg) {
-      if (msg.hasOwnProperty("payload")) {
+      if (msg.hasOwnProperty(node.propName)) {
         var encoder = node.encoding;
         // Use user set encoding property on message if available
         if(msg.hasOwnProperty("encoding")){
           encoder = msg.encoding;
         }
 
-        if(Buffer.isBuffer(msg.payload)) {
-          msg.payload = new Buffer(msg.payload).toString(encoder);
-          // console.log('is buffer', msg.payload, encoder);
+        if(Buffer.isBuffer(msg[node.propName])) {
+          msg[node.propName] = new Buffer(msg[node.propName]).toString(encoder);
+          // console.log('is buffer', msg[node.propName], encoder);
         }
-        else if (Array.isArray(msg.payload)) {
-          msg.payload = new Buffer(msg.payload);
+        else if (Array.isArray(msg[node.propName])) {
+          msg[node.propName] = new Buffer(msg[node.propName]);
         }
         else {
           // The string must be turned into a Buffer
           // with default or specified encoding
           // Preform selected operation:
-          msg.payload = new Buffer(msg.payload, encoder);
+          msg[node.propName] = new Buffer(msg[node.propName], encoder);
           // console.log('bufferResult', bufferResult);
         }
       }

@@ -23,7 +23,7 @@ module.exports = function(RED){
               <label htmlFor="node-input-propName">
                 <i className="fa fa-circle" /> Property
               </label>
-              msg.<input type="text" style={{ width: "208px" }} id="node-input-propName" placeholder="payload" />
+              msg.<input type="text" style={{ width: "208px" }} id="node-input-propName" placeholder="payload"></input>
             </div>
 
             </div>

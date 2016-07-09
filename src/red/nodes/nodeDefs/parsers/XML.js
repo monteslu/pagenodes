@@ -27,7 +27,7 @@ module.exports = function(RED) {
         var node = this;
         node.propName = n.propName || "payload";
         this.on("input", function(msg) {
-            if (msg.hasOwnProperty(node.propName)) {
+          if (msg.hasOwnProperty(node.propName)) {
                 if (typeof msg[node.propName] === "object") {
                     var options = {};
                     if (msg.hasOwnProperty("options") && typeof msg.options === "object") { options = msg.options; }
@@ -35,7 +35,7 @@ module.exports = function(RED) {
                     msg[node.propName] = builder.buildObject(msg[node.propName], options);
                     node.send(msg);
                 }
-                else if (typeof msg[node.propName] == "string") {
+                else if (typeof msg[node.propName] === "string") {
                     var options = {};
                     if (msg.hasOwnProperty("options") && typeof msg.options === "object") { options = msg.options; }
                     options.async = true;

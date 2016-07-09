@@ -4,34 +4,43 @@ module.exports = function(RED){
         color:"#DEBD5C",
         defaults: {
             name: {value:""},
-            attr: {value:""},
-            chr: {value:""}
+            propName:{value:"payload", required:true}
         },
         inputs:1,
         outputs:1,
-        icon: "arrow-in.png",
+        faChar: "&#xf1c9;",
         label: function() {
             return this.name||"xml";
         },
         labelStyle: function() {
             return this.name?"node_label_italic":"";
         },
-        oneditprepare: function() {
-            var showadvanced = showadvanced || true;
-            var advanced = this._("xml.label.advanced");
-            var showall = function() {
-                showadvanced = !showadvanced;
-                if (showadvanced) {
-                    $("#advanced-options").show();
-                    $("#advanced").html('<label for="node-advanced" style="width:200px !important"><i class="fa fa-minus-square"></i> '+advanced+'</label>');
-                }
-                else {
-                    $("#advanced-options").hide();
-                    $("#advanced").html('<label for="node-advanced" style="width:200px !important"><i class="fa fa-plus-square"></i> '+advanced+' ...</label>');
-                }
-            };
-            showall();
-            $("#advanced").click( function() { showall(); });
-        }
+        render: function () {
+          return (
+            <div>
+
+            <div className="form-row">
+              <label htmlFor="node-input-propName">
+                <i className="fa fa-circle" /> Property
+              </label>
+              msg.<input type="text" style={{ width: "208px" }} id="node-input-propName" placeholder="payload"></input>
+            </div>
+
+            </div>
+          )
+        },
+        renderHelp: function () {
+          return (
+            <div>
+              <p>A function that parses the <code>msg.payload</code> or another property to/from XML,
+              and places the result back into that property.</p>
+              <p>If the input is an object, the node converts that object into a XML String.</p>
+              <p>If the input is a XML String, the node parses the XML String into an object.</p>
+            </div>
+          )
+        },
+        renderDescription: () => <p>Parses/Stringifies XML</p>
+
+
     });
 };

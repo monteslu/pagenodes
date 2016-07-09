@@ -31,8 +31,8 @@ module.exports = function(RED){
             <div>
               <p>A function that parses the <code>msg.payload</code> or another property to/from JSON,
               and places the result back into that property.</p>
-              <p>If the input is a object, the node converts that object into a String</p>
-              <p>If the input is a String, the node parses the String into an object</p>
+              <p>If the input is a object, the node converts that object into a String.</p>
+              <p>If the input is a String, the node parses the String into an object.</p>
             </div>
           )
         },

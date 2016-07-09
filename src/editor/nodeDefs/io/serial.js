@@ -15,13 +15,6 @@ module.exports = function(RED){
     label: function() {
       return this.name||this.topic||"serial";
     },
-    oneditprepare: function() {
-
-    },
-    oneditsave: function(a) {
-
-      console.log('saving', this, a);
-    },
     render: function () {
       return (
         <div>
@@ -82,19 +75,6 @@ RED.nodes.registerType('serial out',{
     label: function() {
       return this.name||this.topic||"serial";
     },
-    labelStyle: function() {
-      return this.name?"node_label_italic serialNode":"serialNode";
-    },
-    oneditprepare: function() {
-
-
-
-    },
-    oneditsave: function(a) {
-
-
-      console.log('saving', this, a);
-    },
     render: function () {
       return (
         <div>
@@ -143,18 +123,146 @@ RED.nodes.registerType('serial out',{
     }
   });
 
+
+
+
+
+
+
 RED.nodes.registerType('serial-port',{
     category: 'config',
     defaults: {
       connectionType: {value:"webusb",required:true},
       serialportName: {value:"",required:false},
-      username: {value:"",required:false},
+      baud: {value:"57600",required:false},
       password: {value:"",required:false}
     },
     label: function() {
       return this.name || this.server || 'serial connection';
     },
     oneditprepare: function(a) {
+
+
+
+      $('#needHardwareExtensionDiv').hide();
+      $('#hardwareExtensionOkDiv').hide();
+      $('#hardwareExtensionFirmwareDiv').hide();
+
+      RED.comms.rpc('pluginActive', [], function(result){
+        if(result.status){
+          $('#hardwareExtensionOkDiv').show();
+          $('#hardwareExtensionFirmwareDiv').show();
+        }
+        else{
+          $('#needHardwareExtensionDiv').show();
+        }
+      });
+
+
+
+      try {
+        $("#node-config-input-serialportName").autocomplete( "destroy" );
+      } catch(err) { }
+      $("#node-config-lookup-serial").click(function() {
+          $("#node-config-lookup-serial-icon").removeClass('fa-search');
+          $("#node-config-lookup-serial-icon").addClass('spinner');
+          $("#node-config-lookup-serial").addClass('disabled');
+
+          RED.comms.rpc('gpio/listSerial', [], function(data){
+              if(data.error){
+                console.log('error searching', data.error);
+                return;
+              }
+
+              $("#node-config-lookup-serial-icon").addClass('fa-search');
+              $("#node-config-lookup-serial-icon").removeClass('spinner');
+              $("#node-config-lookup-serial").removeClass('disabled');
+              var ports = [];
+              $.each(data, function(i, port){
+                  ports.push(port);
+              });
+              $("#node-config-input-serialportName").autocomplete({
+                  source:ports,
+                  minLength:0,
+                  close: function( event, ui ) {
+                      $("#node-config-input-serialportName").autocomplete( "destroy" );
+                  }
+              }).autocomplete("search","");
+          });
+
+      });
+
+      var usbOutput = $("#node-config-lookup-usb-output");
+      //web usb handling
+      if(navigator.usb){
+        navigator.usb.getDevices().then(function(devices){
+          usbOutput.html('Authorized Devices: ' + devices.length);
+        })
+        .catch(function(err){
+          usbOutput.html(err);
+        });
+
+        $("#node-config-lookup-usb").click(function() {
+          var DEFAULT_FILTERS = [
+            { 'vendorId': 0x2341, 'productId': 0x8036 },
+            { 'vendorId': 0x2341, 'productId': 0x8037 },
+            { 'vendorId': 0x239a, 'productId': 0x8011 }
+          ];
+
+          navigator.usb.requestDevice({filters: DEFAULT_FILTERS })
+          .then(function(device){
+            console.log('authorized device', device);
+            navigator.usb.getDevices().then(function(devices){
+              usbOutput.html('Authorized Devices: ' + devices.length);
+            })
+            .catch(function(err){
+              usbOutput.html(err);
+            });
+          })
+          .catch(function(err){
+            usbOutput.html(err);
+          });
+
+        });
+
+      }else{
+        usbOutput.html('Web USB API not enabled in this browser');
+      }
+
+
+
+      var typeOptions = ['usb', 'productId', 'vendorId', 'serial', 'plugin', 'baud', 'host', 'port']
+      var typeToggles = {
+        webusb: ['usb', 'productId', 'vendorId'],
+        serial: ['serial', 'plugin', 'baud'],
+        tcp: ['host', 'port', 'plugin']
+      };
+
+      function toggleOptions(type){
+        var rows = typeToggles[type] || [];
+        typeOptions.forEach(function(row){
+          $( "#node-div-" + row + "Row" ).hide();
+          rows.forEach(function(typeOpt){
+            if(typeOpt === row){
+              $( "#node-div-" + row + "Row" ).show();
+            }
+          });
+
+        });
+      }
+
+      toggleOptions(self.connectionType);
+
+
+      var connectionTypeInput = $( "#node-config-input-connectionType" );
+      connectionTypeInput.change(function(){
+        console.log('connectionTypeInput changed', this.value);
+        try{
+          toggleOptions(this.value);
+        }catch(exp){}
+      });
+
+
 
     },
     render: function(){
@@ -200,6 +308,16 @@ RED.nodes.registerType('serial-port',{
 
         </div>
 
+        <div className="form-row" id="node-div-baudRow">
+          <label htmlFor="node-config-input-baud">
+          <i className="fa fa-cog" /> Baud
+          </label>
+          <input
+            type="text"
+            id="node-config-input-baud"
+            placeholder="57600" />
+        </div>
+
 
         <div className="form-row" id="node-div-usbRow">
           <label htmlFor="node-config-input-usbName">
@@ -211,6 +329,48 @@ RED.nodes.registerType('serial-port',{
               id="node-config-lookup-usb-icon"
               className="fa fa-random" />
           </a>
+        </div>
+
+        <div className="form-row" id="node-div-vendorIdRow">
+          <label htmlFor="node-config-input-vendorId">
+          <i className="fa fa-cog" /> vendorId
+          </label>
+          <input
+            type="text"
+            id="node-config-input-vendorId"
+            placeholder="0x2341" />
+        </div>
+
+        <div className="form-row" id="node-div-productIdRow">
+          <label htmlFor="node-config-input-productId">
+          <i className="fa fa-cog" /> productId
+          </label>
+          <input
+            type="text"
+            id="node-config-input-productId"
+            placeholder="0x8036" />
+        </div>
+
+        <div
+          className="form-row"
+          id="node-div-hostRow">
+          <label htmlFor="node-config-input-host">
+            <i className="fa fa-globe" /> Host
+            </label>
+            <input
+              type="text"
+              id="node-config-input-host" />
+        </div>
+
+        <div
+          className="form-row"
+          id="node-div-portRow">
+          <label htmlFor="node-config-input-port">
+            <i className="fa fa-cog" /> port number
+            </label>
+            <input
+              type="text"
+              id="node-config-input-port" />
         </div>
 
 

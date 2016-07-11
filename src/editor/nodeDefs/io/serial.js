@@ -5,7 +5,6 @@ module.exports = function(RED){
     category: 'hardware',
     defaults: {
       name: {value:""},
-      topic: {value: "", required: true},
       connection: {type:"serial-port", required: true}
     },
     color:"BurlyWood",
@@ -235,7 +234,7 @@ RED.nodes.registerType('serial-port',{
       var typeToggles = {
         webusb: ['usb', 'productId', 'vendorId'],
         serial: ['serial', 'plugin', 'baud'],
-        tcp: ['host', 'port', 'plugin']
+        tcp: ['tpcHost', 'tcpPort', 'plugin']
       };
 
       function toggleOptions(type){
@@ -353,24 +352,24 @@ RED.nodes.registerType('serial-port',{
 
         <div
           className="form-row"
-          id="node-div-hostRow">
-          <label htmlFor="node-config-input-host">
+          id="node-div-tpcHostRow">
+          <label htmlFor="node-config-input-tpcHost">
             <i className="fa fa-globe" /> Host
             </label>
             <input
               type="text"
-              id="node-config-input-host" />
+              id="node-config-input-tpcHost" />
         </div>
 
         <div
           className="form-row"
-          id="node-div-portRow">
-          <label htmlFor="node-config-input-port">
+          id="node-div-tcpPortRow">
+          <label htmlFor="node-config-input-tcpPort">
             <i className="fa fa-cog" /> port number
             </label>
             <input
               type="text"
-              id="node-config-input-port" />
+              id="node-config-input-tcpPort" />
         </div>
 
 

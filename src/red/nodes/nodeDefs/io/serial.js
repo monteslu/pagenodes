@@ -2,53 +2,74 @@ var UsbSerial = require('webusb-serial').SerialPort;
 var isUtf8 = require('is-utf8');
 var _ = require('lodash');
 
+window.Buffer = Buffer;
+
 function init(RED) {
 
-  var PluginSerial = require('./lib/pluginPort')(RED).SerialPort;
+  var PluginSerialPort = require('./lib/pluginPort')(RED).SerialPort;
 
   function serialPortNode(n) {
-    var self = this;
-    RED.nodes.createNode(self,n);
-    _.assign(self, n);
-
-    var options = {
-      username: self.username,
-      password: self.password,
-      clientId: self.clientId
-    };
+    var node = this;
+    RED.nodes.createNode(node,n);
+    _.assign(node, n);
+    node.baud = parseInt(node.baud, 10) || 57600;
 
     try{
-      self.conn = serial.connect(self.server, options);
 
-      self.conn.on('connect', function () {
-        process.nextTick(function(){
-          self.emit('connReady', self.conn);
-        });
-      });
+      if(n.connectionType === 'serial'){
+        node.sp = new PluginSerialPort('serial', node.serialportName, {portName: node.serialportName, baud: node.baud});
+      }
+      else if(n.connectionType === 'tcp' || n.connectionType === 'udp'){
+        //console.log('trying', n.tcpHost, n.tcpPort);
+        var options = {
+          host: n.tcpHost,
+          port: parseInt(n.tcpPort, 10)
+        };
 
-      self.conn.on('message', function(topic, payload){
-        // console.log('serial message received', topic, payload);
-        if (isUtf8(payload)) {
-          payload = payload.toString();
+        node.sp = new PluginSerialPort(n.connectionType, options.tcpHost + ':' + options.tcpPort, options);
+      }
+      else if(n.connectionType === 'webusb'){
+        var productId = parseInt(node.productId);
+        var vendorId = parseInt(node.vendorId);
+        var usbOptions = {};
+
+        if(productId && vendorId){
+          usbOptions.filters = [{productId, vendorId}];
         }
-        self.emit('message_' + topic, payload);
-      });
 
-      self.conn.on('error', function(err){
-         console.log('error in serial connection', err);
-         self.emit('connError', err);
-         self.error(err);
-      });
+        node.sp = new UsbSerial(usbOptions);
+
+      }
+
+      if(node.sp){
+        node.sp.on('open', function(){
+          console.log('serial open', node.sp);
+          node.emit('connReady', {});
+        });
+
+        node.sp.on('data', function(data){
+          console.log('spnode data', data);
+          node.emit('data', data);
+        });
+
+        node.sp.on('error', function(err){
+          node.emit('connError', err);
+        });
+      }
+
+
     }catch(exp){
       console.log('error creating serial connection', exp);
       setTimeout(function(){
-        self.emit('connError', {});
+        node.emit('connError', {});
       }, 100)
-      self.error(exp);
+      node.error(exp);
     }
 
-    self.on('close', function() {
-      self.conn.end();
+    node.on('close', function() {
+      if(node.sp && node.sp.close){
+        node.sp.close();
+      }
     });
 
   }
@@ -56,29 +77,27 @@ function init(RED) {
   RED.nodes.registerType("serial-port", serialPortNode);
 
   function serialInNode(n) {
-    var self = this;
-    RED.nodes.createNode(self,n);
-    self.topic = n.topic;
-    self.connection = n.connection;
-    self.connectionConfig = RED.nodes.getNode(self.connection);
+    var node = this;
+    RED.nodes.createNode(node,n);
+    node.connection = n.connection;
+    node.connectionConfig = RED.nodes.getNode(node.connection);
 
-    if(self.connectionConfig){
-      self.status({fill:"yellow",shape:"dot",text:"connecting..."});
+    if(node.connectionConfig){
+      node.status({fill:"yellow",shape:"dot",text:"connecting..."});
 
-      self.connectionConfig.on('connReady', function(conn){
-        self.status({fill:"green",shape:"dot",text:"connected"});
-        self.connectionConfig.conn.subscribe(self.topic);
+      node.connectionConfig.on('connReady', function(conn){
+        node.status({fill:"green",shape:"dot",text:"connected"});
       });
 
-      self.connectionConfig.on('message_' + self.topic, function(payload){
-        self.send({
-          topic: self.topic,
-          payload: payload
+      node.connectionConfig.on('data', function(data){
+        node.send({
+          topic: 'serial',
+          payload: data
         })
       });
 
-      self.connectionConfig.on('connError', function(err){
-        self.status({fill:"red",shape:"dot",text:"error"});
+      node.connectionConfig.on('connError', function(err){
+        node.status({fill:"red",shape:"dot",text:"error"});
       });
     }
 
@@ -87,51 +106,34 @@ function init(RED) {
   RED.nodes.registerType("serial in",serialInNode);
 
   function serialOutNode(n) {
-    var self = this;
-    RED.nodes.createNode(self,n);
-    self.connection = n.connection;
-    self.connectionConfig = RED.nodes.getNode(self.connection);
-    self.topic = n.topic;
+    var node = this;
+    RED.nodes.createNode(node,n);
+    node.connection = n.connection;
+    node.connectionConfig = RED.nodes.getNode(node.connection);
 
-    if (self.connectionConfig) {
+    if (node.connectionConfig) {
 
-      self.status({fill:"yellow",shape:"dot",text:"connecting..."});
+      node.status({fill:"yellow",shape:"dot",text:"connecting..."});
 
-      self.connectionConfig.on('connReady', function(conn){
-        self.status({fill:"green",shape:"dot",text:"connected"});
+      node.connectionConfig.on('connReady', function(conn){
+        node.status({fill:"green",shape:"dot",text:"connected"});
       });
 
-      self.on('input',function(msg) {
-        if(self.connectionConfig.conn){
-          var topic = msg.topic || self.topic;
-          if(topic){
-            if (!Buffer.isBuffer(msg.payload)) {
-              if (typeof msg.payload === 'object') {
-                msg.payload = JSON.stringify(msg.payload);
-              } else if (typeof msg.payload !== 'string') {
-                msg.payload = '' + msg.payload;
-              }
-            }
-
-            var options = {
-                qos: msg.qos || 0,
-                retain: msg.retain || false
-            };
-
-            self.connectionConfig.conn.publish(topic, msg.payload, options);
+      node.on('input',function(msg) {
+        if(node.connectionConfig.sp){
+          if (!Buffer.isBuffer(msg.payload)) {
+            msg.payload = new Buffer(msg.payload);
           }
-          else{
-            self.error("must publish on a topic");
-          }
+          node.connectionConfig.sp.write(msg.payload);
         }
       });
 
-      self.connectionConfig.on('connError', function(err){
-        self.status({fill:"red",shape:"dot",text:"error"});
+      node.connectionConfig.on('connError', function(err){
+        node.status({fill:"red",shape:"dot",text:"error"});
       });
 
     } else {
-      self.error("missing connection configuration");
+      node.error("missing connection configuration");
     }
   }
 

@@ -14,10 +14,12 @@ module.exports = function(RED){
     self.name = name;
     self.options = options;
 
-    RED.events.on('data_' + type + '_' + name, function(data){
+    self.dataListener = function(data){
       // console.log('data from wire', new Buffer(data).toString('hex'));
       self.emit('data', new Buffer(data));
-    });
+    };
+
+    RED.events.on('data_' + self.type + '_' + self.name, self.dataListener);
 
     RED.plugin.rpc('connect', [type, name, options], function(result){
       console.log('PluginSerialPort connect result', result);
@@ -68,6 +70,7 @@ module.exports = function(RED){
         callback();
       }
     });
+    RED.events.removeListener('data_' + self.type + '_' + self.name, self.dataListener);
 
   };
 

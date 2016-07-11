@@ -25,7 +25,7 @@ module.exports = function(RED) {
           // The string must be turned into a Buffer
           // with default or specified encoding
           // Preform selected operation:
-          msg[node.propName] = new Buffer(msg[node.propName], encoder);
+          msg[node.propName] = new Buffer(String(msg[node.propName]), encoder);
           // console.log('bufferResult', bufferResult);
         }
       }

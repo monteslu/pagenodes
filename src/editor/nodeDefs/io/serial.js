@@ -44,13 +44,8 @@ module.exports = function(RED){
     renderHelp: function () {
       return (
         <div>
-          <p>Connects to a connection and subscribes to the specified topic.</p>
-          <p>Outputs a message with the properties:</p>
-          <ul>
-             <li><code>msg.topic</code></li>
-             <li><code>msg.payload</code></li>
-          </ul>
-          <p><code>msg.payload</code> will be a String, unless it is detected as a binary buffer.</p>
+          <p>Connects to a webusb, serial, or tcp port.</p>
+          <p>Emits binary (Buffer) data recieved on the port.</p>
         </div>
       )
     },
@@ -104,14 +99,8 @@ RED.nodes.registerType('serial out',{
     renderHelp: function () {
       return (
         <div>
-          <p>Connects to a serial connection and publishes messages.</p>
-          <p>The topic used can be configured in the node or, if left blank, can be set
-             by <code>msg.topic</code>.</p>
-          <p>Likewise the QoS and retain values can be configured in the node or, if left
-             blank, set by <code>msg.qos</code> and <code>msg.retain</code> respectively.
-             By default, messages are published at QoS 0 with the retain flag set to false.</p>
-          <p>If <code>msg.payload</code> contains an object it will be converted to JSON
-             before being sent.</p>
+          <p>Connects to a webusb, serial, or tcp port.</p>
+          <p>Writes binary (Buffer) data directly to the port.</p>
         </div>
       )
     },

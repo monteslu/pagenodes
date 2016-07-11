@@ -58,10 +58,8 @@ function handleMessage(msg, serverPort){
 }
 
 function connect(){
-  console.log('plugin connect check', active);
   if(!active && window.chrome){
     try{
-      console.log('connecting to plugin');
       var connectedPort = chrome.runtime.connect(editorExtensionId);
 
       connectedPort.onDisconnect.addListener(function(d){
@@ -75,7 +73,6 @@ function connect(){
       port = connectedPort;
 
       active = true;
-      console.log('connected to plugin', true);
 
     }catch(exp){
       console.log('cant connect to plugin', exp);

@@ -21,6 +21,7 @@ const nodeDefs = [
   //require('./io/tcpin'),
   //require('./io/udp'),
   require('./io/camera'),
+  require('./io/rbe'),
   require('./io/meshblu'),
   require('./io/math'),
   require('./io/split'),

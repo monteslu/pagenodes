@@ -11,8 +11,11 @@ module.exports = function(RED){
         inputs:1,   // set the number of inputs - only 0 or 1
         outputs:1,  // set the number of outputs - 0 to n
         faChar: "&#xf1ec;",  //calculator
-        label: function() {  // sets the default label contents
-            return 'math';
+        label: function() {
+            return this.name||"rbe";
+        },
+        labelStyle: function() {
+            return this.name?"node_label_italic":"";
         },
         render: function (){
           return (

@@ -29,6 +29,7 @@ const requiredNodes = [
   require("../nodeDefs/logic/switch"),
   require("../nodeDefs/logic/change"),
   require("../nodeDefs/logic/range"),
+  require("../nodeDefs/io/rbe"),
   require("../nodeDefs/core/comment"),
   require("../nodeDefs/io/httpin"),
   require("../nodeDefs/io/camera"),

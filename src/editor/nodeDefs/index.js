@@ -26,6 +26,7 @@ const nodeDefs = [
   require('./io/math'),
   require('./io/split'),
   require('./io/join'),
+  require('./io/bluetooth'),
   require('./io/vibrate'),
   require('./io/mqtt'),
   require('./io/gamepad'),

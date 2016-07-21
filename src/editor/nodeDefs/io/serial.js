@@ -219,7 +219,7 @@ RED.nodes.registerType('serial-port',{
 
 
 
-      var typeOptions = ['usb', 'productId', 'vendorId', 'serial', 'plugin', 'baud', 'host', 'port']
+      var typeOptions = ['usb', 'productId', 'vendorId', 'serial', 'plugin', 'baud', 'tpcHost', 'tcpPort']
       var typeToggles = {
         webusb: ['usb', 'productId', 'vendorId'],
         serial: ['serial', 'plugin', 'baud'],

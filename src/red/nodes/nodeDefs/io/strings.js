@@ -22,7 +22,7 @@ module.exports = function(RED) {
         }
 
         // Use any user set outside-of-node prefernces
-        // Design Note: Properties attached to message should 
+        // Design Note: Properties attached to message should
         // take precedence over text field input
         if(msg.hasOwnProperty('param2')){
           param2 = msg.param2;
@@ -38,7 +38,7 @@ module.exports = function(RED) {
           msg.payload = lodashFunc(msg.payload, param2, param3);
           node.send(msg);
         }
-        
+
 
       } else {
         node.send(msg); // If no payload - just pass it on.
@@ -47,3 +47,4 @@ module.exports = function(RED) {
   }
   RED.nodes.registerType("strings", StringsNode);
 }
+

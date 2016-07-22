@@ -23,15 +23,11 @@ var stringFunctions = {
   trim: [{param2: 'chars'}],
   trimEnd: [{param2: 'chars'}],
   trimStart: [{param2: 'chars'}],
-  // truncate: [{param2: {param21: 'length', param22: 'length', param23: 'omission'}}],
   unescape: [],
   upperCase: [],
   upperFirst: [],
   words: [{param2: 'pattern'}]
 };
-
-var secondParam;
-var thirdParam;
 
 module.exports = function(RED){
 
@@ -67,7 +63,7 @@ module.exports = function(RED){
                 $("#node-label-param2").html(param.param2);
                 $("#node-form-row-param2").show();
               }
-              if (param.param3) {   
+              if (param.param3) {
                 $("#node-label-param3").html(param.param3);
                 $("#node-form-row-param3").show();
               }
@@ -77,7 +73,7 @@ module.exports = function(RED){
           handleMode(myFuncDef);
 
           var modeInput = $("#node-input-mode");
-          modeInput.change(function (){ 
+          modeInput.change(function (){
             console.log('modeInput changed', this.value);
             handleMode(stringFunctions[this.value]);
           })
@@ -112,7 +108,6 @@ module.exports = function(RED){
                   <option value="trim">trim</option>
                   <option value="trimEnd">trimEnd</option>
                   <option value="trimStart">trimStart</option>
-                  // <option value="truncate">truncate</option>
                   <option value="unescape">unescape</option>
                   <option value="upperCase">upperCase</option>
                   <option value="upperFirst">upperFirst</option>
@@ -120,8 +115,8 @@ module.exports = function(RED){
                 </select>
 
               </div>
-          
-              
+
+
               <div className="form-row" id="node-form-row-param2">
                 <label htmlFor="node-label-param2"><i className="fa fa-crosshairs"/><span id ="node-label-param2" style={{marginLeft:"5%", textTransform: "capitalize"}}></span></label>
                 <input type="text" id="node-input-param2" style={{width:"71%"}}></input>
@@ -144,15 +139,15 @@ module.exports = function(RED){
         renderHelp: function () {
           return (
             <div>
-              <p>Provides <i><a href="https://lodash.com/docs#camelCase" target="_new">Lodash</a></i> string 
+              <p>Provides <i><a href="https://lodash.com/docs#camelCase" target="_new">Lodash</a></i> string
               functions that use <code>msg.payload</code> as the first parameter.</p>
               <p>Other paramters beyond the first can be input in the node's configuration.</p>
-              <p>You may also attach <code>msg.param2</code> and/or <code>msg.param3</code> to override the node's configuration.</p> 
+              <p>You may also attach <code>msg.param2</code> and/or <code>msg.param3</code> to override the node's configuration.</p>
             </div>
           )
         },
         renderDescription: () => <p>Preforms Lodash string functions</p>
     });
 
-
 };
+

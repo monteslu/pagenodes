@@ -2,19 +2,19 @@ module.exports = function(RED){
 
   //**dataURL to blob**
   function dataURLtoBlob(dataurl) {
-      var arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
-          bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
-      while(n--){
-          u8arr[n] = bstr.charCodeAt(n);
-      }
-      return new Blob([u8arr], {type:mime});
+    var arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
+      bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+    while(n--){
+      u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new Blob([u8arr], {type:mime});
   }
 
   //**blob to dataURL**
   function blobToDataURL(blob, callback) {
-      var a = new FileReader();
-      a.onload = function(e) {callback(e.target.result);}
-      a.readAsDataURL(blob);
+    var a = new FileReader();
+    a.onload = function(e) {callback(e.target.result);}
+    a.readAsDataURL(blob);
   }
 
 
@@ -218,52 +218,52 @@ module.exports = function(RED){
         msg.className = 'debug-message'+(o.level?(' debug-message-level-'+o.level):'');
         msg.innerHTML = '<span class="debug-message-date">'+
           getTimestamp()+'</span>'+
-            (name?'<span class="debug-message-name">'+name:'')+
-              '</span>';
-              // NOTE: relying on function error to have a "type" that all other msgs don't
-              if (o.hasOwnProperty("type") && (o.type === "function")) {
-                var errorLvlType = 'error';
-                var errorLvl = 20;
-                if (o.hasOwnProperty("level") && o.level === 30) {
-                  errorLvl = 30;
-                  errorLvlType = 'warn';
-                }
-                msg.className = 'debug-message debug-message-level-' + errorLvl;
-                msg.innerHTML += '<span class="debug-message-topic">function : (' + errorLvlType + ')</span>';
-              } else {
-                msg.innerHTML += '<span class="debug-message-topic">'+
-                  (o.topic?topic+' : ':'')+
-                    (o.property?'msg.'+property:'msg')+" : "+format+
+          (name?'<span class="debug-message-name">'+name:'')+
+          '</span>';
+        // NOTE: relying on function error to have a "type" that all other msgs don't
+        if (o.hasOwnProperty("type") && (o.type === "function")) {
+          var errorLvlType = 'error';
+          var errorLvl = 20;
+          if (o.hasOwnProperty("level") && o.level === 30) {
+            errorLvl = 30;
+            errorLvlType = 'warn';
+          }
+          msg.className = 'debug-message debug-message-level-' + errorLvl;
+          msg.innerHTML += '<span class="debug-message-topic">function : (' + errorLvlType + ')</span>';
+        } else {
+          msg.innerHTML += '<span class="debug-message-topic">'+
+            (o.topic?topic+' : ':'')+
+            (o.property?'msg.'+property:'msg')+" : "+format+
 
-                      '</span>';
-              }
-              var imgHTML = '';
-              if(o.image){
-                var imgURL = o.image.replace(/\"/g,'').replace(/\'/g,'');
-                imgHTML = '<br><img src=\"' + imgURL + '\" style=\"width: 100%\">';
-              }
-              var fileHTML = '';
-              if(o.file){
-                var download = sanitize(o.file.fileInfo.name.replace(/\"/g,'').replace(/\'/g,''));
+            '</span>';
+        }
+        var imgHTML = '';
+        if(o.image){
+          var imgURL = o.image.replace(/\"/g,'').replace(/\'/g,'');
+          imgHTML = '<br><img src=\"' + imgURL + '\" style=\"width: 100%\">';
+        }
+        var fileHTML = '';
+        if(o.file){
+          var download = sanitize(o.file.fileInfo.name.replace(/\"/g,'').replace(/\'/g,''));
 
-                // var dataURL = o.file.fileInfo.data.replace(/\"/g,'').replace(/\'/g,'');
-                var blob = dataURLtoBlob(o.file.fileInfo.data);
-                var url = URL.createObjectURL(blob);
+          // var dataURL = o.file.fileInfo.data.replace(/\"/g,'').replace(/\'/g,'');
+          var blob = dataURLtoBlob(o.file.fileInfo.data);
+          var url = URL.createObjectURL(blob);
 
-                fileHTML = '<br><a href=\"' + url + '\" download=\"'+ download + '\" target=\"_blank\">' + download + '</a>';
-              }
-              msg.innerHTML += '<span class="debug-message-payload">'+ payload + imgHTML + fileHTML + '</span>';
-              var atBottom = (sbc.scrollHeight-messages.offsetHeight-sbc.scrollTop) < 5;
-              messageCount++;
-              $(messages).append(msg);
+          fileHTML = '<br><a href=\"' + url + '\" download=\"'+ download + '\" target=\"_blank\">' + download + '</a>';
+        }
+        msg.innerHTML += '<span class="debug-message-payload">'+ payload + imgHTML + fileHTML + '</span>';
+        var atBottom = (sbc.scrollHeight-messages.offsetHeight-sbc.scrollTop) < 5;
+        messageCount++;
+        $(messages).append(msg);
 
-              if (messageCount > 200) {
-                $("#debug-content .debug-message:first").remove();
-                messageCount--;
-              }
-              if (atBottom) {
-                $(sbc).scrollTop(sbc.scrollHeight);
-              }
+        if (messageCount > 200) {
+          $("#debug-content .debug-message:first").remove();
+          messageCount--;
+        }
+        if (atBottom) {
+          $(sbc).scrollTop(sbc.scrollHeight);
+        }
       };
       RED.comms.subscribe("debug",this.handleDebugMessage);
 
@@ -336,44 +336,46 @@ module.exports = function(RED){
     render: function () {
       return (
         <div>
-        <div className="form-row">
-        <label htmlFor="node-input-select-complete"><i className="fa fa-list"></i> <span data-i18n="debug.output"></span></label>
-        <select type="text" id="node-input-select-complete" style={{ display: "inline-block", width: "250px", verticalAlign: "top" }}>
-        <option value="false" data-i18n="debug.msgprop"></option>
-        <option value="true" data-i18n="debug.msgobj"></option>
-        </select>
-        </div>
-        <div className="form-row" id="node-prop-row">
-        <label htmlFor="node-input-complete">&nbsp;</label>msg.<input type="text" style={{ width: "208px" }} id="node-input-complete"/>
-        </div>
-        <div className="form-row">
-        <label htmlFor="node-input-console"><i className="fa fa-random"></i> <span data-i18n="debug.to"></span></label>
-        <select type="text" id="node-input-console" style={{ display: "inline-block", width: "250px", verticalAlign: "top" }}>
-        <option value="false" data-i18n="debug.debtab"></option>
-        <option value="true" data-i18n="debug.tabcon"></option>
-        </select>
-        </div>
-        <div className="form-row">
-        <label htmlFor="node-input-name"><i className="fa fa-tag"></i> <span data-i18n="common.label.name"></span></label>
-        <input type="text" id="node-input-name" data-i18n="[placeholder]common.label.name"/>
-        </div>
+          <div className="form-row">
+            <label htmlFor="node-input-select-complete"><i className="fa fa-list"></i> <span data-i18n="debug.output"></span></label>
+            <select type="text" id="node-input-select-complete" style={{ display: "inline-block", width: "250px", verticalAlign: "top" }}>
+              <option value="false" data-i18n="debug.msgprop"></option>
+              <option value="true" data-i18n="debug.msgobj"></option>
+            </select>
+          </div>
+          <div className="form-row" id="node-prop-row">
+            <label htmlFor="node-input-complete">&nbsp;</label>msg.<input type="text" style={{ width: "208px" }} id="node-input-complete"/>
+          </div>
+          <div className="form-row">
+            <label htmlFor="node-input-console"><i className="fa fa-random"></i> <span data-i18n="debug.to"></span></label>
+            <select type="text" id="node-input-console" style={{ display: "inline-block", width: "250px", verticalAlign: "top" }}>
+              <option value="false" data-i18n="debug.debtab"></option>
+              <option value="true" data-i18n="debug.tabcon"></option>
+            </select>
+          </div>
+          <div className="form-row">
+            <label htmlFor="node-input-name"><i className="fa fa-tag"></i> <span data-i18n="common.label.name"></span></label>
+            <input type="text" id="node-input-name" data-i18n="[placeholder]common.label.name"/>
+          </div>
         </div>
       )
     },
     renderHelp: function () {
       return (
         <div>
-        <p>The Debug node can be connected to the output of any node. It can be used to display the output of any message property in the debug tab of the sidebar. The default is to display <b>msg.payload</b>.</p>
-        <p>Each message will also display the timestamp, <b>msg.topic</b> and the property chosen to output.</p>
-        <p>The sidebar can be accessed under the options drop-down in the top right corner.</p>
-        <p>The button to the right of the node will toggle its output on and off so you can de-clutter the debug window.</p>
-        <p>If the payload is an object or buffer it will be stringified first for display and indicate that by saying "(Object)" or "(Buffer)".</p>
+          <p>The Debug node can be connected to the output of any node. It can be used to display the output of any message property in the debug tab of the sidebar. The default is to display <b>msg.payload</b>.</p>
+          <p>Each message will also display the timestamp, <b>msg.topic</b> and the property chosen to output.</p>
+          <p>The sidebar can be accessed under the options drop-down in the top right corner.</p>
+          <p>The button to the right of the node will toggle its output on and off so you can de-clutter the debug window.</p>
+          <p>If the payload is an object or buffer it will be stringified first for display and indicate that by saying "(Object)" or "(Buffer)".</p>
           <p>Selecting any particular message will highlight (in red) the debug node that reported it. This is useful if you wire up multiple debug nodes.</p>
-            <p>Optionally can show the complete <b>msg</b> object.</p>
-        <p>In addition any calls to node.warn or node.error will appear here.</p>
+          <p>Optionally can show the complete <b>msg</b> object.</p>
+          <p>In addition any calls to node.warn or node.error will appear here.</p>
         </div>
       )
     },
     renderDescription: () => <p>Display the output of any node.</p>
-   });
+  });
 };
+
+

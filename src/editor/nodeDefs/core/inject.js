@@ -229,10 +229,10 @@ module.exports = function(RED){
         } else {
           if (units == "m") {
             //crontab = "*/"+count+" * * * "+days;
-repeat = count * 60;
+            repeat = count * 60;
           } else if (units == "h") {
             //crontab = "0 */"+count+" * * "+days;
-repeat = count * 60 * 60;
+            repeat = count * 60 * 60;
           }
         }
       } else if (type == "interval-time") {
@@ -312,11 +312,11 @@ repeat = count * 60 * 60;
         });
       }
     },
-render: function () {
+    render: function () {
       return (
         <div>
-        <style>
-        {`
+          <style>
+            {`
           .inject-time-row {
           padding-left: 110px;
           }
@@ -524,3 +524,4 @@ render: function () {
     renderDescription: () => <p>Inject the action of a node</p>
   });
 };
+

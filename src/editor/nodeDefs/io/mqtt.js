@@ -65,8 +65,8 @@ module.exports = function(RED){
           <p>Connects to a broker and subscribes to the specified topic.</p>
           <p>Outputs a message with the properties:</p>
           <ul>
-             <li><code>msg.topic</code></li>
-             <li><code>msg.payload</code></li>
+            <li><code>msg.topic</code></li>
+            <li><code>msg.payload</code></li>
           </ul>
           <p><code>msg.payload</code> will be a String, unless it is detected as a binary buffer.</p>
         </div>
@@ -77,7 +77,7 @@ module.exports = function(RED){
 
 
 
-RED.nodes.registerType('mqtt out',{
+  RED.nodes.registerType('mqtt out',{
     category: 'output',
     defaults: {
       name: {value:""},
@@ -147,12 +147,12 @@ RED.nodes.registerType('mqtt out',{
         <div>
           <p>Connects to a MQTT broker and publishes messages.</p>
           <p>The topic used can be configured in the node or, if left blank, can be set
-             by <code>msg.topic</code>.</p>
+            by <code>msg.topic</code>.</p>
           <p>Likewise the QoS and retain values can be configured in the node or, if left
-             blank, set by <code>msg.qos</code> and <code>msg.retain</code> respectively.
-             By default, messages are published at QoS 0 with the retain flag set to false.</p>
+            blank, set by <code>msg.qos</code> and <code>msg.retain</code> respectively.
+            By default, messages are published at QoS 0 with the retain flag set to false.</p>
           <p>If <code>msg.payload</code> contains an object it will be converted to JSON
-             before being sent.</p>
+            before being sent.</p>
         </div>
       )
     },
@@ -163,7 +163,7 @@ RED.nodes.registerType('mqtt out',{
     }
   });
 
-RED.nodes.registerType('mqtt-broker',{
+  RED.nodes.registerType('mqtt-broker',{
     category: 'config',
     defaults: {
       server: {value:"",required:true},
@@ -179,55 +179,55 @@ RED.nodes.registerType('mqtt-broker',{
     },
     render: function(){
       return(
-      <div>
         <div>
+          <div>
 
-          <div className="form-row node-input-server">
-            <label htmlFor="node-config-input-server">
-              <i className="fa fa-globe" /> server
-            </label>
-            <input
-              className="input-append-left"
-              type="text"
-              id="node-config-input-server"
-              placeholder="wss://my_mqtt_broker:443" />
+            <div className="form-row node-input-server">
+              <label htmlFor="node-config-input-server">
+                <i className="fa fa-globe" /> server
+              </label>
+              <input
+                className="input-append-left"
+                type="text"
+                id="node-config-input-server"
+                placeholder="wss://my_mqtt_broker:443" />
+            </div>
+
+            <div className="form-row">
+              <label htmlFor="node-config-input-clientId">
+                <i className="fa fa-tag" /> client Id
+              </label>
+              <input type="text" id="node-config-input-clientId" />
+            </div>
+
+            <div className="form-row">
+              <label htmlFor="node-config-input-username">
+                <i className="fa fa-user" /> username
+              </label>
+              <input type="text" id="node-config-input-username" />
+            </div>
+
+            <div className="form-row">
+              <label htmlFor="node-config-input-password">
+                <i className="fa fa-lock" /> password
+              </label>
+              <input type="password" id="node-config-input-password" />
+            </div>
+
+            <div className="form-row">
+              <label htmlFor="node-input-name">
+                <i className="fa fa-tag" /> Name
+              </label>
+              <input type="text"
+                id="node-input-name"
+                placeholder="Name" />
+            </div>
+
           </div>
-
-          <div className="form-row">
-            <label htmlFor="node-config-input-clientId">
-              <i className="fa fa-tag" /> client Id
-            </label>
-            <input type="text" id="node-config-input-clientId" />
-          </div>
-
-          <div className="form-row">
-            <label htmlFor="node-config-input-username">
-              <i className="fa fa-user" /> username
-            </label>
-            <input type="text" id="node-config-input-username" />
-          </div>
-
-          <div className="form-row">
-            <label htmlFor="node-config-input-password">
-              <i className="fa fa-lock" /> password
-            </label>
-            <input type="password" id="node-config-input-password" />
-          </div>
-
-          <div className="form-row">
-            <label htmlFor="node-input-name">
-              <i className="fa fa-tag" /> Name
-            </label>
-            <input type="text"
-              id="node-input-name"
-              placeholder="Name" />
-          </div>
-
         </div>
-      </div>
       );
     },
     renderDescription: () => <p>mqtt connection node</p>
   });
-
 };
+

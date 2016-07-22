@@ -1,8 +1,6 @@
 module.exports = function(RED){
 
-
-
-function ws_oneditprepare() {
+  function ws_oneditprepare() {
     $("#websocket-client-row").show();
 
     // if(this.client) {
@@ -11,49 +9,49 @@ function ws_oneditprepare() {
     // else {
     //     $("#node-input-mode").val('server').change();
     // }
-}
+  }
 
-function ws_oneditsave() {
+  function ws_oneditsave() {
     // if($("#node-input-mode").val() === 'client') {
-        $("#node-input-server").append('<option value="">Dummy</option>');
-        $("#node-input-server").val('');
+    $("#node-input-server").append('<option value="">Dummy</option>');
+    $("#node-input-server").val('');
     // }
     // else {
     //     $("#node-input-client").append('<option value="">Dummy</option>');
     //     $("#node-input-client").val('');
     // }
-}
+  }
 
-function ws_label() {
+  function ws_label() {
     var nodeid = (this.client)?this.client:this.server;
     var wsNode = RED.nodes.node(nodeid);
     return this.name||(wsNode?"[ws] "+wsNode.label():"socketio");
-}
+  }
 
-function ws_validateserver() {
+  function ws_validateserver() {
     if($("#node-input-mode").val() === 'client' || (this.client && !this.server)) {
-        return true;
+      return true;
     }
     else {
-        return RED.nodes.node(this.server) != null;
+      return RED.nodes.node(this.server) != null;
     }
-}
+  }
 
-function ws_validateclient() {
+  function ws_validateclient() {
     if($("#node-input-mode").val() === 'client' || (this.client && !this.server)) {
-        return RED.nodes.node(this.client) != null;
+      return RED.nodes.node(this.client) != null;
     }
     else {
-        return true;
+      return true;
     }
-}
+  }
 
-RED.nodes.registerType('socketio in',{
+  RED.nodes.registerType('socketio in',{
     category: 'input',
     defaults: {
-        name: {value:""},
-        topic: {value:"", required:true},
-        client: {type:"socketio-client", validate: ws_validateclient}
+      name: {value:""},
+      topic: {value:"", required:true},
+      client: {type:"socketio-client", validate: ws_validateclient}
     },
     color:"rgb(215, 215, 160)",
     inputs:0,
@@ -61,7 +59,7 @@ RED.nodes.registerType('socketio in',{
     //icon: "white-globe.png",
     faChar: '&#xf0ac;', //globe
     labelStyle: function() {
-        return this.name?"node_label_italic":"";
+      return this.name?"node_label_italic":"";
     },
     label: ws_label,
     oneditsave: ws_oneditsave,
@@ -106,19 +104,19 @@ RED.nodes.registerType('socketio in',{
         <div>
           <p>Socket.io input node.</p>
           <p>By default, the data received from the WebSocket will be in <b>msg.payload</b>.
-          The socket can be configured to expect a properly formed JSON string, in which
-          case it will parse the JSON and send on the resulting object as the entire message.</p>
-      </div>
+            The socket can be configured to expect a properly formed JSON string, in which
+            case it will parse the JSON and send on the resulting object as the entire message.</p>
+        </div>
       )
     },
     renderDescription: () => <p>input from a socket.io sever</p>
-});
+  });
 
-RED.nodes.registerType('socketio out',{
+  RED.nodes.registerType('socketio out',{
     category: 'output',
     defaults: {
-        name: {value:""},
-        client: {type:"socketio-client", validate: ws_validateclient}
+      name: {value:""},
+      client: {type:"socketio-client", validate: ws_validateclient}
     },
     color:"rgb(215, 215, 160)",
     inputs:1,
@@ -127,7 +125,7 @@ RED.nodes.registerType('socketio out',{
     faChar: '&#xf0ac;', //globe
     align: "right",
     labelStyle: function() {
-        return this.name?"node_label_italic":"";
+      return this.name?"node_label_italic":"";
     },
     label: ws_label,
     oneditsave: ws_oneditsave,
@@ -162,30 +160,30 @@ RED.nodes.registerType('socketio out',{
         <div>
           <p>Socket.io out node.</p>
           <p>By default, <b>msg.payload</b> will be sent over the WebSocket. The socket
-          can be configured to encode the entire message object as a JSON string and send that
-          over the WebSocket.</p>
+            can be configured to encode the entire message object as a JSON string and send that
+            over the WebSocket.</p>
 
           <p>If the message arriving at this node started at a WebSocket In node, the message
-          will be sent back to the client that triggered the flow. Otherwise, the message
-          will be broadcast to all connected clients.</p>
+            will be sent back to the client that triggered the flow. Otherwise, the message
+            will be broadcast to all connected clients.</p>
           <p>If you want to broadcast a message that started at a WebSocket In node, you
-          should delete the <b>msg._session</b> property within the flow</p>.
+            should delete the <b>msg._session</b> property within the flow</p>.
         </div>
       )
     },
     renderDescription: () => <p>output to a socket.io sever</p>
-});
+  });
 
 
-RED.nodes.registerType('socketio-client',{
+  RED.nodes.registerType('socketio-client',{
     category: 'config',
     defaults: {
-        path: {value:"",required:true,validate:RED.validators.regex(/^((?!\/debug\/ws).)*$/) }
+      path: {value:"",required:true,validate:RED.validators.regex(/^((?!\/debug\/ws).)*$/) }
     },
     inputs:0,
     outputs:0,
     label: function() {
-        return this.path;
+      return this.path;
     },
     render: function () {
       return (
@@ -217,7 +215,8 @@ RED.nodes.registerType('socketio-client',{
       )
     },
     renderDescription: () => <p>Connect to a WebSocket Server as a client</p>
- });
+  });
 
 
 };
+

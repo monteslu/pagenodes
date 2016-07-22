@@ -56,31 +56,32 @@ module.exports = function(RED) {
     render: function () {
       return(
         <div>
-        <div className="form-row">
-        <label htmlFor="node-input-name">
-        <i className="fa fa-tag" />
-        <span data-i18n="common.label.name" />
-        </label>
-        <input
-        type="text"
-        id="node-input-name"
-        data-i18n="[placeholder]common.label.name" />
-        </div>
+          <div className="form-row">
+            <label htmlFor="node-input-name">
+              <i className="fa fa-tag" />
+              <span data-i18n="common.label.name" />
+            </label>
+            <input
+              type="text"
+              id="node-input-name"
+              data-i18n="[placeholder]common.label.name" />
+          </div>
         </div>
       )
     },
     renderHelp: function () {
       return (
         <div>
-        <p>
-        This button will inject a specified file into a stream
-        </p>
-        <p>
-        Using the <a href="https://developer.mozilla.org/en-US/docs/Web/API/File">File API</a> to deliver a file into a flow.  This could be used to parse XML or CSV with a function node.
-        </p>
+          <p>
+            This button will inject a specified file into a stream
+          </p>
+          <p>
+            Using the <a href="https://developer.mozilla.org/en-US/docs/Web/API/File">File API</a> to deliver a file into a flow.  This could be used to parse XML or CSV with a function node.
+          </p>
         </div>
       )
     },
     renderDescription: () => <p>Inject a File</p>
   })
 }
+

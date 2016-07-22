@@ -36,15 +36,15 @@ module.exports = function(RED){
       if (type == "default") {
         $('<li><span class="deploy-button-group button-group">'+
           '<a id="btn-deploy" class="deploy-button disabled" href="#"><img id="btn-deploy-icon" src="red/images/deploy-full-o.png"> <span>'+RED._("deploy.deploy")+'</span></a>'+
-            '<a id="btn-deploy-options" data-toggle="dropdown" class="deploy-button" href="#"><i class="fa fa-caret-down"></i></a>'+
-              '</span></li>').prependTo(".header-toolbar");
-              RED.menu.init({id:"btn-deploy-options",
-                            options: [
-                              {id:"deploymenu-item-full",toggle:"deploy-type",icon:"red/images/deploy-full.png",label:RED._("deploy.full"),sublabel:RED._("deploy.fullDesc"),selected: true, onselect:function(s) { if(s){changeDeploymentType("full")}}},
-                              {id:"deploymenu-item-flow",toggle:"deploy-type",icon:"red/images/deploy-flows.png",label:RED._("deploy.modifiedFlows"),sublabel:RED._("deploy.modifiedFlowsDesc"), onselect:function(s) {if(s){changeDeploymentType("flows")}}},
-                              {id:"deploymenu-item-node",toggle:"deploy-type",icon:"red/images/deploy-nodes.png",label:RED._("deploy.modifiedNodes"),sublabel:RED._("deploy.modifiedNodesDesc"),onselect:function(s) { if(s){changeDeploymentType("nodes")}}}
-                            ]
-              });
+          '<a id="btn-deploy-options" data-toggle="dropdown" class="deploy-button" href="#"><i class="fa fa-caret-down"></i></a>'+
+          '</span></li>').prependTo(".header-toolbar");
+        RED.menu.init({id:"btn-deploy-options",
+          options: [
+            {id:"deploymenu-item-full",toggle:"deploy-type",icon:"red/images/deploy-full.png",label:RED._("deploy.full"),sublabel:RED._("deploy.fullDesc"),selected: true, onselect:function(s) { if(s){changeDeploymentType("full")}}},
+            {id:"deploymenu-item-flow",toggle:"deploy-type",icon:"red/images/deploy-flows.png",label:RED._("deploy.modifiedFlows"),sublabel:RED._("deploy.modifiedFlowsDesc"), onselect:function(s) {if(s){changeDeploymentType("flows")}}},
+            {id:"deploymenu-item-node",toggle:"deploy-type",icon:"red/images/deploy-nodes.png",label:RED._("deploy.modifiedNodes"),sublabel:RED._("deploy.modifiedNodesDesc"),onselect:function(s) { if(s){changeDeploymentType("nodes")}}}
+          ]
+        });
       } else if (type == "simple") {
         var label = options.label || RED._("deploy.deploy");
         var icon = 'red/images/deploy-full-o.png';
@@ -54,9 +54,9 @@ module.exports = function(RED){
 
         $('<li><span class="deploy-button-group button-group">'+
           '<a id="btn-deploy" class="deploy-button disabled" href="#">'+
-            (icon?'<img id="btn-deploy-icon" src="'+icon+'"> ':'')+
-              '<span>'+label+'</span></a>'+
-                '</span></li>').prependTo(".header-toolbar");
+          (icon?'<img id="btn-deploy-icon" src="'+icon+'"> ':'')+
+          '<span>'+label+'</span></a>'+
+          '</span></li>').prependTo(".header-toolbar");
       }
 
       $('#btn-deploy').click(function() { save(); });
@@ -89,11 +89,11 @@ module.exports = function(RED){
         ],
         create: function() {
           $("#node-dialog-confirm-deploy").parent().find("div.ui-dialog-buttonpane")
-          .prepend('<div style="height:0; vertical-align: middle; display:inline-block; margin-top: 13px; float:left;">'+
-                   '<input style="vertical-align:top;" type="checkbox" id="node-dialog-confirm-deploy-hide">'+
-                     '<label style="display:inline;" for="node-dialog-confirm-deploy-hide"> do not warn about this again</label>'+
-                       '<input type="hidden" id="node-dialog-confirm-deploy-type">'+
-                         '</div>');
+            .prepend('<div style="height:0; vertical-align: middle; display:inline-block; margin-top: 13px; float:left;">'+
+              '<input style="vertical-align:top;" type="checkbox" id="node-dialog-confirm-deploy-hide">'+
+              '<label style="display:inline;" for="node-dialog-confirm-deploy-hide"> do not warn about this again</label>'+
+              '<input type="hidden" id="node-dialog-confirm-deploy-type">'+
+              '</div>');
         }
       });
 
@@ -184,14 +184,14 @@ module.exports = function(RED){
             $( "#node-dialog-confirm-deploy-type" ).val("unknown");
             $( "#node-dialog-confirm-deploy-unknown" ).show();
             $( "#node-dialog-confirm-deploy-unknown-list" )
-            .html("<li>"+unknownNodes.join("</li><li>")+"</li>");
+              .html("<li>"+unknownNodes.join("</li><li>")+"</li>");
           } else if (hasInvalid && !ignoreDeployWarnings.invalid) {
             showWarning = true;
             $( "#node-dialog-confirm-deploy-type" ).val("invalid");
             $( "#node-dialog-confirm-deploy-config" ).show();
             invalidNodes.sort(sortNodeInfo);
             $( "#node-dialog-confirm-deploy-invalid-list" )
-            .html("<li>"+invalidNodes.map(function(A) { return (A.tab?"["+A.tab+"] ":"")+A.label+" ("+A.type+")"}).join("</li><li>")+"</li>");
+              .html("<li>"+invalidNodes.map(function(A) { return (A.tab?"["+A.tab+"] ":"")+A.label+" ("+A.type+")"}).join("</li><li>")+"</li>");
 
           } else if (hasUnusedConfig && !ignoreDeployWarnings.unusedConfig) {
             showWarning = true;
@@ -201,7 +201,7 @@ module.exports = function(RED){
 
             unusedConfigNodes.sort(sortNodeInfo);
             $( "#node-dialog-confirm-deploy-unused-list" )
-            .html("<li>"+unusedConfigNodes.map(function(A) { return (A.tab?"["+A.tab+"] ":"")+A.label+" ("+A.type+")"}).join("</li><li>")+"</li>");
+              .html("<li>"+unusedConfigNodes.map(function(A) { return (A.tab?"["+A.tab+"] ":"")+A.label+" ("+A.type+")"}).join("</li><li>")+"</li>");
           }
           if (showWarning) {
             $( "#node-dialog-confirm-deploy-hide" ).prop("checked",false);
@@ -291,3 +291,4 @@ module.exports = function(RED){
   })();
 
 };
+

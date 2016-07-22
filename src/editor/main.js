@@ -137,37 +137,37 @@ function toggleRemote(state) {
 
 function loadEditor() {
   RED.menu.init({id:"btn-sidemenu",
-                options: [
-                  {id:"menu-item-sidebar-menu",label:RED._("menu.label.sidebar.sidebar"),options:[
-                    {id:"menu-item-sidebar",label:RED._("menu.label.sidebar.show"),toggle:true,onselect:RED.sidebar.toggleSidebar, selected: true},
-                    null
-                  ]},
-                  {id:"menu-item-status",label:RED._("menu.label.displayStatus"),toggle:true,onselect:toggleStatus, selected: true},
-                  null,
-                  {id:"menu-item-import",label:RED._("menu.label.import"),options:[
-                    {id:"menu-item-import-clipboard",label:RED._("menu.label.clipboard"),onselect:RED.clipboard.import}
-                  ]},
-                  {id:"menu-item-export",label:RED._("menu.label.export"),disabled:true,options:[
-                    {id:"menu-item-export-clipboard",label:RED._("menu.label.clipboard"),disabled:true,onselect:RED.clipboard.export},
-                    //{id:"menu-item-export-library",label:RED._("menu.label.library"),disabled:true,onselect:RED.library.export}
-                  ]},
-                  null,
-                  {id:"menu-item-subflow",label:RED._("menu.label.subflows"), options: [
-                    {id:"menu-item-subflow-create",label:RED._("menu.label.createSubflow"),onselect:RED.subflow.createSubflow},
-                    {id:"menu-item-subflow-convert",label:RED._("menu.label.selectionToSubflow"),disabled:true,onselect:RED.subflow.convertToSubflow},
-                  ]},
-                  null,
-                  {id:"menu-item-workspace",label:RED._("menu.label.flows"),options:[
-                    {id:"menu-item-workspace-add",label:RED._("menu.label.add"),onselect:RED.workspaces.add},
-                    {id:"menu-item-workspace-edit",label:RED._("menu.label.rename"),onselect:RED.workspaces.edit},
-                    {id:"menu-item-workspace-delete",label:RED._("menu.label.delete"),onselect:RED.workspaces.remove},
-                    null
-                  ]},
-                  null,
-                  {id:"menu-item-keyboard-shortcuts",label:RED._("menu.label.keyboardShortcuts"),onselect:RED.keyboard.showHelp},
-                  // {id:"menu-item-help", label: "Pagenodes Website", href: RED.settings.theme("menu.menu-item-help.url","https://github.com/monteslu/pagenodes")},
-                  {id:"menu-item-remote",label:"IoT Remote Buttons",toggle:true,onselect:toggleRemote, selected: false}
-                ]
+    options: [
+      {id:"menu-item-sidebar-menu",label:RED._("menu.label.sidebar.sidebar"),options:[
+        {id:"menu-item-sidebar",label:RED._("menu.label.sidebar.show"),toggle:true,onselect:RED.sidebar.toggleSidebar, selected: true},
+        null
+      ]},
+      {id:"menu-item-status",label:RED._("menu.label.displayStatus"),toggle:true,onselect:toggleStatus, selected: true},
+      null,
+      {id:"menu-item-import",label:RED._("menu.label.import"),options:[
+        {id:"menu-item-import-clipboard",label:RED._("menu.label.clipboard"),onselect:RED.clipboard.import}
+      ]},
+      {id:"menu-item-export",label:RED._("menu.label.export"),disabled:true,options:[
+        {id:"menu-item-export-clipboard",label:RED._("menu.label.clipboard"),disabled:true,onselect:RED.clipboard.export},
+        //{id:"menu-item-export-library",label:RED._("menu.label.library"),disabled:true,onselect:RED.library.export}
+      ]},
+      null,
+      {id:"menu-item-subflow",label:RED._("menu.label.subflows"), options: [
+        {id:"menu-item-subflow-create",label:RED._("menu.label.createSubflow"),onselect:RED.subflow.createSubflow},
+        {id:"menu-item-subflow-convert",label:RED._("menu.label.selectionToSubflow"),disabled:true,onselect:RED.subflow.convertToSubflow},
+      ]},
+      null,
+      {id:"menu-item-workspace",label:RED._("menu.label.flows"),options:[
+        {id:"menu-item-workspace-add",label:RED._("menu.label.add"),onselect:RED.workspaces.add},
+        {id:"menu-item-workspace-edit",label:RED._("menu.label.rename"),onselect:RED.workspaces.edit},
+        {id:"menu-item-workspace-delete",label:RED._("menu.label.delete"),onselect:RED.workspaces.remove},
+        null
+      ]},
+      null,
+      {id:"menu-item-keyboard-shortcuts",label:RED._("menu.label.keyboardShortcuts"),onselect:RED.keyboard.showHelp},
+      // {id:"menu-item-help", label: "Pagenodes Website", href: RED.settings.theme("menu.menu-item-help.url","https://github.com/monteslu/pagenodes")},
+      {id:"menu-item-remote",label:"IoT Remote Buttons",toggle:true,onselect:toggleRemote, selected: false}
+    ]
   });
 
   RED.user.init();
@@ -231,3 +231,4 @@ require('./ui/remote-control')(RED);
 require('./ui/typedInput')(RED);
 
 module.exports = RED;
+

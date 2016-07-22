@@ -1,4 +1,3 @@
-
 const log = require("./log");
 const events = require("./events");
 
@@ -14,24 +13,24 @@ const editorExtensionId = localStorage.PN_PLUGIN_ID || "knmappkjdfbfdomfnbfhchna
 
 
 function rpc(name, params, callback){
-    var message = {
-        type: 'rpc',
-        params: params,
-        name: name
-    };
-    if(callback){
-        rpcId++;
-        message.id = idPrefix + rpcId;
-        rpcCallbacks[message.id] = callback;
-        //TODO handle timeouts?
-    }
+  var message = {
+    type: 'rpc',
+    params: params,
+    name: name
+  };
+  if(callback){
+    rpcId++;
+    message.id = idPrefix + rpcId;
+    rpcCallbacks[message.id] = callback;
+    //TODO handle timeouts?
+  }
 
-    postMessage(message, function(msg){
-      if(msg.error){
-        callback(error);
-        delete rpcCallbacks[message.id];
-      }
-    });
+  postMessage(message, function(msg){
+    if(msg.error){
+      callback(error);
+      delete rpcCallbacks[message.id];
+    }
+  });
 }
 
 function postMessage(message, callback){
@@ -83,8 +82,8 @@ function connect(){
 //function handleRpc(message, function)
 
 function start() {
-    console.log('starting server plugin');
-    connect();
+  console.log('starting server plugin');
+  connect();
 }
 
 function isActive(){
@@ -97,8 +96,9 @@ events.on('rpc_pluginActive', function(data){
 
 
 module.exports = {
-    rpc,
-    start,
-    postMessage,
-    isActive
+  rpc,
+  start,
+  postMessage,
+  isActive
 };
+

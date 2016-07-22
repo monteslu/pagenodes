@@ -41,52 +41,52 @@ function getDevices(req){
         headers: headers
       })
     ])
-    .spread(function(mine, local, unclaimed){
-      console.log('getDevices', mine.status, local.status, unclaimed.status);
-      var allDevices = [];
-      var allDeviceMap;
-      if(mine.status.code === 200){
-        _.forEach(mine.entity.devices, function(d){
-          d.owner = 'MINE';
-          allDevices.push(d);
-        });
-      }
-      allDeviceMap = _.indexBy(allDevices, 'uuid');
-
-      if(local.status.code === 200){
-        _.forEach(local.entity.devices, function(d){
-          d.owner = 'CLAIMED';
-          if(!allDeviceMap[d.uuid]){
-            allDeviceMap[d.uuid] = d;
-          }
-        });
-      }
-
-      if(unclaimed.status.code === 200){
-        _.forEach(unclaimed.entity.devices, function(d){
-         if(allDeviceMap[d.uuid]){
-            allDeviceMap[d.uuid].owner = 'UNCLAIMED';
-          }
-        });
-      }
-
-      var retVal = _.values(allDeviceMap);
-      retVal.sort(function(a, b) {
-        if (a.uuid < b.uuid) {
-          return -1;
+      .spread(function(mine, local, unclaimed){
+        console.log('getDevices', mine.status, local.status, unclaimed.status);
+        var allDevices = [];
+        var allDeviceMap;
+        if(mine.status.code === 200){
+          _.forEach(mine.entity.devices, function(d){
+            d.owner = 'MINE';
+            allDevices.push(d);
+          });
         }
-        if (a.uuid > b.uuid) {
-          return 1;
+        allDeviceMap = _.indexBy(allDevices, 'uuid');
+
+        if(local.status.code === 200){
+          _.forEach(local.entity.devices, function(d){
+            d.owner = 'CLAIMED';
+            if(!allDeviceMap[d.uuid]){
+              allDeviceMap[d.uuid] = d;
+            }
+          });
         }
-        // a must be equal to b
-        return 0;
+
+        if(unclaimed.status.code === 200){
+          _.forEach(unclaimed.entity.devices, function(d){
+            if(allDeviceMap[d.uuid]){
+              allDeviceMap[d.uuid].owner = 'UNCLAIMED';
+            }
+          });
+        }
+
+        var retVal = _.values(allDeviceMap);
+        retVal.sort(function(a, b) {
+          if (a.uuid < b.uuid) {
+            return -1;
+          }
+          if (a.uuid > b.uuid) {
+            return 1;
+          }
+          // a must be equal to b
+          return 0;
+        });
+        return req.reply(retVal);
+      })
+      .otherwise(function(err){
+        console.log('error', err);
+        req.reply({error: err});
       });
-      return req.reply(retVal);
-    })
-    .otherwise(function(err){
-      console.log('error', err);
-      req.reply({error: err});
-    });
   }catch(exp){
     console.log('err', exp);
     req.reply({error: exp});
@@ -95,3 +95,4 @@ function getDevices(req){
 }
 
 module.exports = getDevices;
+

@@ -44,3 +44,4 @@ module.exports = function(RED) {
   }
   RED.nodes.registerType("voice rec",SpeechNode);
 }
+

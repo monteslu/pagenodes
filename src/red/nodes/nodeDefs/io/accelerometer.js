@@ -28,3 +28,4 @@ module.exports = function(RED) {
   }
   RED.nodes.registerType("orientation",AccelerometerNode);
 }
+

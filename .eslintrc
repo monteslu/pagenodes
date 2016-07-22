@@ -15,14 +15,11 @@
   "rules": {
     // Disable `no-console` rule
     "no-console": 0,
-    // Give a warning if identifiers contain underscores
-    "no-underscore-dangle": 1,
-    // Default to single quotes and raise an error if something
-    // else is used
+    "no-underscore-dangle": 0,
     "quotes": 0,
     "no-unused-vars": 1,
     "no-undef": 0,
     "no-extra-semi": 1,
-    "no-case-declarations": 0
+    "no-case-declarations": 0,
   }
 }

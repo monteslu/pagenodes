@@ -55,9 +55,9 @@ function init(RED) {
     });
 
     self.conn.on('error', function(err){
-       console.log('error in meshblu connection', err);
-       self.emit('connError', err);
-       self.error(err);
+      console.log('error in meshblu connection', err);
+      self.emit('connError', err);
+      self.error(err);
     });
 
     self.on('close', function() {
@@ -110,7 +110,7 @@ function init(RED) {
     });
 
     self.serverConfig.on('connError', function(err){
-       self.status({fill:"red",shape:"dot",text:"error"});
+      self.status({fill:"red",shape:"dot",text:"error"});
     });
   }
   meshbluInNode.groupName = 'meshblu';
@@ -206,3 +206,4 @@ function init(RED) {
 }
 
 module.exports = init;
+

@@ -1,5 +1,3 @@
-
-
 //var babel = require('babel');
 const _ = require('lodash');
 const globalContext = require('../globalContext');
@@ -87,3 +85,4 @@ module.exports = function(RED) {
   RED.nodes.registerType("function",FunctionNode);
   RED.library.register("functions");
 }
+

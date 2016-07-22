@@ -103,24 +103,24 @@ function handleGPIOIn({state, pin, nodeId, msg}){
     if (state === 'OUTPUT') {
       try{io.pinMode(pin, io.MODES[state]);}catch(exp){ console.log(exp); }
       if ((msg.payload == true)||(msg.payload == 1)||(msg.payload.toString().toLowerCase() === "on")) {
-          io.digitalWrite(pin, 1);
+        io.digitalWrite(pin, 1);
       }
       if ((msg.payload == false)||(msg.payload == 0)||(msg.payload.toString().toLowerCase() === "off")) {
-          io.digitalWrite(pin, 0);
+        io.digitalWrite(pin, 0);
       }
     }
     else if (state === 'PWM') {
       try{io.pinMode(pin, io.MODES[state]);}catch(exp){ console.log(exp); }
       msg.payload = msg.payload * 1;
       if ((msg.payload >= 0) && (msg.payload <= 255)) {
-          io.analogWrite(pin, msg.payload);
+        io.analogWrite(pin, msg.payload);
       }
     }
     else if (state === 'SERVO') {
       try{io.pinMode(pin, io.MODES[state]);}catch(exp){ console.log(exp); }
       msg.payload = msg.payload * 1;
       if ((msg.payload >= 0) && (msg.payload <= 180)) {
-          io.servoWrite(pin, msg.payload);
+        io.servoWrite(pin, msg.payload);
       }
     }
   }

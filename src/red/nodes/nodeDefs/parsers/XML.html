@@ -1,21 +1,5 @@
-<!--
-  Copyright 2014 IBM Corp.
-
-  Licensed under the Apache License, Version 2.0 (the "License");
-  you may not use this file except in compliance with the License.
-  You may obtain a copy of the License at
-
-  http://www.apache.org/licenses/LICENSE-2.0
-
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the License for the specific language governing permissions and
-  limitations under the License.
--->
-
 <script type="text/x-red" data-template-name="xml">
-    <div class="form-row">
+<div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> <span data-i18n="common.label.name"></span></label>
         <input type="text" id="node-input-name" data-i18n="[placeholder]common.label.name" style="width:280px !important">
     </div>
@@ -33,7 +17,7 @@
 </script>
 
 <script type="text/x-red" data-help-name="xml">
-    <p>A function that parses the <b>msg.payload</b> to convert xml to/from a javascript object. Places the result in the payload.</p>
+<p>A function that parses the <b>msg.payload</b> to convert xml to/from a javascript object. Places the result in the payload.</p>
     <p>If the input is a string it tries to parse it as XML and creates a javascript object.</p>
     <p>If the input is a javascript object it tries to build an XML string.</p>
     <p>You can also pass in a <b>msg.options</b> object to overide all the multitude of parameters. See

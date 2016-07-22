@@ -31,3 +31,4 @@ module.exports = function(RED) {
   }
   RED.nodes.registerType("gamepad",GamepadNode);
 }
+

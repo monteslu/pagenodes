@@ -20,3 +20,4 @@ module.exports = function(req, path){
   // }
   return 'https://' + query.server + ':' + query.port + path;
 };
+

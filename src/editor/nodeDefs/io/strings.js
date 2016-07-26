@@ -117,7 +117,7 @@ module.exports = function(RED){
             </div>
           )
         },
-        renderDescription: () => <p>Preforms Lodash string functions</p>
+        renderDescription: () => <p>Performs Lodash string functions</p>
     });
 
 };

@@ -1,33 +1,4 @@
-var stringFunctions = {
-  camelCase: [],
-  capitalize: [],
-  deburr: [],
-  endsWith: [{param2: 'target'}, {param3: 'position'}],
-  escape: [],
-  escapeRegExp: [],
-  kebabCase: [],
-  lowerCase: [],
-  lowerFirst: [],
-  pad: [{param2: 'length'}, {param3: 'chars'}],
-  padEnd: [{param2: 'length'}, {param3: 'chars'}],
-  padStart: [{param2: 'length'}, {param3: 'chars'}],
-  parseInt: [{param2: 'radix'}],
-  repeat: [{param2: 'n'}],
-  replace: [{param2: 'pattern'}, {param3: "replacement"}],
-  snakeCase: [],
-  split: [{param2: 'separator'}, {param3: 'limit'}],
-  startCase: [],
-  startWith: [{param2: 'target'}, {param3: 'position'}],
-  toLower: [],
-  toUpper: [],
-  trim: [{param2: 'chars'}],
-  trimEnd: [{param2: 'chars'}],
-  trimStart: [{param2: 'chars'}],
-  unescape: [],
-  upperCase: [],
-  upperFirst: [],
-  words: [{param2: 'pattern'}]
-};
+var stringFunctions = require('../../../shared/nodes/strings').stringFunctions;
 
 module.exports = function(RED){
 
@@ -36,7 +7,7 @@ module.exports = function(RED){
         color:"#E2D96E", // yellow like other function nodes
         defaults: {             // defines the editable properties of the node
           name: {value:""},   //  along with default values.
-          mode: {value:"camelCase", required:true},
+          func: {value:"camelCase", required:true},
           param2: {value:"", required: false},
           param3: {value:"", required: false}
         },
@@ -51,10 +22,10 @@ module.exports = function(RED){
         },
 
         oneditprepare: function() {
-          var myFuncDef = stringFunctions[this.mode];
+          var myFuncDef = stringFunctions[this.func];
 
 
-          function handleMode(functionDef) {
+          function handleFunc(functionDef) {
             $("#node-form-row-param2").hide();
             $("#node-form-row-param3").hide();
             functionDef.forEach(function(param) {
@@ -70,20 +41,20 @@ module.exports = function(RED){
             });
           }
 
-          handleMode(myFuncDef);
+          handleFunc(myFuncDef);
 
-          var modeInput = $("#node-input-mode");
-          modeInput.change(function (){
-            console.log('modeInput changed', this.value);
-            handleMode(stringFunctions[this.value]);
+          var funcInput = $("#node-input-func");
+          funcInput.change(function (){
+            console.log('funcInput changed', this.value);
+            handleFunc(stringFunctions[this.value]);
           })
         },
         render: function (){
           return (
             <div>
               <div className="form-row">
-                <label htmlFor="node-input-mode"><i className="fa fa-gears"></i> <span>Func</span></label>
-                <select type="text" id="node-input-mode" style={{width:"74%"}}>
+                <label htmlFor="node-input-func"><i className="fa fa-gears"></i> <span>Func</span></label>
+                <select type="text" id="node-input-func" style={{width:"74%"}}>
                   <option value="camelCase">camelCase</option>
                   <option value="capitalize">capitalize</option>
                   <option value="deburr">deburr</option>
@@ -102,7 +73,7 @@ module.exports = function(RED){
                   <option value="snakeCase">snakeCase</option>
                   <option value="split">split</option>
                   <option value="startCase">startCase</option>
-                  <option value="startWith">startWith</option>
+                  <option value="startsWith">startsWith</option>
                   <option value="toLower">toLower</option>
                   <option value="toUpper">toUpper</option>
                   <option value="trim">trim</option>
@@ -141,8 +112,8 @@ module.exports = function(RED){
             <div>
               <p>Provides <i><a href="https://lodash.com/docs#camelCase" target="_new">Lodash</a></i> string
               functions that use <code>msg.payload</code> as the first parameter.</p>
-              <p>Other paramters beyond the first can be input in the node's configuration.</p>
-              <p>You may also attach <code>msg.param2</code> and/or <code>msg.param3</code> to override the node's configuration.</p>
+              <p>Other paramters beyond the first can be input in this node's configuration.</p>
+              <p>You may also attach <code>msg.param2</code> and/or <code>msg.param3</code> and/or <code>msg.func</code> to override this node's configuration.</p>
             </div>
           )
         },

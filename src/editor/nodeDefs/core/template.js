@@ -90,8 +90,7 @@ module.exports = function(RED){
                 </label>
                 <input
                   type="hidden"
-                  id="node-input-template"
-                  autofocus="autofocus" />
+                  id="node-input-template" />
                 <select
                   id="node-input-format"
                   style={{fontSize: '0.8em', marginBottom: 3, width: 110, float: 'right'}}>

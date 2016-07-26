@@ -1,3 +1,5 @@
+var stringFunctions = require('../../../../shared/nodes/strings').stringFunctions;
+
 module.exports = function(RED) {
   "use strict";
   var _ = require("lodash");
@@ -7,12 +9,13 @@ module.exports = function(RED) {
     RED.nodes.createNode(this,n);
 
     var node = this;
-    node.mode = n.mode;
+    node.func = n.func;
     node.param2 = n.param2;
     node.param3 = n.param3;
 
     this.on("input", function(msg) {
       if (msg.hasOwnProperty("payload")) {
+        var func = node.func;
         var param2, param3;
         if(node.param2){
           param2 = node.param2;
@@ -30,10 +33,14 @@ module.exports = function(RED) {
         if(msg.hasOwnProperty('param3')){
           param3 = msg.param3;
         }
+        if (msg.hasOwnProperty('func')){
+          func = msg.func;
+        }
 
-
-
-        var lodashFunc = _[node.mode];
+        if (!stringFunctions[func]) {
+          return node.error("invalid function")
+        }
+        var lodashFunc = _[func];
         if(lodashFunc){
           msg.payload = lodashFunc(msg.payload, param2, param3);
           node.send(msg);

@@ -29,3 +29,4 @@ const stringFunctions = {
   words: [{param2: 'pattern'}]
 };
 module.exports = {stringFunctions};
+

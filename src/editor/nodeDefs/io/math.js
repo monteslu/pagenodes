@@ -12,7 +12,7 @@ module.exports = function(RED){
         outputs:1,  // set the number of outputs - 0 to n
         faChar: "&#xf1ec;",  //calculator
         label: function() {
-            return this.name||"rbe";
+            return this.name||"math";
         },
         labelStyle: function() {
             return this.name?"node_label_italic":"";

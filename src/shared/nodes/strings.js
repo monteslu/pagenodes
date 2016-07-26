@@ -1,0 +1,32 @@
+const stringFunctions = {
+  camelCase: [],
+  capitalize: [],
+  deburr: [],
+  endsWith: [{param2: 'target'}, {param3: 'position'}],
+  escape: [],
+  escapeRegExp: [],
+  kebabCase: [],
+  lowerCase: [],
+  lowerFirst: [],
+  pad: [{param2: 'length'}, {param3: 'chars'}],
+  padEnd: [{param2: 'length'}, {param3: 'chars'}],
+  padStart: [{param2: 'length'}, {param3: 'chars'}],
+  parseInt: [{param2: 'radix'}],
+  repeat: [{param2: 'n'}],
+  replace: [{param2: 'pattern'}, {param3: "replacement"}],
+  snakeCase: [],
+  split: [{param2: 'separator'}, {param3: 'limit'}],
+  startCase: [],
+  startsWith: [{param2: 'target'}, {param3: 'position'}],
+  toLower: [],
+  toUpper: [],
+  trim: [{param2: 'chars'}],
+  trimEnd: [{param2: 'chars'}],
+  trimStart: [{param2: 'chars'}],
+  unescape: [],
+  upperCase: [],
+  upperFirst: [],
+  words: [{param2: 'pattern'}]
+};
+module.exports = {stringFunctions};
+

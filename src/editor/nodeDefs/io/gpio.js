@@ -918,8 +918,7 @@ module.exports = function(RED){
                 </label>
                 <input
                   type="hidden"
-                  id="node-input-func"
-                  autofocus="autofocus" />
+                  id="node-input-func" />
                 <input type="hidden" id="node-input-noerr" />
               </div>
 

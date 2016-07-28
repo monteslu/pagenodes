@@ -62,3 +62,4 @@ module.exports = function(RED) {
   LocalReadNode.groupName = 'localdb';
   RED.nodes.registerType('localread',LocalReadNode);
 }
+

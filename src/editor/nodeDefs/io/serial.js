@@ -54,7 +54,7 @@ module.exports = function(RED){
 
 
 
-RED.nodes.registerType('serial out',{
+  RED.nodes.registerType('serial out',{
     category: 'hardware',
     defaults: {
       name: {value:""},
@@ -117,7 +117,7 @@ RED.nodes.registerType('serial out',{
 
 
 
-RED.nodes.registerType('serial-port',{
+  RED.nodes.registerType('serial-port',{
     category: 'config',
     defaults: {
       connectionType: {value:"webusb",required:true},
@@ -152,31 +152,31 @@ RED.nodes.registerType('serial-port',{
         $("#node-config-input-serialportName").autocomplete( "destroy" );
       } catch(err) { }
       $("#node-config-lookup-serial").click(function() {
-          $("#node-config-lookup-serial-icon").removeClass('fa-search');
-          $("#node-config-lookup-serial-icon").addClass('spinner');
-          $("#node-config-lookup-serial").addClass('disabled');
+        $("#node-config-lookup-serial-icon").removeClass('fa-search');
+        $("#node-config-lookup-serial-icon").addClass('spinner');
+        $("#node-config-lookup-serial").addClass('disabled');
 
-          RED.comms.rpc('gpio/listSerial', [], function(data){
-              if(data.error){
-                console.log('error searching', data.error);
-                return;
-              }
+        RED.comms.rpc('gpio/listSerial', [], function(data){
+          if(data.error){
+            console.log('error searching', data.error);
+            return;
+          }
 
-              $("#node-config-lookup-serial-icon").addClass('fa-search');
-              $("#node-config-lookup-serial-icon").removeClass('spinner');
-              $("#node-config-lookup-serial").removeClass('disabled');
-              var ports = [];
-              $.each(data, function(i, port){
-                  ports.push(port);
-              });
-              $("#node-config-input-serialportName").autocomplete({
-                  source:ports,
-                  minLength:0,
-                  close: function( event, ui ) {
-                      $("#node-config-input-serialportName").autocomplete( "destroy" );
-                  }
-              }).autocomplete("search","");
+          $("#node-config-lookup-serial-icon").addClass('fa-search');
+          $("#node-config-lookup-serial-icon").removeClass('spinner');
+          $("#node-config-lookup-serial").removeClass('disabled');
+          var ports = [];
+          $.each(data, function(i, port){
+            ports.push(port);
           });
+          $("#node-config-input-serialportName").autocomplete({
+            source:ports,
+            minLength:0,
+            close: function( event, ui ) {
+              $("#node-config-input-serialportName").autocomplete( "destroy" );
+            }
+          }).autocomplete("search","");
+        });
 
       });
 
@@ -186,9 +186,9 @@ RED.nodes.registerType('serial-port',{
         navigator.usb.getDevices().then(function(devices){
           usbOutput.html('Authorized Devices: ' + devices.length);
         })
-        .catch(function(err){
-          usbOutput.html(err);
-        });
+          .catch(function(err){
+            usbOutput.html(err);
+          });
 
         $("#node-config-lookup-usb").click(function() {
           var DEFAULT_FILTERS = [
@@ -198,18 +198,18 @@ RED.nodes.registerType('serial-port',{
           ];
 
           navigator.usb.requestDevice({filters: DEFAULT_FILTERS })
-          .then(function(device){
-            console.log('authorized device', device);
-            navigator.usb.getDevices().then(function(devices){
-              usbOutput.html('Authorized Devices: ' + devices.length);
+            .then(function(device){
+              console.log('authorized device', device);
+              navigator.usb.getDevices().then(function(devices){
+                usbOutput.html('Authorized Devices: ' + devices.length);
+              })
+                .catch(function(err){
+                  usbOutput.html(err);
+                });
             })
             .catch(function(err){
               usbOutput.html(err);
             });
-          })
-          .catch(function(err){
-            usbOutput.html(err);
-          });
 
         });
 
@@ -255,126 +255,127 @@ RED.nodes.registerType('serial-port',{
     },
     render: function(){
       return(
-      <div>
+        <div>
 
-        <div className="form-row" id="node-div-connectionTypeRow">
-          <label htmlFor="node-config-input-connectionType">
-            <i className="fa fa-wrench" /> Connection
-          </label>
-          <select id="node-config-input-connectionType">
-            <option value="webusb">WebUSB Serial</option>
-            <option value="serial">Serial Port (plugin)</option>
-            <option value="tcp">TCP (plugin)</option>
-          </select>
-        </div>
-
-        <div className="form-row" id="node-div-pluginRow">
-          <label>
-          </label>
-          <div id="needHardwareExtensionDiv" className="form-tips">
-            This option requires you to have the <a href="https://chrome.google.com/webstore/detail/hardware-extension-for-pa/knmappkjdfbfdomfnbfhchnaamokjdpj" target="_blank"><span className="hardwareExtension">Chrome Hardware Extension</span></a> installed.
+          <div className="form-row" id="node-div-connectionTypeRow">
+            <label htmlFor="node-config-input-connectionType">
+              <i className="fa fa-wrench" /> Connection
+            </label>
+            <select id="node-config-input-connectionType">
+              <option value="webusb">WebUSB Serial</option>
+              <option value="serial">Serial Port (plugin)</option>
+              <option value="tcp">TCP (plugin)</option>
+            </select>
           </div>
-          <div id="hardwareExtensionOkDiv" className="form-tips">
-            Hardware Extension is active <i className="fa fa-thumbs-up" />
+
+          <div className="form-row" id="node-div-pluginRow">
+            <label>
+            </label>
+            <div id="needHardwareExtensionDiv" className="form-tips">
+              This option requires you to have the <a href="https://chrome.google.com/webstore/detail/hardware-extension-for-pa/knmappkjdfbfdomfnbfhchnaamokjdpj" target="_blank"><span className="hardwareExtension">Chrome Hardware Extension</span></a> installed.
+            </div>
+            <div id="hardwareExtensionOkDiv" className="form-tips">
+              Hardware Extension is active <i className="fa fa-thumbs-up" />
+            </div>
           </div>
-        </div>
 
-        <div className="form-row" id="node-div-serialRow">
-          <label htmlFor="node-config-input-serialportName">
-          <i className="fa fa-random" /> Port
-          </label>
-          <input
-            type="text"
-            id="node-config-input-serialportName"
-            style={{width: '60%'}}
-            placeholder="e.g. /dev/ttyUSB0  COM1" />
-          <a id="node-config-lookup-serial" className="btn">
-            <i
-              id="node-config-lookup-serial-icon"
-              className="fa fa-search" />
-          </a><br/>
+          <div className="form-row" id="node-div-serialRow">
+            <label htmlFor="node-config-input-serialportName">
+              <i className="fa fa-random" /> Port
+            </label>
+            <input
+              type="text"
+              id="node-config-input-serialportName"
+              style={{width: '60%'}}
+              placeholder="e.g. /dev/ttyUSB0  COM1" />
+            <a id="node-config-lookup-serial" className="btn">
+              <i
+                id="node-config-lookup-serial-icon"
+                className="fa fa-search" />
+            </a><br/>
 
-        </div>
+          </div>
 
-        <div className="form-row" id="node-div-baudRow">
-          <label htmlFor="node-config-input-baud">
-          <i className="fa fa-cog" /> Baud
-          </label>
-          <input
-            type="text"
-            id="node-config-input-baud"
-            placeholder="57600" />
-        </div>
+          <div className="form-row" id="node-div-baudRow">
+            <label htmlFor="node-config-input-baud">
+              <i className="fa fa-cog" /> Baud
+            </label>
+            <input
+              type="text"
+              id="node-config-input-baud"
+              placeholder="57600" />
+          </div>
 
 
-        <div className="form-row" id="node-div-usbRow">
-          <label htmlFor="node-config-input-usbName">
-          Authorize USB
-          </label>
-          <span id="node-config-lookup-usb-output">...</span>
-          <a id="node-config-lookup-usb" className="btn">
-            <i
-              id="node-config-lookup-usb-icon"
-              className="fa fa-random" />
-          </a>
-        </div>
+          <div className="form-row" id="node-div-usbRow">
+            <label htmlFor="node-config-input-usbName">
+              Authorize USB
+            </label>
+            <span id="node-config-lookup-usb-output">...</span>
+            <a id="node-config-lookup-usb" className="btn">
+              <i
+                id="node-config-lookup-usb-icon"
+                className="fa fa-random" />
+            </a>
+          </div>
 
-        <div className="form-row" id="node-div-vendorIdRow">
-          <label htmlFor="node-config-input-vendorId">
-          <i className="fa fa-cog" /> vendorId
-          </label>
-          <input
-            type="text"
-            id="node-config-input-vendorId"
-            placeholder="0x2341" />
-        </div>
+          <div className="form-row" id="node-div-vendorIdRow">
+            <label htmlFor="node-config-input-vendorId">
+              <i className="fa fa-cog" /> vendorId
+            </label>
+            <input
+              type="text"
+              id="node-config-input-vendorId"
+              placeholder="0x2341" />
+          </div>
 
-        <div className="form-row" id="node-div-productIdRow">
-          <label htmlFor="node-config-input-productId">
-          <i className="fa fa-cog" /> productId
-          </label>
-          <input
-            type="text"
-            id="node-config-input-productId"
-            placeholder="0x8036" />
-        </div>
+          <div className="form-row" id="node-div-productIdRow">
+            <label htmlFor="node-config-input-productId">
+              <i className="fa fa-cog" /> productId
+            </label>
+            <input
+              type="text"
+              id="node-config-input-productId"
+              placeholder="0x8036" />
+          </div>
 
-        <div
-          className="form-row"
-          id="node-div-tpcHostRow">
-          <label htmlFor="node-config-input-tpcHost">
-            <i className="fa fa-globe" /> Host
+          <div
+            className="form-row"
+            id="node-div-tpcHostRow">
+            <label htmlFor="node-config-input-tpcHost">
+              <i className="fa fa-globe" /> Host
             </label>
             <input
               type="text"
               id="node-config-input-tpcHost" />
-        </div>
+          </div>
 
-        <div
-          className="form-row"
-          id="node-div-tcpPortRow">
-          <label htmlFor="node-config-input-tcpPort">
-            <i className="fa fa-cog" /> port number
+          <div
+            className="form-row"
+            id="node-div-tcpPortRow">
+            <label htmlFor="node-config-input-tcpPort">
+              <i className="fa fa-cog" /> port number
             </label>
             <input
               type="text"
               id="node-config-input-tcpPort" />
+          </div>
+
+
+          <div className="form-row">
+            <label htmlFor="node-input-name">
+              <i className="fa fa-tag" /> Name
+            </label>
+            <input type="text"
+              id="node-input-name"
+              placeholder="Name" />
+          </div>
+
         </div>
-
-
-        <div className="form-row">
-          <label htmlFor="node-input-name">
-            <i className="fa fa-tag" /> Name
-          </label>
-          <input type="text"
-            id="node-input-name"
-            placeholder="Name" />
-        </div>
-
-      </div>
       );
     },
     renderDescription: () => <p>serial connection node</p>
   });
 
 };
+

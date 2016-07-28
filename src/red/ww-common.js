@@ -34,10 +34,10 @@ class Node extends EventEmitter {}
 function createNode(self, throttleTime, nodeId){
   var node = new Node();
   _.assign(node, {
-     log: _.throttle(function(msg){
-       self.postMessage({type: 'log', msg, nodeId});
-     }, throttleTime),
-     error: _.throttle(function(error){
+    log: _.throttle(function(msg){
+      self.postMessage({type: 'log', msg, nodeId});
+    }, throttleTime),
+    error: _.throttle(function(error){
       var msg = {type: 'error', nodeId};
       if(typeof error === 'string'){
         msg.message = error;
@@ -45,17 +45,17 @@ function createNode(self, throttleTime, nodeId){
         msg.message = error.toString();
         msg.stack = error.stack;
       }
-       self.postMessage(msg);
-     }, throttleTime),
-     warn: _.throttle(function(error){
-       self.postMessage({type: 'warn', error, nodeId});
-     }, throttleTime),
-     status: _.throttle(function(status){
-       self.postMessage({type: 'status', status, nodeId});
-     }, throttleTime),
-     send: _.throttle(function(msg){
+      self.postMessage(msg);
+    }, throttleTime),
+    warn: _.throttle(function(error){
+      self.postMessage({type: 'warn', error, nodeId});
+    }, throttleTime),
+    status: _.throttle(function(status){
+      self.postMessage({type: 'status', status, nodeId});
+    }, throttleTime),
+    send: _.throttle(function(msg){
       self.postMessage({type: 'send', msg, nodeId});
-     }, throttleTime)
+    }, throttleTime)
   });
   node.id = nodeId || '';
   events.on('input_' + node.id, function(msg){
@@ -69,7 +69,7 @@ function getId(){
 }
 
 function createStore(self, type){
-   const store = {
+  const store = {
     set: _.throttle(function(key, value, callback){
       var rpcId = getId();
       // console.log('calling set', {key: key, value: value, rpcId: rpcId, type: type + 'Set'});
@@ -123,3 +123,4 @@ module.exports = {
   createStore,
   dispatch
 };
+

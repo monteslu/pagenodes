@@ -3,8 +3,6 @@ var util = require('util');
 
 module.exports = function(RED){
 
-
-
   function PluginSerialPort(type, name, options) {
 
     console.log('new PluginSerialPort', type, name, options);
@@ -94,3 +92,4 @@ module.exports = function(RED){
   };
 
 };
+

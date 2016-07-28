@@ -1,4 +1,3 @@
-
 var registry = require("./registry");
 var credentials = require("./credentials");
 var flows = require("./flows");
@@ -12,10 +11,10 @@ var log = require("../log");
  * @param opts - optional additional options for the node
  */
 function registerType(type,constructor,opts) {
-    if (opts && opts.credentials) {
-        credentials.register(type,opts.credentials);
-    }
-    registry.registerType(type,constructor);
+  if (opts && opts.credentials) {
+    credentials.register(type,opts.credentials);
+  }
+  registry.registerType(type,constructor);
 }
 
 /**
@@ -25,116 +24,116 @@ function registerType(type,constructor,opts) {
  * @param def the instance definition for the node
  */
 function createNode(node,def) {
-    Node.call(node,def);
-    var id = node.id;
-    if (def._alias) {
-        id = def._alias;
-    }
-    var creds = credentials.get(id);
-    if (creds) {
-        //console.log("Attaching credentials to ",node.id);
-        node.credentials = creds;
-    } else if (credentials.getDefinition(node.type)) {
-        node.credentials = {};
-    }
+  Node.call(node,def);
+  var id = node.id;
+  if (def._alias) {
+    id = def._alias;
+  }
+  var creds = credentials.get(id);
+  if (creds) {
+    //console.log("Attaching credentials to ",node.id);
+    node.credentials = creds;
+  } else if (credentials.getDefinition(node.type)) {
+    node.credentials = {};
+  }
 }
 
 function init(_settings,storage) {
-    credentials.init(storage);
-    flows.init(_settings,storage);
-    registry.init(_settings);
+  credentials.init(storage);
+  flows.init(_settings,storage);
+  registry.init(_settings);
 }
 
 function checkTypeInUse(id) {
-    var nodeInfo = registry.getNodeInfo(id);
-    if (!nodeInfo) {
-        throw new Error(log._("nodes.index.unrecognised-id", {id:id}));
-    } else {
-        var inUse = {};
-        var config = flows.getFlows();
-        config.forEach(function(n) {
-            inUse[n.type] = (inUse[n.type]||0)+1;
-        });
-        var nodesInUse = [];
-        nodeInfo.types.forEach(function(t) {
-            if (inUse[t]) {
-                nodesInUse.push(t);
-            }
-        });
-        if (nodesInUse.length > 0) {
-            var msg = nodesInUse.join(", ");
-            var err = new Error(log._("nodes.index.type-in-use", {msg:msg}));
-            err.code = "type_in_use";
-            throw err;
-        }
+  var nodeInfo = registry.getNodeInfo(id);
+  if (!nodeInfo) {
+    throw new Error(log._("nodes.index.unrecognised-id", {id:id}));
+  } else {
+    var inUse = {};
+    var config = flows.getFlows();
+    config.forEach(function(n) {
+      inUse[n.type] = (inUse[n.type]||0)+1;
+    });
+    var nodesInUse = [];
+    nodeInfo.types.forEach(function(t) {
+      if (inUse[t]) {
+        nodesInUse.push(t);
+      }
+    });
+    if (nodesInUse.length > 0) {
+      var msg = nodesInUse.join(", ");
+      var err = new Error(log._("nodes.index.type-in-use", {msg:msg}));
+      err.code = "type_in_use";
+      throw err;
     }
+  }
 }
 
 function removeNode(id) {
-    checkTypeInUse(id);
-    return registry.removeNode(id);
+  checkTypeInUse(id);
+  return registry.removeNode(id);
 }
 
 function removeModule(module) {
-    var info = registry.getModuleInfo(module);
-    if (!info) {
-        throw new Error(log._("nodes.index.unrecognised-module", {module:module}));
-    } else {
-        for (var i=0;i<info.nodes.length;i++) {
-            checkTypeInUse(module+"/"+info.nodes[i].name);
-        }
-        return registry.removeModule(module);
+  var info = registry.getModuleInfo(module);
+  if (!info) {
+    throw new Error(log._("nodes.index.unrecognised-module", {module:module}));
+  } else {
+    for (var i=0;i<info.nodes.length;i++) {
+      checkTypeInUse(module+"/"+info.nodes[i].name);
     }
+    return registry.removeModule(module);
+  }
 }
 
 function disableNode(id) {
-    checkTypeInUse(id);
-    return registry.disableNode(id);
+  checkTypeInUse(id);
+  return registry.disableNode(id);
 }
 
 module.exports = {
-    // Lifecycle
-    init: init,
-    load: registry.load,
+  // Lifecycle
+  init: init,
+  load: registry.load,
 
-    // Node registry
-    createNode: createNode,
-    getNode: flows.get,
-    eachNode: flows.eachNode,
+  // Node registry
+  createNode: createNode,
+  getNode: flows.get,
+  eachNode: flows.eachNode,
 
-    addFile: registry.addFile,
-    addModule: registry.addModule,
-    removeModule: removeModule,
+  addFile: registry.addFile,
+  addModule: registry.addModule,
+  removeModule: removeModule,
 
-    enableNode: registry.enableNode,
-    disableNode: disableNode,
+  enableNode: registry.enableNode,
+  disableNode: disableNode,
 
-    // Node type registry
-    registry: registry,
-    registerType: registerType,
-    getType: registry.get,
+  // Node type registry
+  registry: registry,
+  registerType: registerType,
+  getType: registry.get,
 
-    getNodeInfo: registry.getNodeInfo,
-    getNodeList: registry.getNodeList,
+  getNodeInfo: registry.getNodeInfo,
+  getNodeList: registry.getNodeList,
 
-    getModuleInfo: registry.getModuleInfo,
+  getModuleInfo: registry.getModuleInfo,
 
-    getNodeConfigs: registry.getNodeConfigs,
-    getNodeConfig: registry.getNodeConfig,
+  getNodeConfigs: registry.getNodeConfigs,
+  getNodeConfig: registry.getNodeConfig,
 
-    clearRegistry: registry.clear,
-    cleanModuleList: registry.cleanModuleList,
+  clearRegistry: registry.clear,
+  cleanModuleList: registry.cleanModuleList,
 
-    // Flow handling
-    loadFlows: flows.load,
-    stopFlows: flows.stopFlows,
-    setFlows: flows.setFlows,
-    getFlows: flows.getFlows,
+  // Flow handling
+  loadFlows: flows.load,
+  stopFlows: flows.stopFlows,
+  setFlows: flows.setFlows,
+  getFlows: flows.getFlows,
 
-    // Credentials
-    addCredentials: credentials.add,
-    getCredentials: credentials.get,
-    deleteCredentials: credentials.delete
+  // Credentials
+  addCredentials: credentials.add,
+  getCredentials: credentials.get,
+  deleteCredentials: credentials.delete
 
 };
 

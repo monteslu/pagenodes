@@ -57,187 +57,187 @@ const requiredNodes = [
 
 
 events.on("node-locales-dir", function (info) {
-    i18n.registerMessageCatalog(info.namespace, info.dir, info.file);
+  i18n.registerMessageCatalog(info.namespace, info.dir, info.file);
 });
 
 function init(_settings) {
-    settings = _settings;
-    localfilesystem.init(settings);
-    RED = require('../../pn');
+  settings = _settings;
+  localfilesystem.init(settings);
+  RED = require('../../pn');
 }
 
 function load(defaultNodesDir, disableNodePathScan) {
-    // To skip node scan, the following line will use the stored node list.
-    // We should expose that as an option at some point, although the
-    // performance gains are minimal.
-    //return loadNodeFiles(registry.getModuleList());
+  // To skip node scan, the following line will use the stored node list.
+  // We should expose that as an option at some point, although the
+  // performance gains are minimal.
+  //return loadNodeFiles(registry.getModuleList());
 
-    for(var i in requiredNodes){
-        requiredNodes[i](RED);
+  for(var i in requiredNodes){
+    requiredNodes[i](RED);
+  }
+
+  extras.loadBackend(RED);
+
+  console.log('Loaded Nodes', RED.nodes.registry.nodeConstructors);
+
+  // var nodeFiles = localfilesystem.getNodeFiles(defaultNodesDir, disableNodePathScan);
+  var nodeGroups = {};
+  var nodeFiles = {
+    "node-red": {
+      name: "node-red",
+      version: "1.0.0",
+      nodes: nodeGroups
     }
+  };
 
-    extras.loadBackend(RED);
-
-    console.log('Loaded Nodes', RED.nodes.registry.nodeConstructors);
-
-    // var nodeFiles = localfilesystem.getNodeFiles(defaultNodesDir, disableNodePathScan);
-    var nodeGroups = {};
-    var nodeFiles = {
-        "node-red": {
-            name: "node-red",
-            version: "1.0.0",
-            nodes: nodeGroups
-        }
-    };
-
-    _.forEach(RED.nodes.registry.nodeConstructors, function(type, i){
-        var groupName = type.groupName || i;
-        nodeGroups[groupName] = nodeGroups[groupName] || {name: groupName, module: "node-red", types: [], file: groupName + '.js'};
-        nodeGroups[groupName].types.push(i);
-    });
-    return loadNodeFiles(nodeFiles);
+  _.forEach(RED.nodes.registry.nodeConstructors, function(type, i){
+    var groupName = type.groupName || i;
+    nodeGroups[groupName] = nodeGroups[groupName] || {name: groupName, module: "node-red", types: [], file: groupName + '.js'};
+    nodeGroups[groupName].types.push(i);
+  });
+  return loadNodeFiles(nodeFiles);
 }
 
 function loadNodeFiles(nodeFiles) {
-    var promises = [];
-    for (var module in nodeFiles) {
-        /* istanbul ignore else */
-        if (nodeFiles.hasOwnProperty(module)) {
-            if (nodeFiles[module].redVersion && !semver.satisfies(RED.version().replace("-git", ""), nodeFiles[module].redVersion)) {
-                //TODO: log it
-                continue;
-            }
-            if (module == "node-red" || !registry.getModuleInfo(module)) {
-                var first = true;
-                for (var node in nodeFiles[module].nodes) {
-                    /* istanbul ignore else */
-                    if (nodeFiles[module].nodes.hasOwnProperty(node)) {
+  var promises = [];
+  for (var module in nodeFiles) {
+    /* istanbul ignore else */
+    if (nodeFiles.hasOwnProperty(module)) {
+      if (nodeFiles[module].redVersion && !semver.satisfies(RED.version().replace("-git", ""), nodeFiles[module].redVersion)) {
+        //TODO: log it
+        continue;
+      }
+      if (module == "node-red" || !registry.getModuleInfo(module)) {
+        var first = true;
+        for (var node in nodeFiles[module].nodes) {
+          /* istanbul ignore else */
+          if (nodeFiles[module].nodes.hasOwnProperty(node)) {
 
-                        try {
-                            promises.push(loadNodeConfig(nodeFiles[module].nodes[node]));
-                        } catch (err) {
-                            //
-                        }
-                    }
-                }
+            try {
+              promises.push(loadNodeConfig(nodeFiles[module].nodes[node]));
+            } catch (err) {
+              //
             }
+          }
         }
+      }
     }
-    return when.settle(promises).then(function (results) {
-        var nodes = results.map(function (r) {
-            registry.addNodeSet(r.value.id, r.value, r.value.version);
-            return r.value;
-        });
-        return loadNodeSetList(nodes);
+  }
+  return when.settle(promises).then(function (results) {
+    var nodes = results.map(function (r) {
+      registry.addNodeSet(r.value.id, r.value, r.value.version);
+      return r.value;
     });
+    return loadNodeSetList(nodes);
+  });
 }
 
 function loadNodeConfig(fileInfo) {
-    return when.promise(function (resolve) {
-        var file = fileInfo.file;
-        var module = fileInfo.module;
-        var name = fileInfo.name;
-        var version = fileInfo.version;
+  return when.promise(function (resolve) {
+    var file = fileInfo.file;
+    var module = fileInfo.module;
+    var name = fileInfo.name;
+    var version = fileInfo.version;
 
-        var id = module + "/" + name;
-        var info = registry.getNodeInfo(id);
-        var isEnabled = true;
-        if (info) {
-            if (info.hasOwnProperty("loaded")) {
-                throw new Error(file + " already loaded");
-            }
-            isEnabled = info.enabled;
-        }
+    var id = module + "/" + name;
+    var info = registry.getNodeInfo(id);
+    var isEnabled = true;
+    if (info) {
+      if (info.hasOwnProperty("loaded")) {
+        throw new Error(file + " already loaded");
+      }
+      isEnabled = info.enabled;
+    }
 
-        var node = {
-            id: id,
-            module: module,
-            name: name,
-            file: file,
-            template: file.replace(/\.js$/, ".html"),
-            enabled: isEnabled,
-            loaded: false,
-            version: version
-        };
-        if (fileInfo.hasOwnProperty("types")) {
-            node.types = fileInfo.types;
-        }
+    var node = {
+      id: id,
+      module: module,
+      name: name,
+      file: file,
+      template: file.replace(/\.js$/, ".html"),
+      enabled: isEnabled,
+      loaded: false,
+      version: version
+    };
+    if (fileInfo.hasOwnProperty("types")) {
+      node.types = fileInfo.types;
+    }
 
-        // fs.readFile(node.template, 'utf8', function (err, content) {
-            // if (err) {
-            //     node.types = [];
-            //     if (err.code === 'ENOENT') {
-            //         if (!node.types) {
-            //             node.types = [];
-            //         }
-            //         node.err = "Error: " + file + " does not exist";
-            //     } else {
-            //         node.types = [];
-            //         node.err = err.toString();
-            //     }
-            //     resolve(node);
-            // } else {
+    // fs.readFile(node.template, 'utf8', function (err, content) {
+    // if (err) {
+    //     node.types = [];
+    //     if (err.code === 'ENOENT') {
+    //         if (!node.types) {
+    //             node.types = [];
+    //         }
+    //         node.err = "Error: " + file + " does not exist";
+    //     } else {
+    //         node.types = [];
+    //         node.err = err.toString();
+    //     }
+    //     resolve(node);
+    // } else {
 
-                // var content = nodeContents[node.template];
+    // var content = nodeContents[node.template];
 
-                // var types = [];
+    // var types = [];
 
-                // var regExp = /<script ([^>]*)data-template-name=['"]([^'"]*)['"]/gi;
-                // var match = null;
+    // var regExp = /<script ([^>]*)data-template-name=['"]([^'"]*)['"]/gi;
+    // var match = null;
 
-                // while ((match = regExp.exec(content)) !== null) {
-                //     types.push(match[2]);
-                // }
-                // node.types = types;
+    // while ((match = regExp.exec(content)) !== null) {
+    //     types.push(match[2]);
+    // }
+    // node.types = types;
 
-                // var langRegExp = /^<script[^>]* data-lang=['"](.+?)['"]/i;
-                // regExp = /(<script[^>]* data-help-name=[\s\S]*?<\/script>)/gi;
-                // match = null;
-                // var mainContent = "";
-                // var helpContent = {};
-                // var index = 0;
-                // while ((match = regExp.exec(content)) !== null) {
-                //     mainContent += content.substring(index, regExp.lastIndex - match[1].length);
-                //     index = regExp.lastIndex;
-                //     var help = content.substring(regExp.lastIndex - match[1].length, regExp.lastIndex);
+    // var langRegExp = /^<script[^>]* data-lang=['"](.+?)['"]/i;
+    // regExp = /(<script[^>]* data-help-name=[\s\S]*?<\/script>)/gi;
+    // match = null;
+    // var mainContent = "";
+    // var helpContent = {};
+    // var index = 0;
+    // while ((match = regExp.exec(content)) !== null) {
+    //     mainContent += content.substring(index, regExp.lastIndex - match[1].length);
+    //     index = regExp.lastIndex;
+    //     var help = content.substring(regExp.lastIndex - match[1].length, regExp.lastIndex);
 
-                //     var lang = "en-US";
-                //     if ((match = langRegExp.exec(help)) !== null) {
-                //         lang = match[1];
-                //     }
-                //     if (!helpContent.hasOwnProperty(lang)) {
-                //         helpContent[lang] = "";
-                //     }
+    //     var lang = "en-US";
+    //     if ((match = langRegExp.exec(help)) !== null) {
+    //         lang = match[1];
+    //     }
+    //     if (!helpContent.hasOwnProperty(lang)) {
+    //         helpContent[lang] = "";
+    //     }
 
-                //     helpContent[lang] += help;
-                // }
-                // mainContent += content.substring(index);
+    //     helpContent[lang] += help;
+    // }
+    // mainContent += content.substring(index);
 
-                //node.config = mainContent;
-                //node.help = helpContent;
-                node.help = {"en-US": ""};
-                // TODO: parse out the javascript portion of the template
-                //node.script = "";
-                // for (var i = 0; i < node.types.length; i++) {
-                //     if (registry.getTypeId(node.types[i])) {
-                //         node.err = node.types[i] + " already registered";
-                //         break;
-                //     }
-                // }
-                // fs.stat(path.join(path.dirname(file), "locales"), function (err, stat) {
-                //     if (!err) {
-                //         node.namespace = node.id;
-                //         i18n.registerMessageCatalog(node.id, path.join(path.dirname(file), "locales"), path.basename(file, ".js") + ".json").then(function () {
-                //             resolve(node);
-                //         });
-                //     } else {
-                        node.namespace = node.module;
-                        resolve(node);
-                //     }
-                // });
-           // }
-        // });
-    });
+    //node.config = mainContent;
+    //node.help = helpContent;
+    node.help = {"en-US": ""};
+    // TODO: parse out the javascript portion of the template
+    //node.script = "";
+    // for (var i = 0; i < node.types.length; i++) {
+    //     if (registry.getTypeId(node.types[i])) {
+    //         node.err = node.types[i] + " already registered";
+    //         break;
+    //     }
+    // }
+    // fs.stat(path.join(path.dirname(file), "locales"), function (err, stat) {
+    //     if (!err) {
+    //         node.namespace = node.id;
+    //         i18n.registerMessageCatalog(node.id, path.join(path.dirname(file), "locales"), path.basename(file, ".js") + ".json").then(function () {
+    //             resolve(node);
+    //         });
+    //     } else {
+    node.namespace = node.module;
+    resolve(node);
+    //     }
+    // });
+    // }
+    // });
+  });
 }
 
 //function getAPIForNode(node) {
@@ -261,154 +261,155 @@ function loadNodeConfig(fileInfo) {
  *
  */
 function loadNodeSet(node) {
-    var nodeDir = path.dirname(node.file);
-    var nodeFn = path.basename(node.file);
-    if (!node.enabled) {
-        return when.resolve(node);
-    } else {}
-    try {
-        var loadPromise = null;
-        var r = requiredNodes[node.file]; //require(node.file);
-        if (typeof r === "function") {
+  var nodeDir = path.dirname(node.file);
+  var nodeFn = path.basename(node.file);
+  if (!node.enabled) {
+    return when.resolve(node);
+  } else {}
+  try {
+    var loadPromise = null;
+    var r = requiredNodes[node.file]; //require(node.file);
+    if (typeof r === "function") {
 
-            var red = {};
-            for (var i in RED) {
-                if (RED.hasOwnProperty(i) && !/^(init|start|stop)$/.test(i)) {
-                    var propDescriptor = Object.getOwnPropertyDescriptor(RED, i);
-                    Object.defineProperty(red, i, propDescriptor);
-                }
-            }
-            red["_"] = function () {
-                var args = Array.prototype.slice.call(arguments, 0);
-                args[0] = node.namespace + ":" + args[0];
-                return i18n._.apply(null, args);
-            };
-            var promise = null; //r(red);
-            if (promise != null && typeof promise.then === "function") {
-                loadPromise = promise.then(function () {
-                    node.enabled = true;
-                    node.loaded = true;
-                    return node;
-                }).catch(function (err) {
-                    node.err = err;
-                    return node;
-                });
-            }
+      var red = {};
+      for (var i in RED) {
+        if (RED.hasOwnProperty(i) && !/^(init|start|stop)$/.test(i)) {
+          var propDescriptor = Object.getOwnPropertyDescriptor(RED, i);
+          Object.defineProperty(red, i, propDescriptor);
         }
-        if (loadPromise == null) {
-            node.enabled = true;
-            node.loaded = true;
-            loadPromise = when.resolve(node);
-        }
-        return loadPromise;
-    } catch (err) {
-        node.err = err;
-        return when.resolve(node);
+      }
+      red["_"] = function () {
+        var args = Array.prototype.slice.call(arguments, 0);
+        args[0] = node.namespace + ":" + args[0];
+        return i18n._.apply(null, args);
+      };
+      var promise = null; //r(red);
+      if (promise != null && typeof promise.then === "function") {
+        loadPromise = promise.then(function () {
+          node.enabled = true;
+          node.loaded = true;
+          return node;
+        }).catch(function (err) {
+          node.err = err;
+          return node;
+        });
+      }
     }
+    if (loadPromise == null) {
+      node.enabled = true;
+      node.loaded = true;
+      loadPromise = when.resolve(node);
+    }
+    return loadPromise;
+  } catch (err) {
+    node.err = err;
+    return when.resolve(node);
+  }
 }
 
 function loadNodeSetList(nodes) {
-    var promises = [];
-    nodes.forEach(function (node) {
-        if (!node.err) {
-            promises.push(loadNodeSet(node));
-        } else {
-            promises.push(node);
-        }
-    });
+  var promises = [];
+  nodes.forEach(function (node) {
+    if (!node.err) {
+      promises.push(loadNodeSet(node));
+    } else {
+      promises.push(node);
+    }
+  });
 
-    return when.settle(promises).then(function () {
-        if (settings.available()) {
-            return registry.saveNodeList();
-        } else {
-            return;
-        }
-    });
+  return when.settle(promises).then(function () {
+    if (settings.available()) {
+      return registry.saveNodeList();
+    } else {
+      return;
+    }
+  });
 }
 
 function addModule(module) {
-    if (!settings.available()) {
-        throw new Error("Settings unavailable");
-    }
-    var nodes = [];
-    if (registry.getModuleInfo(module)) {
-        // TODO: nls
-        var e = new Error("module_already_loaded");
-        e.code = "module_already_loaded";
-        return when.reject(e);
-    }
-    try {
-        var moduleFiles = localfilesystem.getModuleFiles(module);
-        return loadNodeFiles(moduleFiles);
-    } catch (err) {
-        return when.reject(err);
-    }
+  if (!settings.available()) {
+    throw new Error("Settings unavailable");
+  }
+  var nodes = [];
+  if (registry.getModuleInfo(module)) {
+    // TODO: nls
+    var e = new Error("module_already_loaded");
+    e.code = "module_already_loaded";
+    return when.reject(e);
+  }
+  try {
+    var moduleFiles = localfilesystem.getModuleFiles(module);
+    return loadNodeFiles(moduleFiles);
+  } catch (err) {
+    return when.reject(err);
+  }
 }
 
 function addFile(file) {
-    if (!settings.available()) {
-        throw new Error("Settings unavailable");
-    }
-    var info = registry.getNodeInfo("node-red/" + path.basename(file).replace(/^\d+-/, "").replace(/\.js$/, ""));
-    if (info) {
-        var err = new Error("File already loaded");
-        err.code = "file_already_loaded";
-        return when.reject(err);
-    }
-    var nodeFiles = localfilesystem.getLocalFile(file);
-    if (nodeFiles) {
-        var fileObj = {};
-        fileObj[nodeFiles.module] = {
-            name: nodeFiles.module,
-            version: nodeFiles.version,
-            nodes: {}
-        };
-        fileObj[nodeFiles.module].nodes[nodeFiles.name] = nodeFiles;
+  if (!settings.available()) {
+    throw new Error("Settings unavailable");
+  }
+  var info = registry.getNodeInfo("node-red/" + path.basename(file).replace(/^\d+-/, "").replace(/\.js$/, ""));
+  if (info) {
+    var err = new Error("File already loaded");
+    err.code = "file_already_loaded";
+    return when.reject(err);
+  }
+  var nodeFiles = localfilesystem.getLocalFile(file);
+  if (nodeFiles) {
+    var fileObj = {};
+    fileObj[nodeFiles.module] = {
+      name: nodeFiles.module,
+      version: nodeFiles.version,
+      nodes: {}
+    };
+    fileObj[nodeFiles.module].nodes[nodeFiles.name] = nodeFiles;
 
-        return loadNodeFiles(fileObj);
-    } else {
-        var e = new Error();
-        e.code = 404;
-        return when.reject(e);
-    }
+    return loadNodeFiles(fileObj);
+  } else {
+    var e = new Error();
+    e.code = 404;
+    return when.reject(e);
+  }
 }
 
 function loadNodeHelp(node, lang) {
-    var dir = path.dirname(node.template);
-    var base = path.basename(node.template);
-    var localePath = path.join(dir, "locales", lang, base);
-    try {
-        // TODO: make this async
-        var content = fs.readFileSync(localePath, "utf8");
-        return content;
-    } catch (err) {
-        return null;
-    }
+  var dir = path.dirname(node.template);
+  var base = path.basename(node.template);
+  var localePath = path.join(dir, "locales", lang, base);
+  try {
+    // TODO: make this async
+    var content = fs.readFileSync(localePath, "utf8");
+    return content;
+  } catch (err) {
+    return null;
+  }
 }
 
 function getNodeHelp(node, lang) {
-    if (!node.help[lang]) {
-        var help = loadNodeHelp(node, lang);
-        if (help == null) {
-            var langParts = lang.split("-");
-            if (langParts.length == 2) {
-                help = loadNodeHelp(node, langParts[0]);
-            }
-        }
-        if (help) {
-            node.help[lang] = help;
-        } else {
-            node.help[lang] = node.help["en-US"];
-        }
+  if (!node.help[lang]) {
+    var help = loadNodeHelp(node, lang);
+    if (help == null) {
+      var langParts = lang.split("-");
+      if (langParts.length == 2) {
+        help = loadNodeHelp(node, langParts[0]);
+      }
     }
-    return node.help[lang];
+    if (help) {
+      node.help[lang] = help;
+    } else {
+      node.help[lang] = node.help["en-US"];
+    }
+  }
+  return node.help[lang];
 }
 
 module.exports = {
-    init: init,
-    load: load,
-    addModule: addModule,
-    addFile: addFile,
-    loadNodeSet: loadNodeSet,
-    getNodeHelp: getNodeHelp
+  init: init,
+  load: load,
+  addModule: addModule,
+  addFile: addFile,
+  loadNodeSet: loadNodeSet,
+  getNodeHelp: getNodeHelp
 };
+

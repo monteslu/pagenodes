@@ -288,14 +288,15 @@ module.exports = function(RED){
           <p>
             When a message arrives, the selected property is evaluated against each
             of the defined rules. The message is then sent to the output of <i>all</i>
-          rules that pass.
-        </p>
-        <p>
-          Note: the <i>otherwise</i> rule applies as a "not any of" the rules preceding it.
-        </p>
-      </div>
+            rules that pass.
+          </p>
+          <p>
+            Note: the <i>otherwise</i> rule applies as a "not any of" the rules preceding it.
+          </p>
+        </div>
       )
     },
     renderDescription: () => <p>Route messages based off properties</p>
   });
 };
+

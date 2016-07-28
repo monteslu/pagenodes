@@ -25,13 +25,13 @@ function claim(req){
       method: 'PUT',
       headers: headers
     })
-    .then(function(data){
-      return req.reply({uuid: req.query.toClaim});
-    })
-    .otherwise(function(err){
-      console.log('error', err);
-      req.reply({error: err});
-    });
+      .then(function(data){
+        return req.reply({uuid: req.query.toClaim});
+      })
+      .otherwise(function(err){
+        console.log('error', err);
+        req.reply({error: err});
+      });
   }catch(exp){
     console.log('err', exp);
     req.reply({error: exp});
@@ -39,3 +39,4 @@ function claim(req){
 }
 
 module.exports = claim;
+

@@ -36,9 +36,9 @@ module.exports = function(RED){
           var container = $('<li/>',{class:"node-input-target-node"});
           var row = $('<label/>',{for:"node-input-target-node-"+n.id}).appendTo(container);
           $('<input>',{type:"checkbox",class:"node-input-target-node-checkbox",id:"node-input-target-node-"+n.id})
-          .data('node-id',n.id)
-          .prop('checked', isChecked)
-          .appendTo(row);
+            .data('node-id',n.id)
+            .prop('checked', isChecked)
+            .appendTo(row);
           container.on('mouseover',function(e) {
             n.highlighted = true;
             n.dirty = true;
@@ -193,7 +193,7 @@ module.exports = function(RED){
     render: function () {
       return (
         <div>
-        <style> {`
+          <style> {`
           #node-input-status-target-container {
           position: relative;
           }
@@ -226,50 +226,51 @@ module.exports = function(RED){
           background: #fbfbfb;
           }
           `} </style>
-          <div className="form-row">
+        <div className="form-row">
           <label style={{ width: "auto"  }} htmlFor="node-input-scope" data-i18n="status.label.source"></label>
-            <select id="node-input-scope-select">
-          <option value="all" data-i18n="status.scope.all"></option>
-          <option value="target" data-i18n="status.scope.selected"></option>
+          <select id="node-input-scope-select">
+            <option value="all" data-i18n="status.scope.all"></option>
+            <option value="target" data-i18n="status.scope.selected"></option>
           </select>
-          </div>
-          <div className="form-row node-input-target-row" style={{ display: none }}>
+        </div>
+        <div className="form-row node-input-target-row" style={{ display: none }}>
           <div id="node-input-status-target-container-div" style={{ position: "relative", boxSizing: "border-box", borderRadius: "2px", height: "180px", border: "1px solid #ccc", overflow: "hidden"  }}>
-          <div style={{ boxSizing: "border-box", lineHeight: "20px", fontSize: "0.8em", borderBottom: "1px solid #ddd", height: "20px" }}>
-          <input type="checkbox" data-i18n="[title]status.label.selectAll" id="node-input-target-node-checkbox-all" style={{ width: "30px", margin: "0 2px 1px 2px", }}/>
-          <div style={{ display: "inline-block" }}><a id="node-input-target-sort-label" href="#" data-i18n="[title]status.label.sortByLabel"><span data-i18n="status.label.node"></span> <i className="node-input-status-sort-label-a fa fa-caret-down"></i><i className="node-input-status-sort-label-d fa fa-caret-up"></i></a></div>
-          <div style={{ position: "absolute", right: "10px", width: "50px", display: "inline-block", textAlign: "right" }}><a id="node-input-target-sort-type" href="#" data-i18n="[title]status.label.sortByType"><i className="node-input-status-sort-sublabel-a fa fa-caret-down"></i><i class="node-input-status-sort-sublabel-d fa fa-caret-up"></i> <span data-i18n="status.label.type"></span></a></div>
+            <div style={{ boxSizing: "border-box", lineHeight: "20px", fontSize: "0.8em", borderBottom: "1px solid #ddd", height: "20px" }}>
+              <input type="checkbox" data-i18n="[title]status.label.selectAll" id="node-input-target-node-checkbox-all" style={{ width: "30px", margin: "0 2px 1px 2px", }}/>
+              <div style={{ display: "inline-block" }}><a id="node-input-target-sort-label" href="#" data-i18n="[title]status.label.sortByLabel"><span data-i18n="status.label.node"></span> <i className="node-input-status-sort-label-a fa fa-caret-down"></i><i className="node-input-status-sort-label-d fa fa-caret-up"></i></a></div>
+              <div style={{ position: "absolute", right: "10px", width: "50px", display: "inline-block", textAlign: "right" }}><a id="node-input-target-sort-type" href="#" data-i18n="[title]status.label.sortByType"><i className="node-input-status-sort-sublabel-a fa fa-caret-down"></i><i class="node-input-status-sort-sublabel-d fa fa-caret-up"></i> <span data-i18n="status.label.type"></span></a></div>
+            </div>
+            <div style={{ background: "fbfbfb", boxSizing: "border-box", position: "absolute", top: "20px", bottom: "0", left: "0px", right: "0px", overflowY: "scroll", overflowX: "hidden" }}>
+              <ul id="node-input-status-target-container" style={{ listStyleType: "none", margin: "0" }}></ul>
+            </div>
           </div>
-          <div style={{ background: "fbfbfb", boxSizing: "border-box", position: "absolute", top: "20px", bottom: "0", left: "0px", right: "0px", overflowY: "scroll", overflowX: "hidden" }}>
-          <ul id="node-input-status-target-container" style={{ listStyleType: "none", margin: "0" }}></ul>
-          </div>
-          </div>
-          </div>
-          <div class="form-row">
+        </div>
+        <div class="form-row">
           <label htmlFor="node-input-name"><i class="fa fa-tag"></i> <span data-i18n="common.label.name"></span></label>
-            <input type="text" id="node-input-name" data-i18n="[placeholder]common.label.name"/>
-          </div>
-          </div>
+          <input type="text" id="node-input-name" data-i18n="[placeholder]common.label.name"/>
+        </div>
+      </div>
       )
     },
     renderHelp: function () {
       return (
         <div>
-        <p>Send status messages from other nodes on the same tab.</p>
-        <p>The message sent by this node will have a <code>status</code> property
-        with the following attributes:
-          <ul>
-          <li><code>text</code> : the status text</li>
-          <li><code>source.type</code> : the type of the node that reported status</li>
-          <li><code>source.id</code> : the id of the node that reported status</li>
-          <li><code>source.name</code> : the name, if set, of the node that reported status</li>
+          <p>Send status messages from other nodes on the same tab.</p>
+          <p>The message sent by this node will have a <code>status</code> property
+            with the following attributes:
+            <ul>
+              <li><code>text</code> : the status text</li>
+              <li><code>source.type</code> : the type of the node that reported status</li>
+              <li><code>source.id</code> : the id of the node that reported status</li>
+              <li><code>source.name</code> : the name, if set, of the node that reported status</li>
 
-          </ul>
+            </ul>
           </p>
 
-          </div>
+        </div>
       )
     },
     renderDescription: () => <p>Send status messages from other nodes on the same tab.</p>
   });
 };
+

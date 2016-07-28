@@ -143,3 +143,4 @@ function init(RED) {
 }
 
 module.exports = init;
+

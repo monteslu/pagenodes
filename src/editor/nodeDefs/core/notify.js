@@ -128,3 +128,4 @@ module.exports = function(RED){
     renderDescription: () => <p>Creates a browser notification</p>
   });
 };
+

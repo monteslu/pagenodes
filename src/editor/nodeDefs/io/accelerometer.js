@@ -19,32 +19,32 @@ module.exports = function(RED){
     render: function () {
       return (
         <div>
-        <div className="form-row">
-        <label htmlFor="node-input-name">
-        <i className="fa fa-tag" />
-        <span data-i18n="common.label.name" />
-        </label>
-        <input
-        type="text"
-        id="node-input-name"
-        data-i18n="[placeholder]common.label.name" />
+          <div className="form-row">
+            <label htmlFor="node-input-name">
+              <i className="fa fa-tag" />
+              <span data-i18n="common.label.name" />
+            </label>
+            <input
+              type="text"
+              id="node-input-name"
+              data-i18n="[placeholder]common.label.name" />
 
-        <br/>
+            <br/>
 
-        <label htmlFor="node-input-refreshInterval">
-        <i className="fa fa-tag" />
-        <span>Interval(ms)</span>
-        </label>
-        <input
-        type="text"
-        style={{width:100}}
-        id="node-input-refreshInterval"
-        data-i18n="[placeholder]common.label.name" />
+            <label htmlFor="node-input-refreshInterval">
+              <i className="fa fa-tag" />
+              <span>Interval(ms)</span>
+            </label>
+            <input
+              type="text"
+              style={{width:100}}
+              id="node-input-refreshInterval"
+              data-i18n="[placeholder]common.label.name" />
 
-        </div>
-        <div className="form-tips" id="tip-json" hidden>
-        <span data-i18n="httpin.tip.req" />
-        </div>
+          </div>
+          <div className="form-tips" id="tip-json" hidden>
+            <span data-i18n="httpin.tip.req" />
+          </div>
         </div>
       )
     },
@@ -61,5 +61,6 @@ module.exports = function(RED){
       )
     },
     renderDescription: () => <p>Accelerometer node</p>
-   });
+  });
 };
+

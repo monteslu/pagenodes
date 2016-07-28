@@ -14,10 +14,10 @@ module.exports = function(RED){
     render: function () {
       return (
         <div>
-        <div className="form-tips">
-          Simply switch to <code>IoT Remote Buttons</code> view in the PageNodes menu to send button clicks from this node.
+          <div className="form-tips">
+            Simply switch to <code>IoT Remote Buttons</code> view in the PageNodes menu to send button clicks from this node.
+          </div>
         </div>
-      </div>
       )
     },
     renderHelp: function () {
@@ -35,3 +35,4 @@ module.exports = function(RED){
     renderDescription: () => <p>IoT Remote Control Buttons</p>
   });
 };
+

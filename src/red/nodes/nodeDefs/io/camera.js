@@ -32,9 +32,9 @@ function takepicture(cb) {
   var canvas = document.createElement('canvas');
 
   navigator.getMedia = ( navigator.getUserMedia ||
-                         navigator.webkitGetUserMedia ||
-                         navigator.mozGetUserMedia ||
-                         navigator.msGetUserMedia);
+    navigator.webkitGetUserMedia ||
+    navigator.mozGetUserMedia ||
+    navigator.msGetUserMedia);
 
   navigator.getMedia(
     {
@@ -90,42 +90,43 @@ function takepicture(cb) {
 
 function takeGif(cb){
   gifshot.createGIF({}, function(obj) {
-      // callback object properties
-      // --------------------------
-      // image - Base 64 image
-      // cameraStream - The webRTC MediaStream object
-      // error - Boolean that determines if an error occurred
-      // errorCode - Helpful error label
-      // errorMsg - Helpful error message
-      // savedRenderingContexts - An array of canvas image data (will only be set if the saveRenderingContexts option was used)
-      cb(obj.image);
-      obj.cameraStream.getTracks().forEach(function(track){track.stop()});
+    // callback object properties
+    // --------------------------
+    // image - Base 64 image
+    // cameraStream - The webRTC MediaStream object
+    // error - Boolean that determines if an error occurred
+    // errorCode - Helpful error label
+    // errorMsg - Helpful error message
+    // savedRenderingContexts - An array of canvas image data (will only be set if the saveRenderingContexts option was used)
+    cb(obj.image);
+    obj.cameraStream.getTracks().forEach(function(track){track.stop()});
   });
 }
 
 module.exports = function(RED) {
 
-    function CamerNode(n) {
-        RED.nodes.createNode(this,n);
-        var node = this;
-        node.animated = n.animated;
+  function CamerNode(n) {
+    RED.nodes.createNode(this,n);
+    var node = this;
+    node.animated = n.animated;
 
-        this.on("input",function(msg) {
-            console.log('adding image', msg);
-            if(node.animated){
-              takeGif(function(image){
-                msg.image = image;
-                node.send(msg);
-              });
-            }else{
-              takepicture(function(image){
-                msg.image = image;
-                node.send(msg);
-              });
-            }
-
+    this.on("input",function(msg) {
+      console.log('adding image', msg);
+      if(node.animated){
+        takeGif(function(image){
+          msg.image = image;
+          node.send(msg);
         });
-    }
+      }else{
+        takepicture(function(image){
+          msg.image = image;
+          node.send(msg);
+        });
+      }
 
-    RED.nodes.registerType("camera",CamerNode);
+    });
+  }
+
+  RED.nodes.registerType("camera",CamerNode);
 }
+

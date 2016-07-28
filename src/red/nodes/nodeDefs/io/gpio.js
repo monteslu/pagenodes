@@ -1,18 +1,3 @@
-/*
-
-The MIT License (MIT)
-=====================
-
-Copyright (c) 2015 Luis Montes
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-*/
-
 var createNodebotNode = require('./lib/nodebotNode');
 
 
@@ -134,7 +119,7 @@ function init(RED) {
       });
     }
     else {
-        this.warn("nodebot not configured");
+      this.warn("nodebot not configured");
     }
 
   }
@@ -150,25 +135,25 @@ function init(RED) {
 
 
     if (typeof this.nodebot === "object") {
-        setupStatus(node);
-        node.nodebot.on('boardReady', function() {
-          connectedStatus(node);
-          console.log('launching johnny5Node boardReady', n);
-          node.nodebot.worker.postMessage({type: 'run', data: node.func, nodeId: node.id});
-        });
+      setupStatus(node);
+      node.nodebot.on('boardReady', function() {
+        connectedStatus(node);
+        console.log('launching johnny5Node boardReady', n);
+        node.nodebot.worker.postMessage({type: 'run', data: node.func, nodeId: node.id});
+      });
 
-        node.nodebot.on('send_' + node.id, function(msg){
-          node.send(msg);
-        });
+      node.nodebot.on('send_' + node.id, function(msg){
+        node.send(msg);
+      });
 
-        node.on('input', function(msg){
-          node.nodebot.worker.postMessage({type: 'input', msg, nodeId: node.id});
-        });
+      node.on('input', function(msg){
+        node.nodebot.worker.postMessage({type: 'input', msg, nodeId: node.id});
+      });
 
 
     }
     else {
-        node.warn("nodebot not configured");
+      node.warn("nodebot not configured");
     }
 
   }
@@ -202,15 +187,16 @@ function init(RED) {
     restCall({
       path: 'https://api.github.com/gists/f6f272f8998fd98e59ff131359ccf5ac'
     })
-    .then(function(result){
-      msg.reply({entity: result.entity});
-    })
-    .catch(function(err){
-      msg.reply({error: err});
-    });
+      .then(function(result){
+        msg.reply({entity: result.entity});
+      })
+      .catch(function(err){
+        msg.reply({error: err});
+      });
   });
 
 
 }
 
 module.exports = init;
+

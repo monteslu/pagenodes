@@ -1,4 +1,3 @@
-
 var server = require("./server");
 var nodes = require("./nodes");
 var library = require("./api/library");
@@ -13,31 +12,31 @@ var events = require("./events");
 
 
 var PN = {
-    init: function() {
-        comms.start();
-        plugin.start();
-        log.init({});
-        settings.init();
-    },
-    backend: true,
-    start: server.start,
-    stop: server.stop,
-    nodes: nodes,
-    library: { register: library.register },
-    credentials: credentials,
-    events: events,
-    log: log,
-    comms: comms,
-    plugin: plugin,
-    settings:settings,
-    util: util,
-    auth: {
-        // needsPermission: auth.needsPermission
-    },
-    version: function () {
-        return '1.0.0';
-    },
-    get server() { return server.server }
+  init: function() {
+    comms.start();
+    plugin.start();
+    log.init({});
+    settings.init();
+  },
+  backend: true,
+  start: server.start,
+  stop: server.stop,
+  nodes: nodes,
+  library: { register: library.register },
+  credentials: credentials,
+  events: events,
+  log: log,
+  comms: comms,
+  plugin: plugin,
+  settings:settings,
+  util: util,
+  auth: {
+    // needsPermission: auth.needsPermission
+  },
+  version: function () {
+    return '1.0.0';
+  },
+  get server() { return server.server }
 };
 
 module.exports = PN;

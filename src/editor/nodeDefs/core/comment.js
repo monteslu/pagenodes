@@ -34,7 +34,7 @@ module.exports = function(RED){
         height -= (parseInt(editorRow.css("marginTop"))+parseInt(editorRow.css("marginBottom")));
         $(".node-text-editor").css("height",height+"px");
         that.editor.resize();
-      };
+      }
       $( "#dialog" ).on("dialogresize", functionDialogResize);
       $( "#dialog" ).one("dialogopen", function(ev) {
         var size = $( "#dialog" ).dialog('option','sizeCache-function');
@@ -61,19 +61,19 @@ module.exports = function(RED){
     },
     render: function(){
       return (<div>
-              <div className="form-row">
-              <label htmlForm="node-input-name"><i className="fa fa-comment"></i> <span data-i18n="comment.label.title"></span></label>
-              <input type="text" id="node-input-name"/>
-              </div>
-              <div className="form-row" style={ {marginBottom: "0px"} }>
-              <label htmlForm="node-input-info" style={{width: "100% !important"}}><i className="fa fa-comments"></i> <span data-i18n="comment.label.body"></span></label>
-              <input type="hidden" id="node-input-info" autofocus="autofocus"/>
-              </div>
-              <div className="form-row node-text-editor-row">
-              <div style={{height: "250px"}} className="node-text-editor" id="node-input-info-editor"></div>
-              </div>
-              <div className="form-tips" data-i18n="[html]comment.tip"></div>
-              </div>);
+        <div className="form-row">
+          <label htmlForm="node-input-name"><i className="fa fa-comment"></i> <span data-i18n="comment.label.title"></span></label>
+          <input type="text" id="node-input-name"/>
+        </div>
+        <div className="form-row" style={ {marginBottom: "0px"} }>
+          <label htmlForm="node-input-info" style={{width: "100% !important"}}><i className="fa fa-comments"></i> <span data-i18n="comment.label.body"></span></label>
+          <input type="hidden" id="node-input-info" autofocus="autofocus"/>
+        </div>
+        <div className="form-row node-text-editor-row">
+          <div style={{height: "250px"}} className="node-text-editor" id="node-input-info-editor"></div>
+        </div>
+        <div className="form-tips" data-i18n="[html]comment.tip"></div>
+      </div>);
     },
     renderHelp: function(){
       return (<p>A node you can use to add comments to your flows.</p>);
@@ -81,3 +81,4 @@ module.exports = function(RED){
     renderDescription: () => <p>A node you can use to add comments to your flows.</p>
   });
 };
+

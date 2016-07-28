@@ -15,21 +15,26 @@ module.exports = function(RED) {
           }
           catch(e) { node.error(e.message,msg); }
         }
-        else if (typeof msg[node.propName] === "object") {
+        else if (typeof msg[node.propName] === "object" || Array.isArray(msg[node.propName])) {
           if (!Buffer.isBuffer(msg[node.propName])) {
             try {
               msg[node.propName] = JSON.stringify(msg[node.propName]);
-              node.send(msg);
+              return node.send(msg);
             }
             catch(e) {
-              node.error(RED._("json.errors.dropped-error"));
+              node.error(e);
             }
           }
-          else { node.warn(RED._("json.errors.dropped-object")); }
+
+          node.send(msg);
         }
-        else { node.warn(RED._("json.errors.dropped")); }
+        else {
+          node.send(msg);
+        }
       }
-      else { node.send(msg); } // If no payload - just pass it on.
+      else {
+        node.send(msg); // If no payload - just pass it on.
+      }
     });
   }
   JSONNode.groupName = 'JSON'; //hack!!!

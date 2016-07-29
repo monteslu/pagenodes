@@ -32,7 +32,7 @@ function loadNodeList() {
 }
 
 function loadNodes() {
-  RED.comms.rpc('getNodeConfigs', [], function(data){
+  RED.comms.rpc('getNodeConfigs', [], function(){
     // console.log('getNodeConfigs', data.length);
     // $("body").append(data);
     // $("body").append(templateText);

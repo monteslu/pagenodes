@@ -5,7 +5,6 @@ module.exports = function(RED){
   var subscriptions = {};
   var rpcId = 0;
 
-  var CHILD_FRAME_LOCATION = window.location;
   var rpcCallbacks = {};
 
 

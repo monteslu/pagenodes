@@ -26,12 +26,6 @@ function start() {
 
       api.init({}, storage);
 
-      if (log.metric()) {
-        runtimeMetricInterval = setInterval(function() {
-          reportMetrics();
-        }, settings.runtimeMetricInterval||15000);
-      }
-
       console.log("\n\n"+log._("runtime.welcome")+"\n===================\n");
       if (settings.version) {
         log.info(log._("runtime.version",{component:"Node-RED",version:"v"+settings.version}));
@@ -137,27 +131,6 @@ function installModule(module) {
   return when.resolve('ok');
 }
 
-
-
-function reportMetrics() {
-  var memUsage = process.memoryUsage();
-
-  log.log({
-    level: log.METRIC,
-    event: "runtime.memory.rss",
-    value: memUsage.rss
-  });
-  log.log({
-    level: log.METRIC,
-    event: "runtime.memory.heapTotal",
-    value: memUsage.heapTotal
-  });
-  log.log({
-    level: log.METRIC,
-    event: "runtime.memory.heapUsed",
-    value: memUsage.heapUsed
-  });
-}
 
 function stop() {
   if (runtimeMetricInterval) {

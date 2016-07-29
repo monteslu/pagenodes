@@ -14,7 +14,7 @@
     "build": "babel ./src --out-dir ./build && webpack && grunt build",
     "start": "ecstatic public --port 1337 --cache 0",
     "start80": "ecstatic public --port 80 --cache 0",
-    "lint": "eslint . --ext .js"
+    "lint": "eslint ./src --ext .js"
   },
   "contributors": [
     {

@@ -14,7 +14,7 @@ module.exports = function(RED){
           },
           fallbackLng: ['en-US'],
           useCookie: false
-        },function(data) {
+        },function() {
           done();
         });
         RED["_"] = function() {

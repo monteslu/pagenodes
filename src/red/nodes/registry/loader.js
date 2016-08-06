@@ -1,5 +1,5 @@
 const when = require("when");
-const fs = require("fs");
+
 const path = require("path");
 const semver = require("semver");
 const _ = require("lodash");
@@ -163,94 +163,22 @@ function loadNodeConfig(fileInfo) {
       node.types = fileInfo.types;
     }
 
-    // fs.readFile(node.template, 'utf8', function (err, content) {
-    // if (err) {
-    //     node.types = [];
-    //     if (err.code === 'ENOENT') {
-    //         if (!node.types) {
-    //             node.types = [];
-    //         }
-    //         node.err = "Error: " + file + " does not exist";
-    //     } else {
-    //         node.types = [];
-    //         node.err = err.toString();
-    //     }
-    //     resolve(node);
-    // } else {
 
-    // var content = nodeContents[node.template];
-
-    // var types = [];
-
-    // var regExp = /<script ([^>]*)data-template-name=['"]([^'"]*)['"]/gi;
-    // var match = null;
 
     // while ((match = regExp.exec(content)) !== null) {
     //     types.push(match[2]);
     // }
     // node.types = types;
 
-    // var langRegExp = /^<script[^>]* data-lang=['"](.+?)['"]/i;
-    // regExp = /(<script[^>]* data-help-name=[\s\S]*?<\/script>)/gi;
-    // match = null;
-    // var mainContent = "";
-    // var helpContent = {};
-    // var index = 0;
-    // while ((match = regExp.exec(content)) !== null) {
-    //     mainContent += content.substring(index, regExp.lastIndex - match[1].length);
-    //     index = regExp.lastIndex;
-    //     var help = content.substring(regExp.lastIndex - match[1].length, regExp.lastIndex);
 
-    //     var lang = "en-US";
-    //     if ((match = langRegExp.exec(help)) !== null) {
-    //         lang = match[1];
-    //     }
-    //     if (!helpContent.hasOwnProperty(lang)) {
-    //         helpContent[lang] = "";
-    //     }
-
-    //     helpContent[lang] += help;
-    // }
-    // mainContent += content.substring(index);
-
-    //node.config = mainContent;
-    //node.help = helpContent;
     node.help = {"en-US": ""};
-    // TODO: parse out the javascript portion of the template
-    //node.script = "";
-    // for (var i = 0; i < node.types.length; i++) {
-    //     if (registry.getTypeId(node.types[i])) {
-    //         node.err = node.types[i] + " already registered";
-    //         break;
-    //     }
-    // }
-    // fs.stat(path.join(path.dirname(file), "locales"), function (err, stat) {
-    //     if (!err) {
-    //         node.namespace = node.id;
-    //         i18n.registerMessageCatalog(node.id, path.join(path.dirname(file), "locales"), path.basename(file, ".js") + ".json").then(function () {
-    //             resolve(node);
-    //         });
-    //     } else {
+
     node.namespace = node.module;
     resolve(node);
-    //     }
-    // });
-    // }
-    // });
+
   });
 }
 
-//function getAPIForNode(node) {
-//    var red = {
-//        nodes: RED.nodes,
-//        library: RED.library,
-//        credentials: RED.credentials,
-//        events: RED.events,
-//        log: RED.log,
-//
-//    }
-//
-//}
 
 /**
  * Loads the specified node into the runtime
@@ -373,33 +301,9 @@ function addFile(file) {
   }
 }
 
-function loadNodeHelp(node, lang) {
-  var dir = path.dirname(node.template);
-  var base = path.basename(node.template);
-  var localePath = path.join(dir, "locales", lang, base);
-  try {
-    // TODO: make this async
-    var content = fs.readFileSync(localePath, "utf8");
-    return content;
-  } catch (err) {
-    return null;
-  }
-}
-
 function getNodeHelp(node, lang) {
   if (!node.help[lang]) {
-    var help = loadNodeHelp(node, lang);
-    if (help == null) {
-      var langParts = lang.split("-");
-      if (langParts.length == 2) {
-        help = loadNodeHelp(node, langParts[0]);
-      }
-    }
-    if (help) {
-      node.help[lang] = help;
-    } else {
-      node.help[lang] = node.help["en-US"];
-    }
+    node.help[lang] = node.help["en-US"];
   }
   return node.help[lang];
 }

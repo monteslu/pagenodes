@@ -42,7 +42,7 @@ module.exports = function(RED) {
         }
         var lodashFunc = _[func];
         if(lodashFunc){
-          msg.payload = lodashFunc(msg.payload, param2, param3);
+          msg.payload = lodashFunc(String(msg.payload), param2, param3);
           node.send(msg);
         }
 

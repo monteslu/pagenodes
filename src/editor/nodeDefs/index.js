@@ -25,6 +25,7 @@ const nodeDefs = [
   require('./io/meshblu'),
   require('./io/math'),
   require('./io/strings'),
+  require('./io/arrays'),
   require('./io/split'),
   require('./io/join'),
   require('./io/vibrate'),

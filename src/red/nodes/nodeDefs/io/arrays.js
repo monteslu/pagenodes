@@ -77,8 +77,24 @@ module.exports = function(RED) {
         var lodashFunc = _[func];
         if(lodashFunc){
           if (func === 'concat' || func === 'difference' || func === 'pull' || func === 'pullAll' 
-            || func === 'without' || func === 'zipObject' || func === 'zipObjectDeep') {
-            msg.payload = lodashFunc(msg.payload, JSON.parse(param2));
+            || func === 'without' || func === 'zipObject' || func === 'zipObjectDeep' || func === 'dropRightWhile') {
+            if(typeof param2 === 'string') {
+              try {
+                if (node.param2.name) {
+                  param2 = JSON.parse(msg.param2.name || node.param2.name);
+                } else {
+                  param2 = JSON.parse(msg.param2 || node.param2);
+                }
+              } catch(err) {
+                if (func.param2.name) {
+                  err.message = "Invalid JSON for '" + func.param2.name.capitalize() + "' (or msg.param2) input: " + err.message;
+                } else {
+                  err.message = "Invalid JSON for '" + func.param2.capitalize() + "' (or msg.param2) input: " + err.message;
+                }
+                return node.error(err.message);
+              }
+            }
+            msg.payload = lodashFunc(msg.payload, param2);
             node.send(msg);
           } else if (func === 'differenceBy' || func === 'pullAllBy' || func === 'pullAllWith') {
             msg.payload = lodashFunc(msg.payload, JSON.parse(param2), param3);

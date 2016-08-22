@@ -17,6 +17,64 @@ module.exports = function(RED) {
     return parseInt(input, radix);
   }
 
+  function parseMarkedParameters(inputMap, funct, radix) {
+    var numberOfParameters, parsedParam2, parsedParam3, parsedParam4;
+    var iterations = inputMap[funct].params.length - 1;
+    var paramsChanged = [];
+    // JSON parser, search through all of an arrayFunctions 'function' object's parameters
+    for (var i = 0; i < iterations; i++) {
+      if (inputMap[funct].params[i].type === 'JSON') {
+        try {
+          paramsChanged[i] = JSON.parse(inputMap[funct].params[i]);
+        } catch (err) {
+          err.message = "Invalid JSON for '" + inputMap[func].params[i].name.capitalize + "' input: " + err.message;
+          return node.error(err.message)
+        }
+        if (i === 0) {
+          parsedParam2 = paramsChanged[i];
+        } else if (i === 1) {
+          parsedParam3 = paramsChanged[i];
+        } else if (i === 2) {
+          parsedParam4 = paramsChanged[i];
+        }
+      }
+    }
+    // Number parser
+    for (var i = 0; i < iterations; i++) { 
+      if(inputMap[funct].params[i].type === 'number') {
+        try {
+          paramsChanged[i] = getNumber(inputMap[funct].params[i], radix);
+        } catch (err) {
+          err.message = "Invalid number for '" + inputMap[funct].params[i].name.capitalize + "' input: " + err.message;
+          return node.error(err.message)
+        }
+        if (i === 0) {
+          parsedParam2 = paramsChanged[i];
+        } else if (i === 1) {
+          parsedParam3 = paramsChanged[i];
+        } else if (i === 2){
+          parsedParam4 = paramsChanged[i];
+        }
+      }
+    }
+    // 'Otherwise' parser (generally meaning string but really anything other input not requiring extra handling)
+    for (var i = 0; i < iterations; i++) {
+      if(inputMap[funct].params[i].type === 'string') {
+        if (i === 0) {
+          parsedParam2 = inputMap[funct].params[i];
+        } else if (i === 1) {
+          parsedParam3 = inputMap[funct].params[i];
+        } else if (i === 2) {
+          parsedParam4 = inputMap[funct].params[i];
+        }
+      }
+    }
+
+    // check how many number of parameters the function had:
+    var numberOfParsedParameters = inputMap[funct].params.length;
+    return numberOfParsedParameters;
+  }
+
   function ArraysNode(n) {
     RED.nodes.createNode(this,n);
 
@@ -30,6 +88,14 @@ module.exports = function(RED) {
       if (msg.hasOwnProperty("payload")) {
         var func = node.func;
         var param2, param3, param4, radix;
+
+        if (msg.hasOwnProperty('func')){
+          func = msg.func;
+        }
+        if (!arrayFunctions[func]) {
+          return node.error("invalid function")
+        }
+
         if(node.param2){
           param2 = node.param2;
         }
@@ -52,58 +118,26 @@ module.exports = function(RED) {
         if (msg.hasOwnProperty('param4')){
           param4 = msg.param4;
         }
-        if (msg.hasOwnProperty('func')){
-          func = msg.func;
-        }
         if (msg.hasOwnProperty('radix')) {
           radix = msg.radix;
         } else {
           radix = 10;
         }
 
-        if (!arrayFunctions[func]) {
-          return node.error("invalid function")
-        }
-
-        if(typeof msg.payload === 'string') {
-          try {
-            msg.payload = JSON.parse(msg.payload);
-          } catch(err) {
-            err.message = "Invalid JSON for msg.payload input: " + err.message;
-            return node.error(err.message);
-          }
-        }
-
         var lodashFunc = _[func];
-        if(lodashFunc){
-          if (func === 'concat' || func === 'difference' || func === 'pull' || func === 'pullAll' 
-            || func === 'without' || func === 'zipObject' || func === 'zipObjectDeep' || func === 'dropRightWhile') {
-            if(typeof param2 === 'string') {
-              try {
-                if (node.param2.name) {
-                  param2 = JSON.parse(msg.param2.name || node.param2.name);
-                } else {
-                  param2 = JSON.parse(msg.param2 || node.param2);
-                }
-              } catch(err) {
-                if (func.param2.name) {
-                  err.message = "Invalid JSON for '" + func.param2.name.capitalize() + "' (or msg.param2) input: " + err.message;
-                } else {
-                  err.message = "Invalid JSON for '" + func.param2.capitalize() + "' (or msg.param2) input: " + err.message;
-                }
-                return node.error(err.message);
-              }
-            }
+        if (lodashFunc) {
+          var numberOfHandledParameters = parseMarkedParameters(arrayFunctions, func, radix);
+          if (numberOfHandledParameters === 0) {
+            msg.payload = lodashFunc(msg.payload);
+            node.send(msg);
+          } else if (numberOfHandledParameters === 1) {
             msg.payload = lodashFunc(msg.payload, param2);
             node.send(msg);
-          } else if (func === 'differenceBy' || func === 'pullAllBy' || func === 'pullAllWith') {
-            msg.payload = lodashFunc(msg.payload, JSON.parse(param2), param3);
-            node.send(msg);
-          } else if(func === 'fill') {
-            msg.payload = lodashFunc(msg.payload, param2, param3, param4);
-            node.send(msg);
-          } else {
+          } else if (numberOfHandledParameters === 2) {
             msg.payload = lodashFunc(msg.payload, param2, param3);
+            node.send(msg);
+          } else if (numberOfHandledParameters === 3) {
+            msg.payload = lodashFunc(msg.payload, param2, param3, param4);
             node.send(msg);
           }
         }

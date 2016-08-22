@@ -27,36 +27,61 @@ module.exports = function(RED){
 
 
           function handleFunc(functionDef) {
-            $("#node-form-row-param2").hide();
-            $("#node-tip-param-json").hide();
-            $("#node-form-row-param3").hide();
-            $("#node-form-row-param4").hide();
-            functionDef.forEach(function(param) {
-              console.log("param", param);
-              if(param.param2) {
-                if(param.param2.hasOwnProperty('name')) {
-                  $("#node-label-param2").html(param.param2.name);
-                  $("#node-form-row-param2").show();
-                } else {
-                  $("#node-label-param2").html(param.param2);
-                  $("#node-form-row-param2").show();
-                }
-                if(param.param2.hasOwnProperty('type')) {
-                  if(param.param2.type === 'JSON') {
-                    $("#node-label-param2").html(param.param2.name);
-                    $("#node-tip-param-json").show();
-                  }
-                }
+            $("#node-form-row-param2Name").hide();
+            $("#node-form-row-param2Type").hide();
+            $("#node-form-row-param2Row").hide();
+            $("#node-form-row-param3Name").hide();
+            $("#node-form-row-param3Type").hide();
+            $("#node-form-row-param3Row").hide();
+            $("#node-form-row-param4Name").hide();
+            $("#node-form-row-param4Type").hide();
+            $("#node-form-row-param4Row").hide();
+            $("#node-form-row-description").hide();
+            if (functionDef.hasOwnProperty('params')) {
+              if (functionDef.params.length === 0) {
+                $("#node-form-row-description").html(functionDef.description);
+                $("#node-form-row-description").show();
+              } else if (functionDef.params.length === 1) {
+                $("#node-form-row-param2Name").html(functionDef.params[0].name);
+                $("#node-form-row-param2Type").html(functionDef.params[0].type);
+                $("#node-form-row-description").html(functionDef.description);
+                $("#node-form-row-param2Name").show();
+                $("#node-form-row-param2Type").show();
+                $("#node-form-row-description").show();
+                $("#node-form-row-param2Row").show();
+              } else if (functionDef.params.length === 2) {
+                $("#node-form-row-param2Name").html(functionDef.params[0].name);
+                $("#node-form-row-param2Type").html(functionDef.params[0].type);
+                $("#node-form-row-param3Name").html(functionDef.params[1].name);
+                $("#node-form-row-param3Type").html(functionDef.params[1].type);
+                $("#node-form-row-description").html(functionDef.description);
+                $("#node-form-row-param2Name").show();
+                $("#node-form-row-param2Type").show();
+                $("#node-form-row-param3Name").show();
+                $("#node-form-row-param3Type").show();
+                $("#node-form-row-description").show();
+                $("#node-form-row-param2Row").show();
+                $("#node-form-row-param3Row").show();
+              } else {
+                $("#node-form-row-param2Name").html(functionDef.params[0].name);
+                $("#node-form-row-param2Type").html(functionDef.params[0].type);
+                $("#node-form-row-param3Name").html(functionDef.params[1].name);
+                $("#node-form-row-param3Type").html(functionDef.params[1].type);
+                $("#node-form-row-param4Name").html(functionDef.params[2].name);
+                $("#node-form-row-param4Type").html(functionDef.params[2].type);
+                $("#node-form-row-description").html(functionDef.description);
+                $("#node-form-row-param2Name").show();
+                $("#node-form-row-param2Type").show();
+                $("#node-form-row-param3Name").show();
+                $("#node-form-row-param3Type").show();
+                $("#node-form-row-param4Name").show();
+                $("#node-form-row-param4Type").show();
+                $("#node-form-row-description").show();
+                $("#node-form-row-param2Row").show();
+                $("#node-form-row-param3Row").show();
+                $("#node-form-row-param4Row").show();
               }
-              if (param.param3) {
-                $("#node-label-param3").html(param.param3);
-                $("#node-form-row-param3").show();
-              }
-              if (param.param4) {
-                $("#node-label-param4").html(param.param4);
-                $("#node-form-row-param4").show();
-              }
-            });
+            }
           }
 
           handleFunc(myFuncDef);
@@ -67,12 +92,13 @@ module.exports = function(RED){
             handleFunc(arrayFunctions[this.value]);
           })
         },
+
         render: function (){
           return (
             <div>
               <div className="form-row">
-                <label htmlFor="node-input-func"><i className="fa fa-gears"></i> <span>Func</span></label>
-                <select type="text" id="node-input-func" style={{width:"74%"}}>
+                <i className="fa fa-gears"></i><label htmlFor="node-input-func" style={{marginLeft:"1%"}}>Func</label>
+                <select type="text" id="node-input-func" style={{width: "74%", marginLeft: "-0.8%"}}>
                   <option value="chunk">chunk</option>
                   <option value="compact">compact</option>
                   <option value="concat">concat</option>
@@ -85,7 +111,6 @@ module.exports = function(RED){
                   <option value="fill">fill</option>
                   <option value="findIndex">findIndex</option>
                   <option value="findLastIndex">findLastIndex</option>
-                  <option value="first">first</option>
                   <option value="flatten">flatten</option>
                   <option value="flattenDeep">flattenDeep</option>
                   <option value="fromPairs">fromPairs</option>
@@ -94,7 +119,6 @@ module.exports = function(RED){
                   <option value="initial">initial</option>
                   <option value="intersection">intersection</option>
                   <option value="intersectionBy">intersectionBy</option>
-                  <option value="intersectionWith">intersectionWith</option>
                   <option value="join">join</option>
                   <option value="last">last</option>
                   <option value="lastIndexOf">lastIndexOf</option>
@@ -102,7 +126,6 @@ module.exports = function(RED){
                   <option value="pull">pull</option>
                   <option value="pullAll">pullAll</option>
                   <option value="pullAllBy">pullAllBy</option>
-                  <option value="pullAllWith">pullAllWith</option>
                   <option value="pullAt">pullAt</option>
                   <option value="remove">remove</option>
                   <option value="reverse">reverse</option>
@@ -111,10 +134,9 @@ module.exports = function(RED){
                   <option value="sortedIndexBy">sortedIndexBy</option>
                   <option value="sortedIndexOf">sortedIndexOf</option>
                   <option value="sortedLastIndex">sortedLastIndex</option>
-                  <option value="sortedLastIndexBy">sortedIndexBy</option>
+                  <option value="sortedLastIndexBy">SortedLastIndexBy</option>
                   <option value="sortedLastIndexOf">sortedLastIndexOf</option>
                   <option value="sortedUniq">sortedUniq</option>
-                  <option value="sortedUniqBy">sortedUniqBy</option>
                   <option value="tail">tail</option>
                   <option value="take">take</option>
                   <option value="takeRight">takeRight</option>
@@ -124,45 +146,37 @@ module.exports = function(RED){
                   <option value="uniqBy">uniqBy</option>
                   <option value="uniqWith">uniqWith</option>
                   <option value="unzip">unzip</option>
-                  <option value="unzipWith">unzipWith</option>
                   <option value="without">without</option>
                   <option value="xor">xor</option>
                   <option value="xorBy">xorBy</option>
-                  <option value="xorWith">xorWith</option>
                   <option value="zip">zip</option>
                   <option value="zipObject">zipObject</option>
                   <option value="zipObjectDeep">zipObjectDeep</option>
-                  <option value="zipWith">zipWith</option>
                 </select>
-
               </div>
 
-
-              <div className="form-row" id="node-form-row-param2">
-                <label htmlFor="node-label-param2"><i className="fa fa-crosshairs"/><span id ="node-label-param2" style={{marginLeft:"5%", textTransform: "capitalize"}}></span></label>
+              <div className="form-row" id="node-form-row-param2Row">
+                <i className="fa fa-crosshairs"></i><label id="node-form-row-param2Name" style={{marginLeft:"1%", textTransform: "capitalize"}}></label>
                 <input type="text" id="node-input-param2" style={{width:"71%"}}></input>
               </div>
-
-              <div className="form-row" id="node-tip-param-json" style={{marginRight: "3.5%", marginBottom: "2.5%"}}>
-                <span style={{fontStyle: "italic", marginLeft: "24%"}}></span><i className="fa fa-crosshairs"/> Values <span style={{fontStyle: "italic"}}>parameter must be written in JSON syntax.</span>
-              </div>
-
-              <div className="form-row" id="node-form-row-param3">
-                <label htmlFor="node-label-param3"><i className="fa fa-crosshairs"/><span id ="node-label-param3" style={{marginLeft:"5%", textTransform: "capitalize"}}></span></label>
+              <div className="form-row" id="node-form-row-param3Row">
+                <i className="fa fa-crosshairs"></i><label id="node-form-row-param3Name" style={{marginLeft:"1%", textTransform: "capitalize"}}></label>
                 <input type="text" id="node-input-param3" style={{width:"71%"}}></input>
               </div>
-
-              <div className="form-row" id="node-form-row-param4">
-                <label htmlFor="node-label-param4"><i className="fa fa-crosshairs"/><span id ="node-label-param4" style={{marginLeft:"5%", textTransform: "capitalize"}}></span></label>
+              <div className="form-row" id="node-form-row-param4Row">
+                <i className="fa fa-crosshairs"></i><label id="node-form-row-param4Name" style={{marginLeft:"1%", textTransform: "capitalize"}}></label>
                 <input type="text" id="node-input-param4" style={{width:"71%"}}></input>
               </div>
 
-              <div className="form-row">
-              <label htmlFor="node-input-name"><i className="fa fa-tag"/> <span>Name</span></label>
-                <input type="text" id="node-input-name" placeholder="name" style={{width:"71%"}}></input>
+
+              <div className="form-row" id="node-form-row-description" style={{marginRight: "3.5%", marginBottom: "2.5%"}}>
+                <span style={{fontStyle: "italic", marginLeft: "24%"}}></span><i className="fa fa-crosshairs"/> Values <span style={{fontStyle: "italic"}}>parameter must be written in JSON syntax.</span>
               </div>
 
-
+              <div className="form-row">
+              <label htmlFor="node-input-name"><i className="fa fa-tag"/> <span style={{marginLeft: "1%"}}>Name</span></label>
+                <input type="text" id="node-input-name" placeholder="name" style={{width:"71%", marginLeft: "2.5%"}}></input>
+              </div>
             </div>
           )
         },

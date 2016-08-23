@@ -8,6 +8,7 @@ module.exports = function(RED){
         defaults: {             // defines the editable properties of the node
           name: {value:""},   //  along with default values.
           func: {value:"chunk", required:true},
+          wantsPayloadParsed: {value: false, required: true},
           param2: {value:"", required: false},
           param3: {value:"", required: false},
           param4: {value:"", requried: false}
@@ -96,6 +97,12 @@ module.exports = function(RED){
         render: function (){
           return (
             <div>
+              <div className="form-row">
+                <i className="fa fa-hand-paper-o" /> Handling
+                  <span style={{marginLeft: "5.5%"}}>Parse <code>msg.payload</code> to JSON? </span>
+                  <input type="checkbox" id="node-input-wantsPayloadParsed"style={{width: "inherit"}}></input>
+              </div>
+
               <div className="form-row">
                 <i className="fa fa-gears"></i><label htmlFor="node-input-func" style={{marginLeft:"1%"}}>Func</label>
                 <select type="text" id="node-input-func" style={{width: "74%", marginLeft: "-0.8%"}}>

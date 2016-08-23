@@ -4,89 +4,69 @@ var util = require("util");
 module.exports = function(RED) {
   "use strict";
   var _ = require("lodash");
-  
-  function getNumber(input, radix){
-    input = '' + input;
-    if(input.indexOf('.') > -1){
-      return parseFloat(input, radix);
-    } else if (input.toLowerCase() === "pi") {
-      return Math.PI;
-    } else if (input.toLowerCase() === "e") {
-      return Math.E;
-    }
-    return parseInt(input, radix);
-  }
-
-  function parseMarkedParameters(inputMap, funct, radix) {
-    var numberOfParameters, parsedParam2, parsedParam3, parsedParam4;
-    var iterations = inputMap[funct].params.length - 1;
-    var paramsChanged = [];
-    // JSON parser, search through all of an arrayFunctions 'function' object's parameters
-    for (var i = 0; i < iterations; i++) {
-      if (inputMap[funct].params[i].type === 'JSON') {
-        try {
-          paramsChanged[i] = JSON.parse(inputMap[funct].params[i]);
-        } catch (err) {
-          err.message = "Invalid JSON for '" + inputMap[func].params[i].name.capitalize + "' input: " + err.message;
-          return node.error(err.message)
-        }
-        if (i === 0) {
-          parsedParam2 = paramsChanged[i];
-        } else if (i === 1) {
-          parsedParam3 = paramsChanged[i];
-        } else if (i === 2) {
-          parsedParam4 = paramsChanged[i];
-        }
-      }
-    }
-    // Number parser
-    for (var i = 0; i < iterations; i++) { 
-      if(inputMap[funct].params[i].type === 'number') {
-        try {
-          paramsChanged[i] = getNumber(inputMap[funct].params[i], radix);
-        } catch (err) {
-          err.message = "Invalid number for '" + inputMap[funct].params[i].name.capitalize + "' input: " + err.message;
-          return node.error(err.message)
-        }
-        if (i === 0) {
-          parsedParam2 = paramsChanged[i];
-        } else if (i === 1) {
-          parsedParam3 = paramsChanged[i];
-        } else if (i === 2){
-          parsedParam4 = paramsChanged[i];
-        }
-      }
-    }
-    // 'Otherwise' parser (generally meaning string but really anything other input not requiring extra handling)
-    for (var i = 0; i < iterations; i++) {
-      if(inputMap[funct].params[i].type === 'string') {
-        if (i === 0) {
-          parsedParam2 = inputMap[funct].params[i];
-        } else if (i === 1) {
-          parsedParam3 = inputMap[funct].params[i];
-        } else if (i === 2) {
-          parsedParam4 = inputMap[funct].params[i];
-        }
-      }
-    }
-
-    // check how many number of parameters the function had:
-    var numberOfParsedParameters = inputMap[funct].params.length;
-    return numberOfParsedParameters;
-  }
 
   function ArraysNode(n) {
     RED.nodes.createNode(this,n);
 
     var node = this;
+    node.wantsPayloadParsed = n.wantsPayloadParsed;
     node.func = n.func;
     node.param2 = n.param2;
     node.param3 = n.param3;
     node.param4 = n.param4;
 
+    function getNumber(input, radix){
+      input = '' + input;
+      if(input.indexOf('.') > -1){
+        return parseFloat(input, radix);
+      } else if (input.toLowerCase() === "pi") {
+        return Math.PI;
+      } else if (input.toLowerCase() === "e") {
+        return Math.E;
+      }
+      return parseInt(input, radix);
+    }
+
+    function parametersExpected(inputMap, funct) {
+      var number = inputMap[funct].params.length + 1;
+      return number;
+    }
+
+    function parsePayload(payload) {
+      try {
+        payload = JSON.parse(payload);
+        return payload;
+      } catch (err) {
+        err.message = "Invalid JSON for 'msg.payload' input: " + err.message;
+        return node.error(err.message);
+      }
+    }
+
+    function parseParameter(inputMap, funct, radix, parameter, position) {
+      if (parameter != null) {
+        if (inputMap[funct].params[position].type === 'JSON') {
+          try {
+            parameter = JSON.parse(parameter);
+          } catch (err) {
+            var parameterMistake = _.capitalize(String(inputMap[funct].params[position].name));
+            err.message = "Invalid JSON for '" + parameterMistake + "' input: " + err.message;
+            return node.error(err.message);
+          }
+        } else if (inputMap[funct].params[position].type === 'number') {
+          parameter = getNumber(parameter, radix);
+        } else {
+          return 
+        }
+      } else {
+        parameter = undefined;
+      }
+      return parameter;
+    }
+
     this.on("input", function(msg) {
       if (msg.hasOwnProperty("payload")) {
         var func = node.func;
+        var wantsPayloadParsed = node.wantsPayloadParsed;
         var param2, param3, param4, radix;
 
         if (msg.hasOwnProperty('func')){
@@ -126,20 +106,26 @@ module.exports = function(RED) {
 
         var lodashFunc = _[func];
         if (lodashFunc) {
-          var numberOfHandledParameters = parseMarkedParameters(arrayFunctions, func, radix);
-          if (numberOfHandledParameters === 0) {
-            msg.payload = lodashFunc(msg.payload);
-            node.send(msg);
-          } else if (numberOfHandledParameters === 1) {
-            msg.payload = lodashFunc(msg.payload, param2);
-            node.send(msg);
-          } else if (numberOfHandledParameters === 2) {
-            msg.payload = lodashFunc(msg.payload, param2, param3);
-            node.send(msg);
-          } else if (numberOfHandledParameters === 3) {
-            msg.payload = lodashFunc(msg.payload, param2, param3, param4);
-            node.send(msg);
+          if (wantsPayloadParsed) {
+            msg.payload = parsePayload(msg.payload);
           }
+          var numberOfParameters = parametersExpected(arrayFunctions, func);
+          if (numberOfParameters === 1) {
+            msg.payload = lodashFunc(msg.payload);
+          } else if (numberOfParameters === 2) {
+            param2 = parseParameter(arrayFunctions, func, radix, param2, 0);
+            msg.payload = lodashFunc(msg.payload, param2);
+          } else if (numberOfParameters === 3 ) {
+            param2 = parseParameter(arrayFunctions, func, radix, param2, 0);
+            param3 = parseParameter(arrayFunctions, func, radix, param3, 1);
+            msg.payload = lodashFunc(msg.payload, param2, param3);
+          } else {
+            param2 = parseParameter(arrayFunctions, func, radix, param2, 0);
+            param3 = parseParameter(arrayFunctions, func, radix, param3, 1);
+            param4 = parseParameter(arrayFunctions, func, radix, param4, 2);
+            msg.payload = lodashFunc(msg.payload, param2, param3, param4);
+          }
+          node.send(msg);
         }
       } else {
         node.send(msg); // If no payload - just pass it on.

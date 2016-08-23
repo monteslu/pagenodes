@@ -1,7 +1,7 @@
 const arrayFunctions = {
   chunk: {
-    params: [{name: 'size', type: 'number'}],
-    description: 'Creates an array of elements split intoc groups the length of size. If array cannot be split evenly, the final chunk will be the remaining elements.'
+    params: [{name: 'size', type: 'number', required: false}],
+    description: 'Creates an array of elements split into groups the length of size. If array cannot be split evenly, the final chunk will be the remaining elements.'
   },
   compact: {
     params: [], 
@@ -20,7 +20,7 @@ const arrayFunctions = {
     description: 'This method is like _.difference except that it accepts iteratee which is invoked for each element of array and values to generate the criterion by which they are compared. Result values are chosen from the first array. The iteratee is invoked with one argument: (value).'
   },
   drop: {
-    params: [{name: 'n', type: 'number'}],
+    params: [{name: 'n', type: 'number', required: false}],
     description: 'Creates a slice of array with n elements dropped from the beginning.'
   },
   dropRight: {

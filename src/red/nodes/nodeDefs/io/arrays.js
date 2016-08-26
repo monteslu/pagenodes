@@ -27,6 +27,38 @@ module.exports = function(RED) {
       return parseInt(input, radix);
     }
 
+    function getNumberOrString(input, radix) {
+      // does not allow for NaN return, function to be used in
+      // cases expecting number or string input
+      // numbers are assumed numbers
+      // specials numbers like e and pi are assumed strings until '' encloses either
+      input = '' + input;
+      if(input.indexOf('.') > -1){
+        if (isNaN(parseFloat(input, radix))) {
+          return String(input);
+        } else {
+          return parseFloat(input, radix);
+        }
+      } else if (input.toLowerCase() === "'pi'") {
+        return Math.PI;
+      } else if (input.toLowerCase() === "'e'") {
+        return Math.E;
+      } else if (isNaN(parseInt(input, radix))) {
+        return String(input);
+      } else {
+        return parseInt(input, radix);
+      }
+    }
+
+    function getJSONOrString(input) {
+      try {
+        input = JSON.parse(input);
+      } catch (err) {
+        input = String(input);
+      }
+      return input;
+    }
+
     function parametersExpected(inputMap, funct) {
       var number = inputMap[funct].params.length + 1;
       return number;
@@ -54,8 +86,12 @@ module.exports = function(RED) {
           }
         } else if (inputMap[funct].params[position].type === 'number') {
           parameter = getNumber(parameter, radix);
+        } else if (inputMap[funct].params[position].type === 'numberOrString') {
+          parameter = getNumberOrString(parameter, radix);
+        } else if (inputMap[funct].params[position].type === 'JSONOrString') {
+          parameter = getJSONOrString(parameter);
         } else {
-          return 
+          return parameter;
         }
       } else {
         parameter = undefined;

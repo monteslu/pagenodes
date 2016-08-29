@@ -4,7 +4,7 @@ module.exports = function(RED){
 
     RED.nodes.registerType('strings',{
         category: 'function',      // the palette category
-        color:"#E2D96E", // yellow like other function nodes
+        color:"#66d9ef", // yellow like other function nodes
         defaults: {             // defines the editable properties of the node
           name: {value:""},   //  along with default values.
           func: {value:"camelCase", required:true},

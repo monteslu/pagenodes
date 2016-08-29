@@ -45,6 +45,7 @@ const requiredNodes = [
   require('../nodeDefs/io/vibrate'),
   require("../nodeDefs/io/math"),
   require("../nodeDefs/io/strings"),
+  require("../nodeDefs/io/arrays"),
   require("../nodeDefs/io/split"),
   require("../nodeDefs/io/join"),
   require("../nodeDefs/io/gamepad"),

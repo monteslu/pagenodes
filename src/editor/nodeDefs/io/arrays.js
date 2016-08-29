@@ -89,7 +89,6 @@ module.exports = function(RED){
 
           var funcInput = $("#node-input-func");
           funcInput.change(function (){
-            console.log('funcInput changed', this.value);
             handleFunc(arrayFunctions[this.value]);
           })
         },
@@ -98,14 +97,14 @@ module.exports = function(RED){
           return (
             <div>
               <div className="form-row">
-                <i className="fa fa-hand-paper-o" /> Handling
-                  <span style={{marginLeft: "5.5%"}}>Parse <code>msg.payload</code> to JSON? </span>
-                  <input type="checkbox" id="node-input-wantsPayloadParsed"style={{width: "inherit"}}></input>
+                <i className="fa fa-hand-paper-o" /><label style={{marginLeft:"10px"}}> Handling</label>
+                  <span>Parse <code>msg.payload</code> to JSON? </span>
+                  <input type="checkbox" id="node-input-wantsPayloadParsed"style={{width: "20%"}}></input>
               </div>
 
               <div className="form-row">
-                <i className="fa fa-gears"></i><label htmlFor="node-input-func" style={{marginLeft:"1%"}}>Func</label>
-                <select type="text" id="node-input-func" style={{width: "74%", marginLeft: "-0.8%"}}>
+                <i className="fa fa-gears"></i><label htmlFor="node-input-func" style={{marginLeft:"10px"}}>Func</label>
+                <select type="text" id="node-input-func" style={{width: "72.5%", marginLeft: "-3px"}}>
                   <option value="chunk">chunk</option>
                   <option value="compact">compact</option>
                   <option value="concat">concat</option>
@@ -164,26 +163,26 @@ module.exports = function(RED){
               </div>
 
               <div className="form-row" id="node-form-row-param2Row">
-                <i className="fa fa-crosshairs"></i><label id="node-form-row-param2Name" style={{marginLeft:"1%", textTransform: "capitalize"}}></label>
+                <i className="fa fa-crosshairs"></i><label id="node-form-row-param2Name" style={{marginLeft:"10px", textTransform: "capitalize"}}></label>
                 <input type="text" id="node-input-param2" style={{width:"71%"}}></input>
               </div>
               <div className="form-row" id="node-form-row-param3Row">
-                <i className="fa fa-crosshairs"></i><label id="node-form-row-param3Name" style={{marginLeft:"1%", textTransform: "capitalize"}}></label>
+                <i className="fa fa-crosshairs"></i><label id="node-form-row-param3Name" style={{marginLeft:"10px", textTransform: "capitalize"}}></label>
                 <input type="text" id="node-input-param3" style={{width:"71%"}}></input>
               </div>
               <div className="form-row" id="node-form-row-param4Row">
-                <i className="fa fa-crosshairs"></i><label id="node-form-row-param4Name" style={{marginLeft:"1%", textTransform: "capitalize"}}></label>
+                <i className="fa fa-crosshairs"></i><label id="node-form-row-param4Name" style={{marginLeft:"10px", textTransform: "capitalize"}}></label>
                 <input type="text" id="node-input-param4" style={{width:"71%"}}></input>
               </div>
 
 
-              <div className="form-row" id="node-form-row-description" style={{marginRight: "3.5%", marginBottom: "2.5%"}}>
-                <span style={{fontStyle: "italic", marginLeft: "24%"}}></span><i className="fa fa-crosshairs"/> Values <span style={{fontStyle: "italic"}}>parameter must be written in JSON syntax.</span>
+              <div className="form-row" id="node-form-row-description">
+                <span style={{fontStyle: "italic", marginLeft: "24%"}}></span>
               </div>
 
               <div className="form-row">
-              <label htmlFor="node-input-name"><i className="fa fa-tag"/> <span style={{marginLeft: "1%"}}>Name</span></label>
-                <input type="text" id="node-input-name" placeholder="name" style={{width:"71%", marginLeft: "2.5%"}}></input>
+              <label htmlFor="node-input-name"><i className="fa fa-tag"/> <span style={{marginLeft: "10px"}}>Name</span></label>
+                <input type="text" id="node-input-name" placeholder="name" style={{width:"71%", marginLeft: "20px"}}></input>
               </div>
             </div>
           )

@@ -3,221 +3,73 @@ const collectionFunctions = {
     params: [{name: 'iteratee', type: 'string'}],
     description: 'Creates an object composed of keys generated from the results of running each element of collection thru iteratee. The corresponding value of each key is the number of times the key was returned by iteratee. The iteratee is invoked with one argument: (value).'
   },
-  compact: {
-    params: [],
-    description: 'Creates an array with all falsey values removed. The values false, null, 0, "", undefined, and NaN are falsey.'
+  every: {
+    params: [{name: 'predicate', type: 'JSONOrString'}],
+    description: 'Checks if predicate returns truthy for all elements of collection. Iteration is stopped once predicate returns falsey. The predicate is invoked with three arguments: (value, index|key, collection). Note: This method returns true for empty collections because everything is true of elements of empty collections.'
   },
-  concat: {
+  filter: {
     params: [{name: 'values', type: 'JSONOrString'}],
-    description: 'Creates a new array concatenating array with any additional arrays and/or values.'
+    description: 'Iterates over elements of collection, returning an array of all elements predicate returns truthy for. The predicate is invoked with three arguments: (value, index|key, collection). Note: Unlike _.remove, this method returns a new array.'
   },
-  difference: {
-    params: [{name: 'values', type: 'JSON'}],
-    description: 'Creates an array of array values not included in the other given arrays using SameValueZero for equality comparisons. The order of result values is determined by the order they occur in the first array.'
-  },
-  differenceBy: {
-    params: [{name: 'values', type: 'JSON'}, {name: 'iteratee', type: 'string'}],
-    description: 'This method is like _.difference except that it accepts iteratee which is invoked for each element of array and values to generate the criterion by which they are compared. Result values are chosen from the first array. The iteratee is invoked with one argument: (value).'
-  },
-  drop: {
-    params: [{name: 'n', type: 'number'}],
-    description: 'Creates a slice of array with n elements dropped from the beginning.'
-  },
-  dropRight: {
-    params: [{name: 'n', type: 'number'}],
-    description: 'Creates a slice of array with n elements dropped from the end.'
-  },
-  dropRightWhile: {
-    params: [{name: 'predicate', type: 'JSONOrString'}],
-    description: 'Creates a slice of array excluding elements dropped from the end. Elements are dropped until predicate returns falsey. The predicate is invoked with three arguments: (value, index, array).'
-  },
-  dropWhile: {
-    params: [{name: 'predicate', type: 'JSONOrString'}],
-    description: 'Creates a slice of array excluding elements dropped from the beginning. Elements are dropped until predicate returns falsey. The predicate is invoked with three arguments: (value, index, array).'
-  },
-  fill: {
-    params: [{name: 'value', type: 'numberOrString'}, {name:'start', type: 'number'}, {name: 'end', type: 'number'}],
-    description: 'Fills elements of array with value from start up to, but not including, end.'
-  },
-  findIndex: {
+  find: {
     params: [{name: 'predicate', type: 'JSONOrString'}, {name: 'fromIndex', type: 'number'}],
-    description: 'This method is like _.find except that it returns the index of the first element predicate returns truthy for instead of the element itself.'
+    description: 'Iterates over elements of collection, returning the first element predicate returns truthy for. The predicate is invoked with three arguments: (value, index|key, collection).'
   },
-  findLastIndex: {
-    params: [{name: 'predicate', type: 'JSONOrString'}, {name: 'fromIndex', type: 'number'}],
-    description: 'This method is like _.findIndex except that it iterates over elements of collection from right to left.'
+  groupBy: {
+    params: [{name: 'iteratee', type: 'JSONOrString'}],
+    description: 'Creates an object composed of keys generated from the results of running each element of collection thru iteratee. The order of grouped values is determined by the order they occur in collection. The corresponding value of each key is an array of elements responsible for generating the key. The iteratee is invoked with one argument: (value).'
   },
-  flatten: {
-    params: [],
-    description: 'Flattens array a single level deep.'
-  },
-  flattenDeep: {
-    params: [],
-    description: 'Recursively flattens array.'
-  },
-  flattenDepth: {
-    params: [{name: 'depth', type: 'number'}],
-    description: 'Recursively flatten array up to depth times.'
-  },
-  fromPairs: {
-    params: [],
-    description: 'The inverse of _.toPairs; this method returns an object composed from key-value pairs.'
-  },
-  head: {
-    params: [],
-    description: 'Gets the first element of array.'
-  },
-  indexOf: {
+  includes: {
     params: [{name: 'value', type: 'numberOrString'}, {name: 'fromIndex', type: 'number'}],
-    description: 'Gets the index at which the first occurrence of value is found in array using SameValueZero for equality comparisons. If fromIndex is negative, it is used as the offset from the end of array.'
+    description: 'Checks if value is in collection. If collection is a string, it is checked for a substring of value, otherwise SameValueZero is used for equality comparisons. If fromIndex is negative, it is used as the offset from the end of collection.'
   },
-  initial: {
-    params: [],
-    description: 'Gets all but the last element of array.'
+  invokeMap: {
+    params: [{name: 'path', type: 'JSONOrString'}, {name: 'args', type: 'numberOrString'}],
+    description: 'Invokes the method at path of each element in collection, returning an array of the results of each invoked method. Any additional arguments are provided to each invoked method. If path is a function, it is invoked for, and this bound to, each element in collection.'
   },
-  intersection: {
-    params: [{name: 'array', type: 'JSON'}],
-    description: 'Creates an array of unique values that are included in all given arrays using SameValueZero for equality comparisons. The order of result values is determined by the order they occur in the first array.'
+  keyBy: {
+    params: [{name: 'iteratee', type: 'JSONOrString'}],
+    description: 'Creates an object composed of keys generated from the results of running each element of collection thru iteratee. The corresponding value of each key is the last element responsible for generating the key. The iteratee is invoked with one argument: (value).'
   },
-  intersectionBy: {
-    params: [{name: 'array', type: 'JSON'}, {name: 'iteratee', type: 'JSONOrString'}],
-    description: 'This method is like _.intersection except that it accepts iteratee which is invoked for each element of each arrays to generate the criterion by which they are compared. Result values are chosen from the first array. The iteratee is invoked with one argument: (value).'
+  map: {
+    params: [{name: 'iteratee', type: 'JSONOrString'}],
+    description: 'Creates an array of values by running each element in collection thru iteratee. The iteratee is invoked with three arguments: (value, index|key, collection). Many lodash methods are guarded to work as iteratees for methods like _.every, _.filter, _.map, _.mapValues, _.reject, and _.some.] The guarded methods are: ary, chunk, curry, curryRight, drop, dropRight, every, fill, invert, parseInt, random, range, rangeRight, repeat, sampleSize, slice, some, sortBy, split, take, takeRight, template, trim, trimEnd, trimStart, and words'
   },
-  join: {
-    params: [{name: 'seperator', type: 'string'}],
-    description: 'Converts all elements in array into a string separated by separator.'
+  orderBy: {
+    params: [{name: 'iteratees', type: 'JSON'}, {name: 'orders', type: 'JSON'}],
+    description: 'This method is like _.sortBy except that it allows specifying the sort orders of the iteratees to sort by. If orders is unspecified, all values are sorted in ascending order. Otherwise, specify an order of "desc" for descending or "asc" for ascending sort order of corresponding values.'
   },
-  last: {
-    params: [],
-    description: 'Gets the last element of array.'
-  },
-  lastIndexOf: {
-    params: [{name: 'value', type: 'numberOrString'}, {name: 'lastIndex', type: 'number'}],
-    description: 'This method is like _.indexOf except that it iterates over elements of array from right to left.'
-  },
-  nth: {
-    params: [{name: 'n', type: 'number'}],
-    description: 'Gets the element at index n of array. If n is negative, the nth element from the end is returned.'
-  },
-  pull: {
-    params: [{name: 'values', type: 'numberOrString'}],
-    description: 'Removes all given values from array using SameValueZero for equality comparisons. Note: Unlike _.without, this method mutates array.'
-  },
-  pullAll: {
-    params: [{name: 'values', type: 'JSON'}],
-    description: 'This method is like _.pull except that it accepts an array of values to remove. Note: Unlike _.difference, this method mutates array.'
-  },
-  pullAllBy: {
-    params: [{name: 'values', type: 'JSON'}, {name: 'iteratee', type: 'string'}],
-    description: 'This method is like _.pullAll except that it accepts iteratee which is invoked for each element of array and values to generate the criterion by which they are compared. The iteratee is invoked with one argument: (value). Note: Unlike _.differenceBy, this method mutates array.'
-  },
-  pullAt: {
-    params: [{name: 'indexes', type: 'JSON'}],
-    description: 'Removes elements from array corresponding to indexes and returns an array of removed elements. Note: Unlike _.at, this method mutates array.'
-  },
-  reverse: {
-    params: [],
-    description: 'Reverses array so that the first element becomes the last, the second element becomes the second to last, and so on. Note: This method mutates array and is based on Array#reverse.'
-  },
-  slice: {
-    params: [{name: 'start', type: 'number'}, {name: 'end', type: 'number'}],
-    description: 'Creates a slice of array from start up to, but not including, end. Note: This method is used instead of Array#slice to ensure dense arrays are returned.'
-  },
-  sortedIndex: {
-    params: [{name: 'value', type: 'numberOrString'}],
-    description: 'Uses a binary search to determine the lowest index at which value should be inserted into array in order to maintain its sort order.'
-  },
-  sortedIndexBy: {
-    params: [{name: 'value', type: 'JSONOrString'}, {name: 'iteratee', type: 'string'}],
-    description: 'This method is like _.sortedIndex except that it accepts iteratee which is invoked for value and each element of array to compute their sort ranking. The iteratee is invoked with one argument: (value).',
-  },
-  sortedIndexOf: {
-    params: [{name: 'value', type: 'numberOrString'}],
-    description: 'This method is like _.indexOf except that it performs a binary search on a sorted array.'
-  },
-  sortedLastIndex: {
-    params: [{name: 'value', type: 'numberOrString'}],
-    description: 'This method is like _.sortedIndex except that it returns the highest index at which value should be inserted into array in order to maintain its sort order.'
-  },
-  sortedLastIndexBy: {
-    params: [{name: 'value', type: 'JSONOrString'}, {name: 'iteratee', type: 'string'}],
-    //doesn't show that object can be used as functions, only shorthand, so assuming string here
-    description: 'This method is like _.sortedLastIndex except that it accepts iteratee which is invoked for value and each element of array to compute their sort ranking. The iteratee is invoked with one argument: (value).'
-  },
-  sortedLastIndexOf: {
-    params: [{name: 'value', type: 'numberOrString'}],
-    description: 'This method is like _.lastIndexOf except that it performs a binary search on a sorted array.'
-  },
-  sortedUniq: {
-    params: [],
-    description: 'This method is like _.uniq except that it’s designed and optimized for sorted arrays.'
-  },
-  tail: {
-    params: [],
-    description: 'Gets all but the first element of array.'
-  },
-  take: {
-    params: [{name: 'n', type: 'number'}],
-    description: 'Creates a slice of array with n elements taken from the beginning.'
-  },
-  takeRight: {
-    params: [{name: 'n', type: 'number'}],
-    description: 'Creates a slice of array with n elements taken from the end.'
-  },
-  takeRightWhile: {
-    params: [{name:'predicate', type: 'JSONOrString'}],
-    description: 'Creates a slice of array with elements taken from the end. Elements are taken until predicate returns falsey. The predicate is invoked with three arguments: (value, index, array).'
-  },
-  takeWhile: {
+  partition: {
     params: [{name: 'predicate', type: 'JSONOrString'}],
-    description: 'Creates a slice of array with elements taken from the beginning. Elements are taken until predicate returns falsey. The predicate is invoked with three arguments: (value, index, array).'
+    description: 'Creates an array of elements split into two groups, the first of which contains elements predicate returns truthy for, the second of which contains elements predicate returns falsey for. The predicate is invoked with one argument: (value).'
   },
-  union: {
-    params: [{name: 'array', type: 'JSON'}],
-    description: 'Creates an array of unique values, in order, from all given arrays using SameValueZero for equality comparisons.'
+  reject: {
+    params: [{name: 'predicate', type: 'JSONOrString'}],
+    description: 'The opposite of _.filter; this method returns the elements of collection that predicate does not return truthy for.'
   },
-  unionBy: {
-    params: [{name: 'array', type: 'JSON'}, {name: 'iteratee', type: 'string'}],
-    description: 'This method is like _.union except that it accepts iteratee which is invoked for each element of each arrays to generate the criterion by which uniqueness is computed. Result values are chosen from the first array in which the value occurs. The iteratee is invoked with one argument: (value).'
-  },
-  uniq: {
+  sample: {
     params: [],
-    description: 'Creates a duplicate-free version of an array, using SameValueZero for equality comparisons, in which only the first occurrence of each element is kept.'
+    description: 'Gets a random element from collection.'
   },
-  uniqBy: {
-    params: [{name: 'iteratee', type: 'string'}],
-    description: 'This method is like _.uniq except that it accepts iteratee which is invoked for each element in array to generate the criterion by which uniqueness is computed. The iteratee is invoked with one argument: (value).'
+  sampleSize: {
+    params: [{name: 'n', type: 'number'}],
+    description: 'Gets n random elements at unique keys from collection up to the size of collection.'
   },
-  unzip: {
+  shuffle: {
     params: [],
-    description: 'This method is like _.zip except that it accepts an array of grouped elements and creates an array regrouping the elements to their pre-zip configuration.'
+    description: 'Creates an array of shuffled values, using a version of the Fisher-Yates shuffle.'
   },
-  without: {
-    // really any kind of type except JSON objects
-    // but labeling type as 'string' is meant to signify
-    // no manipulation should be done in this node
-    params: [{name: 'value', type: 'JSON'}],
-    description: 'Creates an array excluding all given values using SameValueZero for equality comparisons.'
+  size: {
+    params: [],
+    description: 'Gets the size of collection by returning its length for array-like values or the number of own enumerable string keyed properties for objects.'
   },
-  xor: {
-    params: [{name: 'array', type: 'JSON'}],
-    description: 'Creates an array of unique values that is the symmetric difference of the given arrays. The order of result values is determined by the order they occur in the arrays.'
+  some: {
+    params: [{name: 'predicate', type: 'JSONOrString'}],
+    description: 'Checks if predicate returns truthy for any element of collection. Iteration is stopped once predicate returns truthy. The predicate is invoked with three arguments: (value, index|key, collection).'
   },
-  xorBy: {
-    params: [{name: 'array', type: 'JSON'}, {name: 'iteratee', type: 'string'}],
-    description: 'This method is like _.xor except that it accepts iteratee which is invoked for each element of each arrays to generate the criterion by which by which they are compared. The iteratee is invoked with one argument:'
-  },
-  zip: {
-    params: [{name: 'array', type: 'JSON'}],
-    description: 'Creates an array of grouped elements, the first of which contains the first elements of the given arrays, the second of which contains the second elements of the given arrays, and so on.'
-  },
-  zipObject: {
-    params: [{name: 'values', type: 'JSON'}],
-    description: 'This method is like _.fromPairs except that it accepts two arrays, one of property identifiers and one of corresponding values.'
-  },
-  zipObjectDeep: {
-    params: [{name: 'values', type: 'JSON'}],
-    description: 'This method is like _.zipObject except that it supports property paths.'
+  sortBy: {
+    params: [{name: 'iteratees', type: 'JSON'}],
+    description: 'Creates an array of elements, sorted in ascending order by the results of running each element in a collection thru each iteratee. This method performs a stable sort, that is, it preserves the original sort order of equal elements. The iteratees are invoked with one argument: (value).'
   }
 };
 module.exports = {collectionFunctions};

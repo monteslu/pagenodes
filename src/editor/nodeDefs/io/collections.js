@@ -94,7 +94,7 @@ module.exports = function(RED){
         },
 
 
-        // options needs replacement, but arrays node code review touches up are here for the rows
+        // options needs replacement, but collections node code review touches up are here for the rows
 
         render: function (){
           return (
@@ -108,60 +108,24 @@ module.exports = function(RED){
               <div className="form-row">
                 <i className="fa fa-gears"></i><label htmlFor="node-input-func" style={{marginLeft:"10px"}}>Func</label>
                 <select type="text" id="node-input-func" style={{width: "72.5%", marginLeft: "-3px"}}>
-                  <option value="chunk">chunk</option>
-                  <option value="compact">compact</option>
-                  <option value="concat">concat</option>
-                  <option value="difference">difference</option>
-                  <option value="differenceBy">differenceBy</option>
-                  <option value="drop">drop</option>
-                  <option value="dropRight">dropRight</option>
-                  <option value="dropRightWhile">dropRightWhile</option>
-                  <option value="dropWhile">dropWhile</option>
-                  <option value="fill">fill</option>
-                  <option value="findIndex">findIndex</option>
-                  <option value="findLastIndex">findLastIndex</option>
-                  <option value="flatten">flatten</option>
-                  <option value="flattenDeep">flattenDeep</option>
-                  <option value="flattenDepth">flattenDepth</option>
-                  <option value="fromPairs">fromPairs</option>
-                  <option value="head">head</option>
-                  <option value="indexOf">indexOf</option>
-                  <option value="initial">initial</option>
-                  <option value="intersection">intersection</option>
-                  <option value="intersectionBy">intersectionBy</option>
-                  <option value="join">join</option>
-                  <option value="last">last</option>
-                  <option value="lastIndexOf">lastIndexOf</option>
-                  <option value="nth">nth</option>
-                  <option value="pull">pull</option>
-                  <option value="pullAll">pullAll</option>
-                  <option value="pullAllBy">pullAllBy</option>
-                  <option value="pullAt">pullAt</option>
-                  <option value="reverse">reverse</option>
-                  <option value="slice">slice</option>
-                  <option value="sortedIndex">sortedIndex</option>
-                  <option value="sortedIndexBy">sortedIndexBy</option>
-                  <option value="sortedIndexOf">sortedIndexOf</option>
-                  <option value="sortedLastIndex">sortedLastIndex</option>
-                  <option value="sortedLastIndexBy">SortedLastIndexBy</option>
-                  <option value="sortedLastIndexOf">sortedLastIndexOf</option>
-                  <option value="sortedUniq">sortedUniq</option>
-                  <option value="tail">tail</option>
-                  <option value="take">take</option>
-                  <option value="takeRight">takeRight</option>
-                  <option value="takeRightWhile">takeRightWhile</option>
-                  <option value="takeWhile">takeWhile</option>
-                  <option value="union">union</option>
-                  <option value="unionBy">unionBy</option>
-                  <option value="uniq">uniq</option>
-                  <option value="uniqBy">uniqBy</option>
-                  <option value="unzip">unzip</option>
-                  <option value="without">without</option>
-                  <option value="xor">xor</option>
-                  <option value="xorBy">xorBy</option>
-                  <option value="zip">zip</option>
-                  <option value="zipObject">zipObject</option>
-                  <option value="zipObjectDeep">zipObjectDeep</option>
+                  <option value="countBy">countBy</option>
+                  <option value="every">every</option>
+                  <option value="filter">filter</option>
+                  <option value="find">find</option>
+                  <option value="groupBy">groupBy</option>
+                  <option value="includes">includes</option>
+                  <option value="invokeMap">invokeMap</option>
+                  <option value="keyBy">keyBy</option>
+                  <option value="map">map</option>
+                  <option value="orderBy">orderBy</option>
+                  <option value="partition">partition</option>
+                  <option value="reject">reject</option>
+                  <option value="sample">sample</option>
+                  <option value="sampleSize">sampleSize</option>
+                  <option value="shuffle">shuffle</option>
+                  <option value="size">size</option>
+                  <option value="some">some</option>
+                  <option value="sortBy">sortBy</option>
                 </select>
               </div>
 

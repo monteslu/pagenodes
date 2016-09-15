@@ -176,9 +176,22 @@ module.exports = function(RED) {
             msg.payload = 1/(Math.tan(getNumber(operand, radix)));
           }
           node.send(msg);
-        }} else {
-          node.send(msg); // If no payload - just pass it on.
+        } else if (node.operator === "~") {
+          msg.payload = ~ getNumber(msg.payload, radix);
+          node.send(msg);
+        } else if (node.operator === "^") {
+          msg.payload = getNumber(msg.payload, radix) ^ getNumber(operand, radix);
+          node.send(msg);
+        } else if (node.operator === "<<") {
+          msg.payload = getNumber(msg.payload, radix) << getNumber(operand, radix);
+          node.send(msg);
+        } else if (node.operator === ">>") {
+          msg.payload = getNumber(msg.payload, radix) >> getNumber(operand, radix);
+          node.send(msg);
         }
+      }else {
+        node.send(msg); // If no payload - just pass it on.
+      }
     });
   }
   RED.nodes.registerType("math", MathNode);

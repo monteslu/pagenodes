@@ -43,6 +43,7 @@ const requiredNodes = [
   require("../nodeDefs/storage/localdb"),
   require("../nodeDefs/io/geolocate"),
   require('../nodeDefs/io/vibrate'),
+  require('../nodeDefs/io/oscillator'),
   require("../nodeDefs/io/math"),
   require("../nodeDefs/io/strings"),
   require("../nodeDefs/io/arrays"),
@@ -54,7 +55,8 @@ const requiredNodes = [
   require('../nodeDefs/io/accelerometer'),
   require('../nodeDefs/storage/file'),
   require("../nodeDefs/parsers/XML"),
-  require('../nodeDefs/io/serial')
+  require('../nodeDefs/io/serial'),
+  require('../nodeDefs/io/midi')
 ];
 
 

@@ -62,6 +62,12 @@ module.exports = function(RED){
               <option value="secr">sec(y)</option>
               <option value="cotr">cot(y)</option>
 
+              // bitwise operators
+              <option value="~">~x</option>
+              <option value="^">x ^ y</option>
+              <option value="<<">x &lt;&lt; y</option>
+              <option value=">>">x &gt;&gt; y</option>
+
             </select>
           </div>
 

@@ -163,26 +163,26 @@ module.exports = function(RED){
               </div>
 
               <div className="form-row" id="node-form-row-param2Row">
-                <i className="fa fa-crosshairs"></i><label id="node-form-row-param2Name" style={{marginLeft:"10px", textTransform: "capitalize"}}></label>
-                <input type="text" id="node-input-param2" style={{width:"71%"}}></input>
+                <i className="fa fa-crosshairs"></i><label htmlFor="node-input-duration" id="node-form-row-param2Name" style={{marginLeft:"10px", textTransform: "capitalize"}}></label>
+                <input type="text" id="node-input-param2"/>
               </div>
+
               <div className="form-row" id="node-form-row-param3Row">
-                <i className="fa fa-crosshairs"></i><label id="node-form-row-param3Name" style={{marginLeft:"10px", textTransform: "capitalize"}}></label>
-                <input type="text" id="node-input-param3" style={{width:"71%"}}></input>
+                <i className="fa fa-crosshairs"></i><label htmlFor="node-input-duration" id="node-form-row-param3Name" style={{marginLeft:"10px", textTransform: "capitalize"}}></label>
+                <input type="text" id="node-input-param3"/>
               </div>
+
               <div className="form-row" id="node-form-row-param4Row">
-                <i className="fa fa-crosshairs"></i><label id="node-form-row-param4Name" style={{marginLeft:"10px", textTransform: "capitalize"}}></label>
-                <input type="text" id="node-input-param4" style={{width:"71%"}}></input>
-              </div>
-
-
-              <div className="form-row" id="node-form-row-description">
-                <span style={{fontStyle: "italic", marginLeft: "24%"}}></span>
+                <i className="fa fa-crosshairs"></i><label htmlFor="node-input-duration" id="node-form-row-param4Name" style={{marginLeft:"10px", textTransform: "capitalize"}}></label>
+                <input type="text" id="node-input-param4"/>
               </div>
 
               <div className="form-row">
-              <label htmlFor="node-input-name"><i className="fa fa-tag"/> <span style={{marginLeft: "10px"}}>Name</span></label>
+                <label htmlFor="node-input-name"><i className="fa fa-tag"/> <span style={{marginLeft: "10px"}}>Name</span></label>
                 <input type="text" id="node-input-name" placeholder="name" style={{width:"71%", marginLeft: "20px"}}></input>
+              </div>
+
+              <div className="form-tips" id="node-form-row-description">
               </div>
             </div>
           )

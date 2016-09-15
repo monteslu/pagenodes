@@ -30,6 +30,7 @@ const nodeDefs = [
   require('./io/split'),
   require('./io/join'),
   require('./io/vibrate'),
+  require('./io/oscillator'),
   require('./io/mqtt'),
   require('./io/gamepad'),
   require('./io/gpio'),
@@ -49,7 +50,8 @@ const nodeDefs = [
   require('./core/voicerec'),
   require('./io/accelerometer'),
   require('./storage/file'),
-  require('./io/serial')
+  require('./io/serial'),
+  require('./io/midi')
 ];
 
 module.exports = function(RED){

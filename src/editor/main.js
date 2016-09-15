@@ -188,6 +188,7 @@ function loadEditor() {
 
   $("#main-container").show();
   $(".header-toolbar").show();
+  extras.initUI(RED);
 
 }
 

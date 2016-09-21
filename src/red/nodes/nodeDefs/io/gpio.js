@@ -3,9 +3,10 @@ var createNodebotNode = require('./lib/nodebotNode');
 
 
 var five = {}; //require('johnny-five');
-var vm = require('vm');
-var util = require('util');
+
 var rest = require('rest');
+
+
 var mimeInterceptor = require('rest/interceptor/mime');
 var errorCodeInterceptor = require('rest/interceptor/errorCode');
 
@@ -36,8 +37,8 @@ function ioErrorStatus(n, err){
   n.warn(err);
 }
 
-function connectedStatus(n){
-  n.status({fill:"green",shape:"dot",text:"connected"});
+function connectedStatus(n, text){
+  n.status({fill:"green",shape:"dot",text: text || "connected"});
 }
 
 
@@ -109,7 +110,6 @@ function init(RED) {
       console.log('launching gpio out', n);
       node.nodebot.on('boardReady', function() {
         connectedStatus(node);
-
         node.on('input', function(msg) {
           var state = msg.state || node.state;
           var pin = msg.pin || node.pin;
@@ -125,6 +125,96 @@ function init(RED) {
   }
   gpioOutNode.groupName = 'gpio';
   RED.nodes.registerType("gpio out",gpioOutNode);
+
+
+  function nodePixelNode(n) {
+    RED.nodes.createNode(this,n);
+    this.buttonState = -1;
+    this.pin = parseInt(n.pin, 10);
+    this.length = parseInt(n.length, 10);
+    this.controller = n.controller;
+
+    this.nodebot = RED.nodes.getNode(n.board);
+    if (typeof this.nodebot === "object") {
+      var node = this;
+      setupStatus(node);
+
+      console.log('launching nodepixel', n);
+      node.nodebot.on('boardReady', function() {
+
+        connectedStatus(node);
+        var pixelConfig = {
+          pin: node.pin,
+          length: node.length,
+          controller: node.controller
+        };
+
+        node.nodebot.worker.postMessage({type: 'setupPixel', config: pixelConfig, nodeId: node.id});
+
+        node.on('input', function(msg) {
+          node.nodebot.worker.postMessage({type: 'pixelMsg', nodeId: node.id, msg});
+        });
+
+      });
+
+      // node.nodebot.on('pixelReady', function(data) {
+      //   if(data.nodeId == node.id){
+      //     connectedStatus(node);
+
+      //   }
+
+      // });
+    }
+    else {
+      this.warn("nodebot not configured");
+    }
+
+  }
+  nodePixelNode.groupName = 'gpio';
+  RED.nodes.registerType("pixel",nodePixelNode);
+
+
+  function servoNode(n) {
+    RED.nodes.createNode(this,n);
+    this.buttonState = -1;
+    this.pin = parseInt(n.pin, 10);
+    this.controller = n.controller;
+    this.mode = n.mode;
+    this.upperRange = n.upperRange;
+    this.lowerRange = n.lowerRange;
+
+    this.nodebot = RED.nodes.getNode(n.board);
+    if (typeof this.nodebot === "object") {
+      var node = this;
+      setupStatus(node);
+
+      node.nodebot.on('boardReady', function() {
+
+        connectedStatus(node);
+        var servoConfig = {
+          pin: node.pin,
+          mode: node.mode,
+          controller: node.controller,
+          lowerRange: node.lowerRange,
+          upperRange: node.upperRange
+        };
+
+        node.nodebot.worker.postMessage({type: 'setupServo', config: servoConfig, nodeId: node.id});
+
+        node.on('input', function(msg) {
+          node.nodebot.worker.postMessage({type: 'servoMsg', nodeId: node.id, msg});
+        });
+
+      });
+
+    }
+    else {
+      this.warn("nodebot not configured");
+    }
+
+  }
+  servoNode.groupName = 'gpio';
+  RED.nodes.registerType("servo",servoNode);
 
 
   function johnny5Node(n) {

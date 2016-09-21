@@ -41,6 +41,11 @@ module.exports = function(RED){
                 placeholder="Name" />
             </div>
 
+
+            <div className="form-tips" id="node-form-row-description">
+            Device ID is optional. If not specified, the first MIDI device found will be used.
+            </div>
+
           </div>
 
         </div>
@@ -96,6 +101,10 @@ module.exports = function(RED){
               <input type="text"
                 id="node-input-name"
                 placeholder="Name" />
+            </div>
+
+            <div className="form-tips" id="node-form-row-description">
+            Device ID is optional. If not specified, the first MIDI device found will be used.
             </div>
 
           </div>

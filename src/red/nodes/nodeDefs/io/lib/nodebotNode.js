@@ -130,6 +130,9 @@ function createNode(RED){
           // node.worker.postMessage({type: 'run', data: node.func});
           node.emit('boardReady', {});
         }
+        else if(type === 'pixelReady'){
+          node.emit('pixelReady', {nodeId: data.nodeId});
+        }
         else if(type === 'error'){
           node.error(new Error(data.message));
         }

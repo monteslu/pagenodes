@@ -17,7 +17,7 @@ module.exports = function(RED){
         outputs:1,  // set the number of outputs - 0 to n
         faChar: "&#xf0cb;",  // 's' text icon
         label: function() {
-            return this.name||"collections";
+            return this.name||this.func||"collections";
         },
         labelStyle: function() {
             return this.name?"node_label_italic":"";

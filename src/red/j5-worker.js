@@ -1,6 +1,9 @@
 const _ = require('lodash');
 const five = require('johnny-five');
 const firmata = require('firmata');
+const pixel = require('node-pixel');
+const oled = require('oled-js');
+const font5x7 = require('oled-font-5x7');
 const cachedRequire = require('./j5-cachedRequire');
 const WorkerSerialPort = require('./worker-serial').SerialPort;
 const common = require('./ww-common');
@@ -24,6 +27,8 @@ var port = new WorkerSerialPort(_serialWrite);
 
 var io, board;
 var SAMPLING_INTERVAL = 300;
+var pixelStrips = {};
+var servos = {};
 
 function startJ5(options){
 
@@ -46,7 +51,7 @@ function startJ5(options){
   });
   board.on('error', function(err){
     console.log('board error', err);
-    self.postMessage('boardError', '' + err);
+    self.postMessage({error: 'boardError: ' + err});
   });
   port.emit('open', {});
 
@@ -129,6 +134,150 @@ function handleGPIOIn({state, pin, nodeId, msg}){
   }
 }
 
+function setupServo({config, nodeId}){
+
+  try{
+
+    if(!config.controller){
+      delete config.controller; //remove empty string
+    }
+
+    if(config.lowerRange && config.upperRange){
+      config.range = [parseInt(config.lowerRange, 10), parseInt(config.upperRange, 10)];
+    }
+
+    if(config.mode === 'continuous'){
+      config.type = 'continuous'
+      delete config.mode;
+    }
+
+    servos[nodeId] = new five.Servo(config);
+
+    console.log('servo configged', servos[nodeId]);
+
+  }
+  catch(inputExp){
+    console.warn(inputExp);
+  }
+}
+
+function servoMessage({msg, nodeId}){
+  var servo = servos[nodeId];
+  var payload = msg.payload;
+  try{
+    if(servo){
+
+      if(_.includes(['home', 'stop', 'min', 'max', 'sweep', 'center'], payload)){
+        return servo[payload]();
+      }
+
+      if(servo.type === 'continuous'){
+        var val = parseFloat(payload, 10);
+        if(!_.isNaN(val)){
+          if(msg.ccw){
+            return servo.ccw(val);
+          }
+          servo.cw(val);
+        }
+      }else{
+        if(msg.duration && msg.steps){
+          return servo.to(parseInt(payload, 10), parseInt(msg.duration, 10), parseInt(msg.steps, 10));
+        }
+
+        if(msg.duration){
+          return servo.to(parseInt(payload, 10), parseInt(msg.duration, 10));
+        }
+
+        return servo.to(parseInt(payload, 10));
+      }
+
+    }
+
+  }catch(exp){
+    console.log('error handling pixel msg', exp);
+  }
+}
+
+function setupPixel({config, nodeId}){
+
+  try{
+
+    if(config.controller === 'FIRMATA'){
+      config.firmata = io;
+    }
+    else{
+      config.board = board;
+    }
+
+    pixelStrips[nodeId] = new pixel.Strip(config);
+
+    pixelStrips[nodeId].on("ready", function() {
+      self.postMessage({type: 'pixelReady', nodeId});
+    });
+  }
+  catch(inputExp){
+    console.warn(inputExp);
+  }
+}
+
+function handlePixelObj(obj, strip){
+  console.log('handlePixelObj', obj);
+  if(obj.strip){
+    strip.color(obj.strip);
+  }
+  else if(obj.clear){
+    strip.clear();
+  }
+  else if(obj.color){
+    var px = strip.pixel(obj.id);
+    if(px){
+      px.color(obj.color);
+    }
+  }
+  else if(obj.shift){
+    var direction = !!obj.backward ? pixel.BACKWARD : pixel.FORWARD;
+    strip.shift(obj.shift, direction, !!obj.wrap);
+  }
+}
+
+function pixelMessage({msg, nodeId}){
+  var strip = pixelStrips[nodeId];
+  var payload = msg.payload;
+  try{
+    if(strip){
+      if(typeof payload === 'string'){
+        strip.color(payload);
+        strip.show();
+      }
+      else if(Array.isArray(payload)){
+        var objs = _.map(payload, function(obj, idx){
+          if(typeof obj === 'string'){
+            return {color: obj, id: idx};
+          }
+          else if(typeof obj === 'object'){
+            return obj;
+          }
+          return null;
+        });
+        _.forEach(objs, function(obj){
+          if(obj){
+            handlePixelObj(obj, strip);
+          }
+        });
+        strip.show();
+      }
+      else if(typeof payload === 'object'){
+        handlePixelObj(payload, strip);
+        strip.show();
+      }
+
+    }
+
+  }catch(exp){
+    console.log('error handling pixel msg', exp);
+  }
+}
+
 self.onmessage = function(evt){
   var data = evt.data;
   var type = data.type;
@@ -158,6 +307,18 @@ self.onmessage = function(evt){
   }
   else if(type === 'inputSubscribe'){
     handleGPIOOut(data);
+  }
+  else if(type === 'setupPixel'){
+    setupPixel(data);
+  }
+  else if(type === 'pixelMsg'){
+    pixelMessage(data);
+  }
+  else if(type === 'setupServo'){
+    setupServo(data);
+  }
+  else if(type === 'servoMsg'){
+    servoMessage(data);
   }
 
   common.dispatch(evt);

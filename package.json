@@ -80,7 +80,7 @@
     "mqtt": "^1.11.0",
     "mqtt-serial": "^0.5.0",
     "mustache": "2.2.0",
-    "node-pixel": "^0.7.1",
+    "node-pixel": "^0.8.1",
     "nopt": "3.0.4",
     "oled-font-5x7": "^1.0.0",
     "oled-js": "^4.0.2",

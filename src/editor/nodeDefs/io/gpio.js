@@ -104,7 +104,7 @@ module.exports = function(RED){
 
 
   RED.nodes.registerType('gpio in',{
-    category: 'hardware',
+    category: 'robotics',
     defaults: {
       name: {value:""},
       state: {value:"INPUT",required:true},
@@ -115,7 +115,8 @@ module.exports = function(RED){
     color:"#f6de1d",
     inputs:0,
     outputs:1,
-    faChar: "&#xf135;", //rocket
+    faChar: "&#xf22c;", //neuter
+    faColor: "black",
     label: function() {
       return this.name||"gpio"+this.pin;
     },
@@ -186,7 +187,7 @@ module.exports = function(RED){
                 </div>
                 <div className="form-row" id="node-div-pinRow">
                   <label htmlFor="node-input-pin">
-                    <i className="fa fa-circle" /> Pin
+                    <i className="fa fa-neuter" /> Pin
                     </label>
                     <input
                       type="text"
@@ -222,7 +223,7 @@ module.exports = function(RED){
 
 
   RED.nodes.registerType('gpio out',{
-    category: 'hardware',
+    category: 'robotics',
     defaults: {
       name: {value:""},
       state: {value:"OUTPUT",required:true},
@@ -233,7 +234,8 @@ module.exports = function(RED){
     color:"#f6de1d",
     inputs:1,
     outputs:0,
-    faChar: "&#xf135;", //rocket
+    faChar: "&#xf22c;", //neuter
+    faColor: "black",
     align: "right",
     label: function() {
       console.log('name', "gpio"+(this.pin || this.i2cAddress || ''));
@@ -286,7 +288,7 @@ module.exports = function(RED){
                 </div>
                 <div className="form-row" id="node-div-pinRow">
                   <label htmlFor="node-input-pin">
-                    <i className="fa fa-circle" /> Pin
+                    <i className="fa fa-neuter" /> Pin
                     </label>
                     <input
                       type="text"
@@ -320,6 +322,221 @@ module.exports = function(RED){
       )
     },
     renderDescription: () => <p>GPIO Output Node</p>
+  });
+
+  RED.nodes.registerType('pixel',{
+    category: 'robotics',
+    defaults: {
+      name: {value:"", required: false},
+      pin: {value:"",required:false},
+      length: {value:"",required:true},
+      controller: {value:"FIRMATA", required:true},
+      board: {type:"nodebot", required:true}
+    },
+    color:"#f6de1d",
+    inputs:1,
+    outputs:0,
+    faChar: "&#xf185;", //sun-o
+    faColor: "black",
+    align: "right",
+    label: function() {
+      return this.name||"neopixel";
+    },
+    render: function () {
+      return (
+        <div>
+          <div>
+
+            <div className="form-row">
+              <label htmlFor="node-input-board">
+                <i className="fa fa-tasks" /> Board
+              </label>
+              <input type="text" id="node-input-board" />
+            </div>
+
+            <div className="form-row">
+              <label htmlFor="node-input-controller">
+                <i className="fa fa-wrench" /> Controller
+              </label>
+              <select type="text" id="node-input-controller">
+                <option value="FIRMATA">
+                  Firmata
+                </option>
+                <option value="I2CBACKPACK">
+                  I2C Backpack
+                </option>
+              </select>
+            </div>
+
+            <div className="form-row" id="node-div-pinRow">
+              <label htmlFor="node-input-pin">
+                <i className="fa fa-neuter" /> Pin
+              </label>
+              <input
+                type="text"
+                id="node-input-pin"
+                placeholder={6} />
+            </div>
+
+            <div className="form-row" id="node-div-lengthRow">
+              <label htmlFor="node-input-length">
+                <i className="fa fa-arrows-h" /> Length
+              </label>
+              <input
+                type="text"
+                id="node-input-length"
+                placeholder={8} />
+            </div>
+
+            <div className="form-row">
+              <label htmlFor="node-input-name">
+              <i className="fa fa-tag" /> Name
+              </label>
+              <input
+                type="text"
+                id="node-input-name"
+                placeholder="Name" />
+            </div>
+
+            <div
+              className="form-tips"
+              id="node-div-formTipRow"><b>Note:</b> The Pin number is not required when using an I2C backpack.
+            </div>
+
+          </div>
+        </div>
+      )
+    },
+    renderHelp: function () {
+      return (
+        <div>
+          <p>Neopixel output node using <a href="https://github.com/ajfisher/node-pixel" target="_blank">node-pixel</a>. </p>
+          <p>A msg can be sent to set an entire strip a single color. Example: <code>{`{payload: '#FF0000'})`}</code> OR <code>{`{payload: {strip: '#FF0000'}})`}</code></p>
+          <p>You can also use an object to specify a single pixel in the array by id. Example: <code>{`{payload: {color: 'blue', id: 3}})`}</code></p>
+          <p>A msg can be sent to shift pixels over. Example shift backwards 2 spaces and wrap: <code>{`{payload: {shift: 2, backward: true, wrap: true}})`}</code></p>
+          <p>An array of commands can be supplied and executed in order. Example: <code>{`{payload: [{strip: 'black'},{color: 'red', id:5},{color: '#00f600', id: 0},{shift: 1}})`}</code></p>
+        </div>
+      )
+    },
+    renderDescription: () => <p>NeoPixel (node-pixel) Output node.</p>
+  });
+
+
+  RED.nodes.registerType('servo',{
+    category: 'robotics',
+    defaults: {
+      name: {value:"", required: false},
+      pin: {value:"", required: true},
+      upperRange: {value:"", required: false},
+      lowerRange: {value:"", required: false},
+      mode: {value:"standard", required:true},
+      controller: {value:"", required:false},
+      board: {type:"nodebot", required:true}
+    },
+    color:"#f6de1d",
+    inputs:1,
+    outputs:0,
+    faChar: "&#xf085;", //gears
+    faColor: "black",
+    align: "right",
+    label: function() {
+      return this.name||"servo";
+    },
+    render: function () {
+      return (
+        <div>
+          <div>
+
+            <div className="form-row">
+              <label htmlFor="node-input-board">
+                <i className="fa fa-tasks" /> Board
+              </label>
+              <input type="text" id="node-input-board" />
+            </div>
+
+            <div className="form-row">
+              <label htmlFor="node-input-mode">
+                <i className="fa fa-wrench" /> Type
+              </label>
+              <select type="text" id="node-input-mode">
+                <option value="standard">
+                  standard
+                </option>
+                <option value="continuous">
+                  continuous
+                </option>
+              </select>
+            </div>
+
+            <div className="form-row" id="node-div-pinRow">
+              <label htmlFor="node-input-pin">
+                <i className="fa fa-neuter" /> Pin
+              </label>
+              <input
+                type="text"
+                id="node-input-pin"
+                placeholder={3} />
+            </div>
+
+            <div className="form-row">
+              <label htmlFor="node-input-controller">
+                <i className="fa fa-wrench" /> Controller
+              </label>
+              <input
+                type="text"
+                id="node-input-controller"
+                placeholder="PCA9685"/>
+            </div>
+
+
+            <div className="form-row">
+              <label htmlFor="node-input-lowerRange">
+                <i className="fa fa-long-arrow-down" /> Lower Range
+              </label>
+              <input
+                type="text"
+                id="node-input-lowerRange"
+                placeholder="0" />
+            </div>
+
+            <div className="form-row">
+              <label htmlFor="node-input-upperRange">
+                <i className="fa fa-long-arrow-up" /> Upper Range
+              </label>
+              <input
+                type="text"
+                id="node-input-upperRange"
+                placeholder="180" />
+            </div>
+
+            <div className="form-row">
+              <label htmlFor="node-input-name">
+              <i className="fa fa-tag" /> Name
+              </label>
+              <input
+                type="text"
+                id="node-input-name"
+                placeholder="Name" />
+            </div>
+
+          </div>
+        </div>
+      )
+    },
+    renderHelp: function () {
+      return (
+        <div>
+          <p>Servo output node using <a href="http://johnny-five.io/api/servo/" target="_blank">johnny-five Servo</a>. </p>
+          <p></p><p></p>
+          <p>A <strong>standard</strong> servo can be messaged to sweep back and forth. Example: <code>{`{payload: 'sweep'})`}</code></p>
+          <p>Other string payload command values are <code>stop</code>, <code>home</code>, <code>min</code>, <code>max</code>, and <code>center</code> </p>
+          <p>You can also set an angle value in the payload. Example: <code>{`{payload: 90})`}</code> OR with timing : <code>{`{payload: 90, duration: 500, steps: 10})`}</code> </p>
+          <p></p><p></p>
+          <p>A <strong>continuous</strong> servo can be given a speed from 0 to 1. Example: <code>{`{payload: 0.25})`}</code> OR to move counter-clockwise:<code>{`{payload: 0.25, ccw: true})`}</code></p>
+        </div>
+      )
+    },
+    renderDescription: () => <p>Servo Output node.</p>
   });
 
 
@@ -815,7 +1032,7 @@ module.exports = function(RED){
 
     RED.nodes.registerType('johnny5',{
         color:"#f6de1d",
-        category: 'hardware',
+        category: 'robotics',
         defaults: {
             name: {value:""},
             func: {value:""},
@@ -825,6 +1042,7 @@ module.exports = function(RED){
         inputs:1,
         outputs:1,
         faChar: "&#xf135;", //rocket
+        faColor: "black",
         label: function() {
             return this.name || 'johnny5';
         },

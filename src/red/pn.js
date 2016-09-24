@@ -36,7 +36,13 @@ var PN = {
   version: function () {
     return '1.0.0';
   },
-  get server() { return server.server }
+  get server() { return server.server },
+  _:function(a,b){
+    if(b){
+      return a+' '+b;
+    }
+    return a;
+  }
 };
 
 module.exports = PN;

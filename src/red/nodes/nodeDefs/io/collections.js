@@ -3,7 +3,8 @@ var util = require("util");
 
 module.exports = function(RED) {
   "use strict";
-  var _ = require("lodash");
+  const _ = require("lodash");
+  const DEFAULT_RESULT = 'payload';
 
   function CollectionsNode(n) {
     RED.nodes.createNode(this,n);
@@ -14,6 +15,7 @@ module.exports = function(RED) {
     node.param2 = n.param2;
     node.param3 = n.param3;
     node.param4 = n.param4;
+    node.resultProp = n.resultProp || DEFAULT_RESULT;
 
     function getNumber(input, radix){
       input = '' + input;
@@ -104,6 +106,7 @@ module.exports = function(RED) {
         var func = node.func;
         var wantsPayloadParsed = node.wantsPayloadParsed;
         var param2, param3, param4, radix;
+        var resultProp = node.resultProp;
 
         if (msg.hasOwnProperty('func')){
           func = msg.func;
@@ -143,23 +146,23 @@ module.exports = function(RED) {
         var lodashFunc = _[func];
         if (lodashFunc) {
           if (wantsPayloadParsed) {
-            msg.payload = parsePayload(msg.payload);
+            _.set(msg, resultProp, parsePayload(msg.payload));
           }
           var numberOfParameters = parametersExpected(collectionFunctions, func);
           if (numberOfParameters === 1) {
-            msg.payload = lodashFunc(msg.payload);
+            _.set(msg, resultProp, lodashFunc(msg.payload));
           } else if (numberOfParameters === 2) {
             param2 = parseParameter(collectionFunctions, func, radix, param2, 0);
-            msg.payload = lodashFunc(msg.payload, param2);
+            _.set(msg, resultProp, lodashFunc(msg.payload, param2));
           } else if (numberOfParameters === 3 ) {
             param2 = parseParameter(collectionFunctions, func, radix, param2, 0);
             param3 = parseParameter(collectionFunctions, func, radix, param3, 1);
-            msg.payload = lodashFunc(msg.payload, param2, param3);
+            _.set(msg, resultProp, lodashFunc(msg.payload, param2, param3));
           } else {
             param2 = parseParameter(collectionFunctions, func, radix, param2, 0);
             param3 = parseParameter(collectionFunctions, func, radix, param3, 1);
             param4 = parseParameter(collectionFunctions, func, radix, param4, 2);
-            msg.payload = lodashFunc(msg.payload, param2, param3, param4);
+            _.set(msg, resultProp, lodashFunc(msg.payload, param2, param3, param4));
           }
           node.send(msg);
         }

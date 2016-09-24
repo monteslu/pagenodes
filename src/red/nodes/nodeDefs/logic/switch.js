@@ -21,30 +21,60 @@ module.exports = function(RED) {
         RED.nodes.createNode(this, n);
         this.rules = n.rules || [];
         this.property = n.property;
+        this.propertyType = n.propertyType || "msg";
         this.checkall = n.checkall || "true";
-        var propertyParts = (n.property || "payload").split(".");
+        this.previousValue = null;
         var node = this;
-
         for (var i=0; i<this.rules.length; i+=1) {
             var rule = this.rules[i];
-            if (!isNaN(Number(rule.v))) {
-                rule.v = Number(rule.v);
-                rule.v2 = Number(rule.v2);
+            if (!rule.vt) {
+                if (!isNaN(Number(rule.v))) {
+                    rule.vt = 'num';
+                } else {
+                    rule.vt = 'str';
+                }
+            }
+            if (rule.vt === 'num') {
+                if (!isNaN(Number(rule.v))) {
+                    rule.v = Number(rule.v);
+                }
+            }
+            if (typeof rule.v2 !== 'undefined') {
+                if (!rule.v2t) {
+                    if (!isNaN(Number(rule.v2))) {
+                        rule.v2t = 'num';
+                    } else {
+                        rule.v2t = 'str';
+                    }
+                }
+                if (rule.v2t === 'num') {
+                    rule.v2 = Number(rule.v2);
+                }
             }
         }
 
         this.on('input', function (msg) {
             var onward = [];
             try {
-                var prop = propertyParts.reduce(function (obj, i) {
-                    return obj[i]
-                }, msg);
+                var prop = RED.util.evaluateNodeProperty(node.property,node.propertyType,node,msg);
                 var elseflag = true;
                 for (var i=0; i<node.rules.length; i+=1) {
                     var rule = node.rules[i];
                     var test = prop;
+                    var v1,v2;
+                    if (rule.vt === 'prev') {
+                        v1 = node.previousValue;
+                    } else {
+                        v1 = RED.util.evaluateNodeProperty(rule.v,rule.vt,node,msg);
+                    }
+                    v2 = rule.v2;
+                    if (rule.v2t === 'prev') {
+                        v2 = node.previousValue;
+                    } else if (typeof v2 !== 'undefined') {
+                        v2 = RED.util.evaluateNodeProperty(rule.v2,rule.v2t,node,msg);
+                    }
                     if (rule.t == "else") { test = elseflag; elseflag = true; }
-                    if (operators[rule.t](test,rule.v, rule.v2, rule.case)) {
+                    if (operators[rule.t](test,v1,v2,rule.case)) {
                         onward.push(msg);
                         elseflag = false;
                         if (node.checkall == "false") { break; }
@@ -52,6 +82,7 @@ module.exports = function(RED) {
                         onward.push(null);
                     }
                 }
+                node.previousValue = prop;
                 this.send(onward);
             } catch(err) {
                 node.warn(err);
@@ -60,4 +91,3 @@ module.exports = function(RED) {
     }
     RED.nodes.registerType("switch", SwitchNode);
 }
-

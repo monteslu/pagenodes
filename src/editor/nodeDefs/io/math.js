@@ -7,12 +7,14 @@ module.exports = function(RED){
       name: {value:""},   //  along with default values.
       operator: {value:"+", required:true},
       operand: {value:"", required:false},
+      payloadProp: {value:"payload", required:false},
+      resultProp: {value:"payload", required:false}
     },
     inputs:1,   // set the number of inputs - only 0 or 1
     outputs:1,  // set the number of outputs - 0 to n
     faChar: "&#xf1ec;",  //calculator
     label: function() {
-      return this.name||"math";
+      return this.name|| this.operator + ' ' + (this.operand || '');
     },
     labelStyle: function() {
       return this.name?"node_label_italic":"";
@@ -72,8 +74,8 @@ module.exports = function(RED){
           </div>
 
           <div className="form-row">
-            <label><span>x = </span></label>
-            <label><span><code>msg.payload</code></span></label>
+            <label htmlFor="node-input-payloadProp"><span>x = <code>msg.</code></span></label>
+            <input type="text" id="node-input-payloadProp" placeholder="payload"></input>
           </div>
 
           <div className="form-row">
@@ -81,10 +83,21 @@ module.exports = function(RED){
             <input type="text" id="node-input-operand" placeholder="Enter a number, 'pi', or 'e'"></input>
           </div>
 
+          <div className="form-row">
+            <label htmlFor="node-input-resultProp"> <span>result = <code>msg.</code></span></label>
+            <input type="text" id="node-input-resultProp" placeholder="payload"></input>
+          </div>
+
 
           <div className="form-row">
             <label htmlFor="node-input-name"><i className="fa fa-tag"></i> <span>Name</span></label>
             <input type="text" id="node-input-name"></input>
+          </div>
+
+          <div className="form-tips">
+            <span>
+              The <code>x</code> value and <code>result</code> value will default to the <code>msg.payload</code> property if not specified.
+            </span>
           </div>
 
         </div>

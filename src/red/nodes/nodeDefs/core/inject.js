@@ -15,6 +15,7 @@ module.exports = function(RED) {
     this.interval_id = null;
     this.cronjob = null;
     this.allowDebugInput = n.allowDebugInput;
+    console.log('inject node', n, this);
 
     if (this.repeat && !isNaN(this.repeat) && this.repeat > 0) {
       this.repeat = this.repeat * 1000;
@@ -32,12 +33,12 @@ module.exports = function(RED) {
 
     this.on("input",function(msg) {
       var msg = {topic:this.topic};
-      if ( (this.payloadType == null && this.payload === "") || this.payloadType === "date") {
+      if ( (!this.payloadType && !this.payload) || this.payloadType === "date") {
         msg.payload = Date.now();
-      } else if (this.payloadType == null || this.payloadType === "string") {
+      } else if (!this.payloadType) {
         msg.payload = this.payload;
       } else {
-        msg.payload = "";
+        msg.payload = RED.util.evaluateNodeProperty(this.payload,this.payloadType,this,msg);
       }
       this.send(msg);
       msg = null;

@@ -221,7 +221,7 @@ function setupPixel({config, nodeId}){
 }
 
 function handlePixelObj(obj, strip){
-  console.log('handlePixelObj', obj);
+  // console.log('handlePixelObj', obj);
   if(obj.strip){
     strip.color(obj.strip);
   }

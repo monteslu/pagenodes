@@ -44,6 +44,8 @@
 @import "dragdrop";
 
 @import "keyboard";
+@import "typedInput";
+@import "editableList";
 
 
 body {
@@ -315,4 +317,34 @@ input[type=range]:focus::-ms-fill-lower {
 }
 input[type=range]:focus::-ms-fill-upper {
   background: #5fb3d5;
+}
+
+
+
+.inject-time-row {
+    padding-left: 110px;
+}
+.inject-time-row select {
+    margin: 3px 0;
+}
+.inject-time-days label {
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    vertical-align: top;
+    width: 100px;
+}
+ .inject-time-days input {
+     width: auto;
+ }
+.inject-time-times {
+    width: 90px;
+}
+#inject-time-time {
+    width: 75px;
+}
+.inject-time-count {
+    width: 40px !important;
 }

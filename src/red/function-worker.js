@@ -10,7 +10,7 @@ const THROTTLE_TIME = 10;
 
 const node = common.createNode(self, THROTTLE_TIME);
 
-console.log('hello from web worker', self);
+// console.log('hello from web worker', self);
 
 function postResult(results, execId){
   self.postMessage({type: 'result', results, execId});

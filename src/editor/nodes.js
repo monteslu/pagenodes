@@ -459,7 +459,7 @@ module.exports = function(RED){
       n.out.forEach(function(p,c) {
         var nOut = {x:p.x,y:p.y,wires:[]};
         var wires = links.filter(function(d) { return d.target === p });
-        for (i=0;i<wires.length;i++) {
+        for (var i=0;i<wires.length;i++) {
           if (wires[i].source.type != "subflow") {
             nOut.wires.push({id:wires[i].source.id,port:wires[i].sourcePort})
           } else {

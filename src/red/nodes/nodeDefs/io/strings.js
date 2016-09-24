@@ -2,7 +2,8 @@ var stringFunctions = require('../../../../shared/nodes/strings').stringFunction
 
 module.exports = function(RED) {
   "use strict";
-  var _ = require("lodash");
+  const _ = require("lodash");
+  const DEFAULT_RESULT = 'payload';
 
 
   function StringsNode(n) {
@@ -12,11 +13,13 @@ module.exports = function(RED) {
     node.func = n.func;
     node.param2 = n.param2;
     node.param3 = n.param3;
+    node.resultProp = n.resultProp || DEFAULT_RESULT;
 
     this.on("input", function(msg) {
       if (msg.hasOwnProperty("payload")) {
         var func = node.func;
         var param2, param3;
+        var resultProp = node.resultProp;
         if(node.param2){
           param2 = node.param2;
         }
@@ -42,7 +45,7 @@ module.exports = function(RED) {
         }
         var lodashFunc = _[func];
         if(lodashFunc){
-          msg.payload = lodashFunc(msg.payload, param2, param3);
+          _.set(msg, resultProp, lodashFunc(msg.payload, param2, param3));
           node.send(msg);
         }
 

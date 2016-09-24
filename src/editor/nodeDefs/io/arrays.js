@@ -11,7 +11,8 @@ module.exports = function(RED){
           wantsPayloadParsed: {value: false, required: true},
           param2: {value:"", required: false},
           param3: {value:"", required: false},
-          param4: {value:"", requried: false}
+          param4: {value:"", requried: false},
+          resultProp: {value:"payload", required:false}
         },
         inputs:1,   // set the number of inputs - only 0 or 1
         outputs:1,  // set the number of outputs - 0 to n
@@ -175,6 +176,11 @@ module.exports = function(RED){
               <div className="form-row" id="node-form-row-param4Row">
                 <i className="fa fa-crosshairs"></i><label htmlFor="node-input-duration" id="node-form-row-param4Name" style={{marginLeft:"10px", textTransform: "capitalize"}}></label>
                 <input type="text" id="node-input-param4"/>
+              </div>
+
+              <div className="form-row">
+                <label htmlFor="node-input-resultProp"> <span>result = <code>msg.</code></span></label>
+                <input type="text" id="node-input-resultProp" placeholder="payload"></input>
               </div>
 
               <div className="form-row">

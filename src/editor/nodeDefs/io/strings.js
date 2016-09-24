@@ -9,7 +9,8 @@ module.exports = function(RED){
           name: {value:""},   //  along with default values.
           func: {value:"camelCase", required:true},
           param2: {value:"", required: false},
-          param3: {value:"", required: false}
+          param3: {value:"", required: false},
+          resultProp: {value:"payload", required:false}
         },
         inputs:1,   // set the number of inputs - only 0 or 1
         outputs:1,  // set the number of outputs - 0 to n
@@ -96,6 +97,11 @@ module.exports = function(RED){
               <div className="form-row" id="node-form-row-param3">
                 <label htmlFor="node-label-param3"><i className="fa fa-crosshairs"/><span id ="node-label-param3" style={{marginLeft:"5%", textTransform: "capitalize"}}></span></label>
                 <input type="text" id="node-input-param3" style={{width:"71%"}}></input>
+              </div>
+
+              <div className="form-row">
+                <label htmlFor="node-input-resultProp"> <span>result = <code>msg.</code></span></label>
+                <input type="text" id="node-input-resultProp" placeholder="payload"></input>
               </div>
 
               <div className="form-row">

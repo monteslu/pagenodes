@@ -493,6 +493,8 @@
             "rules": "Rules",
             "rule": "rule",
             "set": "set __property__",
+            "move": "move __property__",
+            "copy": "copy __property__",
             "change": "change __property__",
             "delete": "delete __property__",
             "changeCount": "change: __count__ rules",
@@ -500,6 +502,8 @@
         },
         "action": {
             "set": "Set",
+            "move": "Move",
+            "copy": "Copy",
             "change": "Change",
             "delete": "Delete",
             "to": "to",

@@ -230,6 +230,6 @@ require('./ui/subflow')(RED);
 require('./ui/touch/radialMenu')(RED);
 require('./ui/remote-control')(RED);
 require('./ui/typedInput')(RED);
-
+require('./ui/editableList')(RED);
 module.exports = RED;
 

@@ -45,158 +45,130 @@ module.exports = function(RED) {
         radix = msg.radix;
       }
 
+      var msgInput = _.get(msg, payloadProp);
+      var inputVal = getNumber(msgInput, radix);
+      var operandVal = getNumber(operand, radix);
+
       // Preform selected operation:
       if(node.operator === "+") {
-        _.set(msg, resultProp, getNumber(_.get(msg, payloadProp), radix) + getNumber(operand, radix));
-        node.send(msg);
+        _.set(msg, resultProp, inputVal + operandVal);
       } else if (node.operator === "-") {
-        _.set(msg, resultProp, getNumber(_.get(msg, payloadProp), radix) - getNumber(operand, radix));
-        node.send(msg);
+        _.set(msg, resultProp, inputVal - operandVal);
       } else if (node.operator === "*") {
-        _.set(msg, resultProp, getNumber(_.get(msg, payloadProp), radix) * getNumber(operand, radix));
-        node.send(msg);
+        _.set(msg, resultProp, inputVal * operandVal);
       } else if (node.operator === "/") {
-        _.set(msg, resultProp, getNumber(_.get(msg, payloadProp), radix) / getNumber(operand, radix));
-        node.send(msg);
+        _.set(msg, resultProp, inputVal / operandVal);
       } else if (node.operator === "%") {
-        _.set(msg, resultProp, getNumber(_.get(msg, payloadProp), radix) % getNumber(operand, radix));
-        node.send(msg);
+        _.set(msg, resultProp, inputVal % operandVal);
       } else if (node.operator === "^") {
-        _.set(msg, resultProp, Math.pow(getNumber(_.get(msg, payloadProp), radix), getNumber(operand, radix)));
-        node.send(msg);
+        _.set(msg, resultProp, Math.pow(inputVal, operandVal));
       } else if (node.operator === "log") {
-        _.set(msg, resultProp, getBaseLog(getNumber(_.get(msg, payloadProp), radix), getNumber(operand, radix)));
-        node.send(msg);
+        _.set(msg, resultProp, getBaseLog(inputVal, operandVal));
       } else if (node.operator === "round") {
-        _.set(msg, resultProp, Math.round(getNumber(_.get(msg, payloadProp), radix)));
-        node.send(msg);
+        _.set(msg, resultProp, Math.round(inputVal));
       } else if (node.operator === "floor") {
-        _.set(msg, resultProp, Math.floor(getNumber(_.get(msg, payloadProp), radix)));
-        node.send(msg);
+        _.set(msg, resultProp, Math.floor(inputVal));
       } else if (node.operator === "ceil") {
-        _.set(msg, resultProp, Math.ceil(getNumber(_.get(msg, payloadProp), radix)));
-        node.send(msg);
+        _.set(msg, resultProp, Math.ceil(inputVal));
       } else if (node.operator === "sin") {
-        if (getNumber(_.get(msg, payloadProp), radix) === Math.PI) {
+        if (inputVal === Math.PI) {
           _.set(msg, resultProp, 0);
         } else {
-          _.set(msg, resultProp, Math.sin(getNumber(_.get(msg, payloadProp), radix)));
+          _.set(msg, resultProp, Math.sin(inputVal));
         }
-        node.send(msg);
       } else if (node.operator === "cos") {
-        if (getNumber(_.get(msg, payloadProp), radix) === Math.PI) {
+        if (inputVal === Math.PI) {
           _.set(msg, resultProp, -1);
         } else {
-          _.set(msg, resultProp, Math.cos(getNumber(_.get(msg, payloadProp), radix)));
+          _.set(msg, resultProp, Math.cos(inputVal));
         }
-        node.send(msg);
       } else if (node.operator === "tan") {
-        if (getNumber(_.get(msg, payloadProp), radix) === Math.PI) {
+        if (inputVal === Math.PI) {
           _.set(msg, resultProp, 0);
         } else {
-          _.set(msg, resultProp, Math.tan(getNumber(_.get(msg, payloadProp), radix)));
+          _.set(msg, resultProp, Math.tan(inputVal));
         }
-        node.send(msg);
       } else if (node.operator === "csc") {
-        if (getNumber(_.get(msg, payloadProp), radix) === Math.PI) {
+        if (inputVal === Math.PI) {
           _.set(msg, resultProp, null);
         } else {
-          _.set(msg, resultProp, 1/(Math.sin(getNumber(_.get(msg, payloadProp), radix))));
+          _.set(msg, resultProp, 1/(Math.sin(inputVal)));
         }
-        node.send(msg);
       } else if (node.operator === "sec") {
-        if (getNumber(_.get(msg, payloadProp), radix) === Math.PI) {
+        if (inputVal === Math.PI) {
           _.set(msg, resultProp, -1);
         } else {
-          _.set(msg, resultProp, 1/(Math.cos(getNumber(_.get(msg, payloadProp), radix))));
+          _.set(msg, resultProp, 1/(Math.cos(inputVal)));
         }
-        node.send(msg);
       } else if (node.operator === "cot") {
-        if (getNumber(_.get(msg, payloadProp), radix) === Math.PI) {
+        if (inputVal === Math.PI) {
           _.set(msg, resultProp, null);
         } else {
-          _.set(msg, resultProp, 1/(Math.tan(getNumber(_.get(msg, payloadProp), radix))));
+          _.set(msg, resultProp, 1/(Math.tan(inputVal)));
         }
-        node.send(msg);
       } else if (node.operator === "-r") {
-        _.set(msg, resultProp, getNumber(operand, radix) - getNumber(_.get(msg, payloadProp), radix));
-        node.send(msg);
+        _.set(msg, resultProp, operandVal - inputVal);
       } else if (node.operator === "/r") {
-        _.set(msg, resultProp, getNumber(operand, radix) / getNumber(_.get(msg, payloadProp), radix));
-        node.send(msg);
+        _.set(msg, resultProp, operandVal / inputVal);
       } else if (node.operator === "%r") {
-        _.set(msg, resultProp, getNumber(operand, radix) % getNumber(_.get(msg, payloadProp), radix));
-        node.send(msg);
+        _.set(msg, resultProp, operandVal % inputVal);
       } else if (node.operator === "^r") {
-        _.set(msg, resultProp, Math.pow(getNumber(operand, radix), getNumber(_.get(msg, payloadProp), radix)));
-        node.send(msg);
+        _.set(msg, resultProp, Math.pow(operandVal, inputVal));
       } else if (node.operator === "logr") {
-        _.set(msg, resultProp, getBaseLog(getNumber(operand, radix), getNumber(_.get(msg, payloadProp), radix)));
-        node.send(msg);
+        _.set(msg, resultProp, getBaseLog(operandVal, inputVal));
       } else if (node.operator === "roundr") {
-        _.set(msg, resultProp, Math.round(getNumber(operand, radix)));
-        node.send(msg);
+        _.set(msg, resultProp, Math.round(operandVal));
       } else if (node.operator === "floorr") {
-        _.set(msg, resultProp, Math.floor(getNumber(operand, radix)));
-        node.send(msg);
+        _.set(msg, resultProp, Math.floor(operandVal));
       } else if (node.operator === "ceilr") {
-        _.set(msg, resultProp, Math.ceil(getNumber(operand, radix)));
-        node.send(msg);
+        _.set(msg, resultProp, Math.ceil(operandVal));
       } else if (node.operator === "sinr") {
-        if (getNumber(_.get(msg, payloadProp), radix) === Math.PI) {
+        if (inputVal === Math.PI) {
           _.set(msg, resultProp, 0);
         } else {
-          _.set(msg, resultProp, Math.sin(getNumber(operand, radix)));
+          _.set(msg, resultProp, Math.sin(operandVal));
         }
-        node.send(msg);
       } else if (node.operator === "cosr") {
-        if (getNumber(_.get(msg, payloadProp), radix) === Math.PI) {
+        if (inputVal === Math.PI) {
           _.set(msg, resultProp, -1);
         } else {
-          _.set(msg, resultProp, Math.cos(getNumber(operand, radix)));
+          _.set(msg, resultProp, Math.cos(operandVal));
         }
-        node.send(msg);
       } else if (node.operator === "tanr") {
-        if (getNumber(_.get(msg, payloadProp), radix) === Math.PI) {
+        if (inputVal === Math.PI) {
           _.set(msg, resultProp, 0);
         } else {
-          _.set(msg, resultProp, Math.tan(getNumber(operand, radix)));
+          _.set(msg, resultProp, Math.tan(operandVal));
         }
-        node.send(msg);
       } else if (node.operator === "cscr") {
-        if (getNumber(_.get(msg, payloadProp), radix) === Math.PI) {
+        if (inputVal === Math.PI) {
           _.set(msg, resultProp, null);
         } else {
-          _.set(msg, resultProp, 1/(Math.sin(getNumber(operand, radix))));
+          _.set(msg, resultProp, 1/(Math.sin(operandVal)));
         }
-        node.send(msg);
       } else if (node.operator === "secr") {
-        if (getNumber(_.get(msg, payloadProp), radix) === Math.PI) {
+        if (inputVal === Math.PI) {
           _.set(msg, resultProp, -1);
         } else {
-          _.set(msg, resultProp, 1/(Math.cos(getNumber(operand, radix))));
+          _.set(msg, resultProp, 1/(Math.cos(operandVal)));
         }
-        node.send(msg);
       } else if (node.operator === "cotr") {
-        if (getNumber(_.get(msg, payloadProp), radix) === Math.PI) {
+        if (inputVal === Math.PI) {
           _.set(msg, resultProp, null);
         } else {
-          _.set(msg, resultProp, 1/(Math.tan(getNumber(operand, radix))));
+          _.set(msg, resultProp, 1/(Math.tan(operandVal)));
         }
-        node.send(msg);
       } else if (node.operator === "~") {
-        _.set(msg, resultProp, ~ getNumber(_.get(msg, payloadProp), radix));
-        node.send(msg);
+        _.set(msg, resultProp, ~ inputVal);
       } else if (node.operator === "^") {
-        _.set(msg, resultProp, getNumber(_.get(msg, payloadProp), radix) ^ getNumber(operand, radix));
-        node.send(msg);
+        _.set(msg, resultProp, inputVal ^ operandVal);
       } else if (node.operator === "<<") {
-        _.set(msg, resultProp, getNumber(_.get(msg, payloadProp), radix) << getNumber(operand, radix));
-        node.send(msg);
+        _.set(msg, resultProp, inputVal << operandVal);
       } else if (node.operator === ">>") {
-        _.set(msg, resultProp, getNumber(_.get(msg, payloadProp), radix) >> getNumber(operand, radix));
-        node.send(msg);
+        _.set(msg, resultProp, inputVal >> operandVal);
       }
+
+      node.send(msg);
 
     });
   }

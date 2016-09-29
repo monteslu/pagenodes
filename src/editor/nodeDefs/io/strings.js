@@ -10,13 +10,14 @@ module.exports = function(RED){
           func: {value:"camelCase", required:true},
           param2: {value:"", required: false},
           param3: {value:"", required: false},
+          payloadProp: {value:"payload", required:false},
           resultProp: {value:"payload", required:false}
         },
         inputs:1,   // set the number of inputs - only 0 or 1
         outputs:1,  // set the number of outputs - 0 to n
         faChar: "&#xf0cc;",  // 's' text icon
         label: function() {
-            return this.name||"strings";
+            return this.name||this.func;
         },
         labelStyle: function() {
             return this.name?"node_label_italic":"";
@@ -53,6 +54,12 @@ module.exports = function(RED){
         render: function (){
           return (
             <div>
+
+              <div className="form-row">
+                <label htmlFor="node-input-payloadProp"><span>input = <code>msg.</code></span></label>
+                <input type="text" id="node-input-payloadProp" placeholder="payload"></input>
+              </div>
+
               <div className="form-row">
                 <label htmlFor="node-input-func"><i className="fa fa-gears"></i> <span>Func</span></label>
                 <select type="text" id="node-input-func" style={{width:"74%"}}>

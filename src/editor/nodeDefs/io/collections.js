@@ -12,6 +12,7 @@ module.exports = function(RED){
           param2: {value:"", required: false},
           param3: {value:"", required: false},
           param4: {value:"", requried: false},
+          payloadProp: {value:"payload", required:false},
           resultProp: {value:"payload", required:false}
         },
         inputs:1,   // set the number of inputs - only 0 or 1
@@ -101,9 +102,8 @@ module.exports = function(RED){
           return (
             <div>
               <div className="form-row">
-                <i className="fa fa-hand-paper-o" /><label style={{marginLeft:"10px"}}> Handling</label>
-                  <span>Parse <code>msg.payload</code> to JSON? </span>
-                  <input type="checkbox" id="node-input-wantsPayloadParsed"style={{width: "20%"}}></input>
+                <label htmlFor="node-input-payloadProp"><span>input = <code>msg.</code></span></label>
+                <input type="text" id="node-input-payloadProp" placeholder="payload"></input>
               </div>
 
               <div className="form-row">

@@ -24,7 +24,7 @@ $(function() {
     start_timing = Date.now();
 
     //load  "server"
-    const pn = require('./red/main');
+    const pn = require('./backend/main');
     passed = Date.now() - start_timing;
     console.log('time3', passed);
     window.PN = pn;

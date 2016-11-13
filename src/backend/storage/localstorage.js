@@ -2,7 +2,6 @@ var when = require('when');
 var nodeFn = require('when/node/function');
 var keys = require('when/keys');
 
-var log = require("../log");
 
 var localforage = require('localforage');
 

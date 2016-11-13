@@ -32,7 +32,7 @@ function loadNodeList() {
 }
 
 function loadNodes() {
-  PN.comms.rpc('getNodeConfigs', [], function(){
+  //PN.comms.rpc('getNodeConfigs', [], function(){
     // console.log('getNodeConfigs', data.length);
     // $("body").append(data);
     // $("body").append(templateText);
@@ -47,7 +47,7 @@ function loadNodes() {
     $(".palette-scroll").show();
     $("#palette-search").show();
     loadFlows();
-  });
+  //});
 }
 
 function loadFlows() {
@@ -233,6 +233,7 @@ require('./ui/touch/radialMenu')(PN);
 require('./ui/remote-control')(PN);
 require('./ui/typedInput')(PN);
 require('./ui/editableList')(PN);
+require('./ui/searchField')(PN);
 PN.components = require('./ui/components');
 module.exports = PN;
 

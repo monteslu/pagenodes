@@ -1,6 +1,9 @@
 require('babel-core/polyfill'); //@#$! safari
 
-const ui = require('./editor/main');
+process.env.BROWSER = true; //this should have already been done.
+
+//load  "server"
+
 
 let passed = Date.now() - start_timing;
 console.log('time00', passed);
@@ -8,9 +11,25 @@ start_timing = Date.now();
 
 
 $(function() {
+
+  const ui = require('./editor/main');
+  const backendFactory = require('./backend');
+
+
+
   let passed = Date.now() - start_timing;
   console.log('time0', passed);
   start_timing = Date.now();
+
+  ui.events.on('nodeDefsLoaded', function(){
+    passed = Date.now() - start_timing;
+    console.log('time4 nodeDefsLoaded', passed);
+    ui.loadNodeList();
+    ui.extras.clientReady(ui);
+  });
+
+  const backend = backendFactory();
+  window.PNBE = backend;
 
   ui.i18n.init(function() {
 
@@ -23,19 +42,19 @@ $(function() {
     console.log('time2', passed);
     start_timing = Date.now();
 
-    //load  "server"
-    const pn = require('./backend/main');
+    ui.comms.rpc('launch', [], function(ok){
+      console.log('launch');
+    });
+
+
+
+
     passed = Date.now() - start_timing;
     console.log('time3', passed);
-    window.PN = pn;
+
     start_timing - Date.now();
     console.log('waiting for server ready');
-    ui.events.on('nodeDefsLoaded', function(){
-      passed = Date.now() - start_timing;
-      console.log('time4', passed);
-      ui.loadNodeList();
-      ui.extras.clientReady(ui);
-    });
+
 
   });
 });

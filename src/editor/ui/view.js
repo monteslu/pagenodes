@@ -308,7 +308,7 @@ module.exports = function(RED){
           mousePos[1] /= scaleFactor;
           mousePos[0] /= scaleFactor;
 
-          var nn = { id:(1+Math.random()*4294967295).toString(16),x: mousePos[0],y:mousePos[1],w:node_width,z:RED.workspaces.active()};
+          var nn = { id:RED.util.generateId(),x: mousePos[0],y:mousePos[1],w:node_width,z:RED.workspaces.active()};
 
           nn.type = selected_tool;
           nn._def = RED.nodes.getType(nn.type);

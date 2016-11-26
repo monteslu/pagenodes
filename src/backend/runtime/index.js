@@ -34,7 +34,14 @@ function PNFactory(settings){
     storage: storage,
     util: util,
     extras: extras,
-    requiredNodes: requiredNodes
+    requiredNodes: requiredNodes,
+    _ : function(a, b){ //stub
+      let retVal = '' + a;
+      if(b){
+        retVal += ' ' + b;
+      }
+      return retVal;
+    }
   };
 
   // PN.comms = commsFactory(PN);

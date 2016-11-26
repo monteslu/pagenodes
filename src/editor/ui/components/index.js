@@ -1,6 +1,13 @@
+import NameRow from './NameRow';
+import TextRow from './TextRow';
+import TypeTextRow from './TypeTextRow';
+import SelectRow from './SelectRow';
+import SearchTextRow from './SearchTextRow';
+
 module.exports = {
-  NameRow: require('./NameRow'),
-  TextRow: require('./TextRow'),
-  SelectRow: require('./SelectRow'),
-  SearchTextRow: require('./SearchTextRow')
+  NameRow,
+  TextRow,
+  SelectRow,
+  SearchTextRow,
+  TypeTextRow
 };

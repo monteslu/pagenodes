@@ -94,7 +94,7 @@ function createCredentials(PN){
     register: function (type, definition) {
       var dashedType = type.replace(/\s+/g, '-');
       credentialsDef[dashedType] = definition;
-      registerEndpoint(dashedType);
+      // registerEndpoint(dashedType);
     },
 
     /**

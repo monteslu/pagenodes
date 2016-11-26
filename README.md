@@ -14,6 +14,8 @@ With pagenodes our goal is to give the user a simple, browser-based IOT network.
 
 ## Install
 
+Building PageNodes requires a local node(version 6+) install.
+
 ```
 git clone git@github.com:monteslu/pagenodes.git
 cd pagenodes

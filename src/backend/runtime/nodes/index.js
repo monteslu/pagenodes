@@ -111,9 +111,9 @@ function createNodes(PN){
     // Node registry
     createNode: createNode,
     getNode: function(a,b,c){
-      console.log('\n\ngetNode', a, b, flows.get, typeof flows.get);
+      // console.log('\n\ngetNode', a, b, flows.get, typeof flows.get);
       var gotten = flows.get(a,b);
-      console.log('\n gotten', gotten);
+      //console.log('\n gotten', gotten);
       return gotten;
     },
     eachNode: flows.eachNode,

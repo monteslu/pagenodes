@@ -60,7 +60,7 @@ function create(PN){
      * @return the node
      */
     get: function(i) {
-      console.log('\n in get', i, activeFlow.getNode);
+      // console.log('\n in get', i, activeFlow.getNode);
       return activeFlow.getNode(i);
     },
 

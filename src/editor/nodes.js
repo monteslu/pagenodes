@@ -141,7 +141,7 @@ module.exports = function(RED){
     })();
 
     function getID() {
-      return (1+Math.random()*4294967295).toString(16);
+      return RED.util.generateId();
     }
 
     function addNode(n) {

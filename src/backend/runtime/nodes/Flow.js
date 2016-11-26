@@ -2,10 +2,6 @@ var when = require("when");
 var clone = require("lodash").cloneDeep;
 var redUtil = require("../util");
 
-function getID() {
-  return (1+Math.random()*4294967295).toString(16);
-}
-
 
 function create(PN){
   const Log = PN.log;
@@ -47,7 +43,7 @@ function create(PN){
     // Clone all of the subflow node definitions and give them new IDs
     for (i=0;i<sf.nodes.length;i++) {
       node = clone(sf.nodes[i].config);
-      var nid = getID();
+      var nid = PN.util.generateId();
       node_map[node.id] = node;
       node._alias = node.id;
       node.id = nid;
@@ -290,21 +286,6 @@ function create(PN){
       }
     }
 
-    //console.log("NODES");
-    //for (i in this.nodes) {
-    //    if (this.nodes.hasOwnProperty(i)) {
-    //        console.log(" ",i,this.nodes[i].type,this.nodes[i].config.name||"");
-    //    }
-    //}
-    //console.log("SUBFLOWS");
-    //for (i in this.subflows) {
-    //    if (this.subflows.hasOwnProperty(i)) {
-    //        console.log(" ",i,this.subflows[i].type,this.subflows[i].config.name||"");
-    //        for (var j=0;j<this.subflows[i].nodes.length;j++) {
-    //            console.log("     ",this.subflows[i].nodes[j].config.id,this.subflows[i].nodes[j].type,this.subflows[i].nodes[j].config.name||"");
-    //        }
-    //    }
-    //}
 
     this.missingTypes = Object.keys(unknownTypes);
   }
@@ -438,14 +419,14 @@ function create(PN){
   }
 
   Flow.prototype.getNode = function(id) {
-    console.log('\nFlow.prototype.getNode', id, this.activeNodes[id]);
+    // console.log('\nFlow.prototype.getNode', id, this.activeNodes[id]);
     return this.activeNodes[id];
-  }
+  };
 
   Flow.prototype.getFlow = function() {
     //console.log(this.config);
     return this.config;
-  }
+  };
 
   Flow.prototype.eachNode = function(callback) {
     for (var id in this.activeNodes) {

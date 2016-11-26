@@ -8,6 +8,9 @@ extrasSW.registerServiceWorker();
 
 var PN = {};
 
+const util = require('./util');
+PN.util = util;
+
 
 function loadNodeList() {
   PN.comms.rpc('getNodeList', [], function(data){

@@ -1,4 +1,4 @@
-require('babel-core/polyfill'); //@#$! safari
+require('babel-polyfill'); //@#$! safari
 
 process.env.BROWSER = true; //this should have already been done.
 

@@ -33,31 +33,31 @@ module.exports = function(RED){
       options = options || {};
       var type = options.type || "default";
 
-      if (type == "default") {
+      // if (type == "default") {
         $('<li><span class="deploy-button-group button-group">'+
-          '<a id="btn-deploy" class="deploy-button disabled" href="#"><img id="btn-deploy-icon" src="red/images/deploy-full-o.png"> <span>'+RED._("deploy.deploy")+'</span></a>'+
-          '<a id="btn-deploy-options" data-toggle="dropdown" class="deploy-button" href="#"><i class="fa fa-caret-down"></i></a>'+
+          '<a id="btn-deploy" class="deploy-button deploy-button-reload" href="#"><i id="btn-deploy-icon" class="fa fa-rotate-right"></i>&nbsp; <span id="deploy-text">Restart</span></a>'+
+          // '<a id="btn-deploy-options" data-toggle="dropdown" class="deploy-button" href="#"><i class="fa fa-caret-down"></i></a>'+
           '</span></li>').prependTo(".header-toolbar");
-        RED.menu.init({id:"btn-deploy-options",
-          options: [
-            {id:"deploymenu-item-full",toggle:"deploy-type",icon:"red/images/deploy-full.png",label:RED._("deploy.full"),sublabel:RED._("deploy.fullDesc"),selected: true, onselect:function(s) { if(s){changeDeploymentType("full")}}},
-            {id:"deploymenu-item-flow",toggle:"deploy-type",icon:"red/images/deploy-flows.png",label:RED._("deploy.modifiedFlows"),sublabel:RED._("deploy.modifiedFlowsDesc"), onselect:function(s) {if(s){changeDeploymentType("flows")}}},
-            {id:"deploymenu-item-node",toggle:"deploy-type",icon:"red/images/deploy-nodes.png",label:RED._("deploy.modifiedNodes"),sublabel:RED._("deploy.modifiedNodesDesc"),onselect:function(s) { if(s){changeDeploymentType("nodes")}}}
-          ]
-        });
-      } else if (type == "simple") {
-        var label = options.label || RED._("deploy.deploy");
-        var icon = 'red/images/deploy-full-o.png';
-        if (options.hasOwnProperty('icon')) {
-          icon = options.icon;
-        }
-
-        $('<li><span class="deploy-button-group button-group">'+
-          '<a id="btn-deploy" class="deploy-button disabled" href="#">'+
-          (icon?'<img id="btn-deploy-icon" src="'+icon+'"> ':'')+
-          '<span>'+label+'</span></a>'+
-          '</span></li>').prependTo(".header-toolbar");
-      }
+        // RED.menu.init({id:"btn-deploy-options",
+        //   options: [
+        //     {id:"deploymenu-item-full",toggle:"deploy-type",icon:"red/images/deploy-full.png",label:RED._("deploy.full"),sublabel:RED._("deploy.fullDesc"),selected: true, onselect:function(s) { if(s){changeDeploymentType("full")}}},
+        //     {id:"deploymenu-item-flow",toggle:"deploy-type",icon:"red/images/deploy-flows.png",label:RED._("deploy.modifiedFlows"),sublabel:RED._("deploy.modifiedFlowsDesc"), onselect:function(s) {if(s){changeDeploymentType("flows")}}},
+        //     {id:"deploymenu-item-node",toggle:"deploy-type",icon:"red/images/deploy-nodes.png",label:RED._("deploy.modifiedNodes"),sublabel:RED._("deploy.modifiedNodesDesc"),onselect:function(s) { if(s){changeDeploymentType("nodes")}}}
+        //   ]
+        // });
+      // } else if (type == "simple") {
+      //   var label = options.label || RED._("deploy.deploy");
+      //   var icon = 'red/images/deploy-full-o.png';
+      //   if (options.hasOwnProperty('icon')) {
+      //     icon = options.icon;
+      //   }
+      //
+      //   $('<li><span class="deploy-button-group button-group">'+
+      //     '<a id="btn-deploy" class="deploy-button disabled" href="#">'+
+      //     (icon?'<img id="btn-deploy-icon" src="'+icon+'"> ':'')+
+      //     '<span>'+label+'</span></a>'+
+      //     '</span></li>').prependTo(".header-toolbar");
+      // }
 
       $('#btn-deploy').click(function() { save(); });
 
@@ -102,10 +102,20 @@ module.exports = function(RED){
           window.onbeforeunload = function() {
             return RED._("deploy.confirm.undeployedChanges");
           }
-          $("#btn-deploy").removeClass("disabled");
+          // $("#btn-deploy").removeClass("disabled");
+          $("#deploy-text").html("Run &nbsp; &nbsp;");
+          $("#btn-deploy-icon").removeClass("fa-rotate-right");
+          $("#btn-deploy-icon").addClass("fa-play");
+          $("#btn-deploy").removeClass("deploy-button-reload");
+          $("#btn-deploy").addClass("deploy-button-run");
         } else {
           window.onbeforeunload = null;
-          $("#btn-deploy").addClass("disabled");
+          // $("#btn-deploy").addClass("disabled");
+          $("#deploy-text").html("Reload");
+          $("#btn-deploy-icon").removeClass("fa-play");
+          $("#btn-deploy-icon").addClass("fa-rotate-right");
+          $("#btn-deploy").removeClass("deploy-button-run");
+          $("#btn-deploy").addClass("deploy-button-reload");
         }
       });
     }
@@ -141,8 +151,11 @@ module.exports = function(RED){
     }
 
     function save(force) {
-      if (RED.nodes.dirty()) {
+      //if (RED.nodes.dirty()) {
+      if (!RED._deploying) {
         //$("#debug-tab-clear").click();  // uncomment this to auto clear debug on deploy
+
+        RED._deploying =  true;
 
         if (!force) {
           var hasUnknown = false;
@@ -206,18 +219,19 @@ module.exports = function(RED){
           if (showWarning) {
             $( "#node-dialog-confirm-deploy-hide" ).prop("checked",false);
             $( "#node-dialog-confirm-deploy" ).dialog( "open" );
+            RED._deploying =  false;
             return;
           }
         }
 
 
-
-
         var nns = RED.nodes.createCompleteNodeSet();
 
-        $("#btn-deploy-icon").removeClass('fa-download');
-        $("#btn-deploy-icon").addClass('spinner');
+        // $("#btn-deploy-icon").removeClass('fa-download');
+        // $("#btn-deploy-icon").addClass('spinner');
         RED.nodes.dirty(false);
+
+        RED.comms.rpc('prepublish', [nns, deploymentType]);
 
         RED.comms.rpc('saveFlows', [nns, deploymentType], function(data){
           RED.notify(RED._("deploy.successfulDeploy"),"success");
@@ -239,49 +253,11 @@ module.exports = function(RED){
           RED.history.markAllDirty();
           RED.view.redraw();
           RED.events.emit("deploy");
-          $("#btn-deploy-icon").removeClass('spinner');
-          $("#btn-deploy-icon").addClass('fa-download');
+          // $("#btn-deploy-icon").removeClass('spinner');
+          // $("#btn-deploy-icon").addClass('fa-download');
+          RED._deploying =  false;
         });
 
-        // $.ajax({
-        //     url:"flows",
-        //     type: "POST",
-        //     data: JSON.stringify(nns),
-        //     contentType: "application/json; charset=utf-8",
-        //     headers: {
-        //         "Node-RED-Deployment-Type":deploymentType
-        //     }
-        // }).done(function(data,textStatus,xhr) {
-        //     RED.notify(RED._("deploy.successfulDeploy"),"success");
-        //     RED.nodes.eachNode(function(node) {
-        //         if (node.changed) {
-        //             node.dirty = true;
-        //             node.changed = false;
-        //         }
-        //         if(node.credentials) {
-        //             delete node.credentials;
-        //         }
-        //     });
-        //     RED.nodes.eachConfig(function (confNode) {
-        //         if (confNode.credentials) {
-        //             delete confNode.credentials;
-        //         }
-        //     });
-        //     // Once deployed, cannot undo back to a clean state
-        //     RED.history.markAllDirty();
-        //     RED.view.redraw();
-        //     RED.events.emit("deploy");
-        // }).fail(function(xhr,textStatus,err) {
-        //     RED.nodes.dirty(true);
-        //     if (xhr.responseText) {
-        //         RED.notify(RED._("notification.error",{message:xhr.responseText}),"error");
-        //     } else {
-        //         RED.notify(RED._("notification.error",{message:RED._("deploy.errors.noResponse")}),"error");
-        //     }
-        // }).always(function() {
-        //     $("#btn-deploy-icon").removeClass('spinner');
-        //     $("#btn-deploy-icon").addClass('fa-download');
-        // });
       }
     }
 
@@ -291,4 +267,3 @@ module.exports = function(RED){
   })();
 
 };
-

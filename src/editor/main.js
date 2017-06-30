@@ -1,7 +1,7 @@
 const extras = require('extras');
 const extrasSW = require('extras/service-worker');
 
-const nodeDefs = require('pagenodes-nodes/src/editor'); //require('./nodeDefs');
+const nodeDefs = require('pagenodes-nodes/dist/editor'); //require('./nodeDefs');
 
 
 extrasSW.registerServiceWorker();
@@ -176,7 +176,7 @@ function loadEditor() {
   });
 
   PN.user.init();
-  PN.library.init();
+  // PN.library.init();
   PN.palette.init();
   PN.sidebar.init();
   PN.subflow.init();
@@ -229,7 +229,7 @@ require('./ui/tab-info')(PN);
 require('./ui/tab-config')(PN);
 require('./ui/editor')(PN);
 require('./ui/clipboard')(PN);
-require('./ui/library')(PN);
+// require('./ui/library')(PN);
 require('./ui/notifications')(PN);
 require('./ui/subflow')(PN);
 require('./ui/touch/radialMenu')(PN);
@@ -239,4 +239,3 @@ require('./ui/editableList')(PN);
 require('./ui/searchField')(PN);
 PN.components = require('./ui/components');
 module.exports = PN;
-

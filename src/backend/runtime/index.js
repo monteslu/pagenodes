@@ -7,6 +7,8 @@ const credentials = require("./nodes/credentials");
 const api = require('./api');
 
 
+
+
 function PNFactory(settings){
   console.log('creating PNBE\n');
   const {storage, extras, requiredNodes} = settings;
@@ -26,7 +28,6 @@ function PNFactory(settings){
     stop: function(){
       this.nodes.stopFlows();
     },
-    // library: { register: library.register },
     credentials: credentials,
     events: pnevents,
     // plugin: plugin,
@@ -43,6 +44,20 @@ function PNFactory(settings){
       return retVal;
     }
   };
+
+
+  PN.contextStorage = {flow: {}};
+
+  PN.context = settings.context || {
+    flow: {
+      get: function(name){
+        return _.get(PN.contextStorage.flow, name);
+      },
+      set: function(name, value){
+        _.set(PN.contextStorage.flow, name, value)
+      }
+    }
+  }
 
   // PN.comms = commsFactory(PN);
   PN.nodes = createNodes(PN);
@@ -66,14 +81,7 @@ function PNFactory(settings){
 
         if (nodeErrors.length > 0) {
           log.warn("------------------------------------------");
-          if (settings.verbose) {
-            for (i=0;i<nodeErrors.length;i+=1) {
-              log.warn("["+nodeErrors[i].name+"] "+nodeErrors[i].err);
-            }
-          } else {
-            log.warn(log._("server.errors",{count:nodeErrors.length}));
-            log.warn(log._("server.errors-help"));
-          }
+          log.warn("["+nodeErrors[i].name+"] "+nodeErrors[i].err);
           log.warn("------------------------------------------");
         }
 
@@ -88,18 +96,13 @@ function PNFactory(settings){
           for (i in missingModules) {
             if (missingModules.hasOwnProperty(i)) {
               log.warn(" - "+i+": "+missingModules[i].join(", "));
-              if (settings.autoInstallModules && i != "node-red") {
-                serverAPI.installModule(i).catch(function(err) {
-                  // Error already reported. Need the otherwise handler
-                  // to stop the error propagating any further
-                });
-              }
             }
           }
           if (!settings.autoInstallModules) {
             log.info(log._("server.removing-modules"));
             PN.nodes.cleanModuleList();
           }
+
         }
 
         console.log('loading flows...');

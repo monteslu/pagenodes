@@ -3,6 +3,7 @@
 var cache = {
   "lodash": require('lodash'),
   "node-pixel": require('node-pixel'),
+  "node-led": require('node-led'),
   "oled-js": require('oled-js'),
   "oled-font-5x7": require('oled-font-5x7'),
   "temporal": require('temporal'),
@@ -15,4 +16,3 @@ function cachedRequire(packageName){
 }
 
 module.exports = cachedRequire;
-

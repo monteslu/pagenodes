@@ -1,6 +1,5 @@
 const events = require("events");
 
-module.exports = function(RED){
-  RED.events = new events.EventEmitter();
+module.exports = function(PN){
+  PN.events = new events.EventEmitter();
 };
-

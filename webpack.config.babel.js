@@ -1,4 +1,5 @@
 const path = require('path');
+const webpack = require('webpack');
 
 module.exports = {
   entry: {
@@ -15,15 +16,18 @@ module.exports = {
     root: path.join(__dirname, 'node_modules')
   },
   module: {
-    noParse: /node_modules\/localforage\/dist\/localforage.js/,
+    noParse: [
+      /node_modules\/localforage\/dist\/localforage.js/,
+      /node_modules\/bindings\/README.md/,
+    ],
     loaders: [
-      {
-        test: /\.js$/,
-        loader: 'babel-loader',
-        query: {
-          presets: ['es2015', 'react']
-        }
-      },
+    //   {
+    //     test: /\.js$/,
+    //     loader: 'babel-loader',
+    //     query: {
+    //       presets: ['es2015', 'react']
+    //     }
+    //   },
       {
         test: /\.json$/,
         loader: "json"
@@ -41,8 +45,12 @@ module.exports = {
       serialport: 'browser-serialport',
       bcrypt: 'bcryptjs',
       extras: process.env.EXTRAS || 'pagenodes-extras',
-      vm: 'vm-browserify'
+      vm: 'vm-browserify',
+      bindings: 'nopt'
     }
   },
+  plugins: [
+    // new webpack.IgnorePlugin(/node_modules\/bindings/)
+  ],
   bail: false
 };

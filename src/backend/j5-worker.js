@@ -1,6 +1,7 @@
 const _ = require('lodash');
 const five = require('johnny-five');
 const firmata = require('firmata');
+const nodeLed = require('node-led');
 const pixel = require('node-pixel');
 const oled = require('oled-js');
 const font5x7 = require('oled-font-5x7');
@@ -29,12 +30,13 @@ var io, board;
 var SAMPLING_INTERVAL = 300;
 var pixelStrips = {};
 var servos = {};
+var nodeLeds = {};
 
 function startJ5(options){
 
   if(options.boardType === 'firmata'){
     var ioOptions = {reportVersionTimeout: 1, samplingInterval: 300};
-    if(options.connectionType === 'webusb-serial'){
+    if(options.connectionType === 'webusb-serial' || 'ble-serial'){
       ioOptions.skipCapabilities = true;
       ioOptions.analogPins = [14,15,16,17,18,19];
     }
@@ -44,7 +46,7 @@ function startJ5(options){
     io = new tinkerIO({deviceId: options.sparkId, token: options.sparkToken, username: options.particleUsername, password: options.particlePassword});
   }
 
-  board = new five.Board({io, repl: false});
+  board = new five.Board({io, repl: false, timeout: 30000});
   board.on('ready', function(){
     console.log('board ready!');
     self.postMessage({type: 'boardReady'});
@@ -194,9 +196,56 @@ function servoMessage({msg, nodeId}){
     }
 
   }catch(exp){
-    console.log('error handling pixel msg', exp);
+    console.log('error handling servo msg', exp);
   }
 }
+
+
+
+
+function setupNodeLed({config, nodeId}){
+
+  try{
+
+    if(nodeLed[config.mode]){
+
+      nodeLeds[nodeId] = {
+        comp: new nodeLed[config.mode](io, {address: config.address}),
+        type: config.mode
+      }
+      nodeLeds[nodeId].comp.clearDisplay();
+      console.log('nodeLed configged', nodeLeds[nodeId]);
+    }
+
+
+  }
+  catch(inputExp){
+    console.warn(inputExp);
+  }
+}
+
+function nodeLedMessage({msg, nodeId}){
+  var led = nodeLeds[nodeId];
+  var payload = msg.payload;
+  try{
+    if(led){
+
+      if(led.type === 'AlphaNum4' || led.type === 'SevenSegment'){
+        led.comp.writeText(msg.payload);
+      }
+      else{
+        led.comp.drawBitmap(msg.payload);
+      }
+    }
+
+  }catch(exp){
+    console.log('error handling node-led msg', exp);
+  }
+}
+
+
+
+
 
 function setupPixel({config, nodeId}){
 
@@ -320,10 +369,15 @@ self.onmessage = function(evt){
   else if(type === 'servoMsg'){
     servoMessage(data);
   }
+  else if(type === 'setupNodeLed'){
+    setupNodeLed(data);
+  }
+  else if(type === 'nodeLedMsg'){
+    nodeLedMessage(data);
+  }
 
   common.dispatch(evt);
 
 };
 
 self.postMessage({type: 'workerReady'});
-

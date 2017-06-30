@@ -1,10 +1,4 @@
 
-const when = require("when");
-
-
-const needsPermission = function(){ return false; }; // require("../api/auth").needsPermission;
-
-
 function createCredentials(PN){
 
   let credentialCache = {};
@@ -82,7 +76,7 @@ function createCredentials(PN){
       if (deletedCredentials) {
         return storage.saveCredentials(credentialCache);
       } else {
-        return when.resolve();
+        return Promise.resolve();
       }
     },
 
@@ -167,5 +161,3 @@ function createCredentials(PN){
 }
 
 module.exports = createCredentials;
-
-

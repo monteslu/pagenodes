@@ -17,8 +17,12 @@
 $activeButton: #121212;
 
 $deployButton: #8C101C;
-$deployButtonHover: #6E0A1E;
-$deployButtonActive: #4C0A17;
+
+$deployButtonReload: blue;
+$deployButtonRun: green;
+
+$deployButtonHover: #0e6057;
+$deployButtonActive: #0e6057;
 
 $deployDisabledButton: #444;
 $deployDisabledButtonHover: #555;
@@ -120,11 +124,12 @@ span.logo {
 }
 
 .deploy-button {
-    background: $deployButton;
     color: #eee !important;
+    border: 1px solid #eee;
 
     &:hover {
         background: $deployButtonHover;
+        color: #ccc !important;
     }
 
     &:active {
@@ -132,6 +137,15 @@ span.logo {
         color: #ccc !important;
     }
 }
+
+.deploy-button-reload {
+    background: $deployButtonReload;
+}
+
+.deploy-button-run {
+    background: $deployButtonRun;
+}
+
 
 #btn-deploy {
 

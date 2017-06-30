@@ -27,8 +27,8 @@ function create(PN, registry){
 
     var nodeGroups = {};
     var nodeFiles = {
-      "node-red": {
-        name: "node-red",
+      "pagenodes": {
+        name: "pagenodes",
         version: "1.0.0",
         nodes: nodeGroups
       }
@@ -48,20 +48,20 @@ function create(PN, registry){
       console.log('loadNodeFiles', module);
       /* istanbul ignore else */
       if (nodeFiles.hasOwnProperty(module)) {
-        if (module == "node-red" || !registry.getModuleInfo(module)) {
-          var first = true;
-          for (var node in nodeFiles[module].nodes) {
-            /* istanbul ignore else */
-            if (nodeFiles[module].nodes.hasOwnProperty(node)) {
 
-              try {
-                promises.push(loadNodeConfig(nodeFiles[module].nodes[node]));
-              } catch (err) {
-                //
-              }
+        var first = true;
+        for (var node in nodeFiles[module].nodes) {
+          /* istanbul ignore else */
+          if (nodeFiles[module].nodes.hasOwnProperty(node)) {
+
+            try {
+              promises.push(loadNodeConfig(nodeFiles[module].nodes[node]));
+            } catch (err) {
+              //
             }
           }
         }
+
       }
     }
 
@@ -184,7 +184,7 @@ function create(PN, registry){
 
     return when.settle(promises).then(function () {
       // if (settings.available()) {
-        return registry.saveNodeList();
+        return 'ok';
       // } else {
         // return;
       // }
@@ -203,4 +203,3 @@ function create(PN, registry){
 }
 
 module.exports = {create};
-

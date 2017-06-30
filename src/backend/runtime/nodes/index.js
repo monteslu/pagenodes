@@ -86,17 +86,6 @@ function createNodes(PN){
     return registry.removeNode(id);
   }
 
-  function removeModule(module) {
-    var info = registry.getModuleInfo(module);
-    if (!info) {
-      throw new Error(log._("nodes.index.unrecognised-module", {module:module}));
-    } else {
-      for (var i=0;i<info.nodes.length;i++) {
-        checkTypeInUse(module+"/"+info.nodes[i].name);
-      }
-      return registry.removeModule(module);
-    }
-  }
 
   function disableNode(id) {
     checkTypeInUse(id);
@@ -120,7 +109,7 @@ function createNodes(PN){
 
     addFile: registry.addFile,
     addModule: registry.addModule,
-    removeModule: removeModule,
+
 
     enableNode: registry.enableNode,
     disableNode: disableNode,
@@ -133,10 +122,8 @@ function createNodes(PN){
     getNodeInfo: registry.getNodeInfo,
     getNodeList: registry.getNodeList,
 
-    getModuleInfo: registry.getModuleInfo,
 
     clearRegistry: registry.clear,
-    cleanModuleList: registry.cleanModuleList,
 
     // Flow handling
     loadFlows: flows.load,
@@ -155,5 +142,3 @@ function createNodes(PN){
 
 
 module.exports = {createNodes};
-
-

@@ -1,4 +1,3 @@
-const when = require("when");
 
 const createRegistryImpl = require("./registry").create;
 const createLoader = require("./loader").create;
@@ -31,7 +30,7 @@ function createRegistryIndex(PN){
           return registry.getNodeInfo(typeOrId);
         });
       }
-      return when.resolve(nodeSet);
+      return Promise.resolve(nodeSet);
     });
   }
 
@@ -45,7 +44,6 @@ function createRegistryIndex(PN){
     getNodeInfo: registry.getNodeInfo,
     getNodeList: registry.getNodeList,
 
-    getModuleInfo: registry.getModuleInfo,
     getModuleList: registry.getModuleList,
 
     getNodeConfigs: registry.getAllNodeConfigs,
@@ -54,7 +52,7 @@ function createRegistryIndex(PN){
     enableNode: enableNodeSet,
     disableNode: registry.disableNodeSet,
 
-    removeModule: registry.removeModule,
+
 
     cleanModuleList: registry.cleanModuleList,
     nodeConstructors: registry.nodeConstructors
@@ -64,6 +62,3 @@ function createRegistryIndex(PN){
 }
 
 module.exports = {createRegistry: createRegistryIndex};
-
-
-

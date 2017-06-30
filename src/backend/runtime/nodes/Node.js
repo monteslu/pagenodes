@@ -2,13 +2,13 @@ var util = require("util");
 var EventEmitter = require("events").EventEmitter;
 var when = require("when");
 
-var redUtil = require("../util");
+var pnUtil = require("../util");
 
 function create(PN){
 
   const {flows} = PN;
   const Log = PN.log;
-  const redUtil = PN.util;
+  const pnUtil = PN.util;
 
   function Node(n) {
     this.id = n.id;
@@ -94,7 +94,7 @@ function create(PN){
         // TODO: pre-load flows.get calls - cannot do in constructor
         //       as not all nodes are defined at that point
         if (!msg._msgid) {
-          msg._msgid = redUtil.generateId();
+          msg._msgid = pnUtil.generateId();
         }
         // this.metric("send",msg);
         node = flows.get(this._wire);
@@ -139,7 +139,7 @@ function create(PN){
                   sentMessageId = m._msgid;
                 }
                 if (msgSent) {
-                  var clonedmsg = redUtil.cloneMessage(m);
+                  var clonedmsg = pnUtil.cloneMessage(m);
                   sendEvents.push({n:node,m:clonedmsg});
                 } else {
                   sendEvents.push({n:node,m:m});
@@ -153,7 +153,7 @@ function create(PN){
     }
     /* istanbul ignore else */
     if (!sentMessageId) {
-      sentMessageId = redUtil.generateId();
+      sentMessageId = pnUtil.generateId();
     }
     this.metric("send",{_msgid:sentMessageId});
 
@@ -172,7 +172,7 @@ function create(PN){
       msg = {};
     }
     if (!msg._msgid) {
-      msg._msgid = redUtil.generateId();
+      msg._msgid = pnUtil.generateId();
     }
     this.metric("receive",msg);
     try {
@@ -236,8 +236,25 @@ function create(PN){
     flows.handleStatus(this,status);
   };
 
+  Node.prototype.context = function(){
+    return PN.context;
+  }
+
+  Node.prototype.setResult = function(msg, val){
+
+    if(this.resultPropType === 'msg'){
+      PN.util.setMessageProperty(msg, this.resultProp, val);
+    }
+    else if(this.resultPropType === 'flow'){
+      PN.context.flow.set(this.resultProp, val);
+    }
+    else if(this.resultPropType === 'global'){
+      PN.context.global.set(this.resultProp, val);
+    }
+
+  }
+
   return Node;
 }
 
 module.exports = {create};
-

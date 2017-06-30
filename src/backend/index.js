@@ -1,20 +1,20 @@
 const extras = require("extras");
 
-const requiredNodes = require('pagenodes-nodes/src/backend');
+const requiredNodes = require('pagenodes-nodes/dist/backend');
 
 const runtimeLauncher = require('./runtime');
 const createComms =require('./comms');
-const createStorage = require('./storage');
-const plugin = require("./plugin");
+const storage = require('./storage/localstorage');
+const createPlugin = require("./plugin");
 
 function launch(){
 
   try{
 
     const PN = runtimeLauncher({extras, requiredNodes});
-    PN.storage = createStorage(PN);
+    PN.storage = storage;
     PN.comms = createComms(PN);
-    PN.plugin = plugin;
+    PN.plugin = createPlugin(PN);
 
     PN.init();
     PN.plugin.start();
@@ -41,6 +41,3 @@ function launch(){
 }
 
 module.exports = launch;
-
-
-

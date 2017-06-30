@@ -35,22 +35,7 @@ function ensureBuffer(o) {
 }
 
 function cloneMessage(msg) {
-  // Temporary fix for #97
-  // TODO: remove this http-node-specific fix somehow
-  var req = msg.req;
-  var res = msg.res;
-  delete msg.req;
-  delete msg.res;
-  var m = _.cloneDeep(msg);
-  if (req) {
-    m.req = req;
-    msg.req = req;
-  }
-  if (res) {
-    m.res = res;
-    msg.res = res;
-  }
-  return m;
+  return _.cloneDeep(msg);
 }
 
 function compareObjects(obj1,obj2) {
@@ -179,4 +164,3 @@ module.exports = {
   setMessageProperty: setMessageProperty,
   evaluateNodeProperty: evaluateNodeProperty
 };
-

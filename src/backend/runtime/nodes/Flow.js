@@ -1,6 +1,6 @@
 var when = require("when");
 var clone = require("lodash").cloneDeep;
-var redUtil = require("../util");
+var pnUtil = require("../util");
 
 
 function create(PN){
@@ -189,7 +189,7 @@ function create(PN){
     } else {
       for (var p in newNode) {
         if (newNode.hasOwnProperty(p) && p != "x" && p != "y" && p != "wires") {
-          if (!redUtil.compareObjects(oldNode[p],newNode[p])) {
+          if (!pnUtil.compareObjects(oldNode[p],newNode[p])) {
             return true;
           }
         }
@@ -528,7 +528,7 @@ function create(PN){
         if (!changed) {
           if (flowNodes[node.z] && flowNodes[node.z].type == "subflow") {
             var originalNode = flow.allNodes[node.id];
-            if (originalNode && !redUtil.compareObjects(originalNode.wires,node.wires)) {
+            if (originalNode && !pnUtil.compareObjects(originalNode.wires,node.wires)) {
               // This is a node in a subflow whose wiring has changed. Mark subflow as changed
               changed = true;
             }
@@ -683,7 +683,7 @@ function create(PN){
     config.forEach(function(n) {
       if (!flowNodes[n.z] || flowNodes[n.z].type != "subflow") {
         var originalNode = flow.allNodes[n.id];
-        if (originalNode && !redUtil.compareObjects(originalNode.wires,n.wires)) {
+        if (originalNode && !pnUtil.compareObjects(originalNode.wires,n.wires)) {
           diff.wiringChanged.push(n.id);
         }
       }
@@ -752,7 +752,7 @@ function create(PN){
           }
           var errorMessage;
           if (msg) {
-            errorMessage = redUtil.cloneMessage(msg);
+            errorMessage = pnUtil.cloneMessage(msg);
           } else {
             errorMessage = {};
           }

@@ -58,43 +58,6 @@ function create(PN){
     return id.split("/")[1];
   }
 
-  function saveNodeList() {
-    var moduleList = {};
-
-    for (var module in moduleConfigs) {
-      /* istanbul ignore else */
-      if (moduleConfigs.hasOwnProperty(module)) {
-        if (Object.keys(moduleConfigs[module].nodes).length > 0) {
-          if (!moduleList[module]) {
-            moduleList[module] = {
-              name: module,
-              version: moduleConfigs[module].version,
-              nodes: {}
-            };
-          }
-          var nodes = moduleConfigs[module].nodes;
-          for(var node in nodes) {
-            /* istanbul ignore else */
-            if (nodes.hasOwnProperty(node)) {
-              var config = nodes[node];
-              var n = filterNodeInfo(config);
-              delete n.err;
-              delete n.file;
-              delete n.id;
-              n.file = config.file;
-              moduleList[module].nodes[node] = n;
-            }
-          }
-        }
-      }
-    }
-    // if (settings.available()) {
-      return when.resolve('ok'); //settings.set("nodes",moduleList);
-    // } else {
-      // return when.reject("Settings unavailable");
-    // }
-  }
-
   function loadNodeConfigs() {
 
 
@@ -167,7 +130,7 @@ function create(PN){
     }
     delete moduleNodes[module];
     delete moduleConfigs[module];
-    saveNodeList();
+
     return infoList;
   }
 
@@ -235,35 +198,8 @@ function create(PN){
   }
 
   function getModuleList() {
-    //var list = [];
-    //for (var module in moduleNodes) {
-    //    /* istanbul ignore else */
-    //    if (moduleNodes.hasOwnProperty(module)) {
-    //        list.push(registry.getModuleInfo(module));
-    //    }
-    //}
-    //return list;
     return moduleConfigs;
 
-  }
-
-  function getModuleInfo(module) {
-    if (moduleNodes[module]) {
-      var nodes = moduleNodes[module];
-      var m = {
-        name: module,
-        version: moduleConfigs[module].version,
-        nodes: []
-      };
-      for (var i = 0; i < nodes.length; ++i) {
-        var nodeInfo = filterNodeInfo(moduleConfigs[module].nodes[nodes[i]]);
-        nodeInfo.version = m.version;
-        m.nodes.push(nodeInfo);
-      }
-      return m;
-    } else {
-      return null;
-    }
   }
 
   function registerNodeConstructor(type,constructor) {
@@ -323,9 +259,7 @@ function create(PN){
       delete config.err;
       config.enabled = true;
       nodeConfigCache = null;
-      return saveNodeList().then(function() {
-        return filterNodeInfo(config);
-      });
+      return filterNodeInfo(config);
     } catch (err) {
       throw new Error("Unrecognised id: "+typeOrId);
     }
@@ -345,9 +279,7 @@ function create(PN){
       // TODO: persist setting
       config.enabled = false;
       nodeConfigCache = null;
-      return saveNodeList().then(function() {
-        return filterNodeInfo(config);
-      });
+      return filterNodeInfo(config);
     } catch (err) {
       throw new Error("Unrecognised id: "+id);
     }
@@ -387,9 +319,7 @@ function create(PN){
         }
       }
     }
-    if (removed) {
-      saveNodeList();
-    }
+
   }
 
   return {
@@ -403,18 +333,13 @@ function create(PN){
     enableNodeSet: enableNodeSet,
     disableNodeSet: disableNodeSet,
 
-    removeModule: removeModule,
     nodeConstructors: nodeConstructors,
     getNodeInfo: getNodeInfo,
     getFullNodeInfo: getFullNodeInfo,
     getNodeList: getNodeList,
     getModuleList: getModuleList,
-    getModuleInfo: getModuleInfo,
-
 
     getTypeId: getTypeId,
-
-    saveNodeList: saveNodeList,
 
     cleanModuleList: cleanModuleList
   };
@@ -422,4 +347,3 @@ function create(PN){
 }
 
 module.exports = {create};
-

@@ -14,7 +14,8 @@
     "build": "babel ./src --out-dir ./build && webpack && grunt build",
     "start": "ecstatic public --port 1337 --cache 0",
     "start80": "ecstatic public --port 80 --cache 0",
-    "lint": "eslint ./src --ext .js"
+    "lint": "eslint ./src --ext .js",
+    "serve:build": "serve -s public"
   },
   "contributors": [
     {
@@ -115,6 +116,7 @@
   },
   "dependencies": {
     "bufferutil": "^3.0.0",
+    "serve": "^6.3.1",
     "tls": "0.0.1",
     "utf-8-validate": "^3.0.1"
   }

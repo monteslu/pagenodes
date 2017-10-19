@@ -15,9 +15,7 @@ COPY package.json .
 # For npm@5 or later, copy package-lock.json as well
 # COPY package.json package-lock.json .
 RUN npm install
-RUN cd node_modules
-RUN git clone git@github.com:iceddev/pagenodes-proprietary.git
-RUN cd ..
+RUN git clone git@github.com:iceddev/pagenodes-proprietary.git;mv pagenodes-proprietary node_modules;cd node_modules/pagenodes-proprietary;npm install;cd /usr/src/app;
 
 # Bundle app source and remove ssh keys from build
 COPY . /usr/src/app

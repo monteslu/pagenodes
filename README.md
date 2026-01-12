@@ -1,16 +1,72 @@
-# React + Vite
+# PageNodes 2
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A visual flow-based programming editor that runs entirely in the browser. Connect nodes together to build IoT applications, AI pipelines, and hardware interactions without any server.
 
-Currently, two official plugins are available:
+This is a from-scratch rewrite of [PageNodes](https://github.com/monteslu/pagenodes), built with React and Vite. The original was a browser port of Node-RED.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Install
 
-## React Compiler
+```
+npm install
+npm run dev
+```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+For production build:
+```
+npm run build
+npm run preview
+```
 
-## Expanding the ESLint configuration
+## Nodes
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+**AI**
+- `llm` - Text generation using Transformers.js (Qwen, Llama, FLAN-T5, etc.)
+- `image-ai` - MediaPipe vision tasks (face detection, object detection, image classification)
+
+**Hardware**
+- `camera` - Capture images/video from webcam
+- `serial` - Web Serial API for Arduino, microcontrollers
+- `bluetooth` - Web Bluetooth for BLE devices
+- `usb` - WebUSB for direct device access
+- `gamepad` - Gamepad API for controllers
+- `accelerometer` - Device motion sensors
+- `midi` - Web MIDI for musical instruments
+- `geolocate` - GPS/location
+- `voicerec` - Speech recognition
+- `oscillator` - Web Audio tone generation
+- `vibrate` - Device vibration
+
+**Network**
+- `mqtt` - MQTT pub/sub
+- `websocket` - WebSocket client
+- `http` - HTTP requests
+- `socketio` - Socket.IO client
+- `eventsource` - Server-sent events
+- `hsync` - P2P sync via [hsync](https://github.com/nicobrinkkemper/hsync)
+
+**Flow Control**
+- `inject` - Trigger flows manually or on timer
+- `debug` - Log messages to sidebar
+- `function` - Custom JavaScript
+- `switch` - Route messages by condition
+- `change` - Set/modify message properties
+- `delay` - Delay or rate-limit messages
+- `trigger` - Send message then optionally another after delay
+- `template` - Mustache templates
+- `join/split` - Combine or split message sequences
+
+**Storage**
+- `localdb` - IndexedDB key-value store
+- `file` - File system access (where supported)
+
+**Output**
+- `canvas` - Draw to HTML canvas
+- `notify` - Browser notifications
+
+## Demo Flows
+
+Load `newflow.json` for example flows demonstrating face detection and LLM chat.
+
+## License
+
+Apache 2.0

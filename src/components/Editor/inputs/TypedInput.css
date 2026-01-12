@@ -1,0 +1,74 @@
+.typed-input {
+  display: flex;
+  position: relative;
+  width: 100%;
+}
+
+.typed-input-type-btn {
+  padding: 8px 10px;
+  border: 1px solid var(--border-color);
+  border-right: none;
+  border-radius: 4px 0 0 4px;
+  background: var(--button-bg);
+  color: var(--text-color);
+  cursor: pointer;
+  font-size: 12px;
+  white-space: nowrap;
+  min-width: 60px;
+  transition: all 0.15s ease;
+}
+
+.typed-input-type-btn:hover {
+  background: var(--hover-bg);
+}
+
+.typed-input-value {
+  flex: 1;
+  padding: 8px 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 0 4px 4px 0;
+  background: var(--input-bg);
+  color: var(--text-color);
+  font-size: 13px;
+  min-width: 0;
+  transition: border-color 0.15s ease;
+}
+
+.typed-input-value:focus {
+  outline: none;
+  border-color: var(--accent-color);
+}
+
+.typed-input-json {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+.typed-input-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 100;
+  background: var(--panel-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  min-width: 100px;
+  margin-top: 4px;
+}
+
+.typed-input-menu-item {
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--text-color);
+  transition: background 0.15s ease;
+}
+
+.typed-input-menu-item:hover {
+  background: var(--hover-bg);
+}
+
+.typed-input-menu-item.selected {
+  background: var(--accent-color);
+  color: white;
+}

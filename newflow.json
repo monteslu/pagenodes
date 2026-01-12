@@ -1,0 +1,293 @@
+{
+  "flows": [
+    {
+      "id": "flow-face-detection",
+      "type": "tab",
+      "label": "Face Detection"
+    },
+    {
+      "id": "flow-llm-chat",
+      "type": "tab",
+      "label": "LLM Chat"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "comment-face",
+      "type": "comment",
+      "name": "Face Detection - Click Take Photo to detect faces",
+      "z": "flow-face-detection",
+      "x": 280,
+      "y": 20,
+      "wires": []
+    },
+    {
+      "id": "inject-photo",
+      "type": "inject",
+      "name": "Take Photo",
+      "z": "flow-face-detection",
+      "x": 80,
+      "y": 80,
+      "wires": [["camera1"]],
+      "topic": "",
+      "payload": "",
+      "payloadType": "date",
+      "repeat": "",
+      "once": false
+    },
+    {
+      "id": "camera1",
+      "type": "camera",
+      "name": "",
+      "z": "flow-face-detection",
+      "x": 80,
+      "y": 160,
+      "wires": [["func-save-image"]],
+      "format": "jpeg",
+      "quality": 0.92,
+      "width": 640,
+      "height": 480,
+      "facingMode": "user",
+      "focusDelay": 500
+    },
+    {
+      "id": "func-save-image",
+      "type": "function",
+      "name": "Save Image",
+      "z": "flow-face-detection",
+      "x": 240,
+      "y": 160,
+      "wires": [["image-ai1"]],
+      "func": "msg.image = msg.payload;\nmsg.imageWidth = msg.width;\nmsg.imageHeight = msg.height;\nreturn msg;"
+    },
+    {
+      "id": "image-ai1",
+      "type": "image-ai",
+      "name": "Detect Faces",
+      "z": "flow-face-detection",
+      "x": 400,
+      "y": 160,
+      "wires": [["func-draw"]],
+      "config": "config-face-detection",
+      "threshold": 0.5,
+      "topk": 5,
+      "labels": ""
+    },
+    {
+      "id": "func-draw",
+      "type": "function",
+      "name": "Draw Boxes",
+      "z": "flow-face-detection",
+      "x": 560,
+      "y": 160,
+      "wires": [["canvas1", "debug-face"]],
+      "func": "var d = msg.payload || [];\nmsg.drawCommands = [\n  {command: \"setSize\", params: [msg.imageWidth, msg.imageHeight]},\n  {command: \"drawImage\", params: [msg.image, 0, 0]},\n  {command: \"strokeStyle\", params: [\"#00ff00\"]},\n  {command: \"lineWidth\", params: [3]}\n];\nfor (var i = 0; i < d.length; i++) {\n  var b = d[i].box;\n  msg.drawCommands.push({\n    command: \"strokeRect\",\n    params: [b.originX, b.originY, b.width, b.height]\n  });\n}\nreturn msg;"
+    },
+    {
+      "id": "canvas1",
+      "type": "canvas",
+      "name": "",
+      "z": "flow-face-detection",
+      "x": 720,
+      "y": 160,
+      "wires": [],
+      "config": "config-canvas"
+    },
+    {
+      "id": "debug-face",
+      "type": "debug",
+      "name": "Detections",
+      "z": "flow-face-detection",
+      "x": 720,
+      "y": 240,
+      "wires": [],
+      "active": true,
+      "tosidebar": true,
+      "console": false,
+      "complete": "payload"
+    },
+    {
+      "id": "comment-llm",
+      "type": "comment",
+      "name": "LLM Chat - Click inject buttons to chat with AI",
+      "z": "flow-llm-chat",
+      "x": 280,
+      "y": 40,
+      "wires": []
+    },
+    {
+      "id": "inject-question",
+      "type": "inject",
+      "name": "Ask Question",
+      "z": "flow-llm-chat",
+      "x": 120,
+      "y": 120,
+      "wires": [["llm1"]],
+      "payloadType": "str",
+      "payload": "What is the capital of France?",
+      "topic": "",
+      "repeat": "",
+      "once": false
+    },
+    {
+      "id": "inject-joke",
+      "type": "inject",
+      "name": "Tell Joke",
+      "z": "flow-llm-chat",
+      "x": 120,
+      "y": 180,
+      "wires": [["llm1"]],
+      "payloadType": "str",
+      "payload": "Tell me a short joke",
+      "topic": "",
+      "repeat": "",
+      "once": false
+    },
+    {
+      "id": "inject-code",
+      "type": "inject",
+      "name": "Explain Code",
+      "z": "flow-llm-chat",
+      "x": 120,
+      "y": 240,
+      "wires": [["llm1"]],
+      "payloadType": "str",
+      "payload": "What does this code do: arr.reduce((a, b) => a + b, 0)",
+      "topic": "",
+      "repeat": "",
+      "once": false
+    },
+    {
+      "id": "llm1",
+      "type": "llm",
+      "name": "Qwen Chat",
+      "z": "flow-llm-chat",
+      "x": 320,
+      "y": 180,
+      "wires": [["debug-llm"]],
+      "config": "config-llm-qwen",
+      "maxTokens": 128,
+      "temperature": 0.7,
+      "topP": 0.9,
+      "streaming": false,
+      "systemPrompt": "You are a helpful assistant. Keep responses brief."
+    },
+    {
+      "id": "debug-llm",
+      "type": "debug",
+      "name": "Response",
+      "z": "flow-llm-chat",
+      "x": 500,
+      "y": 180,
+      "wires": [],
+      "active": true,
+      "tosidebar": true,
+      "console": false,
+      "tostatus": true,
+      "complete": "payload"
+    },
+    {
+      "id": "comment-t5",
+      "type": "comment",
+      "name": "Text-to-Text (Translation, Summarization)",
+      "z": "flow-llm-chat",
+      "x": 260,
+      "y": 320,
+      "wires": []
+    },
+    {
+      "id": "inject-translate",
+      "type": "inject",
+      "name": "Translate",
+      "z": "flow-llm-chat",
+      "x": 120,
+      "y": 380,
+      "wires": [["llm2"]],
+      "payloadType": "str",
+      "payload": "translate English to German: Hello, how are you?",
+      "topic": "",
+      "repeat": "",
+      "once": false
+    },
+    {
+      "id": "inject-summarize",
+      "type": "inject",
+      "name": "Summarize",
+      "z": "flow-llm-chat",
+      "x": 120,
+      "y": 440,
+      "wires": [["llm2"]],
+      "payloadType": "str",
+      "payload": "summarize: Artificial intelligence has transformed the technology landscape over the past decade. Machine learning models can now understand natural language, generate images, write code, and assist with complex problem-solving tasks.",
+      "topic": "",
+      "repeat": "",
+      "once": false
+    },
+    {
+      "id": "llm2",
+      "type": "llm",
+      "name": "FLAN-T5",
+      "z": "flow-llm-chat",
+      "x": 320,
+      "y": 410,
+      "wires": [["debug-t5"]],
+      "config": "config-llm-t5",
+      "maxTokens": 100,
+      "temperature": 0.3,
+      "topP": 0.9,
+      "streaming": false,
+      "systemPrompt": ""
+    },
+    {
+      "id": "debug-t5",
+      "type": "debug",
+      "name": "Result",
+      "z": "flow-llm-chat",
+      "x": 500,
+      "y": 410,
+      "wires": [],
+      "active": true,
+      "tosidebar": true,
+      "console": false,
+      "tostatus": true,
+      "complete": "payload"
+    }
+  ],
+  "configNodes": [
+    {
+      "id": "config-canvas",
+      "type": "canvas-config",
+      "name": "My Canvas",
+      "width": 640,
+      "height": 480,
+      "background": "#ffffff"
+    },
+    {
+      "id": "config-face-detection",
+      "type": "image-ai-config",
+      "name": "Face Detection",
+      "backend": "mediapipe",
+      "task": "face-detection"
+    },
+    {
+      "id": "config-llm-qwen",
+      "type": "llm-config",
+      "name": "Qwen 2.5 Chat",
+      "task": "text-generation",
+      "model": "onnx-community/Qwen2.5-0.5B-Instruct",
+      "customModel": "",
+      "device": "wasm",
+      "dtype": "q4"
+    },
+    {
+      "id": "config-llm-t5",
+      "type": "llm-config",
+      "name": "FLAN-T5 Small",
+      "task": "text2text-generation",
+      "model": "Xenova/flan-t5-small",
+      "customModel": "",
+      "device": "wasm",
+      "dtype": "fp32"
+    }
+  ]
+}

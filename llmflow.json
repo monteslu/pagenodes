@@ -1,0 +1,175 @@
+{
+  "flows": [
+    { "id": "flow1", "type": "tab", "label": "LLM Test" }
+  ],
+  "nodes": [
+    {
+      "id": "comment1",
+      "type": "comment",
+      "name": "LLM Chat - Click inject buttons to test",
+      "z": "flow1",
+      "x": 280,
+      "y": 40,
+      "wires": []
+    },
+    {
+      "id": "inject1",
+      "type": "inject",
+      "name": "Ask Question",
+      "z": "flow1",
+      "x": 120,
+      "y": 100,
+      "wires": [["llm1"]],
+      "payloadType": "str",
+      "payload": "What is the capital of France?",
+      "topic": "",
+      "repeat": "",
+      "once": false
+    },
+    {
+      "id": "inject2",
+      "type": "inject",
+      "name": "Tell Joke",
+      "z": "flow1",
+      "x": 120,
+      "y": 160,
+      "wires": [["llm1"]],
+      "payloadType": "str",
+      "payload": "Tell me a short joke",
+      "topic": "",
+      "repeat": "",
+      "once": false
+    },
+    {
+      "id": "inject3",
+      "type": "inject",
+      "name": "Explain Code",
+      "z": "flow1",
+      "x": 120,
+      "y": 220,
+      "wires": [["llm1"]],
+      "payloadType": "str",
+      "payload": "What does this code do: arr.reduce((a, b) => a + b, 0)",
+      "topic": "",
+      "repeat": "",
+      "once": false
+    },
+    {
+      "id": "llm1",
+      "type": "llm",
+      "name": "Qwen Chat",
+      "z": "flow1",
+      "x": 320,
+      "y": 160,
+      "wires": [["debug1"]],
+      "config": "llmconfig1",
+      "maxTokens": 128,
+      "temperature": 0.7,
+      "topP": 0.9,
+      "streaming": false,
+      "systemPrompt": "You are a helpful assistant. Keep responses brief."
+    },
+    {
+      "id": "debug1",
+      "type": "debug",
+      "name": "Response",
+      "z": "flow1",
+      "x": 500,
+      "y": 160,
+      "wires": [],
+      "active": true,
+      "tosidebar": true,
+      "console": false,
+      "tostatus": true,
+      "complete": "payload"
+    },
+    {
+      "id": "comment2",
+      "type": "comment",
+      "name": "Translation (FLAN-T5)",
+      "z": "flow1",
+      "x": 200,
+      "y": 300,
+      "wires": []
+    },
+    {
+      "id": "inject4",
+      "type": "inject",
+      "name": "Translate",
+      "z": "flow1",
+      "x": 120,
+      "y": 360,
+      "wires": [["llm2"]],
+      "payloadType": "str",
+      "payload": "translate English to German: Hello, how are you?",
+      "topic": "",
+      "repeat": "",
+      "once": false
+    },
+    {
+      "id": "inject5",
+      "type": "inject",
+      "name": "Summarize",
+      "z": "flow1",
+      "x": 120,
+      "y": 420,
+      "wires": [["llm2"]],
+      "payloadType": "str",
+      "payload": "summarize: Artificial intelligence has transformed the technology landscape over the past decade. Machine learning models can now understand natural language, generate images, write code, and assist with complex problem-solving tasks.",
+      "topic": "",
+      "repeat": "",
+      "once": false
+    },
+    {
+      "id": "llm2",
+      "type": "llm",
+      "name": "FLAN-T5",
+      "z": "flow1",
+      "x": 320,
+      "y": 390,
+      "wires": [["debug2"]],
+      "config": "llmconfig2",
+      "maxTokens": 100,
+      "temperature": 0.3,
+      "topP": 0.9,
+      "streaming": false,
+      "systemPrompt": ""
+    },
+    {
+      "id": "debug2",
+      "type": "debug",
+      "name": "Result",
+      "z": "flow1",
+      "x": 500,
+      "y": 390,
+      "wires": [],
+      "active": true,
+      "tosidebar": true,
+      "console": false,
+      "tostatus": true,
+      "complete": "payload"
+    }
+  ],
+  "configNodes": [
+    {
+      "id": "llmconfig1",
+      "type": "llm-config",
+      "name": "Qwen 2.5 Chat",
+      "task": "text-generation",
+      "model": "onnx-community/Qwen2.5-0.5B-Instruct",
+      "customModel": "",
+      "device": "wasm",
+      "dtype": "q4"
+    },
+    {
+      "id": "llmconfig2",
+      "type": "llm-config",
+      "name": "FLAN-T5 Small",
+      "task": "text2text-generation",
+      "model": "Xenova/flan-t5-small",
+      "customModel": "",
+      "device": "wasm",
+      "dtype": "fp32"
+    }
+  ]
+}

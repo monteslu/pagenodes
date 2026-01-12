@@ -1,0 +1,90 @@
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+.app-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  min-height: 0; /* Prevent flex child from overflowing */
+}
+
+.canvas-wrapper {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+  min-width: 0;  /* Prevent flex child from overflowing */
+  min-height: 0; /* Prevent flex child from overflowing */
+}
+
+.resize-handle {
+  width: 4px;
+  background: var(--border-color);
+  cursor: col-resize;
+  transition: background 0.15s ease;
+  flex-shrink: 0;
+}
+
+.resize-handle:hover,
+.resize-handle.resizing {
+  background: var(--accent-color);
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  min-width: 150px;
+  max-width: 600px;
+  background: var(--sidebar-bg);
+  flex-shrink: 0;
+}
+
+.sidebar-tabs {
+  display: flex;
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.sidebar-tab {
+  flex: 1;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s ease;
+}
+
+.sidebar-tab:hover {
+  color: var(--text-color);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.sidebar-tab.active {
+  color: var(--text-color);
+  border-bottom-color: var(--accent-color);
+}
+
+/* When sidebar has tabs, panels should not have their own header border */
+.sidebar .debug-panel,
+.sidebar .info-panel {
+  border-left: none;
+}
+
+.sidebar .debug-header h3,
+.sidebar .info-header h3 {
+  display: none;
+}
+
+.sidebar .debug-header,
+.sidebar .info-header {
+  justify-content: flex-end;
+  padding: 6px 12px;
+}

@@ -1,0 +1,209 @@
+.canvas-container {
+  flex: 1;
+  overflow: auto;
+  background: var(--bg-color);
+  position: relative;
+  min-height: 0;
+}
+
+.canvas-svg {
+  display: block;
+}
+
+.canvas-bg {
+  cursor: default;
+}
+
+/* ============================================
+   NODES
+   ============================================ */
+
+.node {
+  cursor: move;
+}
+
+.node:hover .node-body {
+  filter: brightness(1.08);
+}
+
+.node.selected .node-body {
+  filter: brightness(1.1);
+}
+
+/* Error nodes - preserve red shadow on hover/selected */
+.node.has-errors .node-body {
+  filter: url(#errorGlow);
+}
+
+.node.has-errors:hover .node-body {
+  filter: url(#errorGlow) brightness(1.08);
+}
+
+.node.has-errors.selected .node-body {
+  filter: url(#errorSelectedGlow) brightness(1.1);
+}
+
+.node.has-errors.selected:hover .node-body {
+  filter: url(#errorSelectedGlow) brightness(1.1);
+}
+
+.node-shadow {
+  pointer-events: none;
+}
+
+.node-body {
+  transition: filter 0.15s ease, stroke-width 0.15s ease;
+}
+
+.node:hover .node-body {
+  stroke-width: 2;
+  stroke: #444;
+}
+
+.node.selected .node-body {
+  stroke-width: 2;
+  stroke: #ff9900;
+}
+
+.node.selected:hover .node-body {
+  stroke-width: 2;
+  stroke: #ffbb33;
+}
+
+.node-icon {
+  font-family: 'Font Awesome 5 Free', sans-serif;
+  user-select: none;
+}
+
+.node-type {
+  user-select: none;
+  font-family: var(--font-family);
+}
+
+.node-label {
+  user-select: none;
+  font-family: var(--font-family);
+}
+
+/* ============================================
+   PORTS
+   ============================================ */
+
+.port {
+  cursor: crosshair;
+  stroke: #555;
+  stroke-width: 1;
+  transition: fill 0.15s ease, stroke 0.15s ease, transform 0.1s ease;
+}
+
+.port-input {
+  fill: #ddd;
+}
+
+.port-output {
+  fill: #ddd;
+}
+
+.port:hover {
+  fill: #ff9900;
+  stroke: #333;
+  stroke-width: 2;
+}
+
+/* ============================================
+   WIRES
+   ============================================ */
+
+.wire-group {
+  cursor: pointer;
+}
+
+.wire-outer {
+  fill: none;
+  stroke: #ddd;
+  stroke-width: 5;
+  stroke-linecap: round;
+  pointer-events: stroke;
+}
+
+.wire-inner {
+  fill: none;
+  stroke: url(#wireGradient);
+  stroke-width: 3;
+  stroke-linecap: round;
+  pointer-events: none;
+  transition: stroke 0.2s ease;
+}
+
+.wire-inner-selected {
+  fill: none;
+  stroke: url(#wireSelectedGradient);
+  stroke-width: 3;
+  stroke-linecap: round;
+  pointer-events: none;
+}
+
+.wire-group:hover .wire-outer {
+  stroke: #fff;
+}
+
+.wire-group:hover .wire-inner {
+  stroke: #ffcc00;
+}
+
+/* ============================================
+   TEMP WIRE (drawing new connection)
+   ============================================ */
+
+/* Temp wire - thinner and grey when not connected */
+.wire-outer-temp {
+  stroke: #666;
+  stroke-width: 3;
+}
+
+.wire-inner-temp {
+  stroke: #888;
+  stroke-width: 1.5;
+}
+
+/* Temp wire - colored when hovering over valid input */
+.wire-inner-connecting {
+  stroke: url(#wireGradient);
+  stroke-width: 1.5;
+}
+
+.wire-connecting .wire-outer-temp {
+  stroke: #999;
+}
+
+/* Pending wire - connected but not deployed yet (thin but colored) */
+.wire-outer-pending {
+  stroke: #666;
+  stroke-width: 3;
+}
+
+.wire-inner-pending {
+  stroke: url(#wireGradient);
+  stroke-width: 1.5;
+}
+
+/* Temp wire should stay grey on hover when not connected */
+.wire-temp:hover .wire-outer-temp {
+  stroke: #666;
+}
+
+.wire-temp:hover .wire-inner-temp {
+  stroke: #888;
+}
+
+/* ============================================
+   SELECTION
+   ============================================ */
+
+.selection-box {
+  fill: rgba(74, 158, 255, 0.1);
+  stroke: var(--selection-color);
+  stroke-width: 1;
+  stroke-dasharray: 6 3;
+  pointer-events: none;
+}

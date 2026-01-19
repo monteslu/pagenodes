@@ -1,47 +1,95 @@
-// Arrays node - Runtime implementation
+// Arrays node - Runtime implementation using lodash
+import * as _ from 'lodash-es';
+
+// Helper to safely parse JSON
+const tryParseJSON = (val) => {
+  if (typeof val !== 'string') return val;
+  try {
+    return JSON.parse(val);
+  } catch {
+    return val;
+  }
+};
+
+// Custom array functions not in lodash
+const customFunctions = {
+  // Native array methods that lodash doesn't cover the same way
+  length: (arr) => _.size(arr),
+  push: (arr, val) => { const a = [...arr]; a.push(tryParseJSON(val)); return a; },
+  pop: (arr) => _.last(arr),
+  shift: (arr) => _.head(arr),
+  unshift: (arr, val) => { const a = [...arr]; a.unshift(tryParseJSON(val)); return a; },
+  splice: (arr, start, deleteCount) => {
+    const a = [...arr];
+    return a.splice(Number(start) || 0, Number(deleteCount) || 1);
+  }
+};
+
+// Map operation names to lodash/custom functions
+const getFn = (operation) => {
+  // Check custom functions first
+  if (customFunctions[operation]) {
+    return customFunctions[operation];
+  }
+  // Then check lodash
+  if (_[operation]) {
+    return _[operation];
+  }
+  return null;
+};
 
 export const arraysRuntime = {
   type: 'arrays',
 
   onInput(msg) {
-    let arr = Array.isArray(msg.payload) ? [...msg.payload] : [msg.payload];
-    const { arg1, arg2 } = this.config;
-    let result;
+    const operation = this.config.operation;
+    const fn = getFn(operation);
 
-    switch (this.config.operation) {
-      case 'push': arr.push(arg1); result = arr; break;
-      case 'pop': result = arr.pop(); break;
-      case 'shift': result = arr.shift(); break;
-      case 'unshift': arr.unshift(arg1); result = arr; break;
-      case 'slice': result = arr.slice(parseInt(arg1) || 0, arg2 ? parseInt(arg2) : undefined); break;
-      case 'splice': result = arr.splice(parseInt(arg1) || 0, parseInt(arg2) || 1); break;
-      case 'concat': result = arr.concat(JSON.parse(arg1 || '[]')); break;
-      case 'join': result = arr.join(arg1 || ','); break;
-      case 'reverse': result = arr.reverse(); break;
-      case 'sort': result = arr.sort(); break;
-      case 'length': result = arr.length; break;
-      case 'indexOf': result = arr.indexOf(arg1); break;
-      case 'includes': result = arr.includes(arg1); break;
-      case 'first': result = arr[0]; break;
-      case 'last': result = arr[arr.length - 1]; break;
-      case 'unique': result = [...new Set(arr)]; break;
-      case 'compact': result = arr.filter(Boolean); break;
-      case 'shuffle': result = arr.sort(() => Math.random() - 0.5); break;
-      case 'sample': result = arr[Math.floor(Math.random() * arr.length)]; break;
-      case 'chunk': {
-        const size = parseInt(arg1) || 1;
-        result = [];
-        for (let i = 0; i < arr.length; i += size) {
-          result.push(arr.slice(i, i + size));
-        }
-        break;
-      }
-      case 'flat': result = arr.flat(parseInt(arg1) || 1); break;
-      case 'fill': result = arr.fill(arg1); break;
-      default: result = arr;
+    if (!fn) {
+      this.warn(`Unknown array operation: ${operation}`);
+      return;
     }
 
-    msg.payload = result;
-    this.send(msg);
+    // Ensure we have an array to work with
+    let arr = msg.payload;
+    if (!Array.isArray(arr)) {
+      arr = [arr];
+    }
+
+    let { arg1, arg2, arg3 } = this.config;
+
+    // Allow msg properties to override config
+    if (msg.hasOwnProperty('arg1')) arg1 = msg.arg1;
+    if (msg.hasOwnProperty('arg2')) arg2 = msg.arg2;
+    if (msg.hasOwnProperty('arg3')) arg3 = msg.arg3;
+
+    // Parse JSON arguments where needed
+    const parseArg = (arg, asJSON = false) => {
+      if (arg === undefined || arg === null || arg === '') return undefined;
+      if (asJSON) return tryParseJSON(arg);
+      // Try to parse as number if it looks like one
+      const num = Number(arg);
+      return isNaN(num) ? arg : num;
+    };
+
+    try {
+      let result;
+
+      // Call with appropriate number of arguments
+      if (arg3 !== undefined && arg3 !== '') {
+        result = fn(arr, parseArg(arg1, true), parseArg(arg2, true), parseArg(arg3, true));
+      } else if (arg2 !== undefined && arg2 !== '') {
+        result = fn(arr, parseArg(arg1, true), parseArg(arg2, true));
+      } else if (arg1 !== undefined && arg1 !== '') {
+        result = fn(arr, parseArg(arg1, true));
+      } else {
+        result = fn(arr);
+      }
+
+      msg.payload = result;
+      this.send(msg);
+    } catch (err) {
+      this.warn(`Array operation error: ${err.message}`);
+    }
   }
 };

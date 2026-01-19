@@ -1,10 +1,9 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import { defineConfig } from 'vitest/config';
 
-// https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
-  worker: {
-    format: 'es'  // ES module workers - MediaPipe loads WASM via fetch when local
+  test: {
+    environment: 'node',
+    include: ['src/**/*.test.js', 'test/**/*.test.js'],
+    globals: true
   }
-})
+});

@@ -1,40 +1,114 @@
-// Strings node - Runtime implementation
+// Strings node - Runtime implementation using lodash
+import * as _ from 'lodash-es';
+
+// Custom string functions not in lodash
+const customFunctions = {
+  substring: (str, start, end) => {
+    str = String(str);
+    start = Number(start) || 0;
+    if (end !== undefined && end !== '') {
+      return str.substring(start, Number(end));
+    }
+    return str.substring(start);
+  },
+
+  concatString: (stra, strb) => {
+    return String(stra) + String(strb);
+  },
+
+  scrollText: (str, places) => {
+    str = String(str);
+    places = parseInt(Number(places), 10);
+    if (!places) {
+      return str;
+    }
+    if (places < 0) {
+      places = Math.abs(places);
+      return str.substring(str.length - places) + str.substring(0, str.length - places);
+    }
+    return str.substring(places) + str.substring(0, places);
+  },
+
+  // Native JS functions that lodash doesn't have
+  length: (str) => String(str).length,
+  charAt: (str, index) => String(str).charAt(Number(index) || 0),
+  charCodeAt: (str, index) => String(str).charCodeAt(Number(index) || 0),
+  indexOf: (str, search, fromIndex) => String(str).indexOf(search, Number(fromIndex) || 0),
+  lastIndexOf: (str, search, fromIndex) => {
+    str = String(str);
+    return fromIndex !== undefined ? str.lastIndexOf(search, Number(fromIndex)) : str.lastIndexOf(search);
+  },
+  match: (str, regex) => String(str).match(new RegExp(regex, 'g')),
+  search: (str, regex) => String(str).search(new RegExp(regex)),
+  slice: (str, start, end) => {
+    str = String(str);
+    start = Number(start) || 0;
+    return end !== undefined && end !== '' ? str.slice(start, Number(end)) : str.slice(start);
+  },
+  localeCompare: (str, compareStr) => String(str).localeCompare(String(compareStr)),
+  normalize: (str, form) => String(str).normalize(form || 'NFC'),
+  at: (str, index) => String(str).at(Number(index) || 0)
+};
+
+// Map operation names to lodash/custom functions
+const getFn = (operation) => {
+  // Check custom functions first
+  if (customFunctions[operation]) {
+    return customFunctions[operation];
+  }
+  // Then check lodash
+  if (_[operation]) {
+    return _[operation];
+  }
+  return null;
+};
 
 export const stringsRuntime = {
   type: 'strings',
 
   onInput(msg) {
-    const val = String(msg.payload);
-    const { arg1, arg2 } = this.config;
-    let result;
+    const operation = this.config.operation;
+    const fn = getFn(operation);
 
-    switch (this.config.operation) {
-      case 'toLowerCase': result = val.toLowerCase(); break;
-      case 'toUpperCase': result = val.toUpperCase(); break;
-      case 'trim': result = val.trim(); break;
-      case 'trimStart': result = val.trimStart(); break;
-      case 'trimEnd': result = val.trimEnd(); break;
-      case 'length': result = val.length; break;
-      case 'charAt': result = val.charAt(parseInt(arg1) || 0); break;
-      case 'concat': result = val + arg1; break;
-      case 'includes': result = val.includes(arg1); break;
-      case 'indexOf': result = val.indexOf(arg1); break;
-      case 'lastIndexOf': result = val.lastIndexOf(arg1); break;
-      case 'replace': result = val.replace(arg1, arg2); break;
-      case 'replaceAll': result = val.split(arg1).join(arg2); break;
-      case 'slice': result = val.slice(parseInt(arg1) || 0, arg2 ? parseInt(arg2) : undefined); break;
-      case 'split': result = val.split(arg1 || ''); break;
-      case 'substring': result = val.substring(parseInt(arg1) || 0, arg2 ? parseInt(arg2) : undefined); break;
-      case 'repeat': result = val.repeat(parseInt(arg1) || 1); break;
-      case 'padStart': result = val.padStart(parseInt(arg1) || 0, arg2 || ' '); break;
-      case 'padEnd': result = val.padEnd(parseInt(arg1) || 0, arg2 || ' '); break;
-      case 'startsWith': result = val.startsWith(arg1); break;
-      case 'endsWith': result = val.endsWith(arg1); break;
-      case 'match': result = val.match(new RegExp(arg1, 'g')); break;
-      default: result = val;
+    if (!fn) {
+      this.warn(`Unknown string operation: ${operation}`);
+      return;
     }
 
-    msg.payload = result;
-    this.send(msg);
+    const val = msg.payload;
+    let { arg1, arg2, arg3 } = this.config;
+
+    // Allow msg properties to override config
+    if (msg.hasOwnProperty('arg1')) arg1 = msg.arg1;
+    if (msg.hasOwnProperty('arg2')) arg2 = msg.arg2;
+    if (msg.hasOwnProperty('arg3')) arg3 = msg.arg3;
+
+    // Parse arg1/arg2/arg3 based on type hints if needed
+    // For numbers, try to parse them
+    const parseArg = (arg) => {
+      if (arg === undefined || arg === null || arg === '') return undefined;
+      // Try to parse as number if it looks like one
+      const num = Number(arg);
+      return isNaN(num) ? arg : num;
+    };
+
+    try {
+      let result;
+      // Call with appropriate number of arguments
+      if (arg3 !== undefined && arg3 !== '') {
+        result = fn(val, arg1, arg2, arg3);
+      } else if (arg2 !== undefined && arg2 !== '') {
+        result = fn(val, arg1, arg2);
+      } else if (arg1 !== undefined && arg1 !== '') {
+        result = fn(val, arg1);
+      } else {
+        result = fn(val);
+      }
+
+      msg.payload = result;
+      this.send(msg);
+    } catch (err) {
+      this.warn(`String operation error: ${err.message}`);
+    }
   }
 };

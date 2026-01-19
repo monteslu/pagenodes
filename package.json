@@ -20,6 +20,7 @@
     "johnny-five": "^2.1.0",
     "jshint": "^2.13.6",
     "localforage": "^1.10.0",
+    "lodash-es": "^4.17.22",
     "mqtt": "^5.14.1",
     "net-web": "^0.3.0",
     "prettier": "^3.7.4",

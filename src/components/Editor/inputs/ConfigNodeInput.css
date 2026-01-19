@@ -1,0 +1,110 @@
+.config-node-input {
+  position: relative;
+  width: 100%;
+}
+
+.config-node-select-wrapper {
+  display: flex;
+  gap: 4px;
+}
+
+.config-node-select-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  background: var(--input-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  color: var(--text-color);
+  cursor: pointer;
+  font-size: 13px;
+  text-align: left;
+  transition: border-color 0.15s ease;
+}
+
+.config-node-select-btn:hover {
+  border-color: var(--accent-color);
+}
+
+.config-node-value {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.config-node-arrow {
+  font-size: 10px;
+  opacity: 0.6;
+  margin-left: 8px;
+}
+
+.config-node-edit-btn {
+  padding: 8px 10px;
+  background: var(--button-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  color: var(--text-color);
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.15s ease;
+}
+
+.config-node-edit-btn:hover {
+  background: var(--hover-bg);
+  border-color: var(--accent-color);
+}
+
+.config-node-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 4px;
+  background: var(--input-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 100;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.config-node-option {
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.config-node-option:hover {
+  background: var(--hover-bg);
+}
+
+.config-node-option.selected {
+  background: var(--accent-color);
+  color: white;
+}
+
+.config-node-empty {
+  padding: 12px;
+  text-align: center;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.config-node-divider {
+  height: 1px;
+  background: var(--border-color);
+  margin: 4px 0;
+}
+
+.config-node-add {
+  color: var(--accent-color);
+  font-weight: 500;
+}
+
+.config-node-add:hover {
+  background: rgba(74, 158, 255, 0.1);
+}

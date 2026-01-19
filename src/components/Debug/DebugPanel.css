@@ -1,0 +1,374 @@
+.debug-panel {
+  flex: 1;
+  background: var(--sidebar-bg);
+  border-left: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.debug-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.debug-header h3 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.debug-controls {
+  display: flex;
+  gap: 6px;
+}
+
+.debug-toggle,
+.debug-clear {
+  padding: 4px 8px;
+  font-size: 11px;
+  font-weight: 500;
+  border-radius: 3px;
+  cursor: pointer;
+  border: 1px solid var(--border-color);
+  background: var(--bg-color);
+  color: var(--text-muted);
+  transition: all 0.15s ease;
+}
+
+.debug-toggle:hover,
+.debug-clear:hover {
+  background: var(--hover-bg);
+  color: var(--text-color);
+}
+
+.debug-toggle.active {
+  background: #4a9;
+  border-color: #3a8;
+  color: white;
+}
+
+.debug-input-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.debug-input-checkbox {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.debug-input-checkbox input {
+  margin: 0;
+  cursor: pointer;
+}
+
+.debug-input-field {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 6px 8px;
+  font-size: 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  background: var(--bg-color);
+  color: var(--text-color);
+  outline: none;
+  height: 30px;
+  box-sizing: border-box;
+}
+
+.debug-input-field:focus {
+  border-color: #4a9;
+}
+
+.debug-input-field:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.debug-input-field::placeholder {
+  color: var(--text-muted);
+}
+
+.debug-input-send {
+  padding: 6px 12px;
+  font-size: 14px;
+  border-radius: 3px;
+  cursor: pointer;
+  border: 1px solid #8aa8be;
+  background: #a6bbcf;
+  color: #333;
+  transition: all 0.15s ease;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.debug-input-send:hover:not(:disabled) {
+  background: #96abbd;
+  border-color: #7a98ad;
+}
+
+.debug-input-send:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.debug-input-icon {
+  font-family: 'Font Awesome 6 Free', sans-serif;
+  font-weight: 900;
+  font-size: 12px;
+}
+
+.debug-input-send.hidden {
+  display: none;
+}
+
+.debug-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+.debug-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--text-muted);
+  text-align: center;
+  font-size: 12px;
+  padding: 20px;
+}
+
+.debug-empty .hint {
+  margin-top: 8px;
+  font-size: 11px;
+  opacity: 0.7;
+}
+
+.debug-message {
+  background: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 8px;
+  margin-bottom: 6px;
+  font-size: 11px;
+}
+
+.debug-message-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.debug-node-name {
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.debug-time {
+  color: var(--text-muted);
+  font-size: 10px;
+  font-family: monospace;
+}
+
+.debug-topic {
+  color: var(--text-muted);
+  font-size: 10px;
+  margin-bottom: 4px;
+}
+
+.debug-payload {
+  margin: 0;
+  padding: 6px;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 11px;
+  color: var(--text-color);
+  white-space: pre-wrap;
+  word-break: break-all;
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.debug-media {
+  margin-top: 4px;
+  padding: 4px;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.debug-media img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 2px;
+}
+
+.debug-media video {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 2px;
+}
+
+.debug-media audio {
+  width: 100%;
+  height: 32px;
+}
+
+/* Accordion content area */
+.debug-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Collapsible sections - accordion behavior */
+.debug-section {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* Collapsed sections only show header */
+.debug-section.collapsed {
+  flex: 0 0 auto;
+}
+
+/* Expanded sections share space equally (50/50 when both open) */
+.debug-section.expanded {
+  flex: 1 1 0;
+  min-height: 0;
+}
+
+.debug-section-header {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  cursor: pointer;
+  user-select: none;
+  background: var(--header-bg);
+}
+
+.debug-section-header:hover {
+  background: var(--hover-bg);
+}
+
+.section-toggle {
+  font-size: 8px;
+  color: var(--text-muted);
+  transition: transform 0.15s ease;
+}
+
+.section-toggle.expanded {
+  transform: rotate(90deg);
+}
+
+.section-name {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+.section-badge {
+  background: #c44;
+  color: white;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 1px 5px;
+  border-radius: 8px;
+  min-width: 16px;
+  text-align: center;
+}
+
+.debug-section-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+  min-height: 0;
+}
+
+.debug-empty-section {
+  color: var(--text-muted);
+  font-size: 11px;
+  text-align: center;
+  padding: 12px;
+}
+
+/* Download items */
+.debug-download {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 6px 8px;
+  margin-bottom: 4px;
+}
+
+.download-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.download-filename {
+  font-size: 12px;
+  font-weight: 500;
+  color: #4a9;
+  cursor: pointer;
+  text-decoration: underline;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.download-filename:hover {
+  color: #5ba;
+}
+
+.download-meta {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.download-remove {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 2px 6px;
+  line-height: 1;
+  border-radius: 3px;
+}
+
+.download-remove:hover {
+  background: rgba(200, 60, 60, 0.2);
+  color: #c44;
+}

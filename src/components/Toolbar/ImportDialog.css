@@ -1,0 +1,159 @@
+.import-dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.import-dialog {
+  background: var(--panel-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  width: min(500px, 90vw);
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.import-dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.import-dialog-title {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text-color);
+}
+
+.import-dialog-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 20px;
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.import-dialog-close:hover {
+  color: var(--text-color);
+}
+
+.import-dialog-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.import-dialog-instructions {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.import-dialog-textarea {
+  width: 100%;
+  min-height: 200px;
+  padding: 10px;
+  font-size: 12px;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  line-height: 1.4;
+  background: var(--input-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  color: var(--text-color);
+  outline: none;
+  resize: vertical;
+  transition: border-color 0.15s ease;
+}
+
+.import-dialog-textarea:focus {
+  border-color: var(--accent-color);
+}
+
+.import-dialog-textarea::placeholder {
+  color: var(--text-muted);
+}
+
+.import-dialog-error {
+  padding: 8px 12px;
+  background: rgba(229, 57, 53, 0.1);
+  border: 1px solid rgba(229, 57, 53, 0.3);
+  border-radius: 4px;
+  color: #e53935;
+  font-size: 12px;
+}
+
+.import-dialog-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--border-color);
+}
+
+.import-dialog-spacer {
+  flex: 1;
+}
+
+.import-dialog-footer .btn {
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
+}
+
+.import-dialog-footer .btn-file {
+  background: transparent;
+  border-color: var(--border-color);
+  color: var(--text-color);
+}
+
+.import-dialog-footer .btn-file:hover {
+  background: var(--hover-bg);
+}
+
+.import-dialog-footer .btn-cancel {
+  background: transparent;
+  border-color: var(--border-color);
+  color: var(--text-color);
+}
+
+.import-dialog-footer .btn-cancel:hover {
+  background: var(--hover-bg);
+}
+
+.import-dialog-footer .btn-import {
+  background: var(--accent-color);
+  color: white;
+}
+
+.import-dialog-footer .btn-import:hover:not(:disabled) {
+  background: var(--accent-hover);
+}
+
+.import-dialog-footer .btn-import:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

@@ -46,7 +46,7 @@ export const fileReadNode = {
       reader.onload = () => {
         let payload = reader.result;
         if (format === 'json') {
-          try { payload = JSON.parse(payload); } catch {}
+          try { payload = JSON.parse(payload); } catch { /* not valid JSON */ }
         }
         peerRef.current.methods.sendResult(nodeId, {
           payload,

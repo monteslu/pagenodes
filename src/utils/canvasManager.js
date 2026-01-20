@@ -383,8 +383,9 @@ class CanvasManager {
           if (typeof ctx.reset === 'function') {
             ctx.reset();
           } else {
-            // Fallback for older browsers
-            canvas.width = canvas.width; // This resets the context
+            // Fallback for older browsers - reassigning width triggers reset
+            const w = canvas.width;
+            canvas.width = w;
           }
         }
         // Handle drawImage with various image sources

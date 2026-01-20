@@ -79,9 +79,9 @@ export const collectionsRuntime = {
     let { arg1, arg2, arg3 } = this.config;
 
     // Allow msg properties to override config
-    if (msg.hasOwnProperty('arg1')) arg1 = msg.arg1;
-    if (msg.hasOwnProperty('arg2')) arg2 = msg.arg2;
-    if (msg.hasOwnProperty('arg3')) arg3 = msg.arg3;
+    if (Object.hasOwn(msg, 'arg1')) arg1 = msg.arg1;
+    if (Object.hasOwn(msg, 'arg2')) arg2 = msg.arg2;
+    if (Object.hasOwn(msg, 'arg3')) arg3 = msg.arg3;
 
     // Parse JSON arguments where needed
     const parseArg = (arg) => {

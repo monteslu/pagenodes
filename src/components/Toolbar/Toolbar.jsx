@@ -63,7 +63,7 @@ export function Toolbar() {
         return { ..._node, ...config };
       }),
       configNodes: Object.values(flowState.configNodes).map(node => {
-        const { _node, users, ...config } = node;
+        const { _node, users: _users, ...config } = node;
         return { ..._node, ...config };
       })
     };
@@ -111,7 +111,7 @@ export function Toolbar() {
         return { ..._node, ...config };
       }),
       configNodes: Object.values(flowState.configNodes).map(node => {
-        const { _node, users, ...config } = node;
+        const { _node, users: _users, ...config } = node;
         return { ..._node, ...config };
       })
     };
@@ -139,7 +139,7 @@ export function Toolbar() {
   }, [connectMcp, disconnectMcp]);
 
   const handleImportComplete = useCallback((data) => {
-    const { flows, nodes, configNodes } = data;
+    const { nodes, configNodes } = data;
 
     // Calculate offset to avoid overlapping with existing nodes
     // Find the bounding box of existing nodes in the active flow

@@ -62,7 +62,7 @@ export const websocketInRuntime = {
       this.status({ fill: 'yellow', shape: 'ring', text: 'connecting' });
     });
 
-    configNode.on('ws_connected', (url) => {
+    configNode.on('ws_connected', () => {
       this.status({ fill: 'green', shape: 'dot', text: 'connected' });
     });
 
@@ -77,7 +77,7 @@ export const websocketInRuntime = {
     configNode.on('ws_message', (data) => {
       let payload = data;
       if (!this.config.wholemsg) {
-        try { payload = JSON.parse(data); } catch {}
+        try { payload = JSON.parse(data); } catch { /* not JSON */ }
       }
       this.send({ payload });
     });

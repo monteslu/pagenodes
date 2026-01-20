@@ -118,7 +118,7 @@ export const mqttInRuntime = {
         if (this._datatype === 'utf8' || this._datatype === 'auto') {
           payload = message.toString();
           if (this._datatype === 'auto') {
-            try { payload = JSON.parse(payload); } catch {}
+            try { payload = JSON.parse(payload); } catch { /* not JSON */ }
           }
         } else if (this._datatype === 'json') {
           try { payload = JSON.parse(message.toString()); }

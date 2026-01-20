@@ -41,7 +41,7 @@ export const buttonsNode = {
   mainThread: {
     // Called when a button is pressed in the ButtonsPanel
     // Broadcasts to runtime which then sends to all buttons nodes
-    buttonPress(peerRef, nodeId, { button }) {
+    buttonPress() {
       // This is called per-node but we want to broadcast to all
       // The actual broadcast happens via broadcastButtonPress
     }

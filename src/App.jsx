@@ -24,7 +24,7 @@ const MAX_SIDEBAR_WIDTH = 1200;
 function AppContent() {
   const { state: editor, dispatch: editorDispatch } = useEditor();
   const { dispatch: flowDispatch } = useFlows();
-  const { enabled: debugEnabled, messages, downloads } = useDebug();
+  const { messages, downloads } = useDebug();
   const { inject: runtimeInject, callMainThread, isRunning, isReady, deploy } = useRuntime();
   const { state: flowState } = useFlows();
   const { addNode, deleteSelected, nodes } = useNodes();

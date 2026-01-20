@@ -4,7 +4,7 @@
 export const cameraRuntime = {
   type: 'camera',
 
-  onInput(msg) {
+  onInput() {
     // Request camera capture from main thread
     this.mainThread('capture', {
       width: this.config.width || 640,

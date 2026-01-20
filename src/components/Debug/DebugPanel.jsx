@@ -21,7 +21,7 @@ export function DebugPanel() {
     try {
       const saved = localStorage.getItem(PANEL_STATE_KEY);
       if (saved) return { ...DEFAULT_SECTIONS, ...JSON.parse(saved) };
-    } catch {}
+    } catch { /* ignore parse errors */ }
     return DEFAULT_SECTIONS;
   });
 

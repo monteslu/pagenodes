@@ -181,7 +181,7 @@ export const hsyncOutRuntime = {
     if (this.config.headers) {
       try {
         headers = JSON.parse(this.config.headers);
-      } catch (e) {
+      } catch {
         // Use defaults
       }
     }

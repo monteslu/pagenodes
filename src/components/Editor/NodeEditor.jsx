@@ -161,6 +161,40 @@ export function NodeEditor({ node, onClose }) {
     };
   }, [values, nodeName, handleValueChange, node, def, flowState.configNodes]);
 
+  // Compute dynamic label for preview node - must be before early return
+  const previewLabel = useMemo(() => {
+    if (!def || !node) return '';
+    const mockNode = {
+      _node: { ...node._node, name: nodeName },
+      ...values
+    };
+    if (typeof def.label === 'function') {
+      try {
+        return def.label(mockNode);
+      } catch {
+        return nodeName || node._node.type;
+      }
+    }
+    return nodeName || node._node.type;
+  }, [def, node, nodeName, values]);
+
+  // Compute dynamic outputs if node defines an outputs function - must be before early return
+  const previewOutputs = useMemo(() => {
+    if (!def || !node) return 0;
+    if (typeof def.outputs === 'function') {
+      const mockNode = {
+        _node: { ...node._node, name: nodeName },
+        ...values
+      };
+      try {
+        return def.outputs(mockNode);
+      } catch {
+        return 1;
+      }
+    }
+    return def.outputs || 0;
+  }, [def, node, nodeName, values]);
+
   if (!node || !def) {
     return null;
   }
@@ -287,41 +321,6 @@ export function NodeEditor({ node, onClose }) {
 
   // If node has custom renderEditor, use it
   const customEditor = def.renderEditor ? def.renderEditor(PN) : null;
-
-  // Compute dynamic label for preview node
-  const previewLabel = useMemo(() => {
-    if (!def) return '';
-    // Create a mock node with current edited values for label function
-    const mockNode = {
-      _node: { ...node._node, name: nodeName },
-      ...values
-    };
-    if (typeof def.label === 'function') {
-      try {
-        return def.label(mockNode);
-      } catch {
-        return nodeName || node._node.type;
-      }
-    }
-    return nodeName || node._node.type;
-  }, [def, node, nodeName, values]);
-
-  // Compute dynamic outputs if node defines an outputs function
-  const previewOutputs = useMemo(() => {
-    if (!def) return 0;
-    if (typeof def.outputs === 'function') {
-      const mockNode = {
-        _node: { ...node._node, name: nodeName },
-        ...values
-      };
-      try {
-        return def.outputs(mockNode);
-      } catch {
-        return 1;
-      }
-    }
-    return def.outputs || 0;
-  }, [def, node, nodeName, values]);
 
   return (
     <div className="node-editor-overlay" onClick={handleCancel}>

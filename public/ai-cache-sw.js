@@ -25,7 +25,7 @@ function shouldCache(url) {
 }
 
 // Install event - just skip waiting
-self.addEventListener('install', (event) => {
+self.addEventListener('install', () => {
   console.log('[AI Cache SW] Installing...');
   self.skipWaiting();
 });
@@ -97,7 +97,7 @@ self.addEventListener('fetch', (event) => {
 
 // Message handler for cache management
 self.addEventListener('message', (event) => {
-  const { type, data } = event.data || {};
+  const { type } = event.data || {};
 
   switch (type) {
     case 'GET_CACHE_SIZE':

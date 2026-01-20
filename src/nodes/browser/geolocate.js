@@ -31,7 +31,7 @@ export const geolocateRuntime = {
     );
   },
 
-  onInput(msg) {
+  onInput() {
     if (!navigator.geolocation) {
       this.error('Geolocation not supported');
       return;

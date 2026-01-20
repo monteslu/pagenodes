@@ -94,7 +94,6 @@ function parseImportData(text) {
       type: f.type,
       label: f.label || f.name || 'Flow'
     }));
-    const configNodeTypes = new Set();
     // Find config node types (nodes that are referenced but don't have x/y)
     const allNodes = data.filter(n => n.type !== 'tab');
     const nodesWithPosition = allNodes.filter(n => typeof n.x === 'number');

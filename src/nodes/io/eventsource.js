@@ -22,7 +22,7 @@ export const eventsourceRuntime = {
         // Try to parse as JSON
         try {
           payload = JSON.parse(event.data);
-        } catch {}
+        } catch { /* not JSON, use raw data */ }
 
         this.send({
           payload,

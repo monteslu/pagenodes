@@ -68,7 +68,7 @@ export const hsyncConnectionNode = {
             try {
               res.writeHead(400, { 'Content-Type': 'application/json' });
               res.end(JSON.stringify({ error: 'Invalid JSON', message: req.parseError.message }));
-            } catch (e) {
+            } catch {
               // Ignore
             }
             return;
@@ -117,7 +117,7 @@ export const hsyncConnectionNode = {
             try {
               res.writeHead(404, { 'Content-Type': 'text/plain' });
               res.end('Not Found');
-            } catch (e) {
+            } catch {
               // Ignore
             }
           }
@@ -129,7 +129,7 @@ export const hsyncConnectionNode = {
               try {
                 res.writeHead(504, { 'Content-Type': 'text/plain' });
                 res.end('Gateway Timeout');
-              } catch (e) {
+              } catch {
                 // Response may already be sent
               }
             }
@@ -590,7 +590,7 @@ export const hsyncP2PInNode = {
       const entry = nodeStreamServers.get(nodeId);
       if (entry?.sockets.has(socketId)) {
         const socket = entry.sockets.get(socketId);
-        socket.write(Buffer.from(data));
+        socket.write(new Uint8Array(data));
       }
     },
 
@@ -679,7 +679,7 @@ export const hsyncP2POutNode = {
   },
 
   mainThread: {
-    async p2pConnect(peerRef, nodeId, { configId, peerHostname, direction, streamMode, targetPort }) {
+    async p2pConnect(peerRef, nodeId, { configId, peerHostname, streamMode, targetPort }) {
       try {
         const entry = hsyncConnections.get(configId);
         if (!entry?.conn) {
@@ -802,7 +802,7 @@ export const hsyncP2POutNode = {
       socket.connect(targetPort, 'localhost');
     },
 
-    p2pSend(peerRef, nodeId, { payload, streamMode, socketId }) {
+    p2pSend(peerRef, nodeId, { payload, streamMode }) {
       const entry = hsyncP2PPeers.get(nodeId);
       if (!entry?.peer?.dcOpen) return;
 

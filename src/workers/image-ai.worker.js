@@ -112,7 +112,7 @@ async function loadPipeline(task, model, options = {}) {
  * Run a vision task
  */
 async function runTask(task, model, imageData, options = {}) {
-  const { dtype, modelUrl, threshold, topk, labels } = options;
+  const { threshold, topk, labels } = options;
 
   // Load pipeline if needed
   if (!loadedPipeline || loadedTask !== task || loadedModel !== model) {
@@ -147,13 +147,14 @@ async function runTask(task, model, imageData, options = {}) {
       result = await loadedPipeline(imageData, { topk: topk || 5 });
       break;
 
-    case 'zero-shot-image-classification':
+    case 'zero-shot-image-classification': {
       const labelList = (labels || '').split(',').map(l => l.trim()).filter(Boolean);
       if (labelList.length === 0) {
         throw new Error('Labels required for zero-shot classification');
       }
       result = await loadedPipeline(imageData, labelList);
       break;
+    }
 
     case 'depth-estimation':
       result = await loadedPipeline(imageData);

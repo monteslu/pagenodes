@@ -4,16 +4,14 @@ import { canvasManager } from '../utils/canvasManager';
 const CanvasContext = createContext(null);
 
 export function CanvasProvider({ children }) {
-  const [canvases, setCanvases] = useState({});
+  // Initialize with current canvas manager state using lazy initializer
+  const [canvases, setCanvases] = useState(() => canvasManager.getCanvases());
 
   // Subscribe to canvas manager changes
   useEffect(() => {
     const unsubscribe = canvasManager.subscribe((newCanvases) => {
       setCanvases({ ...newCanvases });
     });
-
-    // Initialize with current state
-    setCanvases(canvasManager.getCanvases());
 
     return unsubscribe;
   }, []);

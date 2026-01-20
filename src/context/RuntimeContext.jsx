@@ -25,10 +25,20 @@ export function RuntimeProvider({ children }) {
   const errorsRef = useRef(errors);
   const nodeStatusesRef = useRef(nodeStatuses);
   const deployRef = useRef(null);
-  flowStateRef.current = flowState;
-  messagesRef.current = messages;
-  errorsRef.current = errors;
-  nodeStatusesRef.current = nodeStatuses;
+
+  // Update refs in effect to avoid updating during render
+  useEffect(() => {
+    flowStateRef.current = flowState;
+  }, [flowState]);
+  useEffect(() => {
+    messagesRef.current = messages;
+  }, [messages]);
+  useEffect(() => {
+    errorsRef.current = errors;
+  }, [errors]);
+  useEffect(() => {
+    nodeStatusesRef.current = nodeStatuses;
+  }, [nodeStatuses]);
 
   // Initialize worker and rawr peer
   useEffect(() => {
@@ -473,7 +483,7 @@ export function RuntimeProvider({ children }) {
           result.relatedDocs = typeof nodeDef.relatedDocs === 'function'
             ? nodeDef.relatedDocs()
             : nodeDef.relatedDocs;
-        } catch (e) {
+        } catch {
           // Ignore errors in relatedDocs
         }
       }
@@ -503,7 +513,7 @@ export function RuntimeProvider({ children }) {
     // Convert nodes object to array and strip editor-only props
     const flowNodes = Object.values(nodes).map(node => {
       // Keep _node with runtime-relevant props, keep config at top level
-      const { x, y, ...runtimeNodeProps } = node._node;
+      const { x: _x, y: _y, ...runtimeNodeProps } = node._node;
       return {
         _node: runtimeNodeProps,
         ...Object.fromEntries(

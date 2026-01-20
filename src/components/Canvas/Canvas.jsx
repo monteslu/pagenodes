@@ -119,7 +119,7 @@ export function Canvas({ onEditNode, onInject, onFileDrop }) {
     }
   }, [canvasHandlers, onDrag, selecting, editor.connecting, screenToCanvas]);
 
-  const handleCanvasTouchEnd = useCallback((e) => {
+  const handleCanvasTouchEnd = useCallback(() => {
     // Simulate mouseup
     canvasHandlers.onMouseUp({});
     endDrag();

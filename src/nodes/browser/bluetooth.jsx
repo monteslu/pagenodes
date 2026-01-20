@@ -66,13 +66,13 @@ export const bluetoothInNode = {
                     console.log('Bluetooth: Auto-reconnecting to saved device:', d.name);
                     break;
                   }
-                } catch (e) {
+                } catch {
                   // Device not in range or other issue, continue
                 }
               }
             }
-          } catch (e) {
-            console.log('Bluetooth getDevices not available or failed:', e.message);
+          } catch (err) {
+            console.log('Bluetooth getDevices not available or failed:', err.message);
           }
         }
 
@@ -209,13 +209,13 @@ export const bluetoothOutNode = {
                     console.log('Bluetooth: Auto-reconnecting to saved device:', d.name);
                     break;
                   }
-                } catch (e) {
+                } catch {
                   // Device not in range or other issue, continue
                 }
               }
             }
-          } catch (e) {
-            console.log('Bluetooth getDevices not available or failed:', e.message);
+          } catch (err2) {
+            console.log('Bluetooth getDevices not available or failed:', err2.message);
           }
         }
 

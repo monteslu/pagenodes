@@ -11,7 +11,7 @@ const createStatusPN = (status) => ({
   }
 });
 
-export function Node({ node, status, selected, isPending, hasErrors, onMouseDown, onDoubleClick, onPortMouseDown, onPortMouseUp, onPortMouseEnter, onPortMouseLeave, onInject, onFileDrop, onTouchStart }) {
+export function Node({ node, status, selected, isPending, hasErrors, onMouseDown, onDoubleClick, onPortMouseDown, onPortMouseUp, onPortMouseEnter, onPortMouseLeave, onInject, onFileDrop }) {
   const def = nodeRegistry.get(node._node.type);
   const [isDragOver, setIsDragOver] = useState(false);
 

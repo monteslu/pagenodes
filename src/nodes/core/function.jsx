@@ -69,7 +69,7 @@ function lintCode(code) {
 async function formatCode(code) {
   try {
     return await prettier.format(code, PRETTIER_OPTIONS);
-  } catch (err) {
+  } catch {
     // Return original if formatting fails (e.g., syntax error)
     return null;
   }

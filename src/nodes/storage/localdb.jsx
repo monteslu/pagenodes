@@ -41,7 +41,7 @@ export const localreadNode = {
         const store = storage === 'session' ? sessionStorage : localStorage;
         let value = store.getItem(key);
         if (value) {
-          try { value = JSON.parse(value); } catch {}
+          try { value = JSON.parse(value); } catch { /* not JSON */ }
         }
         peerRef.current.methods.sendResult(nodeId, { payload: value });
       } catch (err) {

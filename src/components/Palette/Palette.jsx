@@ -32,7 +32,7 @@ export function Palette() {
       if (saved) {
         return { ...DEFAULT_EXPANDED, ...JSON.parse(saved) };
       }
-    } catch (e) {
+    } catch {
       // Ignore parse errors
     }
     return DEFAULT_EXPANDED;

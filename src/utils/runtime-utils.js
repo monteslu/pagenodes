@@ -50,7 +50,7 @@ export function normalizeMessages(msg) {
 export function cloneMessage(msg) {
   try {
     return JSON.parse(JSON.stringify(msg));
-  } catch (e) {
+  } catch {
     // If can't clone (circular refs, etc), return shallow copy
     return { ...msg };
   }

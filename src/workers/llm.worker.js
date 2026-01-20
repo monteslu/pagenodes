@@ -118,7 +118,7 @@ async function loadPipeline(task, model, options = {}) {
  * Run an LLM task
  */
 async function runTask(task, model, input, options = {}) {
-  const { dtype, modelUrl, maxTokens, temperature, topP, streaming, systemPrompt } = options;
+  const { maxTokens, temperature, topP, streaming, systemPrompt } = options;
 
   // Load pipeline if needed
   if (!loadedPipeline || loadedTask !== task || loadedModel !== model) {

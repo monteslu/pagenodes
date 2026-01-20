@@ -29,9 +29,8 @@ jobs:
       - name: Run tests
         run: npm run test:run
 
-      # Lint disabled until pre-existing errors are fixed
-      # - name: Run linter
-      #   run: npm run lint
+      - name: Run linter
+        run: npm run lint
 
   build:
     runs-on: ubuntu-latest

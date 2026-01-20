@@ -97,7 +97,7 @@ export const imageAiConfigNode = {
 
   renderEditor(PN) {
     const { TextInput, SelectInput } = PN.components;
-    const { useNodeValue, useNodeName, useState, useEffect } = PN.hooks;
+    const { useNodeValue, useNodeName, useEffect } = PN.hooks;
 
     const [name, setName] = useNodeName();
     const [backend, setBackend] = useNodeValue('backend');
@@ -106,8 +106,6 @@ export const imageAiConfigNode = {
     const [delegate, setDelegate] = useNodeValue('delegate');
     const [device, setDevice] = useNodeValue('device');
     const [dtype, setDtype] = useNodeValue('dtype');
-    const [customModel, setCustomModel] = useState('');
-
     const isMediaPipe = backend === 'mediapipe';
     const isTransformers = backend === 'transformers';
 
@@ -194,7 +192,7 @@ export const imageAiConfigNode = {
                 ]}
                 onChange={(v) => {
                   if (v === '__custom__') {
-                    setModel(customModel || '');
+                    setModel('');
                   } else {
                     setModel(v);
                   }

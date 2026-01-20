@@ -79,18 +79,9 @@ export const stringsRuntime = {
     let { arg1, arg2, arg3 } = this.config;
 
     // Allow msg properties to override config
-    if (msg.hasOwnProperty('arg1')) arg1 = msg.arg1;
-    if (msg.hasOwnProperty('arg2')) arg2 = msg.arg2;
-    if (msg.hasOwnProperty('arg3')) arg3 = msg.arg3;
-
-    // Parse arg1/arg2/arg3 based on type hints if needed
-    // For numbers, try to parse them
-    const parseArg = (arg) => {
-      if (arg === undefined || arg === null || arg === '') return undefined;
-      // Try to parse as number if it looks like one
-      const num = Number(arg);
-      return isNaN(num) ? arg : num;
-    };
+    if (Object.hasOwn(msg, 'arg1')) arg1 = msg.arg1;
+    if (Object.hasOwn(msg, 'arg2')) arg2 = msg.arg2;
+    if (Object.hasOwn(msg, 'arg3')) arg3 = msg.arg3;
 
     try {
       let result;

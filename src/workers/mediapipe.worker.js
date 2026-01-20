@@ -187,7 +187,7 @@ async function toImageBitmap(imageData) {
  * Run inference on an image
  */
 async function runTask(task, imageData, options = {}) {
-  const { delegate, threshold, maxResults } = options;
+  const { delegate } = options;
 
   // Load detector if needed
   if (!loadedDetector || loadedTask !== task) {

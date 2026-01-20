@@ -8,9 +8,14 @@ export function useNodes() {
   const { state: flowState, dispatch: flowDispatch } = useFlows();
   const { state: editorState, dispatch: editorDispatch } = useEditor();
 
-  // Nodes for current flow (filter by _node.z)
+  // Nodes for current flow (filter by _node.z, exclude config nodes)
   const activeNodes = useMemo(() =>
-    Object.values(flowState.nodes).filter(n => n._node.z === editorState.activeFlow),
+    Object.values(flowState.nodes).filter(n => {
+      if (n._node.z !== editorState.activeFlow) return false;
+      // Never render config nodes on canvas
+      const def = nodeRegistry.get(n._node.type);
+      return def?.category !== 'config';
+    }),
     [flowState.nodes, editorState.activeFlow]
   );
 
@@ -25,15 +30,16 @@ export function useNodes() {
     const def = nodeRegistry.get(type);
     if (!def) return null;
 
+    // Config nodes don't belong to a flow (no z property) and don't render on canvas
+    const isConfigNode = def.category === 'config';
+
     const node = {
       // Reserved properties in _node
       _node: {
         id: generateId(),
         type,
         name: '',
-        z: editorState.activeFlow,
-        x,
-        y,
+        ...(isConfigNode ? {} : { z: editorState.activeFlow, x, y }),
         wires: Array(def.outputs || 0).fill().map(() => [])
       },
       // Custom config from defaults

@@ -212,7 +212,8 @@ export function Canvas({ onEditNode, onInject, onFileDrop }) {
       dispatch({ type: 'START_CONNECTING', sourceId: nodeId, sourcePort: portIndex });
       const node = nodes[nodeId];
       const def = nodeRegistry.get(node._node.type);
-      const height = calcNodeHeight(def?.outputs || 1);
+      const outputs = def?.getOutputs ? def.getOutputs(node) : (def?.outputs || 1);
+      const height = calcNodeHeight(outputs);
       const pos = getPortPosition(node, portIndex, true, height);
       setTempWire({ x: pos.x, y: pos.y });
     }

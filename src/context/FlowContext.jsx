@@ -1,4 +1,5 @@
 import { createContext, useContext, useReducer, useCallback, useMemo, useRef, useEffect } from 'react';
+import { nodeRegistry } from '../nodes';
 
 const MAX_HISTORY = 50;
 
@@ -32,8 +33,10 @@ function flowReducer(state, action) {
       const nodes = {};
       const configNodes = {};
       action.nodes.forEach(n => {
-        // Config nodes have category 'config' and no x/y position
-        if (n._def?.category === 'config' || n._node?.category === 'config') {
+        // Check if this is a config node using the node registry
+        const nodeDef = nodeRegistry.get(n._node.type);
+        const isConfigNode = nodeDef?.category === 'config';
+        if (isConfigNode) {
           configNodes[n._node.id] = n;
         } else {
           nodes[n._node.id] = n;
@@ -64,8 +67,10 @@ function flowReducer(state, action) {
       // Merge nodes (add new nodes, imported nodes go to targetFlow if specified)
       const mergedNodes = { ...state.nodes };
       for (const node of action.nodes) {
-        // If targetFlow specified, override the node's z property
-        if (action.targetFlow) {
+        // If targetFlow specified, override the node's z property (but not for config nodes)
+        const nodeDef = nodeRegistry.get(node._node.type);
+        const isConfigNode = nodeDef?.category === 'config';
+        if (action.targetFlow && !isConfigNode) {
           node._node.z = action.targetFlow;
         }
         mergedNodes[node._node.id] = node;
@@ -122,36 +127,80 @@ function flowReducer(state, action) {
       return { ...state, flows, nodes };
     }
 
-    case 'ADD_NODE':
+    case 'ADD_NODE': {
+      // Check if this is a config node using the node registry
+      const nodeDef = nodeRegistry.get(action.node._node.type);
+      const isConfigNode = nodeDef?.category === 'config';
+      if (isConfigNode) {
+        return {
+          ...state,
+          configNodes: { ...state.configNodes, [action.node._node.id]: action.node }
+        };
+      }
       return {
         ...state,
         nodes: { ...state.nodes, [action.node._node.id]: action.node }
       };
+    }
 
-    case 'UPDATE_NODE':
-      return {
-        ...state,
-        nodes: {
-          ...state.nodes,
-          [action.id]: { ...state.nodes[action.id], ...action.changes }
-        }
-      };
-
-    case 'UPDATE_NODE_PROPS':
-      return {
-        ...state,
-        nodes: {
-          ...state.nodes,
-          [action.id]: {
-            ...state.nodes[action.id],
-            _node: { ...state.nodes[action.id]._node, ...action.nodeProps }
+    case 'UPDATE_NODE': {
+      // Check if node is in nodes or configNodes
+      if (state.nodes[action.id]) {
+        return {
+          ...state,
+          nodes: {
+            ...state.nodes,
+            [action.id]: { ...state.nodes[action.id], ...action.changes }
           }
-        }
-      };
+        };
+      } else if (state.configNodes[action.id]) {
+        return {
+          ...state,
+          configNodes: {
+            ...state.configNodes,
+            [action.id]: { ...state.configNodes[action.id], ...action.changes }
+          }
+        };
+      }
+      return state;
+    }
+
+    case 'UPDATE_NODE_PROPS': {
+      // Check if node is in nodes or configNodes
+      if (state.nodes[action.id]) {
+        return {
+          ...state,
+          nodes: {
+            ...state.nodes,
+            [action.id]: {
+              ...state.nodes[action.id],
+              _node: { ...state.nodes[action.id]._node, ...action.nodeProps }
+            }
+          }
+        };
+      } else if (state.configNodes[action.id]) {
+        return {
+          ...state,
+          configNodes: {
+            ...state.configNodes,
+            [action.id]: {
+              ...state.configNodes[action.id],
+              _node: { ...state.configNodes[action.id]._node, ...action.nodeProps }
+            }
+          }
+        };
+      }
+      return state;
+    }
 
     case 'DELETE_NODES': {
       const nodes = { ...state.nodes };
-      action.ids.forEach(id => delete nodes[id]);
+      const configNodes = { ...state.configNodes };
+      action.ids.forEach(id => {
+        delete nodes[id];
+        delete configNodes[id];
+      });
+      // Clean up wires referencing deleted nodes
       Object.values(nodes).forEach(node => {
         if (node._node.wires) {
           node._node.wires = node._node.wires.map(outputs =>
@@ -159,7 +208,7 @@ function flowReducer(state, action) {
           );
         }
       });
-      return { ...state, nodes };
+      return { ...state, nodes, configNodes };
     }
 
     case 'MOVE_NODES':

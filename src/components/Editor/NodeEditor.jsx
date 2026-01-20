@@ -178,14 +178,23 @@ export function NodeEditor({ node, onClose }) {
     return nodeName || node._node.type;
   }, [def, node, nodeName, values]);
 
-  // Compute dynamic outputs if node defines an outputs function - must be before early return
+  // Compute dynamic outputs if node defines getOutputs or outputs as function - must be before early return
   const previewOutputs = useMemo(() => {
     if (!def || !node) return 0;
+    const mockNode = {
+      _node: { ...node._node, name: nodeName },
+      ...values
+    };
+    // Check for getOutputs method first (preferred pattern)
+    if (typeof def.getOutputs === 'function') {
+      try {
+        return def.getOutputs(mockNode);
+      } catch {
+        return def.outputs || 1;
+      }
+    }
+    // Fall back to checking if outputs itself is a function
     if (typeof def.outputs === 'function') {
-      const mockNode = {
-        _node: { ...node._node, name: nodeName },
-        ...values
-      };
       try {
         return def.outputs(mockNode);
       } catch {

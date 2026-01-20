@@ -22,7 +22,8 @@ export function FlowMinimap({ flowId, nodes, size = 50, onClick }) {
 
     for (const node of flowNodes) {
       const def = nodeRegistry.get(node._node.type);
-      const nodeHeight = calcNodeHeight(def?.outputs || 0);
+      const outputs = def?.getOutputs ? def.getOutputs(node) : (def?.outputs || 0);
+      const nodeHeight = calcNodeHeight(outputs);
       maxX = Math.max(maxX, node._node.x + NODE_WIDTH);
       maxY = Math.max(maxY, node._node.y + nodeHeight);
     }
@@ -69,7 +70,8 @@ export function FlowMinimap({ flowId, nodes, size = 50, onClick }) {
       {flowNodes.map(node => {
         const def = nodeRegistry.get(node._node.type);
         const color = def?.color || '#ddd';
-        const nodeHeight = calcNodeHeight(def?.outputs || 0);
+        const outputs = def?.getOutputs ? def.getOutputs(node) : (def?.outputs || 0);
+        const nodeHeight = calcNodeHeight(outputs);
 
         return (
           <rect

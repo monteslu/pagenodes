@@ -76,7 +76,8 @@ export function Node({ node, status, selected, isPending, hasErrors, onMouseDown
     return node._node.type;
   }, [def, node]);
 
-  const outputs = def?.outputs || 0;
+  // Use dynamic getOutputs if available, otherwise static outputs
+  const outputs = def?.getOutputs ? def.getOutputs(node) : (def?.outputs || 0);
   const height = calcNodeHeight(outputs);
 
   return (
@@ -99,6 +100,7 @@ export function Node({ node, status, selected, isPending, hasErrors, onMouseDown
         isPending={isPending}
         hasErrors={hasErrors}
         showButton={true}
+        outputs={outputs}
         onButtonClick={handleButtonClick}
         onPortMouseDown={(e, portIndex, isOutput) => onPortMouseDown(e, node._node.id, portIndex, isOutput)}
         onPortMouseUp={(e, portIndex, isOutput) => onPortMouseUp(e, node._node.id, portIndex, isOutput)}

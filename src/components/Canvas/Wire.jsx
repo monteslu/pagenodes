@@ -4,9 +4,9 @@ import { nodeRegistry } from '../../nodes';
 
 export function Wire({ sourceNode, sourcePort, targetNode, targetPos, selected, onMouseDown, onMouseUp, isTemp, isConnecting, isPending }) {
   const pathData = useMemo(() => {
-    // Get source node output count for proper positioning
+    // Get source node output count for proper positioning (use dynamic getOutputs if available)
     const sourceDef = nodeRegistry.get(sourceNode._node.type);
-    const sourceOutputs = sourceDef?.outputs || 1;
+    const sourceOutputs = sourceDef?.getOutputs ? sourceDef.getOutputs(sourceNode) : (sourceDef?.outputs || 1);
     const sourceHeight = calcNodeHeight(sourceOutputs);
     const sourcePos = getPortPosition(sourceNode, sourcePort, true, sourceHeight);
 
@@ -14,13 +14,13 @@ export function Wire({ sourceNode, sourcePort, targetNode, targetPos, selected, 
     if (targetNode && !targetPos) {
       // Connected to a target node (saved wire)
       const targetDef = nodeRegistry.get(targetNode._node.type);
-      const targetOutputs = targetDef?.outputs || 1;
+      const targetOutputs = targetDef?.getOutputs ? targetDef.getOutputs(targetNode) : (targetDef?.outputs || 1);
       const targetHeight = calcNodeHeight(targetOutputs);
       endPos = getPortPosition(targetNode, 0, false, targetHeight);
     } else if (targetNode && targetPos) {
       // Temp wire hovering over a valid input - snap to port
       const targetDef = nodeRegistry.get(targetNode._node.type);
-      const targetOutputs = targetDef?.outputs || 1;
+      const targetOutputs = targetDef?.getOutputs ? targetDef.getOutputs(targetNode) : (targetDef?.outputs || 1);
       const targetHeight = calcNodeHeight(targetOutputs);
       endPos = getPortPosition(targetNode, 0, false, targetHeight);
     } else if (targetPos) {

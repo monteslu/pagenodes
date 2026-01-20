@@ -13,6 +13,7 @@ export function NodeShape({
   hasErrors = false,
   showButton = false,
   width = NODE_WIDTH,
+  outputs: outputsProp,  // Pre-calculated outputs (for dynamic output counts)
   onButtonClick,
   onPortMouseDown,
   onPortMouseUp,
@@ -23,7 +24,8 @@ export function NodeShape({
   const displayLabel = label || type;
   const color = def?.color || '#ddd';
   const inputs = def?.inputs || 0;
-  const outputs = def?.outputs || 0;
+  // Use provided outputs prop (dynamic), falling back to definition's static outputs
+  const outputs = outputsProp ?? (def?.outputs || 0);
 
   const height = calcNodeHeight(outputs);
   const outputYPositions = calcOutputYPositions(outputs, height);

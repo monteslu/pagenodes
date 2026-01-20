@@ -14,6 +14,7 @@ import { CanvasPanel } from './components/Canvases/CanvasPanel';
 import { ButtonsPanel } from './components/Buttons';
 import { generateId } from './utils/id';
 import { storage } from './utils/storage';
+import { nodeRegistry } from './nodes';
 import './App.css';
 
 const SIDEBAR_WIDTH_KEY = 'pagenodes2_sidebar_width';
@@ -25,7 +26,7 @@ function AppContent() {
   const { state: editor, dispatch: editorDispatch } = useEditor();
   const { dispatch: flowDispatch } = useFlows();
   const { messages, downloads } = useDebug();
-  const { inject: runtimeInject, callMainThread, isRunning, isReady, deploy } = useRuntime();
+  const { inject: runtimeInject, callMainThread, isRunning, isReady, deploy, hasCanvasNodes, hasButtonsNodes } = useRuntime();
   const { state: flowState } = useFlows();
   const { addNode, deleteSelected, nodes } = useNodes();
 
@@ -98,8 +99,18 @@ function AppContent() {
 
         if (savedFlows && savedFlows.flows && savedFlows.flows.length > 0) {
           // Convert saved nodes to internal format
+          // Check if each node is a config node and strip z/x/y if so
           const internalNodes = (savedFlows.nodes || []).map(node => {
             const { id, type, name, z, x, y, wires, ...config } = node;
+            const nodeDef = nodeRegistry.get(type);
+            const isConfigNode = nodeDef?.category === 'config';
+            // Config nodes shouldn't have z, x, y - they don't render on canvas
+            if (isConfigNode) {
+              return {
+                _node: { id, type, name: name || '', wires: wires || [] },
+                ...config
+              };
+            }
             return {
               _node: { id, type, name: name || '', z, x: x || 0, y: y || 0, wires: wires || [] },
               ...config
@@ -400,6 +411,15 @@ function AppContent() {
     }
   }, [editor.selectedNodes, editingNode]);
 
+  // Switch to valid tab if current tab becomes unavailable after deploy
+  useEffect(() => {
+    if (sidebarTab === 'canvases' && !hasCanvasNodes) {
+      setSidebarTab('debug');
+    } else if (sidebarTab === 'buttons' && !hasButtonsNodes) {
+      setSidebarTab('debug');
+    }
+  }, [hasCanvasNodes, hasButtonsNodes, sidebarTab]);
+
   return (
     <div className="app">
       <Toolbar />
@@ -434,26 +454,32 @@ function AppContent() {
                 <span className="tab-badge">{messages.length + downloads.length}</span>
               )}
             </button>
-            <button
-              className={`sidebar-tab ${sidebarTab === 'canvases' ? 'active' : ''}`}
-              onClick={() => setSidebarTab('canvases')}
-            >
-              Canvases
-            </button>
-            <button
-              className={`sidebar-tab ${sidebarTab === 'buttons' ? 'active' : ''}`}
-              onClick={() => setSidebarTab('buttons')}
-            >
-              Buttons
-            </button>
+            {hasCanvasNodes && (
+              <button
+                className={`sidebar-tab ${sidebarTab === 'canvases' ? 'active' : ''}`}
+                onClick={() => setSidebarTab('canvases')}
+              >
+                Canvases
+              </button>
+            )}
+            {hasButtonsNodes && (
+              <button
+                className={`sidebar-tab ${sidebarTab === 'buttons' ? 'active' : ''}`}
+                onClick={() => setSidebarTab('buttons')}
+              >
+                Buttons
+              </button>
+            )}
           </div>
           {sidebarTab === 'debug' && <DebugPanel />}
           {sidebarTab === 'info' && <InfoPanel onEditNode={handleEditNode} />}
           {/* Always render CanvasPanel to preserve canvas content, hide with CSS */}
-          <div style={{ display: sidebarTab === 'canvases' ? 'flex' : 'none', flex: 1, minHeight: 0 }}>
-            <CanvasPanel />
-          </div>
-          {sidebarTab === 'buttons' && <ButtonsPanel />}
+          {hasCanvasNodes && (
+            <div style={{ display: sidebarTab === 'canvases' ? 'flex' : 'none', flex: 1, minHeight: 0 }}>
+              <CanvasPanel />
+            </div>
+          )}
+          {hasButtonsNodes && sidebarTab === 'buttons' && <ButtonsPanel />}
         </div>
 
         {/* Node editor dialog */}

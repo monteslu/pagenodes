@@ -17,6 +17,8 @@ export function RuntimeProvider({ children }) {
   const [isRunning, setIsRunning] = useState(false);
   const [nodeStatuses, setNodeStatuses] = useState({});
   const [mcpStatus, setMcpStatus] = useState('disabled'); // disabled, connecting, connected, error
+  const [hasCanvasNodes, setHasCanvasNodes] = useState(false);
+  const [hasButtonsNodes, setHasButtonsNodes] = useState(false)
   const { addMessage, addDownload, addError, clear, clearErrors, messages, errors } = useDebug();
   const { state: flowState, dispatch: flowDispatch } = useFlows();
 
@@ -811,6 +813,11 @@ export function RuntimeProvider({ children }) {
       ...Object.keys(configNodes)
     ]);
 
+    // Check which special node types are being deployed
+    const deployedTypes = new Set(flowNodes.map(n => n._node.type));
+    setHasCanvasNodes(deployedTypes.has('canvas'));
+    setHasButtonsNodes(deployedTypes.has('buttons'));
+
     try {
       const result = await peerRef.current.methods.deploy(flowNodes, flowConfigNodes, errorNodeIds);
       setIsRunning(true);
@@ -915,6 +922,8 @@ export function RuntimeProvider({ children }) {
     isRunning,
     nodeStatuses,
     mcpStatus,
+    hasCanvasNodes,
+    hasButtonsNodes,
     deploy,
     inject,
     injectText,

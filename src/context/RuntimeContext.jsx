@@ -6,6 +6,7 @@ import { useFlows } from './FlowContext';
 import { nodeRegistry } from '../nodes';
 import { storage } from '../utils/storage';
 import { generateId } from '../utils/id';
+import { validateNode } from '../utils/validation';
 
 const RuntimeContext = createContext(null);
 
@@ -168,10 +169,48 @@ export function RuntimeProvider({ children }) {
     });
 
     peerRef.current.addHandler('mcpAddNode', (args) => {
+      const errors = [];
+
+      // Validate args exist
+      if (!args || typeof args !== 'object') {
+        return { success: false, errors: ['args must be an object'] };
+      }
+
       const { type, flowId, x, y, name, config } = args;
-      const nodeDef = nodeRegistry.get(type);
-      if (!nodeDef) {
-        throw new Error(`Unknown node type: ${type}`);
+
+      // Validate required fields
+      if (!type || typeof type !== 'string') {
+        errors.push('type is required and must be a string');
+      }
+
+      // Validate node type exists
+      const nodeDef = type ? nodeRegistry.get(type) : null;
+      if (type && !nodeDef) {
+        errors.push(`Unknown node type: "${type}"`);
+      }
+
+      // Return early if we have critical errors
+      if (errors.length > 0) {
+        return { success: false, errors };
+      }
+
+      const isConfigNode = nodeDef.category === 'config';
+
+      // Validate flowId for non-config nodes
+      if (!isConfigNode) {
+        if (!flowId || typeof flowId !== 'string') {
+          errors.push('flowId is required for non-config nodes');
+        } else {
+          const flowExists = flowStateRef.current.flows.some(f => f.id === flowId);
+          if (!flowExists) {
+            errors.push(`Flow not found: "${flowId}"`);
+          }
+        }
+      }
+
+      // Return if flow validation failed
+      if (errors.length > 0) {
+        return { success: false, errors };
       }
 
       // Build defaults from node definition
@@ -187,83 +226,227 @@ export function RuntimeProvider({ children }) {
           id: generateId(),
           type,
           name: name || '',
-          z: flowId,
-          x: x || 100,
-          y: y || 100,
+          ...(isConfigNode ? {} : { z: flowId, x: x || 100, y: y || 100 }),
           wires: []
         },
         ...defaults,
         ...config
       };
 
+      // Validate required properties
+      const validationErrors = validateNode(newNode);
+      if (validationErrors.length > 0) {
+        return {
+          success: false,
+          errors: validationErrors.map(e => `${type}: ${e}`)
+        };
+      }
+
       flowDispatch({ type: 'ADD_NODE', node: newNode });
       return { success: true, node: newNode };
     });
 
     peerRef.current.addHandler('mcpAddNodes', (flowId, nodes) => {
-      if (!Array.isArray(nodes) || nodes.length === 0) {
-        throw new Error('nodes must be a non-empty array');
+      const errors = [];
+      const warnings = [];
+
+      // Validate nodes array
+      if (!Array.isArray(nodes)) {
+        return { success: false, errors: ['nodes must be an array'] };
+      }
+      if (nodes.length === 0) {
+        return { success: false, errors: ['nodes array cannot be empty'] };
       }
 
-      // First pass: generate real IDs and build tempId → realId map
-      const tempToReal = {};
-      const nodesWithIds = nodes.map(node => {
-        const realId = generateId();
-        if (node.tempId) {
-          tempToReal[node.tempId] = realId;
+      // Validate flowId
+      if (!flowId || typeof flowId !== 'string') {
+        errors.push('flowId is required and must be a string');
+      } else {
+        const flowExists = flowStateRef.current.flows.some(f => f.id === flowId);
+        if (!flowExists) {
+          errors.push(`Flow not found: "${flowId}"`);
         }
-        return { ...node, _realId: realId };
+      }
+
+      // Return early if flowId is invalid
+      if (errors.length > 0) {
+        return { success: false, errors };
+      }
+
+      // First pass: validate all nodes and collect tempIds
+      const tempIds = new Set();
+      const nodeValidations = [];
+
+      for (let i = 0; i < nodes.length; i++) {
+        const node = nodes[i];
+        const nodeErrors = [];
+        const nodeLabel = node.tempId || node.name || `node[${i}]`;
+
+        // Validate node is an object
+        if (!node || typeof node !== 'object') {
+          errors.push(`${nodeLabel}: must be an object`);
+          nodeValidations.push({ valid: false });
+          continue;
+        }
+
+        // Validate required fields
+        if (!node.type || typeof node.type !== 'string') {
+          nodeErrors.push('type is required and must be a string');
+        }
+
+        if (!node.tempId || typeof node.tempId !== 'string') {
+          nodeErrors.push('tempId is required and must be a string');
+        } else if (tempIds.has(node.tempId)) {
+          nodeErrors.push(`duplicate tempId: "${node.tempId}"`);
+        } else {
+          tempIds.add(node.tempId);
+        }
+
+        // Validate node type exists
+        const nodeDef = node.type ? nodeRegistry.get(node.type) : null;
+        if (node.type && !nodeDef) {
+          nodeErrors.push(`unknown node type: "${node.type}"`);
+        }
+
+        // Validate position for non-config nodes
+        if (nodeDef && nodeDef.category !== 'config') {
+          if (typeof node.x !== 'number' || typeof node.y !== 'number') {
+            nodeErrors.push('x and y coordinates are required for non-config nodes');
+          }
+        }
+
+        if (nodeErrors.length > 0) {
+          errors.push(`${nodeLabel}: ${nodeErrors.join('; ')}`);
+          nodeValidations.push({ valid: false });
+        } else {
+          nodeValidations.push({ valid: true, nodeDef });
+        }
+      }
+
+      // Return early if any node has critical errors
+      if (errors.length > 0) {
+        return { success: false, errors };
+      }
+
+      // Second pass: validate wires reference valid tempIds or existing nodes
+      const existingNodes = flowStateRef.current.nodes;
+      for (let i = 0; i < nodes.length; i++) {
+        const node = nodes[i];
+        const nodeLabel = node.tempId || `node[${i}]`;
+
+        if (node.wires && Array.isArray(node.wires)) {
+          for (let port = 0; port < node.wires.length; port++) {
+            const outputWires = node.wires[port];
+            if (!Array.isArray(outputWires)) {
+              errors.push(`${nodeLabel}: wires[${port}] must be an array`);
+              continue;
+            }
+            for (const targetId of outputWires) {
+              if (typeof targetId !== 'string') {
+                errors.push(`${nodeLabel}: wire target must be a string, got ${typeof targetId}`);
+              } else if (!tempIds.has(targetId) && !existingNodes[targetId]) {
+                warnings.push(`${nodeLabel}: wire target "${targetId}" not found in batch or existing nodes`);
+              }
+            }
+          }
+        }
+      }
+
+      // Return early if wire validation found errors
+      if (errors.length > 0) {
+        return { success: false, errors, warnings: warnings.length > 0 ? warnings : undefined };
+      }
+
+      // Third pass: generate real IDs and build tempId → realId map
+      const tempToReal = {};
+      const nodesWithIds = nodes.map((node, i) => {
+        const realId = generateId();
+        tempToReal[node.tempId] = realId;
+        return { ...node, _realId: realId, _nodeDef: nodeValidations[i].nodeDef };
       });
 
-      // Second pass: create nodes with wires mapped to real IDs
+      // Fourth pass: create nodes with wires mapped to real IDs
       const createdNodes = [];
-      for (const node of nodesWithIds) {
-        const { tempId, type, x, y, name, wires, _realId, ...config } = node;
+      const validationErrors = [];
 
-        const nodeDef = nodeRegistry.get(type);
-        if (!nodeDef) {
-          throw new Error(`Unknown node type: ${type}`);
-        }
+      for (const node of nodesWithIds) {
+        const { tempId, type, x, y, name, wires, _realId, _nodeDef, ...config } = node;
 
         // Build defaults from node definition
         const defaults = {};
-        if (nodeDef.defaults) {
-          for (const [key, def] of Object.entries(nodeDef.defaults)) {
+        if (_nodeDef.defaults) {
+          for (const [key, def] of Object.entries(_nodeDef.defaults)) {
             defaults[key] = config[key] ?? def.default;
           }
         }
 
-        // Map tempIds in wires to real IDs
+        // Map tempIds in wires to real IDs (fall back to original if it's an existing node ID)
         const mappedWires = (wires || []).map(outputWires =>
           (outputWires || []).map(targetTempId => tempToReal[targetTempId] || targetTempId)
         );
+
+        // Config nodes don't belong to a flow (no z property) and don't render on canvas
+        const isConfigNode = _nodeDef.category === 'config';
 
         const newNode = {
           _node: {
             id: _realId,
             type,
             name: name || '',
-            z: flowId,
-            x: x || 100,
-            y: y || 100,
+            ...(isConfigNode ? {} : { z: flowId, x: x || 100, y: y || 100 }),
             wires: mappedWires
           },
           ...defaults,
           ...config
         };
 
-        flowDispatch({ type: 'ADD_NODE', node: newNode });
-        createdNodes.push({ tempId, id: _realId, node: newNode });
+        // Validate required properties
+        const nodeValErrors = validateNode(newNode);
+        if (nodeValErrors.length > 0) {
+          validationErrors.push(`${tempId}: ${nodeValErrors.join('; ')}`);
+        }
+
+        createdNodes.push({ tempId, id: _realId, node: newNode, errors: nodeValErrors });
       }
 
-      return { success: true, nodes: createdNodes };
+      // If any nodes have validation errors, don't create any nodes
+      if (validationErrors.length > 0) {
+        return {
+          success: false,
+          errors: validationErrors,
+          warnings: warnings.length > 0 ? warnings : undefined
+        };
+      }
+
+      // All validation passed, actually create the nodes
+      for (const { node } of createdNodes) {
+        flowDispatch({ type: 'ADD_NODE', node });
+      }
+
+      // Return success with node mapping (without the internal errors field)
+      const result = {
+        success: true,
+        nodes: createdNodes.map(({ tempId, id, node }) => ({ tempId, id, node }))
+      };
+      if (warnings.length > 0) {
+        result.warnings = warnings;
+      }
+      return result;
     });
 
     peerRef.current.addHandler('mcpUpdateNode', (nodeId, updates) => {
+      // Validate inputs
+      if (!nodeId || typeof nodeId !== 'string') {
+        return { success: false, errors: ['nodeId is required and must be a string'] };
+      }
+      if (!updates || typeof updates !== 'object') {
+        return { success: false, errors: ['updates is required and must be an object'] };
+      }
+
       const state = flowStateRef.current;
-      const node = state.nodes[nodeId];
+      const node = state.nodes[nodeId] || state.configNodes?.[nodeId];
       if (!node) {
-        throw new Error(`Node not found: ${nodeId}`);
+        return { success: false, errors: [`Node not found: "${nodeId}"`] };
       }
 
       // Separate _node updates from config updates
@@ -289,19 +472,47 @@ export function RuntimeProvider({ children }) {
     });
 
     peerRef.current.addHandler('mcpDeleteNode', (nodeId) => {
+      // Validate input
+      if (!nodeId || typeof nodeId !== 'string') {
+        return { success: false, errors: ['nodeId is required and must be a string'] };
+      }
+
+      const state = flowStateRef.current;
+      const node = state.nodes[nodeId] || state.configNodes?.[nodeId];
+      if (!node) {
+        return { success: false, errors: [`Node not found: "${nodeId}"`] };
+      }
+
       flowDispatch({ type: 'DELETE_NODES', ids: [nodeId] });
       return { success: true };
     });
 
     peerRef.current.addHandler('mcpConnectNodes', (sourceId, targetId, sourcePort = 0) => {
+      const errors = [];
+
+      // Validate inputs
+      if (!sourceId || typeof sourceId !== 'string') {
+        errors.push('sourceId is required and must be a string');
+      }
+      if (!targetId || typeof targetId !== 'string') {
+        errors.push('targetId is required and must be a string');
+      }
+      if (typeof sourcePort !== 'number' || sourcePort < 0) {
+        errors.push('sourcePort must be a non-negative number');
+      }
+
+      if (errors.length > 0) {
+        return { success: false, errors };
+      }
+
       const state = flowStateRef.current;
       const sourceNode = state.nodes[sourceId];
       if (!sourceNode) {
-        throw new Error(`Source node not found: ${sourceId}. Available node IDs: ${Object.keys(state.nodes).join(', ')}`);
+        return { success: false, errors: [`Source node not found: "${sourceId}"`] };
       }
       const targetNode = state.nodes[targetId];
       if (!targetNode) {
-        throw new Error(`Target node not found: ${targetId}. Available node IDs: ${Object.keys(state.nodes).join(', ')}`);
+        return { success: false, errors: [`Target node not found: "${targetId}"`] };
       }
 
       // Update wires
@@ -330,10 +541,27 @@ export function RuntimeProvider({ children }) {
     });
 
     peerRef.current.addHandler('mcpDisconnectNodes', (sourceId, targetId, sourcePort = 0) => {
+      const errors = [];
+
+      // Validate inputs
+      if (!sourceId || typeof sourceId !== 'string') {
+        errors.push('sourceId is required and must be a string');
+      }
+      if (!targetId || typeof targetId !== 'string') {
+        errors.push('targetId is required and must be a string');
+      }
+      if (typeof sourcePort !== 'number' || sourcePort < 0) {
+        errors.push('sourcePort must be a non-negative number');
+      }
+
+      if (errors.length > 0) {
+        return { success: false, errors };
+      }
+
       const state = flowStateRef.current;
       const sourceNode = state.nodes[sourceId];
       if (!sourceNode) {
-        throw new Error(`Source node not found: ${sourceId}`);
+        return { success: false, errors: [`Source node not found: "${sourceId}"`] };
       }
 
       const wires = [...(sourceNode._node.wires || [])];
@@ -350,12 +578,17 @@ export function RuntimeProvider({ children }) {
     });
 
     peerRef.current.addHandler('mcpDeploy', async () => {
-      if (deployRef.current) {
+      if (!deployRef.current) {
+        return { success: false, errors: ['Deploy function not ready - runtime may still be initializing'] };
+      }
+
+      try {
         const state = flowStateRef.current;
         await deployRef.current(state.nodes, state.configNodes, []);
         return { success: true, message: 'Flows deployed to runtime' };
+      } catch (err) {
+        return { success: false, errors: [err.message || 'Deploy failed'] };
       }
-      return { success: false, message: 'Deploy function not ready' };
     });
 
     peerRef.current.addHandler('mcpGetDebugOutput', (limit = 10) => {
@@ -371,24 +604,61 @@ export function RuntimeProvider({ children }) {
     });
 
     peerRef.current.addHandler('mcpInject', async (nodeId, payload) => {
-      if (!peerRef.current) {
-        return { success: false, error: 'Runtime not connected' };
+      // Validate input
+      if (!nodeId || typeof nodeId !== 'string') {
+        return { success: false, errors: ['nodeId is required and must be a string'] };
       }
+
+      if (!peerRef.current) {
+        return { success: false, errors: ['Runtime not connected'] };
+      }
+
+      // Verify node exists and is an inject node
+      const state = flowStateRef.current;
+      const node = state.nodes[nodeId];
+      if (!node) {
+        return { success: false, errors: [`Node not found: "${nodeId}"`] };
+      }
+      if (node._node.type !== 'inject') {
+        return { success: false, errors: [`Node "${nodeId}" is not an inject node (type: ${node._node.type}). Use trigger_node for non-inject nodes.`] };
+      }
+
       // Build message object (check both undefined and null since RPC converts undefined to null)
       const msg = (payload !== undefined && payload !== null) ? { payload } : {};
       // inject returns { success, _msgid } for tracing
-      const result = await peerRef.current.methods.inject(nodeId, msg);
-      return result;
+      try {
+        const result = await peerRef.current.methods.inject(nodeId, msg);
+        return result;
+      } catch (err) {
+        return { success: false, errors: [err.message || 'Inject failed'] };
+      }
     });
 
     peerRef.current.addHandler('mcpTrigger', async (nodeId, msg) => {
-      if (!peerRef.current) {
-        return { success: false, error: 'Runtime not connected' };
+      // Validate input
+      if (!nodeId || typeof nodeId !== 'string') {
+        return { success: false, errors: ['nodeId is required and must be a string'] };
       }
+
+      if (!peerRef.current) {
+        return { success: false, errors: ['Runtime not connected'] };
+      }
+
+      // Verify node exists
+      const state = flowStateRef.current;
+      const node = state.nodes[nodeId];
+      if (!node) {
+        return { success: false, errors: [`Node not found: "${nodeId}"`] };
+      }
+
       // Build message object (handle null from RPC)
       const message = (msg !== undefined && msg !== null) ? msg : {};
-      const result = await peerRef.current.methods.trigger(nodeId, message);
-      return result;
+      try {
+        const result = await peerRef.current.methods.trigger(nodeId, message);
+        return result;
+      } catch (err) {
+        return { success: false, errors: [err.message || 'Trigger failed'] };
+      }
     });
 
     peerRef.current.addHandler('mcpClearDebug', () => {
@@ -409,9 +679,10 @@ export function RuntimeProvider({ children }) {
       // Get the canvas SVG from the DOM
       const svgElement = document.querySelector('.canvas-svg');
       if (!svgElement) {
-        return { error: 'Canvas SVG not found' };
+        return { success: false, errors: ['Canvas SVG not found - editor may not be visible'] };
       }
       return {
+        success: true,
         svg: svgElement.outerHTML,
         width: svgElement.getAttribute('width'),
         height: svgElement.getAttribute('height')
@@ -494,7 +765,8 @@ export function RuntimeProvider({ children }) {
     // Load settings and connect to MCP if enabled
     storage.getSettings().then(settings => {
       if (settings.mcpEnabled) {
-        peerRef.current.methods.connectMcp(settings.mcpPort);
+        const url = typeof window !== 'undefined' ? window.location.href : null;
+        peerRef.current.methods.connectMcp({ port: settings.mcpPort, url });
       }
     });
 
@@ -621,7 +893,9 @@ export function RuntimeProvider({ children }) {
   // Connect to MCP server
   const connectMcp = useCallback((port) => {
     if (!peerRef.current) return;
-    peerRef.current.methods.connectMcp(port);
+    // Pass the current browser URL so the MCP server knows which client is connected
+    const url = typeof window !== 'undefined' ? window.location.href : null;
+    peerRef.current.methods.connectMcp({ port, url });
   }, []);
 
   // Disconnect from MCP server

@@ -697,12 +697,19 @@ let mcpSocket = null;
 let mcpPeer = null;
 let mcpReconnectTimer = null;
 let mcpPort = null;
+let mcpClientUrl = null;
 
 /**
  * Connect to MCP server
+ * @param {object} options - { port: number, url: string }
  */
-function connectMcp(port) {
+function connectMcp(options) {
+  // Support both old (port only) and new ({ port, url }) signatures
+  const port = typeof options === 'object' ? options.port : options;
+  const url = typeof options === 'object' ? options.url : null;
+
   mcpPort = port;
+  mcpClientUrl = url;
 
   if (mcpSocket) {
     mcpSocket.close();
@@ -812,6 +819,13 @@ function connectMcp(port) {
         return await peer.methods.mcpGetNodeDetails(type);
       });
 
+      // Register this client with the MCP server
+      if (mcpClientUrl) {
+        mcpPeer.methods.registerClient({ url: mcpClientUrl }).catch(err => {
+          console.warn('Failed to register client with MCP server:', err);
+        });
+      }
+
       peer.notifiers.mcpStatus({ status: 'connected' });
     };
 
@@ -822,7 +836,7 @@ function connectMcp(port) {
       mcpPeer = null;
       // Try to reconnect after 3 seconds
       if (mcpPort) {
-        mcpReconnectTimer = setTimeout(() => connectMcp(mcpPort), 3000);
+        mcpReconnectTimer = setTimeout(() => connectMcp({ port: mcpPort, url: mcpClientUrl }), 3000);
       }
     };
 

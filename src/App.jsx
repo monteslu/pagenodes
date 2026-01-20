@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useState, useRef } from 'react';
+import { useEffect, useCallback, useState, useRef, useMemo } from 'react';
 import { useEditor } from './context/EditorContext';
 import { useFlows } from './context/FlowContext';
 import { useDebug } from './context/DebugContext';
@@ -415,14 +415,12 @@ function AppContent() {
     }
   }, [editor.selectedNodes, editingNode]);
 
-  // Switch to valid tab if current tab becomes unavailable after deploy
-  useEffect(() => {
-    if (sidebarTab === 'canvases' && !hasCanvasNodes) {
-      setSidebarTab('debug');
-    } else if (sidebarTab === 'buttons' && !hasButtonsNodes) {
-      setSidebarTab('debug');
-    }
-  }, [hasCanvasNodes, hasButtonsNodes, sidebarTab]);
+  // Compute effective tab - fall back to debug if selected tab is unavailable
+  const effectiveTab = useMemo(() => {
+    if (sidebarTab === 'canvases' && !hasCanvasNodes) return 'debug';
+    if (sidebarTab === 'buttons' && !hasButtonsNodes) return 'debug';
+    return sidebarTab;
+  }, [sidebarTab, hasCanvasNodes, hasButtonsNodes]);
 
   return (
     <div className="app">
@@ -444,13 +442,13 @@ function AppContent() {
         <div className="sidebar" style={{ width: sidebarWidth }}>
           <div className="sidebar-tabs">
             <button
-              className={`sidebar-tab ${sidebarTab === 'info' ? 'active' : ''}`}
+              className={`sidebar-tab ${effectiveTab === 'info' ? 'active' : ''}`}
               onClick={() => setSidebarTab('info')}
             >
               Info
             </button>
             <button
-              className={`sidebar-tab ${sidebarTab === 'debug' ? 'active' : ''}`}
+              className={`sidebar-tab ${effectiveTab === 'debug' ? 'active' : ''}`}
               onClick={() => setSidebarTab('debug')}
             >
               Debug
@@ -460,7 +458,7 @@ function AppContent() {
             </button>
             {hasCanvasNodes && (
               <button
-                className={`sidebar-tab ${sidebarTab === 'canvases' ? 'active' : ''}`}
+                className={`sidebar-tab ${effectiveTab === 'canvases' ? 'active' : ''}`}
                 onClick={() => setSidebarTab('canvases')}
               >
                 Canvases
@@ -468,22 +466,22 @@ function AppContent() {
             )}
             {hasButtonsNodes && (
               <button
-                className={`sidebar-tab ${sidebarTab === 'buttons' ? 'active' : ''}`}
+                className={`sidebar-tab ${effectiveTab === 'buttons' ? 'active' : ''}`}
                 onClick={() => setSidebarTab('buttons')}
               >
                 Buttons
               </button>
             )}
           </div>
-          {sidebarTab === 'debug' && <DebugPanel />}
-          {sidebarTab === 'info' && <InfoPanel onEditNode={handleEditNode} />}
+          {effectiveTab === 'debug' && <DebugPanel />}
+          {effectiveTab === 'info' && <InfoPanel onEditNode={handleEditNode} />}
           {/* Always render CanvasPanel to preserve canvas content, hide with CSS */}
           {hasCanvasNodes && (
-            <div style={{ display: sidebarTab === 'canvases' ? 'flex' : 'none', flex: 1, minHeight: 0 }}>
+            <div style={{ display: effectiveTab === 'canvases' ? 'flex' : 'none', flex: 1, minHeight: 0 }}>
               <CanvasPanel />
             </div>
           )}
-          {hasButtonsNodes && sidebarTab === 'buttons' && <ButtonsPanel />}
+          {hasButtonsNodes && effectiveTab === 'buttons' && <ButtonsPanel />}
         </div>
 
         {/* Node editor dialog */}

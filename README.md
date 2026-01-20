@@ -4,6 +4,8 @@
 
 A visual flow-based programming editor that runs entirely in the browser. Connect nodes together to build IoT applications, AI pipelines, and hardware interactions without any server.
 
+![PageNodes Screenshot](pagenodes2.png)
+
 This is a from-scratch rewrite of [PageNodes](https://github.com/monteslu/pagenodes), built with React and Vite. Inspired by [Node-RED](https://nodered.org/).
 
 ## Install

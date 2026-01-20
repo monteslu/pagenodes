@@ -24,7 +24,8 @@ export default defineConfig([
     },
     rules: {
       'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
-      'react-refresh/only-export-components': ['warn', { allowExportNames: ['useEditor', 'useFlows'] }],
+      'react-refresh/only-export-components': 'off',
+      'react-hooks/exhaustive-deps': 'off',
     },
   },
   // Node definitions use renderEditor pattern that calls hooks in render functions

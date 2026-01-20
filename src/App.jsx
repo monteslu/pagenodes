@@ -185,14 +185,18 @@ function AppContent() {
     const nodeType = e.dataTransfer.getData('nodeType');
     if (!nodeType) return;
 
-    // Get drop position relative to canvas (accounting for zoom)
+    // Get the offset where drag started within the palette node
+    const offsetX = parseFloat(e.dataTransfer.getData('offsetX')) || 0;
+    const offsetY = parseFloat(e.dataTransfer.getData('offsetY')) || 0;
+
+    // Get drop position relative to canvas (accounting for zoom and drag offset)
     const canvas = e.currentTarget.querySelector('.canvas-svg');
     if (!canvas) return;
 
     // getBoundingClientRect already accounts for scroll position
     const rect = canvas.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / editor.zoom;
-    const y = (e.clientY - rect.top) / editor.zoom;
+    const x = (e.clientX - rect.left - offsetX) / editor.zoom;
+    const y = (e.clientY - rect.top - offsetY) / editor.zoom;
 
     addNode(nodeType, x, y);
   }, [addNode, editor.zoom]);

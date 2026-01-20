@@ -9,11 +9,6 @@ export function CanvasPanel() {
 
   return (
     <div className="canvas-panel">
-      <div className="canvas-panel-header">
-        <h3>Canvases</h3>
-        <span className="canvas-count">{canvasList.length}</span>
-      </div>
-
       <div className="canvas-panel-content">
         {canvasList.length === 0 ? (
           <div className="canvas-empty">
@@ -106,8 +101,8 @@ function CanvasItem({ config, setCanvasRef }) {
     <div className="canvas-item">
       <div className="canvas-item-header">
         <div className="canvas-item-info">
-          <span className="canvas-name">{config.name || 'Canvas'}</span>
-          <span className="canvas-size">{config.width} x {config.height}</span>
+          {config.name && <span className="canvas-name">{config.name}</span>}
+          <span className="canvas-size">{config.width} × {config.height}</span>
         </div>
         <div className="canvas-item-actions">
           <button

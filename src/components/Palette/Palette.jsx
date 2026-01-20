@@ -84,11 +84,6 @@ export function Palette() {
     }));
   }, []);
 
-  const handleDragStart = useCallback((e, nodeType) => {
-    e.dataTransfer.setData('nodeType', nodeType);
-    e.dataTransfer.effectAllowed = 'copy';
-  }, []);
-
   const handleTouchDrag = useCallback((nodeType, clientX, clientY) => {
     // Dispatch custom event for App.jsx to handle
     window.dispatchEvent(new CustomEvent('palette-touch-drop', {
@@ -159,7 +154,6 @@ export function Palette() {
                       <PaletteNode
                         key={nodeDef.type}
                         nodeDef={nodeDef}
-                        onDragStart={handleDragStart}
                         onTouchDrag={handleTouchDrag}
                       />
                     ))}

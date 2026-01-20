@@ -32,7 +32,7 @@ class CanvasManager {
     const existing = this.canvases[configId];
     this.canvases[configId] = {
       id: configId,
-      name: config.name || `Canvas`,
+      name: config.name || '',
       width: config.width || 400,
       height: config.height || 300,
       background: config.background || '#ffffff'

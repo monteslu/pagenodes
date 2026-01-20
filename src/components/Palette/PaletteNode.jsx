@@ -3,7 +3,7 @@ import { NodeShape, NODE_WIDTH, calcNodeHeight } from '../Canvas/NodeShape';
 
 const PALETTE_NODE_WIDTH = 120;
 
-export function PaletteNode({ nodeDef, onDragStart, onTouchDrag }) {
+export function PaletteNode({ nodeDef, onTouchDrag }) {
   const touchRef = useRef(null);
   const ghostRef = useRef(null);
 
@@ -94,11 +94,24 @@ export function PaletteNode({ nodeDef, onDragStart, onTouchDrag }) {
     touchRef.current = null;
   }, [onTouchDrag]);
 
+  const handleDragStart = useCallback((e) => {
+    // Store the offset within the node shape where drag started
+    // Account for SVG viewBox offset (-10, -2) - the node shape starts 10px from left, 2px from top
+    const rect = e.currentTarget.getBoundingClientRect();
+    const offsetX = e.clientX - rect.left - 10;
+    const offsetY = e.clientY - rect.top - 2;
+
+    e.dataTransfer.setData('nodeType', nodeDef.type);
+    e.dataTransfer.setData('offsetX', String(offsetX));
+    e.dataTransfer.setData('offsetY', String(offsetY));
+    e.dataTransfer.effectAllowed = 'copy';
+  }, [nodeDef.type]);
+
   return (
     <div
       className="palette-node"
       draggable
-      onDragStart={(e) => onDragStart(e, nodeDef.type)}
+      onDragStart={handleDragStart}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}

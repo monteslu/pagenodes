@@ -6,7 +6,7 @@ A visual flow-based programming editor that runs entirely in the browser. Connec
 
 ![PageNodes Screenshot](pagenodes2.png)
 
-This is a from-scratch rewrite of [PageNodes](https://github.com/monteslu/pagenodes), built with React and Vite. Inspired by [Node-RED](https://nodered.org/).
+This is a from-scratch rewrite of [PageNodes.com](https://pagenodes.com), built with React and Vite. Inspired by [Node-RED](https://nodered.org/).
 
 ## Install
 

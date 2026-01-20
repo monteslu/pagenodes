@@ -1,6 +1,15 @@
 import { useMemo, useCallback } from 'react';
 import { nodeRegistry } from '../../nodes';
-import { NODE_WIDTH, calcNodeHeight } from '../../utils/geometry';
+import { calcNodeHeight, calcNodeWidth } from '../../utils/geometry';
+
+// Helper to get node label
+function getNodeLabel(node, def) {
+  if (node._node.name) return node._node.name;
+  if (def?.label) {
+    return typeof def.label === 'function' ? def.label(node) : def.label;
+  }
+  return node._node.type;
+}
 
 const MIN_VIEW_SIZE = 500; // Minimum viewBox size
 const PADDING = 50; // Padding around nodes
@@ -24,7 +33,10 @@ export function FlowMinimap({ flowId, nodes, size = 50, onClick }) {
       const def = nodeRegistry.get(node._node.type);
       const outputs = def?.getOutputs ? def.getOutputs(node) : (def?.outputs || 0);
       const nodeHeight = calcNodeHeight(outputs);
-      maxX = Math.max(maxX, node._node.x + NODE_WIDTH);
+      const label = getNodeLabel(node, def);
+      const hasIcon = def?.icon && def?.faChar;
+      const nodeWidth = calcNodeWidth(label, hasIcon);
+      maxX = Math.max(maxX, node._node.x + nodeWidth);
       maxY = Math.max(maxY, node._node.y + nodeHeight);
     }
 
@@ -72,13 +84,16 @@ export function FlowMinimap({ flowId, nodes, size = 50, onClick }) {
         const color = def?.color || '#ddd';
         const outputs = def?.getOutputs ? def.getOutputs(node) : (def?.outputs || 0);
         const nodeHeight = calcNodeHeight(outputs);
+        const label = getNodeLabel(node, def);
+        const hasIcon = def?.icon && def?.faChar;
+        const nodeWidth = calcNodeWidth(label, hasIcon);
 
         return (
           <rect
             key={node._node.id}
             x={node._node.x}
             y={node._node.y}
-            width={NODE_WIDTH}
+            width={nodeWidth}
             height={nodeHeight}
             fill={color}
             rx={5}

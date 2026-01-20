@@ -1,7 +1,7 @@
 import { useMemo, useCallback, useState } from 'react';
 import { nodeRegistry } from '../../nodes';
-import { calcNodeHeight } from '../../utils/geometry';
-import { NodeShape, NODE_WIDTH } from './NodeShape';
+import { calcNodeHeight, calcNodeWidth, truncateLabel } from '../../utils/geometry';
+import { NodeShape } from './NodeShape';
 
 // PN object for renderStatusSVG
 const createStatusPN = (status) => ({
@@ -80,6 +80,11 @@ export function Node({ node, status, selected, isPending, hasErrors, onMouseDown
   const outputs = def?.getOutputs ? def.getOutputs(node) : (def?.outputs || 0);
   const height = calcNodeHeight(outputs);
 
+  // Calculate dynamic width based on label (only on canvas, not palette)
+  const hasIcon = def?.icon && def?.faChar;
+  const width = calcNodeWidth(label, hasIcon);
+  const displayLabel = truncateLabel(label, hasIcon);
+
   return (
     <g
       className={`node ${selected ? 'selected' : ''} ${hasErrors ? 'has-errors' : ''} ${isDragOver ? 'drag-over' : ''}`}
@@ -95,11 +100,12 @@ export function Node({ node, status, selected, isPending, hasErrors, onMouseDown
       <NodeShape
         def={def}
         type={node._node.type}
-        label={label.length > 14 ? label.slice(0, 12) + '...' : label}
+        label={displayLabel}
         selected={selected}
         isPending={isPending}
         hasErrors={hasErrors}
         showButton={true}
+        width={width}
         outputs={outputs}
         onButtonClick={handleButtonClick}
         onPortMouseDown={(e, portIndex, isOutput) => onPortMouseDown(e, node._node.id, portIndex, isOutput)}

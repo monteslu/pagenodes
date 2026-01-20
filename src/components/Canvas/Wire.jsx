@@ -1,14 +1,26 @@
 import { useMemo } from 'react';
-import { getPortPosition, getWireControlPoints, calcNodeHeight } from '../../utils/geometry';
+import { getPortPosition, getWireControlPoints, calcNodeHeight, calcNodeWidth } from '../../utils/geometry';
 import { nodeRegistry } from '../../nodes';
+
+// Helper to get node label for width calculation
+function getNodeLabel(node, def) {
+  if (node._node.name) return node._node.name;
+  if (def?.label) {
+    return typeof def.label === 'function' ? def.label(node) : def.label;
+  }
+  return node._node.type;
+}
 
 export function Wire({ sourceNode, sourcePort, targetNode, targetPos, selected, onMouseDown, onMouseUp, isTemp, isConnecting, isPending }) {
   const pathData = useMemo(() => {
-    // Get source node output count for proper positioning (use dynamic getOutputs if available)
+    // Get source node dimensions (use dynamic getOutputs if available)
     const sourceDef = nodeRegistry.get(sourceNode._node.type);
     const sourceOutputs = sourceDef?.getOutputs ? sourceDef.getOutputs(sourceNode) : (sourceDef?.outputs || 1);
     const sourceHeight = calcNodeHeight(sourceOutputs);
-    const sourcePos = getPortPosition(sourceNode, sourcePort, true, sourceHeight);
+    const sourceLabel = getNodeLabel(sourceNode, sourceDef);
+    const sourceHasIcon = sourceDef?.icon && sourceDef?.faChar;
+    const sourceWidth = calcNodeWidth(sourceLabel, sourceHasIcon);
+    const sourcePos = getPortPosition(sourceNode, sourcePort, true, sourceHeight, sourceWidth);
 
     let endPos;
     if (targetNode && !targetPos) {

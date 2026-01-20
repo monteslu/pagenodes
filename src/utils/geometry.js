@@ -1,10 +1,41 @@
 // Node dimensions (matching pagenodes 1)
 export const NODE_WIDTH = 100;
+export const MIN_NODE_WIDTH = 100;
+export const MAX_NODE_WIDTH = 200;
 export const NODE_HEIGHT = 30;
 export const MIN_NODE_HEIGHT = 30;
 export const STEP_HEIGHT = 15;
 export const PORT_SIZE = 10;
 export const WIRE_CURVE_OFFSET = 60;
+export const CHAR_WIDTH = 6; // Approximate width per character at font-size 10
+
+// Calculate node width based on label length
+export function calcNodeWidth(label, hasIcon = false) {
+  if (!label) return MIN_NODE_WIDTH;
+
+  // Base padding for ports and margins
+  const basePadding = 30;
+  // Extra padding if there's an icon
+  const iconPadding = hasIcon ? 26 : 0;
+
+  const textWidth = label.length * CHAR_WIDTH;
+  const neededWidth = textWidth + basePadding + iconPadding;
+
+  return Math.min(MAX_NODE_WIDTH, Math.max(MIN_NODE_WIDTH, neededWidth));
+}
+
+// Calculate max label length that fits in max width, and truncate if needed
+export function truncateLabel(label, hasIcon = false) {
+  if (!label) return '';
+
+  const basePadding = 30;
+  const iconPadding = hasIcon ? 26 : 0;
+  const availableWidth = MAX_NODE_WIDTH - basePadding - iconPadding;
+  const maxChars = Math.floor(availableWidth / CHAR_WIDTH);
+
+  if (label.length <= maxChars) return label;
+  return label.slice(0, maxChars - 2) + '..';
+}
 
 // Calculate node height based on number of outputs
 export function calcNodeHeight(outputs) {
@@ -28,16 +59,17 @@ export function calcOutputYPositions(outputs, height) {
 }
 
 // Calculate port position on a node
-export function getPortPosition(node, portIndex, isOutput, nodeHeight) {
+export function getPortPosition(node, portIndex, isOutput, nodeHeight, nodeWidth) {
   const height = nodeHeight || calcNodeHeight(
     isOutput ? (node._node.wires?.length || 1) : 1
   );
+  const width = nodeWidth || NODE_WIDTH;
 
   if (isOutput) {
     const outputs = node._node.wires?.length || 1;
     const positions = calcOutputYPositions(outputs, height);
     return {
-      x: node._node.x + NODE_WIDTH,
+      x: node._node.x + width,
       y: node._node.y + (positions[portIndex] || height / 2)
     };
   } else {
@@ -74,11 +106,12 @@ export function getWireControlPoints(sourcePos, targetPos) {
 }
 
 // Check if a point is inside a node
-export function isPointInNode(x, y, node) {
+export function isPointInNode(x, y, node, nodeWidth) {
   const height = calcNodeHeight(node._node.wires?.length || 1);
+  const width = nodeWidth || NODE_WIDTH;
   return (
     x >= node._node.x &&
-    x <= node._node.x + NODE_WIDTH &&
+    x <= node._node.x + width &&
     y >= node._node.y &&
     y <= node._node.y + height
   );
@@ -95,12 +128,13 @@ export function rectsOverlap(rect1, rect2) {
 }
 
 // Check if a node is within a selection rectangle
-export function isNodeInSelection(node, selectionRect) {
+export function isNodeInSelection(node, selectionRect, nodeWidth) {
   const height = calcNodeHeight(node._node.wires?.length || 1);
+  const width = nodeWidth || NODE_WIDTH;
   const nodeRect = {
     x: node._node.x,
     y: node._node.y,
-    width: NODE_WIDTH,
+    width: width,
     height: height
   };
   return rectsOverlap(nodeRect, selectionRect);

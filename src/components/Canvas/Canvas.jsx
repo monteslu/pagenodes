@@ -7,7 +7,7 @@ import { useDrag } from '../../hooks/useDrag';
 import { Node } from './Node';
 import { Wire } from './Wire';
 import { SVGDefs } from './SVGDefs';
-import { getPortPosition, calcNodeHeight, normalizeRect, isNodeInSelection } from '../../utils/geometry';
+import { getPortPosition, calcNodeHeight, calcNodeWidth, normalizeRect, isNodeInSelection } from '../../utils/geometry';
 import { nodeRegistry } from '../../nodes';
 import './Canvas.css';
 
@@ -214,7 +214,11 @@ export function Canvas({ onEditNode, onInject, onFileDrop }) {
       const def = nodeRegistry.get(node._node.type);
       const outputs = def?.getOutputs ? def.getOutputs(node) : (def?.outputs || 1);
       const height = calcNodeHeight(outputs);
-      const pos = getPortPosition(node, portIndex, true, height);
+      // Calculate width for proper port position
+      const label = node._node.name || (typeof def?.label === 'function' ? def.label(node) : def?.label) || node._node.type;
+      const hasIcon = def?.icon && def?.faChar;
+      const width = calcNodeWidth(label, hasIcon);
+      const pos = getPortPosition(node, portIndex, true, height, width);
       setTempWire({ x: pos.x, y: pos.y });
     }
   }, [dispatch, nodes]);

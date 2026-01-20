@@ -13,6 +13,7 @@ import { ArrayInput } from './inputs/ArrayInput';
 import { TypedInput } from './inputs/TypedInput';
 import { ConfigNodeDialog } from './ConfigNodeDialog';
 import { NodeShape, calcNodeHeight } from '../Canvas/NodeShape';
+import { calcNodeWidth, truncateLabel } from '../../utils/geometry';
 import './NodeEditor.css';
 
 export function NodeEditor({ node, onClose }) {
@@ -204,6 +205,13 @@ export function NodeEditor({ node, onClose }) {
     return def.outputs || 0;
   }, [def, node, nodeName, values]);
 
+  // Compute dynamic width for preview node
+  const hasIcon = def?.icon && def?.faChar;
+  const previewWidth = useMemo(() => {
+    return calcNodeWidth(previewLabel, hasIcon);
+  }, [previewLabel, hasIcon]);
+  const displayLabel = truncateLabel(previewLabel, hasIcon);
+
   if (!node || !def) {
     return null;
   }
@@ -337,15 +345,15 @@ export function NodeEditor({ node, onClose }) {
         <div className="node-editor-header">
           <svg
             className="node-editor-node"
-            width={140}
+            width={previewWidth + 20}
             height={calcNodeHeight(previewOutputs) + 4}
-            viewBox={`-10 -2 140 ${calcNodeHeight(previewOutputs) + 4}`}
+            viewBox={`-10 -2 ${previewWidth + 20} ${calcNodeHeight(previewOutputs) + 4}`}
           >
             <NodeShape
               def={{ ...def, outputs: previewOutputs }}
               type={node._node.type}
-              label={previewLabel}
-              width={120}
+              label={displayLabel}
+              width={previewWidth}
               selected={false}
               showButton={false}
             />

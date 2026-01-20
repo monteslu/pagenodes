@@ -1,0 +1,167 @@
+.buttons-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--panel-bg, #1e1e1e);
+}
+
+.buttons-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border-color, #333);
+}
+
+.buttons-header h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-color, #e0e0e0);
+}
+
+.buttons-fullscreen-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted, #888);
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 900;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.buttons-fullscreen-btn:hover {
+  background: var(--hover-bg, #333);
+  color: var(--text-color, #e0e0e0);
+}
+
+.buttons-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+  overflow: hidden;
+}
+
+.buttons-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+  gap: 8px;
+  flex: 1;
+  min-height: 0;
+}
+
+.dial-button {
+  min-height: 40px;
+  border: none;
+  border-radius: 12px;
+  background: var(--button-color, #666);
+  color: #fff;
+  font-size: clamp(18px, 4vw, 32px);
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.1s, filter 0.1s, box-shadow 0.1s;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.dial-button:hover:not(:disabled) {
+  transform: scale(1.05);
+  filter: brightness(1.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+.dial-button:active:not(:disabled),
+.dial-button.active {
+  transform: scale(0.95);
+  filter: brightness(0.9);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.dial-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.buttons-disabled-msg {
+  text-align: center;
+  margin-top: 12px;
+  color: var(--text-muted, #888);
+  font-size: 12px;
+}
+
+/* Fullscreen mode */
+.buttons-fullscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #1a1a2e;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+}
+
+.buttons-exit-fullscreen {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: #fff;
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 900;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 12px 16px;
+  border-radius: 8px;
+  z-index: 10001;
+  transition: background 0.15s;
+}
+
+.buttons-exit-fullscreen:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.buttons-fullscreen-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 60px 40px 40px;
+  min-height: 0;
+}
+
+.buttons-fullscreen-content .buttons-grid {
+  flex: 1;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  gap: 16px;
+}
+
+.buttons-fullscreen-content .dial-button {
+  font-size: clamp(32px, 8vw, 72px);
+  border-radius: 20px;
+}
+
+.buttons-fullscreen-content .buttons-disabled-msg {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 18px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .buttons-fullscreen-content {
+    padding: 20px;
+  }
+
+  .buttons-fullscreen-content .dial-button {
+    min-height: 80px;
+    font-size: 36px;
+  }
+}

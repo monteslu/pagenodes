@@ -1,0 +1,99 @@
+.code-input-wrapper {
+  flex: 1;
+  min-height: 120px;
+  max-height: 300px;
+  overflow: auto;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background: var(--input-bg);
+}
+
+.code-input-editor {
+  min-height: 100%;
+  color: var(--text-color);
+}
+
+.code-input-editor pre,
+.code-input-editor textarea {
+  white-space: pre !important;
+}
+
+.code-input-textarea {
+  outline: none !important;
+  caret-color: var(--text-color);
+}
+
+.code-input-textarea:focus {
+  outline: none !important;
+}
+
+/* Dark theme syntax highlighting - matches app colors */
+.code-input-wrapper .token.comment,
+.code-input-wrapper .token.prolog,
+.code-input-wrapper .token.doctype,
+.code-input-wrapper .token.cdata {
+  color: #6a9955;
+}
+
+.code-input-wrapper .token.punctuation {
+  color: #d4d4d4;
+}
+
+.code-input-wrapper .token.property,
+.code-input-wrapper .token.tag,
+.code-input-wrapper .token.constant,
+.code-input-wrapper .token.symbol,
+.code-input-wrapper .token.deleted {
+  color: #ce9178;
+}
+
+.code-input-wrapper .token.boolean,
+.code-input-wrapper .token.number {
+  color: #b5cea8;
+}
+
+.code-input-wrapper .token.selector,
+.code-input-wrapper .token.attr-name,
+.code-input-wrapper .token.string,
+.code-input-wrapper .token.char,
+.code-input-wrapper .token.builtin,
+.code-input-wrapper .token.inserted {
+  color: #ce9178;
+}
+
+.code-input-wrapper .token.operator,
+.code-input-wrapper .token.entity,
+.code-input-wrapper .token.url,
+.code-input-wrapper .language-css .token.string,
+.code-input-wrapper .style .token.string,
+.code-input-wrapper .token.variable {
+  color: #d4d4d4;
+}
+
+.code-input-wrapper .token.atrule,
+.code-input-wrapper .token.attr-value,
+.code-input-wrapper .token.keyword {
+  color: #569cd6;
+}
+
+.code-input-wrapper .token.function {
+  color: #dcdcaa;
+}
+
+.code-input-wrapper .token.class-name {
+  color: #4ec9b0;
+}
+
+.code-input-wrapper .token.regex,
+.code-input-wrapper .token.important {
+  color: #d16969;
+}
+
+.code-input-wrapper .token.important,
+.code-input-wrapper .token.bold {
+  font-weight: bold;
+}
+
+.code-input-wrapper .token.italic {
+  font-style: italic;
+}

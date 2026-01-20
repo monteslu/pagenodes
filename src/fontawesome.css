@@ -1,0 +1,37 @@
+/* Font Awesome 6.7.2 Free - Solid icons for node icons */
+@font-face {
+  font-family: 'Font Awesome 6 Free';
+  font-style: normal;
+  font-weight: 900;
+  font-display: block;
+  src: url('/fonts/fa-solid-900.woff2') format('woff2'),
+       url('/fonts/fa-solid-900.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Font Awesome 6 Free';
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url('/fonts/fa-regular-400.woff2') format('woff2'),
+       url('/fonts/fa-regular-400.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Font Awesome 6 Brands';
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url('/fonts/fa-brands-400.woff2') format('woff2'),
+       url('/fonts/fa-brands-400.ttf') format('truetype');
+}
+
+.node-icon {
+  font-family: 'Font Awesome 6 Free', sans-serif;
+  font-weight: 900;
+}
+
+.node-icon-brand {
+  font-family: 'Font Awesome 6 Brands', sans-serif;
+  font-weight: 400;
+}

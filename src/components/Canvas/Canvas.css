@@ -208,6 +208,65 @@
 }
 
 /* ============================================
+   AUDIO STREAM WIRES (green)
+   ============================================ */
+
+.wire-group-stream {
+  cursor: pointer;
+}
+
+.wire-outer-stream {
+  fill: none;
+  stroke: #1a5c1a;
+  stroke-width: 5;
+  stroke-linecap: round;
+  pointer-events: stroke;
+}
+
+.wire-inner-stream {
+  fill: none;
+  stroke: #2d9a2d;
+  stroke-width: 3;
+  stroke-linecap: round;
+  pointer-events: none;
+  transition: stroke 0.2s ease;
+}
+
+.wire-inner-selected-stream {
+  fill: none;
+  stroke: #4cff4c;
+  stroke-width: 3;
+  stroke-linecap: round;
+  pointer-events: none;
+}
+
+.wire-group-stream:hover .wire-outer-stream {
+  stroke: #2a8a2a;
+}
+
+.wire-group-stream:hover .wire-inner-stream {
+  stroke: #4cff4c;
+}
+
+/* Stream temp wire - thinner and grey when not connected */
+.wire-inner-temp-stream {
+  stroke: #446644;
+  stroke-width: 1.5;
+}
+
+/* Stream temp wire - colored when hovering over valid input */
+.wire-inner-connecting-stream {
+  stroke: #2d9a2d;
+  stroke-width: 1.5;
+}
+
+/* Stream pending wire - connected but not deployed */
+.wire-inner-pending-stream {
+  stroke: #2d9a2d;
+  stroke-width: 1.5;
+}
+
+/* ============================================
    SELECTION
    ============================================ */
 

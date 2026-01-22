@@ -54,7 +54,7 @@ export const midiInNode = {
   },
 
   mainThread: {
-    async start(peerRef, nodeId, { deviceIndex, channel }) {
+    async start(peerRef, nodeId, { deviceIndex, channel }, PN) {
       try {
         if (!midiAccess && navigator.requestMIDIAccess) {
           midiAccess = await navigator.requestMIDIAccess();
@@ -94,12 +94,12 @@ export const midiInNode = {
           peerRef.current.methods.emitEvent(nodeId, 'error', 'No MIDI input device');
         }
       } catch (err) {
-        console.error('MIDI access denied:', err);
+        PN.error('MIDI access denied:', err);
         peerRef.current.methods.emitEvent(nodeId, 'error', err?.message || 'access denied');
       }
     },
 
-    stop(peerRef, nodeId) {
+    stop(peerRef, nodeId, _params, _PN) {
       if (midiInputs.has(nodeId)) {
         const { input } = midiInputs.get(nodeId);
         input.onmidimessage = null;
@@ -172,7 +172,7 @@ export const midiOutNode = {
   },
 
   mainThread: {
-    async startOut(peerRef, nodeId, { deviceIndex, channel }) {
+    async startOut(peerRef, nodeId, { deviceIndex, channel }, PN) {
       try {
         if (!midiAccess && navigator.requestMIDIAccess) {
           midiAccess = await navigator.requestMIDIAccess();
@@ -191,12 +191,12 @@ export const midiOutNode = {
           peerRef.current.methods.emitEvent(nodeId, 'error', 'No MIDI output device');
         }
       } catch (err) {
-        console.error('MIDI access denied:', err);
+        PN.error('MIDI access denied:', err);
         peerRef.current.methods.emitEvent(nodeId, 'error', err?.message || 'access denied');
       }
     },
 
-    send(peerRef, nodeId, { payload, channel }) {
+    send(peerRef, nodeId, { payload, channel }, _PN) {
       const entry = midiOutputs.get(nodeId);
       if (!entry?.output) return;
 
@@ -211,7 +211,7 @@ export const midiOutNode = {
       }
     },
 
-    stopOut(peerRef, nodeId) {
+    stopOut(peerRef, nodeId, _params, _PN) {
       midiOutputs.delete(nodeId);
     }
   },

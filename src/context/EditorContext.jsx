@@ -75,7 +75,7 @@ function editorReducer(state, action) {
       return { ...state, nodeErrors: action.errors };
 
     case 'START_CONNECTING':
-      return { ...state, connecting: { sourceId: action.sourceId, sourcePort: action.sourcePort } };
+      return { ...state, connecting: { sourceId: action.sourceId, sourcePort: action.sourcePort, isStream: action.isStream || false } };
 
     case 'STOP_CONNECTING':
       return { ...state, connecting: null };

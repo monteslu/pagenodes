@@ -14,7 +14,7 @@ export const debugRuntime = {
     }
 
     if (this.config.console) {
-      console.log('[debug]', this.name || this.id, output);
+      this.log('[debug]', this.name || this.id, output);
     }
   }
 };

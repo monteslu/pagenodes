@@ -1,6 +1,6 @@
 import { useMemo, useCallback } from 'react';
 import { nodeRegistry } from '../../nodes';
-import { calcNodeHeight, calcNodeWidth } from '../../utils/geometry';
+import { calcNodeHeight, calcNodeHeightWithAudio, calcNodeWidth } from '../../utils/geometry';
 
 // Helper to get node label
 function getNodeLabel(node, def) {
@@ -9,6 +9,18 @@ function getNodeLabel(node, def) {
     return typeof def.label === 'function' ? def.label(node) : def.label;
   }
   return node._node.type;
+}
+
+// Helper to calculate node height including audio ports
+function getNodeHeight(node, def) {
+  const outputs = def?.getOutputs ? def.getOutputs(node) : (def?.outputs || 0);
+  const inputs = def?.inputs || 0;
+  const streamOutputs = def?.getStreamOutputs ? def.getStreamOutputs(node) : (def?.streamOutputs || 0);
+  const streamInputs = def?.getStreamInputs ? def.getStreamInputs(node) : (def?.streamInputs || 0);
+  const hasAudioPorts = streamInputs > 0 || streamOutputs > 0;
+  return hasAudioPorts
+    ? calcNodeHeightWithAudio(outputs, streamOutputs, inputs, streamInputs)
+    : calcNodeHeight(outputs);
 }
 
 const MIN_VIEW_SIZE = 500; // Minimum viewBox size
@@ -31,8 +43,7 @@ export function FlowMinimap({ flowId, nodes, size = 50, onClick }) {
 
     for (const node of flowNodes) {
       const def = nodeRegistry.get(node._node.type);
-      const outputs = def?.getOutputs ? def.getOutputs(node) : (def?.outputs || 0);
-      const nodeHeight = calcNodeHeight(outputs);
+      const nodeHeight = getNodeHeight(node, def);
       const label = getNodeLabel(node, def);
       const hasIcon = def?.icon && def?.faChar;
       const nodeWidth = calcNodeWidth(label, hasIcon);
@@ -82,8 +93,7 @@ export function FlowMinimap({ flowId, nodes, size = 50, onClick }) {
       {flowNodes.map(node => {
         const def = nodeRegistry.get(node._node.type);
         const color = def?.color || '#ddd';
-        const outputs = def?.getOutputs ? def.getOutputs(node) : (def?.outputs || 0);
-        const nodeHeight = calcNodeHeight(outputs);
+        const nodeHeight = getNodeHeight(node, def);
         const label = getNodeLabel(node, def);
         const hasIcon = def?.icon && def?.faChar;
         const nodeWidth = calcNodeWidth(label, hasIcon);

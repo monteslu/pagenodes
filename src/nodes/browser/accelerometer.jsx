@@ -28,7 +28,7 @@ export const accelerometerNode = {
   },
 
   mainThread: {
-    start(peerRef, nodeId, { frequency, includeGravity }) {
+    start(peerRef, nodeId, { frequency, includeGravity }, PN) {
       // Clean up existing sensor for this node
       if (sensorCleanups.has(nodeId)) {
         sensorCleanups.get(nodeId)();
@@ -45,7 +45,7 @@ export const accelerometerNode = {
           sensor.start();
           sensorCleanups.set(nodeId, () => sensor.stop());
         } catch (err) {
-          console.error('Accelerometer error:', err);
+          PN.error('Accelerometer error:', err);
           peerRef.current.methods.emitEvent(nodeId, 'error', err?.message || 'sensor error');
         }
       } else if ('DeviceMotionEvent' in window) {
@@ -66,7 +66,7 @@ export const accelerometerNode = {
       }
     },
 
-    stop(peerRef, nodeId) {
+    stop(peerRef, nodeId, _params, _PN) {
       if (sensorCleanups.has(nodeId)) {
         sensorCleanups.get(nodeId)();
         sensorCleanups.delete(nodeId);
@@ -120,7 +120,7 @@ export const gyroscopeNode = {
   },
 
   mainThread: {
-    start(peerRef, nodeId, { frequency }) {
+    start(peerRef, nodeId, { frequency }, PN) {
       // Clean up existing sensor for this node
       if (sensorCleanups.has(nodeId)) {
         sensorCleanups.get(nodeId)();
@@ -137,7 +137,7 @@ export const gyroscopeNode = {
           sensor.start();
           sensorCleanups.set(nodeId, () => sensor.stop());
         } catch (err) {
-          console.error('Gyroscope error:', err);
+          PN.error('Gyroscope error:', err);
           peerRef.current.methods.emitEvent(nodeId, 'error', err?.message || 'sensor error');
         }
       } else {
@@ -145,7 +145,7 @@ export const gyroscopeNode = {
       }
     },
 
-    stop(peerRef, nodeId) {
+    stop(peerRef, nodeId, _params, _PN) {
       if (sensorCleanups.has(nodeId)) {
         sensorCleanups.get(nodeId)();
         sensorCleanups.delete(nodeId);
@@ -198,7 +198,7 @@ export const orientationNode = {
   },
 
   mainThread: {
-    start(peerRef, nodeId) {
+    start(peerRef, nodeId, _params, _PN) {
       // Clean up existing sensor for this node
       if (sensorCleanups.has(nodeId)) {
         sensorCleanups.get(nodeId)();
@@ -222,7 +222,7 @@ export const orientationNode = {
       }
     },
 
-    stop(peerRef, nodeId) {
+    stop(peerRef, nodeId, _params, _PN) {
       if (sensorCleanups.has(nodeId)) {
         sensorCleanups.get(nodeId)();
         sensorCleanups.delete(nodeId);

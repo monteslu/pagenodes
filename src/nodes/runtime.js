@@ -66,7 +66,6 @@ import { gamepadRuntime } from './browser/gamepad.js';
 import { geolocateRuntime } from './browser/geolocate.js';
 import { accelerometerRuntime, gyroscopeRuntime, orientationRuntime } from './browser/accelerometer.js';
 import { vibrateRuntime } from './browser/vibrate.js';
-import { oscillatorRuntime } from './browser/oscillator.js';
 import { midiInRuntime, midiOutRuntime } from './browser/midi.js';
 import { voicerecRuntime, speechRuntime } from './browser/voicerec.js';
 import { bluetoothInRuntime, bluetoothOutRuntime } from './browser/bluetooth.js';
@@ -87,6 +86,29 @@ import { llmConfigRuntime, llmRuntime } from './ai/llm.js';
 
 // Output nodes
 import { canvasConfigRuntime, canvasRuntime } from './output/canvas.js';
+
+// Audio nodes
+import { audioOscillatorRuntime } from './audio/oscillator.js';
+import { audioGainRuntime } from './audio/gain.js';
+import { audioSpeakersRuntime } from './audio/speakers.js';
+import { audioMicRuntime } from './audio/mic.js';
+import { audioFilterRuntime } from './audio/filter.js';
+import { audioAnalyserRuntime } from './audio/analyser.js';
+import { audioDelayRuntime } from './audio/delay.js';
+import { audioPannerRuntime } from './audio/panner.js';
+import { audioCompressorRuntime } from './audio/compressor.js';
+import { audioWaveShaperRuntime } from './audio/waveshaper.js';
+import { audioBufferRuntime } from './audio/buffer.js';
+import { audioConvolverRuntime } from './audio/convolver.js';
+import { audioPanner3dRuntime } from './audio/panner3d.js';
+import { audioConstantRuntime } from './audio/constant.js';
+import { audioRecorderRuntime } from './audio/recorder.js';
+import { audioSplitterRuntime } from './audio/splitter.js';
+import { audioMergerRuntime } from './audio/merger.js';
+import { audioIIRFilterRuntime } from './audio/iirfilter.js';
+import { audioWorkletRuntime } from './audio/worklet.js';
+import { audioMediaElementRuntime } from './audio/mediaelement.js';
+import { audioStemsRuntime } from './audio/stems.js';
 
 // Register all runtime implementations
 [
@@ -140,7 +162,6 @@ import { canvasConfigRuntime, canvasRuntime } from './output/canvas.js';
   gyroscopeRuntime,
   orientationRuntime,
   vibrateRuntime,
-  oscillatorRuntime,
   midiInRuntime,
   midiOutRuntime,
   voicerecRuntime,
@@ -173,6 +194,29 @@ import { canvasConfigRuntime, canvasRuntime } from './output/canvas.js';
 
   // Output
   canvasRuntime,
+
+  // Audio
+  audioOscillatorRuntime,
+  audioGainRuntime,
+  audioSpeakersRuntime,
+  audioMicRuntime,
+  audioFilterRuntime,
+  audioAnalyserRuntime,
+  audioDelayRuntime,
+  audioPannerRuntime,
+  audioCompressorRuntime,
+  audioWaveShaperRuntime,
+  audioBufferRuntime,
+  audioConvolverRuntime,
+  audioPanner3dRuntime,
+  audioConstantRuntime,
+  audioRecorderRuntime,
+  audioSplitterRuntime,
+  audioMergerRuntime,
+  audioIIRFilterRuntime,
+  audioWorkletRuntime,
+  audioMediaElementRuntime,
+  audioStemsRuntime,
 
   // Config nodes (AI)
   imageAiConfigRuntime,

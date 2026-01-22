@@ -39,7 +39,7 @@ export const bluetoothInNode = {
   },
 
   mainThread: {
-    async connect(peerRef, nodeId, { deviceName, namePrefix, serviceUUID, characteristicUUID, forceDialog }) {
+    async connect(peerRef, nodeId, { deviceName, namePrefix, serviceUUID, characteristicUUID, forceDialog }, PN) {
       try {
         let device = null;
 
@@ -63,7 +63,7 @@ export const bluetoothInNode = {
 
                   if (d.gatt) {
                     device = d;
-                    console.log('Bluetooth: Auto-reconnecting to saved device:', d.name);
+                    PN.log('Bluetooth: Auto-reconnecting to saved device:', d.name);
                     break;
                   }
                 } catch {
@@ -72,7 +72,7 @@ export const bluetoothInNode = {
               }
             }
           } catch (err) {
-            console.log('Bluetooth getDevices not available or failed:', err.message);
+            PN.log('Bluetooth getDevices not available or failed:', err.message);
           }
         }
 
@@ -106,12 +106,12 @@ export const bluetoothInNode = {
 
         peerRef.current.methods.emitEvent(nodeId, 'connected', device.name);
       } catch (err) {
-        console.error('Bluetooth In connect error:', err);
+        PN.error('Bluetooth In connect error:', err);
         peerRef.current.methods.emitEvent(nodeId, 'error', err?.message || 'connect failed');
       }
     },
 
-    disconnect(peerRef, nodeId) {
+    disconnect(peerRef, nodeId, _params, _PN) {
       const entry = bluetoothDevices.get(nodeId);
       if (entry?.device?.gatt?.connected) {
         entry.device.gatt.disconnect();
@@ -186,7 +186,7 @@ export const bluetoothOutNode = {
   },
 
   mainThread: {
-    async connect(peerRef, nodeId, { deviceName, namePrefix, serviceUUID, characteristicUUID, forceDialog }) {
+    async connect(peerRef, nodeId, { deviceName, namePrefix, serviceUUID, characteristicUUID, forceDialog }, PN) {
       try {
         let device = null;
 
@@ -206,7 +206,7 @@ export const bluetoothOutNode = {
 
                   if (d.gatt) {
                     device = d;
-                    console.log('Bluetooth: Auto-reconnecting to saved device:', d.name);
+                    PN.log('Bluetooth: Auto-reconnecting to saved device:', d.name);
                     break;
                   }
                 } catch {
@@ -215,7 +215,7 @@ export const bluetoothOutNode = {
               }
             }
           } catch (err2) {
-            console.log('Bluetooth getDevices not available or failed:', err2.message);
+            PN.log('Bluetooth getDevices not available or failed:', err2.message);
           }
         }
 
@@ -240,16 +240,16 @@ export const bluetoothOutNode = {
         bluetoothDevices.set(nodeId, { device, server, service, characteristic });
         peerRef.current.methods.emitEvent(nodeId, 'connected', device.name);
       } catch (err) {
-        console.error('Bluetooth Out connect error:', err);
+        PN.error('Bluetooth Out connect error:', err);
         peerRef.current.methods.emitEvent(nodeId, 'error', err?.message || 'connect failed');
       }
     },
 
-    async write(peerRef, nodeId, { payload }) {
+    async write(peerRef, nodeId, { payload }, PN) {
       try {
         const entry = bluetoothDevices.get(nodeId);
         if (!entry?.characteristic) {
-          console.warn('Bluetooth Out: not connected');
+          PN.warn('Bluetooth Out: not connected');
           return;
         }
 
@@ -261,11 +261,11 @@ export const bluetoothOutNode = {
 
         await entry.characteristic.writeValue(data);
       } catch (err) {
-        console.error('Bluetooth Out write error:', err);
+        PN.error('Bluetooth Out write error:', err);
       }
     },
 
-    disconnect(peerRef, nodeId) {
+    disconnect(peerRef, nodeId, _params, _PN) {
       const entry = bluetoothDevices.get(nodeId);
       if (entry?.device?.gatt?.connected) {
         entry.device.gatt.disconnect();

@@ -118,7 +118,7 @@ export const nodebotRuntime = {
         this.status({ fill: 'red', shape: 'dot', text: 'firmata error' });
       });
     }).catch(err => {
-      console.error('Failed to load firmata:', err);
+      this.error('Failed to load firmata:', err);
       this.status({ fill: 'red', shape: 'dot', text: 'firmata not available' });
     });
   },
@@ -155,7 +155,7 @@ export const nodebotRuntime = {
       this._inputSubscriptions.set(nodeId, { pin: pinNum, state, callback });
       return true;
     } catch (e) {
-      console.error('Error subscribing to pin:', e);
+      this.error('Error subscribing to pin:', e);
       return false;
     }
   },
@@ -185,7 +185,7 @@ export const nodebotRuntime = {
       }
       return true;
     } catch (e) {
-      console.error('Error writing to pin:', e);
+      this.error('Error writing to pin:', e);
       return false;
     }
   },

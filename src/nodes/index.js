@@ -91,7 +91,6 @@ import { gamepadNode } from './browser/gamepad.jsx';
 import { geolocateNode } from './browser/geolocate.jsx';
 import { accelerometerNode, gyroscopeNode, orientationNode } from './browser/accelerometer.jsx';
 import { vibrateNode } from './browser/vibrate.jsx';
-import { oscillatorNode } from './browser/oscillator.jsx';
 import { midiInNode, midiOutNode } from './browser/midi.jsx';
 import { voicerecNode, speechNode } from './browser/voicerec.jsx';
 import { bluetoothInNode, bluetoothOutNode } from './browser/bluetooth.jsx';
@@ -112,6 +111,29 @@ import { llmConfigNode, llmNode } from './ai/llm.jsx';
 
 // Output nodes
 import { canvasConfigNode, canvasNode } from './output/canvas.jsx';
+
+// Audio nodes
+import { audioOscillatorNode } from './audio/oscillator.jsx';
+import { audioGainNode } from './audio/gain.jsx';
+import { audioSpeakersNode } from './audio/speakers.jsx';
+import { audioMicNode } from './audio/mic.jsx';
+import { audioFilterNode } from './audio/filter.jsx';
+import { audioAnalyserNode } from './audio/analyser.jsx';
+import { audioDelayNode } from './audio/delay.jsx';
+import { audioPannerNode } from './audio/panner.jsx';
+import { audioCompressorNode } from './audio/compressor.jsx';
+import { audioWaveShaperNode } from './audio/waveshaper.jsx';
+import { audioBufferNode } from './audio/buffer.jsx';
+import { audioConvolverNode } from './audio/convolver.jsx';
+import { audioPanner3dNode } from './audio/panner3d.jsx';
+import { audioConstantNode } from './audio/constant.jsx';
+import { audioRecorderNode } from './audio/recorder.jsx';
+import { audioSplitterNode } from './audio/splitter.jsx';
+import { audioMergerNode } from './audio/merger.jsx';
+import { audioIIRFilterNode } from './audio/iirfilter.jsx';
+import { audioWorkletNode } from './audio/worklet.jsx';
+import { audioMediaElementNode } from './audio/mediaelement.jsx';
+import { audioStemsNode } from './audio/stems.jsx';
 
 [
   // Core
@@ -164,7 +186,6 @@ import { canvasConfigNode, canvasNode } from './output/canvas.jsx';
   gyroscopeNode,
   orientationNode,
   vibrateNode,
-  oscillatorNode,
   midiInNode,
   midiOutNode,
   voicerecNode,
@@ -197,6 +218,29 @@ import { canvasConfigNode, canvasNode } from './output/canvas.jsx';
 
   // Output
   canvasNode,
+
+  // Audio
+  audioOscillatorNode,
+  audioGainNode,
+  audioSpeakersNode,
+  audioMicNode,
+  audioFilterNode,
+  audioAnalyserNode,
+  audioDelayNode,
+  audioPannerNode,
+  audioCompressorNode,
+  audioWaveShaperNode,
+  audioBufferNode,
+  audioConvolverNode,
+  audioPanner3dNode,
+  audioConstantNode,
+  audioRecorderNode,
+  audioSplitterNode,
+  audioMergerNode,
+  audioIIRFilterNode,
+  audioWorkletNode,
+  audioMediaElementNode,
+  audioStemsNode,
 
   // Config nodes (not shown in palette, but registered for lookups)
   mqttBrokerNode,

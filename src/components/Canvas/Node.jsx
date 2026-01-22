@@ -1,6 +1,6 @@
 import { useMemo, useCallback, useState } from 'react';
 import { nodeRegistry } from '../../nodes';
-import { calcNodeHeight, calcNodeWidth, truncateLabel } from '../../utils/geometry';
+import { calcNodeHeight, calcNodeHeightWithAudio, calcNodeWidth, truncateLabel } from '../../utils/geometry';
 import { NodeShape } from './NodeShape';
 
 // PN object for renderStatusSVG
@@ -11,7 +11,7 @@ const createStatusPN = (status) => ({
   }
 });
 
-export function Node({ node, status, selected, isPending, hasErrors, onMouseDown, onDoubleClick, onPortMouseDown, onPortMouseUp, onPortMouseEnter, onPortMouseLeave, onInject, onFileDrop }) {
+export function Node({ node, status, selected, isPending, hasErrors, onMouseDown, onDoubleClick, onPortMouseDown, onPortMouseUp, onPortMouseEnter, onPortMouseLeave, onStreamPortMouseDown, onStreamPortMouseUp, onStreamPortMouseEnter, onStreamPortMouseLeave, onInject, onFileDrop }) {
   const def = nodeRegistry.get(node._node.type);
   const [isDragOver, setIsDragOver] = useState(false);
 
@@ -78,7 +78,17 @@ export function Node({ node, status, selected, isPending, hasErrors, onMouseDown
 
   // Use dynamic getOutputs if available, otherwise static outputs
   const outputs = def?.getOutputs ? def.getOutputs(node) : (def?.outputs || 0);
-  const height = calcNodeHeight(outputs);
+  const inputs = def?.inputs || 0;
+
+  // Audio stream ports
+  const streamInputs = def?.getStreamInputs ? def.getStreamInputs(node) : (def?.streamInputs || 0);
+  const streamOutputs = def?.getStreamOutputs ? def.getStreamOutputs(node) : (def?.streamOutputs || 0);
+
+  // Calculate height based on all ports
+  const hasAudioPorts = streamInputs > 0 || streamOutputs > 0;
+  const height = hasAudioPorts
+    ? calcNodeHeightWithAudio(outputs, streamOutputs, inputs, streamInputs)
+    : calcNodeHeight(outputs);
 
   // Calculate dynamic width based on label (only on canvas, not palette)
   const hasIcon = def?.icon && def?.faChar;
@@ -101,17 +111,24 @@ export function Node({ node, status, selected, isPending, hasErrors, onMouseDown
         def={def}
         type={node._node.type}
         label={displayLabel}
+        node={node}
         selected={selected}
         isPending={isPending}
         hasErrors={hasErrors}
         showButton={true}
         width={width}
         outputs={outputs}
+        streamInputs={streamInputs}
+        streamOutputs={streamOutputs}
         onButtonClick={handleButtonClick}
         onPortMouseDown={(e, portIndex, isOutput) => onPortMouseDown(e, node._node.id, portIndex, isOutput)}
         onPortMouseUp={(e, portIndex, isOutput) => onPortMouseUp(e, node._node.id, portIndex, isOutput)}
         onPortMouseEnter={(e, portIndex, isOutput) => onPortMouseEnter?.(e, node._node.id, portIndex, isOutput)}
         onPortMouseLeave={(e, portIndex, isOutput) => onPortMouseLeave?.(e, node._node.id, portIndex, isOutput)}
+        onStreamPortMouseDown={(e, portIndex, isOutput) => onStreamPortMouseDown?.(e, node._node.id, portIndex, isOutput)}
+        onStreamPortMouseUp={(e, portIndex, isOutput) => onStreamPortMouseUp?.(e, node._node.id, portIndex, isOutput)}
+        onStreamPortMouseEnter={(e, portIndex, isOutput) => onStreamPortMouseEnter?.(e, node._node.id, portIndex, isOutput)}
+        onStreamPortMouseLeave={(e, portIndex, isOutput) => onStreamPortMouseLeave?.(e, node._node.id, portIndex, isOutput)}
       />
 
       {/* Status indicator below node */}

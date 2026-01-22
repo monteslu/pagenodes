@@ -23,7 +23,7 @@ export const usbDeviceNode = {
   },
 
   mainThread: {
-    async connect(peerRef, nodeId, { vendorId, productId, interfaceNumber, forceDialog }) {
+    async connect(peerRef, nodeId, { vendorId, productId, interfaceNumber, forceDialog }, PN) {
       try {
         // Parse vendor/product IDs
         const vid = vendorId ? (parseInt(vendorId, 16) || parseInt(vendorId, 10)) : null;
@@ -39,7 +39,7 @@ export const usbDeviceNode = {
             const pidMatch = !pid || d.productId === pid;
             if (vidMatch && pidMatch) {
               device = d;
-              console.log('USB: Auto-reconnecting to saved device:', d.productName);
+              PN.log('USB: Auto-reconnecting to saved device:', d.productName);
               break;
             }
           }
@@ -84,12 +84,12 @@ export const usbDeviceNode = {
           productId: device.productId
         });
       } catch (err) {
-        console.error('USB connect error:', err);
+        PN.error('USB connect error:', err);
         peerRef.current.methods.emitEvent(nodeId, 'error', err?.message || 'connect failed');
       }
     },
 
-    async disconnect(peerRef, nodeId) {
+    async disconnect(peerRef, nodeId, params, PN) {
       const entry = usbDevices.get(nodeId);
       if (entry) {
         try {
@@ -98,13 +98,13 @@ export const usbDeviceNode = {
           await entry.device.releaseInterface(entry.interfaceNumber);
           await entry.device.close();
         } catch (err) {
-          console.error('USB disconnect error:', err);
+          PN.error('USB disconnect error:', err);
         }
         usbDevices.delete(nodeId);
       }
     },
 
-    getDevice(nodeId) {
+    getDevice(peerRef, nodeId, _params, _PN) {
       return usbDevices.get(nodeId);
     }
   },
@@ -166,7 +166,7 @@ export const usbInNode = {
   },
 
   mainThread: {
-    async startListening(peerRef, nodeId, { configNodeId, endpointNumber, packetSize }) {
+    async startListening(peerRef, nodeId, { configNodeId, endpointNumber, packetSize }, PN) {
       const entry = usbDevices.get(configNodeId);
       if (!entry) {
         peerRef.current.methods.emitEvent(nodeId, 'error', 'Device not connected');
@@ -191,7 +191,7 @@ export const usbInNode = {
           }
         } catch (err) {
           if (!controller.signal.aborted) {
-            console.error('USB read error:', err);
+            PN.error('USB read error:', err);
             peerRef.current.methods.emitEvent(nodeId, 'error', err?.message || 'read failed');
           }
         }
@@ -201,7 +201,7 @@ export const usbInNode = {
       peerRef.current.methods.emitEvent(nodeId, 'listening', { endpoint });
     },
 
-    async stopListening(peerRef, nodeId, { configNodeId }) {
+    async stopListening(peerRef, nodeId, { configNodeId }, _PN) {
       const entry = usbDevices.get(configNodeId);
       if (entry) {
         const controller = entry.listeners.get(nodeId);
@@ -271,10 +271,10 @@ export const usbOutNode = {
   },
 
   mainThread: {
-    async write(peerRef, nodeId, { configNodeId, endpointNumber, payload }) {
+    async write(peerRef, nodeId, { configNodeId, endpointNumber, payload }, PN) {
       const entry = usbDevices.get(configNodeId);
       if (!entry) {
-        console.warn('USB out: device not connected');
+        PN.warn('USB out: device not connected');
         return;
       }
 
@@ -296,10 +296,10 @@ export const usbOutNode = {
 
         const result = await entry.device.transferOut(endpoint, data);
         if (result.status !== 'ok') {
-          console.warn('USB write status:', result.status);
+          PN.warn('USB write status:', result.status);
         }
       } catch (err) {
-        console.error('USB write error:', err);
+        PN.error('USB write error:', err);
         peerRef.current.methods.emitEvent(nodeId, 'error', err?.message || 'write failed');
       }
     }

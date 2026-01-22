@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef } from 'react';
 import { generateId } from '../../utils/id';
+import { logger } from '../../utils/logger';
 import './ImportDialog.css';
 
 /**
@@ -157,7 +158,7 @@ export function ImportDialog({ onImport, onClose }) {
       const remapped = remapIds(parsed);
       onImport(remapped);
     } catch (err) {
-      console.error('Import error:', err);
+      logger.error( 'Import error:', err);
       setError('Invalid JSON format: ' + err.message);
     }
   }, [text, onImport]);

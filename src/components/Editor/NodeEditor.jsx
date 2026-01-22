@@ -12,7 +12,7 @@ import { ConfigNodeInput } from './inputs/ConfigNodeInput';
 import { ArrayInput } from './inputs/ArrayInput';
 import { TypedInput } from './inputs/TypedInput';
 import { ConfigNodeDialog } from './ConfigNodeDialog';
-import { NodeShape, calcNodeHeight } from '../Canvas/NodeShape';
+import { NodeShape, calcNodeHeight, calcNodeHeightWithAudio } from '../Canvas/NodeShape';
 import { calcNodeWidth, truncateLabel } from '../../utils/geometry';
 import './NodeEditor.css';
 
@@ -51,12 +51,9 @@ export function NodeEditor({ node, onClose }) {
         const currentValue = values[fieldKey];
         const isValid = options.some(opt => opt.value === currentValue);
 
-        console.log(`[NodeEditor] Validating ${fieldKey}: filterValue=${filterValue}, options=${options.length}, currentValue=${currentValue}, isValid=${isValid}`);
-
         if (!isValid && options.length > 0) {
           updates[fieldKey] = options[0].value;
           needsUpdate = true;
-          console.log(`[NodeEditor] Updating ${fieldKey} to ${options[0].value}`);
         }
       }
     });
@@ -205,6 +202,27 @@ export function NodeEditor({ node, onClose }) {
     return def.outputs || 0;
   }, [def, node, nodeName, values]);
 
+  // Compute audio stream ports for height calculation
+  const previewStreamPorts = useMemo(() => {
+    if (!def || !node) return { inputs: 0, outputs: 0 };
+    const mockNode = {
+      _node: { ...node._node, name: nodeName },
+      ...values
+    };
+    const streamInputs = def.getStreamInputs ? def.getStreamInputs(mockNode) : (def.streamInputs || 0);
+    const streamOutputs = def.getStreamOutputs ? def.getStreamOutputs(mockNode) : (def.streamOutputs || 0);
+    return { inputs: streamInputs, outputs: streamOutputs };
+  }, [def, node, nodeName, values]);
+
+  // Compute preview height based on all ports
+  const previewHeight = useMemo(() => {
+    const inputs = def?.inputs || 0;
+    const hasAudioPorts = previewStreamPorts.inputs > 0 || previewStreamPorts.outputs > 0;
+    return hasAudioPorts
+      ? calcNodeHeightWithAudio(previewOutputs, previewStreamPorts.outputs, inputs, previewStreamPorts.inputs)
+      : calcNodeHeight(previewOutputs);
+  }, [def, previewOutputs, previewStreamPorts]);
+
   // Compute dynamic width for preview node
   const hasIcon = def?.icon && def?.faChar;
   const previewWidth = useMemo(() => {
@@ -346,8 +364,8 @@ export function NodeEditor({ node, onClose }) {
           <svg
             className="node-editor-node"
             width={previewWidth + 20}
-            height={calcNodeHeight(previewOutputs) + 4}
-            viewBox={`-10 -2 ${previewWidth + 20} ${calcNodeHeight(previewOutputs) + 4}`}
+            height={previewHeight + 4}
+            viewBox={`-10 -2 ${previewWidth + 20} ${previewHeight + 4}`}
           >
             <NodeShape
               def={{ ...def, outputs: previewOutputs }}
@@ -356,6 +374,8 @@ export function NodeEditor({ node, onClose }) {
               width={previewWidth}
               selected={false}
               showButton={false}
+              streamOutputs={previewStreamPorts.outputs}
+              streamInputs={previewStreamPorts.inputs}
             />
           </svg>
           <div className="node-editor-spacer" />

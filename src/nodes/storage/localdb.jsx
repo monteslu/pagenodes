@@ -36,7 +36,7 @@ export const localreadNode = {
   },
 
   mainThread: {
-    read(peerRef, nodeId, { key, storage }) {
+    read(peerRef, nodeId, { key, storage }, PN) {
       try {
         const store = storage === 'session' ? sessionStorage : localStorage;
         let value = store.getItem(key);
@@ -45,7 +45,7 @@ export const localreadNode = {
         }
         peerRef.current.methods.sendResult(nodeId, { payload: value });
       } catch (err) {
-        console.error('Storage read error:', err);
+        PN.error('Storage read error:', err);
       }
     }
   },
@@ -127,14 +127,14 @@ export const localwriteNode = {
   },
 
   mainThread: {
-    write(peerRef, nodeId, { key, value, storage }) {
+    write(peerRef, nodeId, { key, value, storage }, PN) {
       try {
         const store = storage === 'session' ? sessionStorage : localStorage;
         const data = typeof value === 'string' ? value : JSON.stringify(value);
         store.setItem(key, data);
         peerRef.current.methods.sendResult(nodeId, { payload: value });
       } catch (err) {
-        console.error('Storage write error:', err);
+        PN.error('Storage write error:', err);
       }
     }
   },

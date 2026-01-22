@@ -57,7 +57,7 @@ function getOrCreateWorker(configId, config) {
   // Handle ready notification
   peer.notifications.onready(() => {
     state.ready = true;
-    console.log(`[Image AI] ${config.backend || 'transformers'} worker ready for config:`, configId);
+    self.PN?.log('image-ai', `${config.backend || 'transformers'} worker ready for config:`, configId);
   });
 
   aiWorkers.set(configId, state);

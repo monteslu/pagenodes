@@ -9,6 +9,9 @@ export const PORT_SIZE = 10;
 export const WIRE_CURVE_OFFSET = 60;
 export const CHAR_WIDTH = 6; // Approximate width per character at font-size 10
 
+// Audio port constants
+export const AUDIO_PORT_OFFSET = 8; // Vertical offset between message and audio ports
+
 // Calculate node width based on label length
 export function calcNodeWidth(label, hasIcon = false) {
   if (!label) return MIN_NODE_WIDTH;
@@ -43,6 +46,17 @@ export function calcNodeHeight(outputs) {
   return MIN_NODE_HEIGHT + (outputs - 1) * STEP_HEIGHT;
 }
 
+// Calculate node height considering both message and audio ports
+export function calcNodeHeightWithAudio(outputs, streamOutputs, inputs, streamInputs) {
+  // Calculate max ports on each side
+  const leftPorts = (inputs || 0) + (streamInputs || 0);
+  const rightPorts = (outputs || 0) + (streamOutputs || 0);
+  const maxPorts = Math.max(leftPorts, rightPorts, 1);
+
+  if (maxPorts <= 1) return MIN_NODE_HEIGHT;
+  return MIN_NODE_HEIGHT + (maxPorts - 1) * STEP_HEIGHT;
+}
+
 // Calculate Y positions for output ports
 export function calcOutputYPositions(outputs, height) {
   if (outputs === 0) return [];
@@ -58,8 +72,37 @@ export function calcOutputYPositions(outputs, height) {
   return positions;
 }
 
+// Calculate Y positions for stacked ports (message ports on top, audio ports below)
+export function calcStackedPortPositions(messagePorts, audioPorts, height) {
+  const totalPorts = messagePorts + audioPorts;
+  if (totalPorts === 0) return { message: [], audio: [] };
+
+  if (totalPorts === 1) {
+    if (messagePorts === 1) return { message: [height / 2], audio: [] };
+    return { message: [], audio: [height / 2] };
+  }
+
+  const spread = (totalPorts - 1) * STEP_HEIGHT;
+  const startY = (height - spread) / 2;
+
+  const messagePositions = [];
+  const audioPositions = [];
+
+  // Message ports come first (top)
+  for (let i = 0; i < messagePorts; i++) {
+    messagePositions.push(startY + i * STEP_HEIGHT);
+  }
+
+  // Audio ports come after (bottom)
+  for (let i = 0; i < audioPorts; i++) {
+    audioPositions.push(startY + (messagePorts + i) * STEP_HEIGHT);
+  }
+
+  return { message: messagePositions, audio: audioPositions };
+}
+
 // Calculate port position on a node
-export function getPortPosition(node, portIndex, isOutput, nodeHeight, nodeWidth) {
+export function getPortPosition(node, portIndex, isOutput, nodeHeight, nodeWidth, nodeDef) {
   const height = nodeHeight || calcNodeHeight(
     isOutput ? (node._node.wires?.length || 1) : 1
   );
@@ -73,9 +116,47 @@ export function getPortPosition(node, portIndex, isOutput, nodeHeight, nodeWidth
       y: node._node.y + (positions[portIndex] || height / 2)
     };
   } else {
+    // For input ports, check if node has both message and audio inputs
+    const msgInputs = nodeDef?.inputs || 1;
+    const streamInputs = nodeDef?.getStreamInputs ? nodeDef.getStreamInputs(node) : (nodeDef?.streamInputs || 0);
+
+    if (streamInputs > 0 && msgInputs > 0) {
+      // Use stacked positions when there are both message and audio inputs
+      const positions = calcStackedPortPositions(msgInputs, streamInputs, height);
+      return {
+        x: node._node.x,
+        y: node._node.y + (positions.message[portIndex] || height / 2)
+      };
+    }
+
     return {
       x: node._node.x,
       y: node._node.y + height / 2
+    };
+  }
+}
+
+// Calculate audio stream port position on a node
+export function getStreamPortPosition(node, portIndex, isOutput, nodeDef, nodeHeight, nodeWidth) {
+  const msgOutputs = nodeDef?.outputs || 0;
+  const msgInputs = nodeDef?.inputs || 0;
+  const streamOutputs = nodeDef?.getStreamOutputs ? nodeDef.getStreamOutputs(node) : (nodeDef?.streamOutputs || 0);
+  const streamInputs = nodeDef?.getStreamInputs ? nodeDef.getStreamInputs(node) : (nodeDef?.streamInputs || 0);
+
+  const height = nodeHeight || calcNodeHeightWithAudio(msgOutputs, streamOutputs, msgInputs, streamInputs);
+  const width = nodeWidth || NODE_WIDTH;
+
+  if (isOutput) {
+    const positions = calcStackedPortPositions(msgOutputs, streamOutputs, height);
+    return {
+      x: node._node.x + width,
+      y: node._node.y + (positions.audio[portIndex] || height / 2)
+    };
+  } else {
+    const positions = calcStackedPortPositions(msgInputs, streamInputs, height);
+    return {
+      x: node._node.x,
+      y: node._node.y + (positions.audio[portIndex] || height / 2)
     };
   }
 }
@@ -166,4 +247,46 @@ export function normalizeRect(x1, y1, x2, y2) {
     width: Math.abs(x2 - x1),
     height: Math.abs(y2 - y1)
   };
+}
+
+/**
+ * Check if adding a connection would create a cycle in the graph.
+ * Uses depth-first search to check if targetId can reach sourceId.
+ *
+ * @param {Object} nodes - Map of nodeId -> node objects
+ * @param {string} sourceId - Source node of the proposed connection
+ * @param {string} targetId - Target node of the proposed connection
+ * @param {boolean} isStream - Whether checking stream wires (true) or message wires (false)
+ * @returns {boolean} True if connection would create a cycle
+ */
+export function wouldCreateCycle(nodes, sourceId, targetId, isStream = false) {
+  // Can't create a cycle with self-connection (though we should prevent those anyway)
+  if (sourceId === targetId) return true;
+
+  // DFS from targetId to see if we can reach sourceId
+  const visited = new Set();
+  const wireKey = isStream ? 'streamWires' : 'wires';
+
+  function canReach(currentId, goalId) {
+    if (currentId === goalId) return true;
+    if (visited.has(currentId)) return false;
+
+    visited.add(currentId);
+
+    const node = nodes[currentId];
+    if (!node) return false;
+
+    const wires = node._node[wireKey] || [];
+    for (const portWires of wires) {
+      if (!Array.isArray(portWires)) continue;
+      for (const nextId of portWires) {
+        if (canReach(nextId, goalId)) return true;
+      }
+    }
+
+    return false;
+  }
+
+  // Check if target can already reach source (cycle would be created)
+  return canReach(targetId, sourceId);
 }

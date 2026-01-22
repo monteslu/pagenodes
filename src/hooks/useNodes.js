@@ -33,6 +33,9 @@ export function useNodes() {
     // Config nodes don't belong to a flow (no z property) and don't render on canvas
     const isConfigNode = def.category === 'config';
 
+    // Calculate stream outputs (audio ports)
+    const streamOutputs = def.getStreamOutputs ? def.getStreamOutputs({}) : (def.streamOutputs || 0);
+
     const node = {
       // Reserved properties in _node
       _node: {
@@ -40,7 +43,9 @@ export function useNodes() {
         type,
         name: '',
         ...(isConfigNode ? {} : { z: editorState.activeFlow, x, y }),
-        wires: Array(def.outputs || 0).fill().map(() => [])
+        wires: Array(def.outputs || 0).fill().map(() => []),
+        // Only add streamWires if node has stream outputs
+        ...(streamOutputs > 0 ? { streamWires: Array(streamOutputs).fill().map(() => []) } : {})
       },
       // Custom config from defaults
       ...Object.fromEntries(
@@ -72,15 +77,27 @@ export function useNodes() {
     editorDispatch({ type: 'MARK_DIRTY' });
   }, [flowDispatch, editorDispatch]);
 
-  // Connect two nodes
+  // Connect two nodes (message wires)
   const connect = useCallback((sourceId, sourcePort, targetId) => {
     flowDispatch({ type: 'CONNECT', sourceId, sourcePort, targetId });
     editorDispatch({ type: 'MARK_DIRTY' });
   }, [flowDispatch, editorDispatch]);
 
-  // Disconnect nodes
+  // Disconnect nodes (message wires)
   const disconnect = useCallback((sourceId, sourcePort, targetId) => {
     flowDispatch({ type: 'DISCONNECT', sourceId, sourcePort, targetId });
+    editorDispatch({ type: 'MARK_DIRTY' });
+  }, [flowDispatch, editorDispatch]);
+
+  // Connect two nodes (audio stream wires)
+  const streamConnect = useCallback((sourceId, sourcePort, targetId) => {
+    flowDispatch({ type: 'CONNECT_STREAM', sourceId, sourcePort, targetId });
+    editorDispatch({ type: 'MARK_DIRTY' });
+  }, [flowDispatch, editorDispatch]);
+
+  // Disconnect nodes (audio stream wires)
+  const streamDisconnect = useCallback((sourceId, sourcePort, targetId) => {
+    flowDispatch({ type: 'DISCONNECT_STREAM', sourceId, sourcePort, targetId });
     editorDispatch({ type: 'MARK_DIRTY' });
   }, [flowDispatch, editorDispatch]);
 
@@ -105,6 +122,8 @@ export function useNodes() {
     moveNodes,
     connect,
     disconnect,
+    streamConnect,
+    streamDisconnect,
     deleteSelected,
     getNode
   };

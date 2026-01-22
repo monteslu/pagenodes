@@ -1,5 +1,6 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { useCanvases } from '../../context/CanvasContext';
+import { logger } from '../../utils/logger';
 import './CanvasPanel.css';
 
 export function CanvasPanel() {
@@ -92,7 +93,7 @@ function CanvasItem({ config, setCanvasRef }) {
       document.exitFullscreen();
     } else {
       canvasRef.current.requestFullscreen().catch(err => {
-        console.error('Fullscreen error:', err);
+        logger.error( 'Fullscreen error:', err);
       });
     }
   }, []);

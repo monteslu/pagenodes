@@ -66,7 +66,7 @@ export const voicerecNode = {
     const voiceRecognitions = new Map();
 
     return {
-      start(peerRef, nodeId, { lang, continuous, interimResults }) {
+      start(peerRef, nodeId, { lang, continuous, interimResults }, PN) {
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         if (!SpeechRecognition) return;
 
@@ -90,14 +90,14 @@ export const voicerecNode = {
         };
 
         recognition.onerror = (event) => {
-          console.error('Speech recognition error:', event.error);
+          PN.error('Speech recognition error:', event.error);
         };
 
         recognition.start();
         voiceRecognitions.set(nodeId, recognition);
       },
 
-      stop(peerRef, nodeId) {
+      stop(peerRef, nodeId, _params, _PN) {
         if (voiceRecognitions.has(nodeId)) {
           voiceRecognitions.get(nodeId).stop();
           voiceRecognitions.delete(nodeId);
@@ -175,7 +175,7 @@ export const speechNode = {
   },
 
   mainThread: {
-    speak(peerRef, nodeId, { text, lang, pitch, rate, volume }) {
+    speak(peerRef, nodeId, { text, lang, pitch, rate, volume }, _PN) {
       if (!window.speechSynthesis) return;
 
       const utterance = new SpeechSynthesisUtterance(text);

@@ -11,6 +11,7 @@ import { ConfigNodesDialog } from './ConfigNodesDialog';
 import { ConfirmDialog } from './ConfirmDialog';
 import { SettingsDialog } from './SettingsDialog';
 import { FlowMinimap } from './FlowMinimap';
+import { logger } from '../../utils/logger';
 import './Toolbar.css';
 
 export function Toolbar() {
@@ -40,7 +41,7 @@ export function Toolbar() {
 
   const handleDeploy = useCallback(async () => {
     if (!isReady) {
-      console.warn('Runtime not ready');
+      logger.warn( 'Runtime not ready');
       return;
     }
 
@@ -68,7 +69,7 @@ export function Toolbar() {
       })
     };
     await storage.saveFlows(flowConfig);
-    console.log('Flows saved to storage');
+    logger.log( 'Flows saved to storage');
   }, [isReady, deploy, flowState.flows, flowState.nodes, flowState.configNodes, dispatch]);
 
   const handleDelete = () => {

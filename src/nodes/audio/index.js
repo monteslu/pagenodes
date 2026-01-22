@@ -6,3 +6,7 @@ export { audioMicNode } from './mic.jsx';
 export { audioFilterNode } from './filter.jsx';
 export { audioAnalyserNode } from './analyser.jsx';
 export { audioDelayNode } from './delay.jsx';
+export { audioPannerNode } from './panner.jsx';
+export { audioCompressorNode } from './compressor.jsx';
+export { audioWaveShaperNode } from './waveshaper.jsx';
+export { audioBufferNode } from './buffer.jsx';

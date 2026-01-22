@@ -96,6 +96,10 @@ import { audioMicRuntime } from './audio/mic.js';
 import { audioFilterRuntime } from './audio/filter.js';
 import { audioAnalyserRuntime } from './audio/analyser.js';
 import { audioDelayRuntime } from './audio/delay.js';
+import { audioPannerRuntime } from './audio/panner.js';
+import { audioCompressorRuntime } from './audio/compressor.js';
+import { audioWaveShaperRuntime } from './audio/waveshaper.js';
+import { audioBufferRuntime } from './audio/buffer.js';
 
 // Register all runtime implementations
 [
@@ -191,6 +195,10 @@ import { audioDelayRuntime } from './audio/delay.js';
   audioFilterRuntime,
   audioAnalyserRuntime,
   audioDelayRuntime,
+  audioPannerRuntime,
+  audioCompressorRuntime,
+  audioWaveShaperRuntime,
+  audioBufferRuntime,
 
   // Config nodes (AI)
   imageAiConfigRuntime,

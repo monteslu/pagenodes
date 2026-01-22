@@ -121,6 +121,10 @@ import { audioMicNode } from './audio/mic.jsx';
 import { audioFilterNode } from './audio/filter.jsx';
 import { audioAnalyserNode } from './audio/analyser.jsx';
 import { audioDelayNode } from './audio/delay.jsx';
+import { audioPannerNode } from './audio/panner.jsx';
+import { audioCompressorNode } from './audio/compressor.jsx';
+import { audioWaveShaperNode } from './audio/waveshaper.jsx';
+import { audioBufferNode } from './audio/buffer.jsx';
 
 [
   // Core
@@ -215,6 +219,10 @@ import { audioDelayNode } from './audio/delay.jsx';
   audioFilterNode,
   audioAnalyserNode,
   audioDelayNode,
+  audioPannerNode,
+  audioCompressorNode,
+  audioWaveShaperNode,
+  audioBufferNode,
 
   // Config nodes (not shown in palette, but registered for lookups)
   mqttBrokerNode,

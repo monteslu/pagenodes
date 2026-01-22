@@ -128,6 +128,44 @@ class AudioManager {
         if (options.release !== undefined) audioNode.release.value = options.release;
         break;
 
+      case 'WaveShaperNode':
+        audioNode = ctx.createWaveShaper();
+        if (options.curve) {
+          // curve can be a Float32Array or an array of numbers
+          audioNode.curve = options.curve instanceof Float32Array
+            ? options.curve
+            : new Float32Array(options.curve);
+        }
+        if (options.oversample) audioNode.oversample = options.oversample;
+        break;
+
+      case 'AudioBufferSourceNode': {
+        // Create a buffer source node with gate for start/stop control
+        // Unlike oscillators, buffer sources are one-shot, so we recreate them on play
+        const gate = ctx.createGain();
+        gate.gain.value = 0;  // Start silent
+
+        const nodeData = {
+          audioNode: gate,
+          bufferSource: null,  // Created on play
+          buffer: null,        // The decoded audio buffer
+          gate: gate,
+          type: nodeType,
+          config: options,
+          started: false,
+          loop: options.loop || false,
+          loopStart: options.loopStart || 0,
+          loopEnd: options.loopEnd || 0,
+          playbackRate: options.playbackRate || 1,
+          detune: options.detune || 0
+        };
+
+        this.nodes.set(nodeId, nodeData);
+        this.connections.set(nodeId, new Set());
+
+        return nodeData;
+      }
+
       case 'AnalyserNode':
         audioNode = ctx.createAnalyser();
         if (options.fftSize) audioNode.fftSize = options.fftSize;
@@ -510,6 +548,11 @@ class AudioManager {
       // For oscillators, type is on the oscillator, not the gate
       if (nodeData.oscillator && option === 'type') {
         nodeData.oscillator[option] = value;
+      } else if (nodeData.type === 'WaveShaperNode' && option === 'curve') {
+        // WaveShaper curve must be a Float32Array
+        nodeData.audioNode.curve = value instanceof Float32Array
+          ? value
+          : new Float32Array(value);
       } else {
         nodeData.audioNode[option] = value;
       }
@@ -635,6 +678,136 @@ class AudioManager {
     }
 
     return false;
+  }
+
+  /**
+   * Load an audio buffer from a URL or ArrayBuffer
+   */
+  async loadBuffer(nodeId, source) {
+    const nodeData = this.nodes.get(nodeId);
+    if (!nodeData || nodeData.type !== 'AudioBufferSourceNode') return false;
+
+    const ctx = await this.ensureContext();
+
+    try {
+      let arrayBuffer;
+
+      if (source instanceof ArrayBuffer) {
+        arrayBuffer = source;
+      } else if (typeof source === 'string') {
+        // It's a URL
+        const response = await fetch(source);
+        arrayBuffer = await response.arrayBuffer();
+      } else if (source && source.buffer instanceof ArrayBuffer) {
+        // It's a typed array like Uint8Array
+        arrayBuffer = source.buffer.slice(source.byteOffset, source.byteOffset + source.byteLength);
+      } else {
+        console.error('loadBuffer: Invalid source type');
+        return false;
+      }
+
+      // Decode the audio data
+      const audioBuffer = await ctx.decodeAudioData(arrayBuffer);
+      nodeData.buffer = audioBuffer;
+      return true;
+    } catch (e) {
+      console.error('Load buffer error:', e);
+      return false;
+    }
+  }
+
+  /**
+   * Play a buffer source node
+   * Creates a new BufferSourceNode each time (they are one-shot)
+   */
+  async playBuffer(nodeId, options = {}) {
+    const nodeData = this.nodes.get(nodeId);
+    if (!nodeData || nodeData.type !== 'AudioBufferSourceNode') return false;
+    if (!nodeData.buffer) {
+      console.warn('playBuffer: No buffer loaded');
+      return false;
+    }
+
+    const ctx = await this.ensureContext();
+
+    // Stop any currently playing buffer
+    if (nodeData.bufferSource) {
+      try {
+        nodeData.bufferSource.stop();
+        nodeData.bufferSource.disconnect();
+      } catch {
+        // May already be stopped
+      }
+    }
+
+    // Create a new buffer source
+    const source = ctx.createBufferSource();
+    source.buffer = nodeData.buffer;
+
+    // Apply settings
+    source.loop = options.loop !== undefined ? options.loop : nodeData.loop;
+    source.loopStart = options.loopStart !== undefined ? options.loopStart : nodeData.loopStart;
+    source.loopEnd = options.loopEnd !== undefined ? options.loopEnd : nodeData.loopEnd;
+    if (options.playbackRate !== undefined) source.playbackRate.value = options.playbackRate;
+    if (options.detune !== undefined) source.detune.value = options.detune;
+
+    // Connect to gate
+    source.connect(nodeData.gate);
+    nodeData.bufferSource = source;
+
+    // Open the gate
+    nodeData.gate.gain.cancelScheduledValues(ctx.currentTime);
+    nodeData.gate.gain.setValueAtTime(nodeData.gate.gain.value, ctx.currentTime);
+    nodeData.gate.gain.linearRampToValueAtTime(1, ctx.currentTime + 0.01);
+
+    // Start playback
+    const offset = options.offset || 0;
+    const duration = options.duration;
+
+    if (duration !== undefined) {
+      source.start(0, offset, duration);
+    } else {
+      source.start(0, offset);
+    }
+
+    nodeData.started = true;
+
+    // Handle end of playback
+    source.onended = () => {
+      // Close the gate when done
+      nodeData.gate.gain.cancelScheduledValues(ctx.currentTime);
+      nodeData.gate.gain.setValueAtTime(nodeData.gate.gain.value, ctx.currentTime);
+      nodeData.gate.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.01);
+      nodeData.started = false;
+    };
+
+    return true;
+  }
+
+  /**
+   * Stop a buffer source node
+   */
+  stopBuffer(nodeId) {
+    const nodeData = this.nodes.get(nodeId);
+    if (!nodeData || nodeData.type !== 'AudioBufferSourceNode') return false;
+
+    if (nodeData.bufferSource) {
+      try {
+        nodeData.bufferSource.stop();
+      } catch {
+        // May already be stopped
+      }
+    }
+
+    // Close the gate
+    if (nodeData.gate && this.ctx) {
+      nodeData.gate.gain.cancelScheduledValues(this.ctx.currentTime);
+      nodeData.gate.gain.setValueAtTime(nodeData.gate.gain.value, this.ctx.currentTime);
+      nodeData.gate.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 0.01);
+    }
+
+    nodeData.started = false;
+    return true;
   }
 
   /**
@@ -835,6 +1008,16 @@ class AudioManager {
 
       case 'destroyDelayEffect':
         return this.destroyDelayEffect(nodeId);
+
+      // Buffer source actions
+      case 'loadAudioBuffer':
+        return this.loadBuffer(nodeId, params.source);
+
+      case 'playAudioBuffer':
+        return this.playBuffer(nodeId, params.options);
+
+      case 'stopAudioBuffer':
+        return this.stopBuffer(nodeId);
 
       default:
         console.warn(`Unknown audio action: ${action}`);

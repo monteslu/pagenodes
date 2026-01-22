@@ -15,6 +15,7 @@ import { ButtonsPanel } from './components/Buttons';
 import { generateId } from './utils/id';
 import { storage } from './utils/storage';
 import { nodeRegistry } from './nodes';
+import { logger } from './utils/logger';
 import './App.css';
 
 const SIDEBAR_WIDTH_KEY = 'pagenodes2_sidebar_width';
@@ -101,7 +102,7 @@ function AppContent() {
           // Convert saved nodes to internal format
           // Check if each node is a config node and strip z/x/y if so
           const internalNodes = (savedFlows.nodes || []).map(node => {
-            const { id, type, name, z, x, y, wires, ...config } = node;
+            const { id, type, name, z, x, y, wires, streamWires, ...config } = node;
             const nodeDef = nodeRegistry.get(type);
             const isConfigNode = nodeDef?.category === 'config';
             // Config nodes shouldn't have z, x, y - they don't render on canvas
@@ -112,7 +113,10 @@ function AppContent() {
               };
             }
             return {
-              _node: { id, type, name: name || '', z, x: x || 0, y: y || 0, wires: wires || [] },
+              _node: {
+                id, type, name: name || '', z, x: x || 0, y: y || 0, wires: wires || [],
+                ...(streamWires ? { streamWires } : {})
+              },
               ...config
             };
           });
@@ -134,7 +138,7 @@ function AppContent() {
           });
           editorDispatch({ type: 'SET_ACTIVE_FLOW', id: savedFlows.flows[0].id });
           setFlowsLoaded(true);
-          console.log('Flows loaded from storage');
+          logger.log( 'Flows loaded from storage');
         } else {
           // No saved flows, create default
           const defaultFlowId = generateId();
@@ -148,7 +152,7 @@ function AppContent() {
           setFlowsLoaded(true);
         }
       } catch (err) {
-        console.error('Failed to load flows from storage:', err);
+        logger.error( 'Failed to load flows from storage:', err);
         // Fallback to default
         const defaultFlowId = generateId();
         flowDispatch({
@@ -170,11 +174,11 @@ function AppContent() {
     if (flowsLoaded && isReady && !isRunning) {
       const nodeCount = Object.keys(flowState.nodes).length;
       const configCount = Object.keys(flowState.configNodes).length;
-      console.log('Auto-deploying flows...', nodeCount, 'nodes,', configCount, 'config nodes');
+      logger.log( 'Auto-deploying flows...', nodeCount, 'nodes,', configCount, 'config nodes');
       if (nodeCount > 0 || configCount > 0) {
         deploy(flowState.nodes, flowState.configNodes);
       } else {
-        console.warn('No nodes to deploy - flowState may not be ready yet');
+        logger.warn( 'No nodes to deploy - flowState may not be ready yet');
       }
     }
   }, [flowsLoaded, isReady, flowState.nodes, flowState.configNodes, isRunning, deploy]);
@@ -237,7 +241,7 @@ function AppContent() {
   // Handle node button click - inject nodes trigger via runtime, file read opens picker
   const handleInject = useCallback((node) => {
     if (!isRunning) {
-      console.warn('Runtime not running - deploy first');
+      logger.warn( 'Runtime not running - deploy first');
       return;
     }
 
@@ -258,7 +262,7 @@ function AppContent() {
   // Handle file drop on file read node
   const handleFileDrop = useCallback((node, file) => {
     if (!isRunning) {
-      console.warn('Runtime not running - deploy first');
+      logger.warn( 'Runtime not running - deploy first');
       return;
     }
 

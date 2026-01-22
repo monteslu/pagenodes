@@ -9,6 +9,9 @@ export const audioOscillatorNode = {
   type: 'oscillator',
   category: 'audio',
   description: 'Generates continuous audio tone stream',
+  relatedDocs: () => [
+    { label: 'OscillatorNode (MDN)', url: 'https://developer.mozilla.org/en-US/docs/Web/API/OscillatorNode' }
+  ],
   label: (node) => node._node.name || 'oscillator',
   color: '#2d9a2d',  // Green for audio nodes
   fontColor: '#fff',  // White text for contrast
@@ -50,6 +53,16 @@ export const audioOscillatorNode = {
       detune: {
         type: 'number',
         description: 'Set detune in cents',
+        optional: true
+      },
+      realTable: {
+        type: 'array',
+        description: 'Cosine (real) Fourier coefficients for custom waveform',
+        optional: true
+      },
+      imagTable: {
+        type: 'array',
+        description: 'Sine (imaginary) Fourier coefficients for custom waveform',
         optional: true
       },
       start: {
@@ -111,6 +124,20 @@ export const audioOscillatorNode = {
           <li><code>msg.stop</code> - Stop the oscillator</li>
           <li><code>msg.duration</code> - Play for this many milliseconds</li>
         </ul>
+
+        <h5>Custom Waveforms (PeriodicWave)</h5>
+        <p>Create instrument-like timbres using Fourier coefficients:</p>
+        <ul>
+          <li><code>msg.realTable</code> - Array of cosine (real) coefficients</li>
+          <li><code>msg.imagTable</code> - Array of sine (imaginary) coefficients (optional)</li>
+        </ul>
+        <p>The first element is DC offset (usually 0), subsequent elements are harmonic amplitudes.
+        You can extract these from an FFT of an instrument sound to synthesize that timbre at any pitch.</p>
+        <pre>{`// Example: simple organ-like timbre
+{
+  realTable: [0, 1, 0.5, 0.3, 0.25, 0.2],
+  start: true
+}`}</pre>
 
         <h5>Audio Output</h5>
         <p>Connect the green audio port to other audio nodes like Gain or Speakers.</p>

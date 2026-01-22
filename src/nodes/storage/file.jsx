@@ -13,7 +13,8 @@ export const fileReadNode = {
   button: true, // Show button to trigger file picker
 
   defaults: {
-    format: { type: 'select', default: 'utf8', options: [
+    format: { type: 'select', default: 'auto', options: [
+      { value: 'auto', label: 'Auto (detect from mime type)' },
       { value: 'utf8', label: 'Text (UTF-8)' },
       { value: 'binary', label: 'Binary (ArrayBuffer)' },
       { value: 'dataurl', label: 'Data URL' },
@@ -40,12 +41,31 @@ export const fileReadNode = {
   },
 
   mainThread: {
+    // Detect format from mime type
+    _detectFormat(mimeType) {
+      if (!mimeType) return 'binary';
+
+      // Text types
+      if (mimeType.startsWith('text/')) return 'utf8';
+      if (mimeType === 'application/json') return 'json';
+      if (mimeType === 'application/xml' || mimeType.endsWith('+xml')) return 'utf8';
+      if (mimeType === 'application/javascript') return 'utf8';
+
+      // Everything else is binary (images, audio, video, etc.)
+      return 'binary';
+    },
+
     // Shared file reading logic
     _readFile(peerRef, nodeId, file, format) {
+      // Auto-detect format from mime type if set to 'auto'
+      const effectiveFormat = format === 'auto'
+        ? this._detectFormat(file.type)
+        : format;
+
       const reader = new FileReader();
       reader.onload = () => {
         let payload = reader.result;
-        if (format === 'json') {
+        if (effectiveFormat === 'json') {
           try { payload = JSON.parse(payload); } catch { /* not valid JSON */ }
         }
         peerRef.current.methods.sendResult(nodeId, {
@@ -55,9 +75,9 @@ export const fileReadNode = {
         });
       };
 
-      if (format === 'binary') {
+      if (effectiveFormat === 'binary') {
         reader.readAsArrayBuffer(file);
-      } else if (format === 'dataurl') {
+      } else if (effectiveFormat === 'dataurl') {
         reader.readAsDataURL(file);
       } else {
         reader.readAsText(file);
@@ -101,6 +121,7 @@ export const fileReadNode = {
         <ul>
           <li><strong>Format</strong>:
             <ul>
+              <li>Auto - Detect from mime type (text/* → text, application/json → JSON, else → binary)</li>
               <li>Text (UTF-8) - Read as text string</li>
               <li>Binary - Read as ArrayBuffer</li>
               <li>Data URL - Read as base64 data URL</li>

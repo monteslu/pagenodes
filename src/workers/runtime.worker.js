@@ -13,6 +13,7 @@ import { generateId } from '../utils/id.js';
 import mqtt from 'mqtt';
 import { io } from 'socket.io-client';
 import { runtimeRegistry } from '../nodes/runtime.js';
+import { createWorkerLogger } from '../utils/logger.js';
 
 // Make mqtt and io available globally for runtime implementations
 self.mqtt = mqtt;
@@ -20,6 +21,9 @@ self.io = io;
 
 // Set up rawr peer for RPC communication
 let peer;
+
+// Worker-side logger that syncs to main thread
+let PN;
 
 // Flow context storage
 const context = {
@@ -116,7 +120,7 @@ function handleError(sourceNode, errorText, originalMsg, errorObj) {
         break; // Only first regular catch node handles it
       }
     } catch (e) {
-      console.error('Error in catch node:', e);
+      PN.error('Error in catch node:', e);
     }
   }
 
@@ -235,9 +239,8 @@ class RuntimeNode {
 
           const targetNode = nodes.get(targetId);
           if (targetNode) {
-            // Clone message for each recipient
-            const clonedMsg = JSON.parse(JSON.stringify(m));
-            setTimeout(() => targetNode.receive(clonedMsg), 0);
+            // Pass message directly - no need to clone within same worker context
+            setTimeout(() => targetNode.receive(m), 0);
           }
         }
       }
@@ -370,7 +373,7 @@ class RuntimeNode {
         try {
           callback(...args);
         } catch (e) {
-          console.error('Error in event listener', event, e);
+          PN.error('Error in event listener', event, e);
         }
       }
     }
@@ -382,7 +385,7 @@ class RuntimeNode {
       try {
         this._onClose();
       } catch (e) {
-        console.error('Error in onClose', e);
+        PN.error('Error in onClose', e);
       }
     }
 
@@ -391,7 +394,7 @@ class RuntimeNode {
       try {
         cb();
       } catch (e) {
-        console.error('Error in close callback', e);
+        PN.error('Error in close callback', e);
       }
     }
   }
@@ -404,7 +407,7 @@ function createNode(nodeDef) {
   const runtimeDef = runtimeRegistry.get(nodeDef._node.type);
 
   if (!runtimeDef) {
-    console.warn(`Unknown node type: ${nodeDef._node.type}`);
+    PN.warn(`Unknown node type: ${nodeDef._node.type}`);
     return new RuntimeNode(nodeDef, null);
   }
 
@@ -415,7 +418,7 @@ function createNode(nodeDef) {
  * Deploy flows - called from main thread
  * Optimized to skip reinitializing config nodes that haven't changed.
  */
-function deployFlows(flowNodes, flowConfigNodes = [], skipNodeIds = []) {
+async function deployFlows(flowNodes, flowConfigNodes = [], skipNodeIds = []) {
   // Store error node IDs
   errorNodeIds = new Set(skipNodeIds);
 
@@ -429,7 +432,7 @@ function deployFlows(flowNodes, flowConfigNodes = [], skipNodeIds = []) {
     if (prevState && configsEqual(prevState, configNode)) {
       // Config unchanged - keep existing instance
       unchangedConfigIds.add(configNode._node.id);
-      console.log(`[deploy] Config node ${configNode._node.id} (${configNode._node.type}) unchanged, keeping connection`);
+      PN.log(`[deploy] Config node ${configNode._node.id} (${configNode._node.type}) unchanged, keeping connection`);
     }
   }
 
@@ -440,7 +443,7 @@ function deployFlows(flowNodes, flowConfigNodes = [], skipNodeIds = []) {
     try {
       node.close();
     } catch (e) {
-      console.error('Error closing node', id, e);
+      PN.error('Error closing node', id, e);
     }
   }
 
@@ -453,10 +456,10 @@ function deployFlows(flowNodes, flowConfigNodes = [], skipNodeIds = []) {
       const instance = nodes.get(id);
       if (instance) {
         try {
-          console.log(`[deploy] Closing config node ${id} (${configData.type}) - ${wasRemoved ? 'removed' : 'changed'}`);
+          PN.log(`[deploy] Closing config node ${id} (${configData.type}) - ${wasRemoved ? 'removed' : 'changed'}`);
           instance.close();
         } catch (e) {
-          console.error('Error closing config node', id, e);
+          PN.error('Error closing config node', id, e);
         }
         nodes.delete(id);
       }
@@ -506,7 +509,7 @@ function deployFlows(flowNodes, flowConfigNodes = [], skipNodeIds = []) {
       try {
         node.onInit();
       } catch (e) {
-        console.error('Error initializing config node', node.id, e);
+        PN.error('Error initializing config node', node.id, e);
       }
     }
   }
@@ -519,16 +522,29 @@ function deployFlows(flowNodes, flowConfigNodes = [], skipNodeIds = []) {
   }
 
   // Initialize all regular nodes (skip error nodes)
+  // Collect async onInit promises to await them all
+  const initPromises = [];
   for (const nodeDef of flowNodes) {
     if (errorNodeIds.has(nodeDef._node.id)) continue;
     const node = nodes.get(nodeDef._node.id);
     if (node && node.onInit) {
       try {
-        node.onInit();
+        const result = node.onInit();
+        // If onInit returns a promise, track it
+        if (result && typeof result.then === 'function') {
+          initPromises.push(result.catch(e => {
+            PN.error('Error in async onInit for node', node.id, e);
+          }));
+        }
       } catch (e) {
-        console.error('Error initializing node', node.id, e);
+        PN.error('Error initializing node', node.id, e);
       }
     }
+  }
+
+  // Wait for all async onInit to complete
+  if (initPromises.length > 0) {
+    await Promise.all(initPromises);
   }
 
   // Populate catch nodes array for error routing
@@ -538,7 +554,7 @@ function deployFlows(flowNodes, flowConfigNodes = [], skipNodeIds = []) {
       catchNodes.push(node);
     }
   }
-  console.log(`[deploy] Found ${catchNodes.length} catch node(s) for error routing`);
+  PN.log(`Deploy complete: found ${catchNodes.length} catch node(s) for error routing`);
 
   const skippedCount = skipNodeIds.length;
   const reusedConfigCount = unchangedConfigIds.size;
@@ -558,13 +574,13 @@ function deployFlows(flowNodes, flowConfigNodes = [], skipNodeIds = []) {
 function injectNode(nodeId, msg = {}) {
   // Skip error nodes
   if (errorNodeIds.has(nodeId)) {
-    console.warn('Cannot inject into error node:', nodeId);
+    PN.warn('Cannot inject into error node:', nodeId);
     return { success: false, error: 'Node has errors' };
   }
 
   const node = nodes.get(nodeId);
   if (!node) {
-    console.warn('Node not found:', nodeId);
+    PN.warn('Node not found:', nodeId);
     return { success: false, error: 'Node not found' };
   }
 
@@ -647,7 +663,7 @@ function stopRuntime() {
     try {
       node.close();
     } catch (e) {
-      console.error('Error closing node', e);
+      PN.error('Error closing node', e);
     }
   }
   nodes.clear();
@@ -686,7 +702,7 @@ function broadcastToType(nodeType, action, params) {
       try {
         node.fromMainThread(action, params);
       } catch (e) {
-        console.error(`Error in fromMainThread for ${nodeType}:`, e);
+        PN.error(`Error in fromMainThread for ${nodeType}:`, e);
       }
     }
   }
@@ -728,14 +744,22 @@ function connectMcp(options) {
   peer.notifiers.mcpStatus({ status: 'connecting' });
 
   try {
-    mcpSocket = new WebSocket(`ws://localhost:${port}`);
+    const socket = new WebSocket(`ws://localhost:${port}`);
+    mcpSocket = socket;
 
-    mcpSocket.onopen = () => {
-      console.log('MCP WebSocket connected');
+    socket.onopen = () => {
+      // Check if this socket is still the active one (race condition protection)
+      if (mcpSocket !== socket) {
+        PN.log('MCP WebSocket connected but socket was replaced, ignoring');
+        socket.close();
+        return;
+      }
+
+      PN.log('mcp WebSocket connected');
 
       // Create rawr peer over the WebSocket
       mcpPeer = rawr({
-        transport: transports.websocket(mcpSocket)
+        transport: transports.websocket(socket)
       });
 
       // Register handlers for MCP server to call
@@ -787,6 +811,14 @@ function connectMcp(options) {
         return await peer.methods.mcpGetErrors(limit);
       });
 
+      mcpPeer.addHandler('getLogs', async (limit, context, level) => {
+        return await peer.methods.mcpGetLogs(limit, context, level);
+      });
+
+      mcpPeer.addHandler('clearLogs', async () => {
+        return await peer.methods.mcpClearLogs();
+      });
+
       mcpPeer.addHandler('getInjectNodes', async () => {
         return await peer.methods.mcpGetInjectNodes();
       });
@@ -822,15 +854,18 @@ function connectMcp(options) {
       // Register this client with the MCP server
       if (mcpClientUrl) {
         mcpPeer.methods.registerClient({ url: mcpClientUrl }).catch(err => {
-          console.warn('Failed to register client with MCP server:', err);
+          PN.warn('Failed to register client with MCP server:', err);
         });
       }
 
       peer.notifiers.mcpStatus({ status: 'connected' });
     };
 
-    mcpSocket.onclose = () => {
-      console.log('MCP WebSocket closed');
+    socket.onclose = () => {
+      // Only handle if this is still the active socket
+      if (mcpSocket !== socket) return;
+
+      PN.log('mcp WebSocket closed');
       peer.notifiers.mcpStatus({ status: 'error' });
       mcpSocket = null;
       mcpPeer = null;
@@ -840,12 +875,15 @@ function connectMcp(options) {
       }
     };
 
-    mcpSocket.onerror = (err) => {
-      console.error('MCP WebSocket error:', err);
+    socket.onerror = (err) => {
+      // Only handle if this is still the active socket
+      if (mcpSocket !== socket) return;
+
+      PN.error('mcp WebSocket error:', err);
       peer.notifiers.mcpStatus({ status: 'error' });
     };
   } catch (err) {
-    console.error('Failed to connect to MCP:', err);
+    PN.error('mcp Failed to connect:', err);
     peer.notifiers.mcpStatus({ status: 'error' });
   }
 }
@@ -875,6 +913,14 @@ peer = rawr({
   transport: transports.worker(self)
 });
 
+// Initialize worker logger that syncs to main thread
+PN = createWorkerLogger('worker', (entries) => {
+  peer.notifiers.logs(entries);
+});
+
+// Make PN available globally for node runtimes
+self.PN = PN;
+
 // Register method handlers using addHandler (not peer.methods which is for calling)
 peer.addHandler('deploy', deployFlows);
 peer.addHandler('inject', injectNode);
@@ -890,4 +936,4 @@ peer.addHandler('disconnectMcp', disconnectMcp);
 // Notify main thread that worker is ready
 peer.notifiers.ready();
 
-console.log('Runtime worker initialized');
+PN.log('Runtime worker initialized');

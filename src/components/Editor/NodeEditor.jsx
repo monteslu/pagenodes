@@ -51,12 +51,9 @@ export function NodeEditor({ node, onClose }) {
         const currentValue = values[fieldKey];
         const isValid = options.some(opt => opt.value === currentValue);
 
-        console.log(`[NodeEditor] Validating ${fieldKey}: filterValue=${filterValue}, options=${options.length}, currentValue=${currentValue}, isValid=${isValid}`);
-
         if (!isValid && options.length > 0) {
           updates[fieldKey] = options[0].value;
           needsUpdate = true;
-          console.log(`[NodeEditor] Updating ${fieldKey} to ${options[0].value}`);
         }
       }
     });

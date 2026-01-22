@@ -32,7 +32,7 @@ export const hsyncConnectionNode = {
   },
 
   mainThread: {
-    async connect(peerRef, nodeId, { dynamic, hostname, secret, dynamicHost, useLocalStorage, port }) {
+    async connect(peerRef, nodeId, { dynamic, hostname, secret, dynamicHost, useLocalStorage, port }, PN) {
       try {
         if (hsyncConnections.has(nodeId)) {
           const oldEntry = hsyncConnections.get(nodeId);
@@ -151,12 +151,12 @@ export const hsyncConnectionNode = {
         // Emit connected immediately since connection is established
         peerRef.current.methods.emitEvent(nodeId, 'hsync_connected', conn.webUrl);
       } catch (err) {
-        console.error('hsync connect error:', err);
+        PN.error('hsync connect error:', err);
         peerRef.current.methods.emitEvent(nodeId, 'hsync_error', err?.message || 'connection failed');
       }
     },
 
-    disconnect(peerRef, nodeId) {
+    disconnect(peerRef, nodeId, _params, _PN) {
       const entry = hsyncConnections.get(nodeId);
       if (entry) {
         entry.server?.close?.();
@@ -166,10 +166,10 @@ export const hsyncConnectionNode = {
     },
 
     // Called by hsync out node to send response
-    sendResponse(peerRef, nodeId, { requestId, statusCode, headers, body }) {
+    sendResponse(peerRef, nodeId, { requestId, statusCode, headers, body }, PN) {
       const res = pendingResponses.get(requestId);
       if (!res) {
-        console.warn('No pending response for requestId:', requestId);
+        PN.warn('No pending response for requestId:', requestId);
         return;
       }
 
@@ -184,7 +184,7 @@ export const hsyncConnectionNode = {
           res.end(body || '');
         }
       } catch (err) {
-        console.error('Error sending response:', err);
+        PN.error('Error sending response:', err);
       }
     }
   },
@@ -303,14 +303,14 @@ export const hsyncInNode = {
   renderStatusSVG: hsyncRenderStatusSVG,
 
   mainThread: {
-    register(peerRef, nodeId, { connectionId, method, route }) {
+    register(peerRef, nodeId, { connectionId, method, route }, _PN) {
       if (!registeredInNodes.has(connectionId)) {
         registeredInNodes.set(connectionId, new Map());
       }
       registeredInNodes.get(connectionId).set(nodeId, { method, route });
     },
 
-    unregister(peerRef, nodeId, { connectionId }) {
+    unregister(peerRef, nodeId, { connectionId }, _PN) {
       const inNodes = registeredInNodes.get(connectionId);
       if (inNodes) {
         inNodes.delete(nodeId);
@@ -385,17 +385,17 @@ export const hsyncOutNode = {
   renderStatusSVG: hsyncRenderStatusSVG,
 
   mainThread: {
-    respond(peerRef, nodeId, { configId, requestId, statusCode, headers, payload }) {
+    respond(peerRef, nodeId, { configId, requestId, statusCode, headers, payload }, PN) {
       // Get the connection's mainThread handler
       const entry = hsyncConnections.get(configId);
       if (!entry) {
-        console.warn('hsync out: no connection for', configId);
+        PN.warn('hsync out: no connection for', configId);
         return;
       }
 
       const res = pendingResponses.get(requestId);
       if (!res) {
-        console.warn('hsync out: no pending response for', requestId);
+        PN.warn('hsync out: no pending response for', requestId);
         return;
       }
 
@@ -411,7 +411,7 @@ export const hsyncOutNode = {
           res.end(payload != null ? String(payload) : '');
         }
       } catch (err) {
-        console.error('Error sending response:', err);
+        PN.error('Error sending response:', err);
       }
     }
   },
@@ -510,7 +510,7 @@ export const hsyncP2PInNode = {
   },
 
   mainThread: {
-    async p2pConnect(peerRef, nodeId, { configId, peerHostname, direction, streamMode, listenPort }) {
+    async p2pConnect(peerRef, nodeId, { configId, peerHostname, direction, streamMode, listenPort }, PN) {
       try {
         const entry = hsyncConnections.get(configId);
         if (!entry?.conn) {
@@ -575,18 +575,18 @@ export const hsyncP2PInNode = {
 
         if (!peer.dcOpen && peer.rtcStatus !== 'connecting') {
           peer.connectRTC().catch(err => {
-            console.error('P2P connect error:', err);
+            PN.error('P2P connect error:', err);
             peerRef.current.methods.emitEvent(nodeId, 'hsync_p2p_error', err?.message || 'connect failed');
           });
         }
       } catch (err) {
-        console.error('hsync P2P connect error:', err);
+        PN.error('hsync P2P connect error:', err);
         peerRef.current.methods.emitEvent(nodeId, 'hsync_p2p_error', err?.message || 'error');
       }
     },
 
     // Send binary data to a specific socket (for replies)
-    p2pStreamWrite(peerRef, nodeId, { socketId, data }) {
+    p2pStreamWrite(peerRef, nodeId, { socketId, data }, _PN) {
       const entry = nodeStreamServers.get(nodeId);
       if (entry?.sockets.has(socketId)) {
         const socket = entry.sockets.get(socketId);
@@ -594,7 +594,7 @@ export const hsyncP2PInNode = {
       }
     },
 
-    p2pDisconnect(peerRef, nodeId) {
+    p2pDisconnect(peerRef, nodeId, _params, _PN) {
       const entry = hsyncP2PPeers.get(nodeId);
       // Clean up from shared socket listeners
       if (entry?.sharedSocketKey) {
@@ -679,7 +679,7 @@ export const hsyncP2POutNode = {
   },
 
   mainThread: {
-    async p2pConnect(peerRef, nodeId, { configId, peerHostname, streamMode, targetPort }) {
+    async p2pConnect(peerRef, nodeId, { configId, peerHostname, streamMode, targetPort }, PN) {
       try {
         const entry = hsyncConnections.get(configId);
         if (!entry?.conn) {
@@ -722,25 +722,25 @@ export const hsyncP2POutNode = {
               });
               peerRef.current.methods.emitEvent(nodeId, 'hsync_p2p_stream_ready', targetPort);
             } catch (err) {
-              console.error('Failed to create socket listener:', err);
+              PN.error('Failed to create socket listener:', err);
             }
           }
         }
 
         if (!peer.dcOpen && peer.rtcStatus !== 'connecting') {
           peer.connectRTC().catch(err => {
-            console.error('P2P connect error:', err);
+            PN.error('P2P connect error:', err);
             peerRef.current.methods.emitEvent(nodeId, 'hsync_p2p_error', err?.message || 'connect failed');
           });
         }
       } catch (err) {
-        console.error('hsync P2P connect error:', err);
+        PN.error('hsync P2P connect error:', err);
         peerRef.current.methods.emitEvent(nodeId, 'hsync_p2p_error', err?.message || 'error');
       }
     },
 
     // Connect to the stream and send data
-    async p2pStreamConnect(peerRef, nodeId, { targetPort, peerHostname }) {
+    async p2pStreamConnect(peerRef, nodeId, { targetPort, peerHostname }, PN) {
       const entry = hsyncP2PPeers.get(nodeId);
       if (!entry) return;
 
@@ -795,14 +795,14 @@ export const hsyncP2POutNode = {
       });
 
       socket.on('error', (err) => {
-        console.error('Stream socket error:', err);
+        PN.error('Stream socket error:', err);
         sharedStreamSockets.delete(socketKey);
       });
 
       socket.connect(targetPort, 'localhost');
     },
 
-    p2pSend(peerRef, nodeId, { payload, streamMode }) {
+    p2pSend(peerRef, nodeId, { payload, streamMode }, _PN) {
       const entry = hsyncP2PPeers.get(nodeId);
       if (!entry?.peer?.dcOpen) return;
 
@@ -822,7 +822,7 @@ export const hsyncP2POutNode = {
       }
     },
 
-    p2pDisconnect(peerRef, nodeId) {
+    p2pDisconnect(peerRef, nodeId, _params, _PN) {
       const entry = hsyncP2PPeers.get(nodeId);
       if (entry?.sharedSocketKey) {
         const shared = sharedStreamSockets.get(entry.sharedSocketKey);

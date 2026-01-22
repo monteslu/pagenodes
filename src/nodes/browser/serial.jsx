@@ -59,7 +59,7 @@ export const serialInNode = {
   },
 
   mainThread: {
-    async connect(peerRef, nodeId, { vendorId, productId, baudRate, dataBits, stopBits, parity, flowControl, forceDialog }) {
+    async connect(peerRef, nodeId, { vendorId, productId, baudRate, dataBits, stopBits, parity, flowControl, forceDialog }, PN) {
       try {
         // Parse vendor/product IDs for matching
         const vid = vendorId ? (parseInt(vendorId, 16) || parseInt(vendorId, 10)) : null;
@@ -76,7 +76,7 @@ export const serialInNode = {
             const pidMatch = !pid || info.usbProductId === pid;
             if (vidMatch && pidMatch) {
               port = p;
-              console.log('Serial: Auto-reconnecting to saved port');
+              PN.log('Serial: Auto-reconnecting to saved port');
               break;
             }
           }
@@ -128,7 +128,7 @@ export const serialInNode = {
             }
           } catch (err) {
             if (err.name !== 'NetworkError') {
-              console.error('Serial read error:', err);
+              PN.error('Serial read error:', err);
             }
           }
         };
@@ -136,12 +136,12 @@ export const serialInNode = {
         readLoop();
         peerRef.current.methods.emitEvent(nodeId, 'connected', null);
       } catch (err) {
-        console.error('Serial connect error:', err);
+        PN.error('Serial connect error:', err);
         peerRef.current.methods.emitEvent(nodeId, 'error', err?.message || 'connect failed');
       }
     },
 
-    async disconnect(peerRef, nodeId) {
+    async disconnect(peerRef, nodeId, params, PN) {
       const entry = serialPorts.get(nodeId);
       if (entry) {
         try {
@@ -149,7 +149,7 @@ export const serialInNode = {
           if (entry.writer) await entry.writer.close();
           await entry.port.close();
         } catch (err) {
-          console.error('Serial disconnect error:', err);
+          PN.error('Serial disconnect error:', err);
         }
         serialPorts.delete(nodeId);
       }
@@ -242,7 +242,7 @@ export const serialOutNode = {
   },
 
   mainThread: {
-    async connect(peerRef, nodeId, { vendorId, productId, baudRate, dataBits, stopBits, parity, flowControl, forceDialog }) {
+    async connect(peerRef, nodeId, { vendorId, productId, baudRate, dataBits, stopBits, parity, flowControl, forceDialog }, PN) {
       try {
         // Parse vendor/product IDs for matching
         const vid = vendorId ? (parseInt(vendorId, 16) || parseInt(vendorId, 10)) : null;
@@ -259,7 +259,7 @@ export const serialOutNode = {
             const pidMatch = !pid || info.usbProductId === pid;
             if (vidMatch && pidMatch) {
               port = p;
-              console.log('Serial: Auto-reconnecting to saved port');
+              PN.log('Serial: Auto-reconnecting to saved port');
               break;
             }
           }
@@ -292,15 +292,15 @@ export const serialOutNode = {
         serialPorts.set(nodeId, { port, writer, isOutput: true });
         peerRef.current.methods.emitEvent(nodeId, 'connected', null);
       } catch (err) {
-        console.error('Serial connect error:', err);
+        PN.error('Serial connect error:', err);
         peerRef.current.methods.emitEvent(nodeId, 'error', err?.message || 'connect failed');
       }
     },
 
-    async write(peerRef, nodeId, { payload }) {
+    async write(peerRef, nodeId, { payload }, PN) {
       const entry = serialPorts.get(nodeId);
       if (!entry?.writer) {
-        console.warn('Serial out: not connected');
+        PN.warn('Serial out: not connected');
         return;
       }
 
@@ -308,18 +308,18 @@ export const serialOutNode = {
         const data = typeof payload === 'string' ? payload : JSON.stringify(payload);
         await entry.writer.write(data);
       } catch (err) {
-        console.error('Serial write error:', err);
+        PN.error('Serial write error:', err);
       }
     },
 
-    async disconnect(peerRef, nodeId) {
+    async disconnect(peerRef, nodeId, params, PN) {
       const entry = serialPorts.get(nodeId);
       if (entry) {
         try {
           if (entry.writer) await entry.writer.close();
           await entry.port.close();
         } catch (err) {
-          console.error('Serial disconnect error:', err);
+          PN.error('Serial disconnect error:', err);
         }
         serialPorts.delete(nodeId);
       }

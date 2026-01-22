@@ -8,6 +8,7 @@ import { storage } from '../utils/storage';
 import { generateId } from '../utils/id';
 import { validateNode } from '../utils/validation';
 import { audioManager } from '../audio/AudioManager';
+import { logger, createMainThreadPN } from '../utils/logger';
 
 const RuntimeContext = createContext(null);
 
@@ -30,7 +31,6 @@ export function RuntimeProvider({ children }) {
   const nodeStatusesRef = useRef(nodeStatuses);
   const deployRef = useRef(null);
 
-  // Update refs in effect to avoid updating during render
   useEffect(() => {
     flowStateRef.current = flowState;
   }, [flowState]);
@@ -60,7 +60,7 @@ export function RuntimeProvider({ children }) {
     // Handle notifications from worker
     peerRef.current.notifications.onready(() => {
       setIsReady(true);
-      console.log('Runtime worker ready');
+      logger.log( 'Runtime worker ready');
     });
 
     peerRef.current.notifications.ondebug(({ nodeId, nodeName, payload, topic, _msgid }) => {
@@ -68,12 +68,13 @@ export function RuntimeProvider({ children }) {
     });
 
     peerRef.current.notifications.onlog(({ nodeId, level, text }) => {
+      // Logs from node runtime - include node context in message
       if (level === 'error') {
-        console.error(`[${nodeId}]`, text);
+        logger.error(`[node:${nodeId}]`, text);
       } else if (level === 'warn') {
-        console.warn(`[${nodeId}]`, text);
+        logger.warn(`[node:${nodeId}]`, text);
       } else {
-        console.log(`[${nodeId}]`, text);
+        logger.log(`[node:${nodeId}]`, text);
       }
     });
 
@@ -83,6 +84,11 @@ export function RuntimeProvider({ children }) {
 
     peerRef.current.notifications.onmcpStatus(({ status }) => {
       setMcpStatus(status);
+    });
+
+    // Merge logs from worker
+    peerRef.current.notifications.onlogs((entries) => {
+      logger.merge(entries);
     });
 
     // Handle download notifications from file write nodes
@@ -99,11 +105,34 @@ export function RuntimeProvider({ children }) {
       addError(nodeId, nodeName, nodeType, message, stack, _msgid);
     });
 
+    // Give AudioManager access to peer for sending events back to worker
+    audioManager.setPeer(peerRef.current);
+
     // Audio actions that should be routed to AudioManager
     const audioActions = new Set([
+      // Core audio node actions
       'createAudioNode', 'setAudioParam', 'rampAudioParam', 'setAudioOption',
-      'startAudioNode', 'stopAudioNode', 'setMuted', 'destroyAudioNode',
-      'connectAudio', 'disconnectAudio'
+      'startAudioNode', 'stopAudioNode', 'playAudioNode', 'setPeriodicWave',
+      'setMuted', 'destroyAudioNode',
+      'connectAudio', 'disconnectAudio',
+      // Mic actions
+      'createMicNode', 'startMicNode', 'stopMicNode', 'destroyMicNode',
+      // Analyser actions
+      'getAnalyserData',
+      // Delay effect actions
+      'createDelayEffect', 'setDelayParam', 'rampDelayParam', 'destroyDelayEffect',
+      // Buffer source actions
+      'loadAudioBuffer', 'playAudioBuffer', 'stopAudioBuffer',
+      // Convolver actions
+      'loadConvolverBuffer',
+      // MediaStreamDestination/Recorder actions
+      'createMediaStreamDestination', 'startRecording', 'stopRecording',
+      // Worklet actions
+      'createAudioWorklet', 'setWorkletMessageHandler', 'postToWorklet',
+      // MediaElementSource actions
+      'createMediaElementSource', 'mediaElementControl',
+      // Stems actions
+      'createStemsNode', 'loadStems', 'controlStems'
     ]);
 
     // Generic mainThread request handler (fire-and-forget)
@@ -114,51 +143,50 @@ export function RuntimeProvider({ children }) {
         try {
           await audioManager.handleMainThreadCall(nodeId, action, params);
         } catch (err) {
-          console.error(`Error in audio action ${action}:`, err);
+          logger.error(`[audio] Error in audio action ${action}:`, err);
         }
         return;
       }
 
       const nodeDef = nodeRegistry.get(nodeType);
       if (!nodeDef?.mainThread?.[action]) {
-        console.warn(`No mainThread handler for ${nodeType}.${action}`);
+        logger.warn(`No mainThread handler for ${nodeType}.${action}`);
         return;
       }
 
       try {
-        await nodeDef.mainThread[action](peerRef, nodeId, params);
+        const PN = createMainThreadPN();
+        await nodeDef.mainThread[action](peerRef, nodeId, params, PN);
       } catch (err) {
-        console.error(`Error in mainThread handler ${nodeType}.${action}:`, err);
+        logger.error(`Error in mainThread handler ${nodeType}.${action}:`, err);
       }
     });
 
     // Generic mainThread method handler (returns result to worker)
     peerRef.current.addHandler('mainThreadCall', async ({ nodeId, nodeType, action, params }) => {
+      // Route audio actions to AudioManager
+      if (audioActions.has(action)) {
+        return await audioManager.handleMainThreadCall(nodeId, action, params);
+      }
+
       const nodeDef = nodeRegistry.get(nodeType);
       if (!nodeDef?.mainThread?.[action]) {
         throw new Error(`No mainThread handler for ${nodeType}.${action}`);
       }
 
-      return await nodeDef.mainThread[action](peerRef, nodeId, params);
+      const PN = createMainThreadPN();
+      return await nodeDef.mainThread[action](peerRef, nodeId, params, PN);
     });
 
     // MCP handlers - called from worker when MCP server requests data
     peerRef.current.addHandler('mcpGetState', () => {
       const state = flowStateRef.current;
-      // Build compact node catalog from registry
+      // Build minimal node catalog - just type, category, description
+      // Use get_node_details for full property schemas when needed
       const nodeCatalog = nodeRegistry.getAll().map(def => ({
         type: def.type,
         category: def.category,
-        description: def.description || '',
-        inputs: def.inputs,
-        outputs: def.outputs,
-        // Just property names and types, not full schema
-        properties: def.defaults ? Object.entries(def.defaults).map(([name, schema]) => ({
-          name,
-          type: schema.type,
-          required: schema.required || false
-        })) : [],
-        requiresGesture: def.requiresGesture || false
+        description: def.description || ''
       }));
 
       return {
@@ -390,7 +418,7 @@ export function RuntimeProvider({ children }) {
       const validationErrors = [];
 
       for (const node of nodesWithIds) {
-        const { tempId, type, x, y, name, wires, _realId, _nodeDef, ...config } = node;
+        const { tempId, type, x, y, name, wires, streamWires, _realId, _nodeDef, ...config } = node;
 
         // Build defaults from node definition
         const defaults = {};
@@ -405,6 +433,13 @@ export function RuntimeProvider({ children }) {
           (outputWires || []).map(targetTempId => tempToReal[targetTempId] || targetTempId)
         );
 
+        // Map tempIds in streamWires to real IDs (for audio node connections)
+        const mappedStreamWires = streamWires
+          ? streamWires.map(outputWires =>
+              (outputWires || []).map(targetTempId => tempToReal[targetTempId] || targetTempId)
+            )
+          : undefined;
+
         // Config nodes don't belong to a flow (no z property) and don't render on canvas
         const isConfigNode = _nodeDef.category === 'config';
 
@@ -414,7 +449,8 @@ export function RuntimeProvider({ children }) {
             type,
             name: name || '',
             ...(isConfigNode ? {} : { z: flowId, x: x || 100, y: y || 100 }),
-            wires: mappedWires
+            wires: mappedWires,
+            ...(mappedStreamWires ? { streamWires: mappedStreamWires } : {})
           },
           ...defaults,
           ...config
@@ -473,7 +509,7 @@ export function RuntimeProvider({ children }) {
       const nodeUpdates = {};
       const configUpdates = {};
       for (const [key, value] of Object.entries(updates)) {
-        if (['x', 'y', 'name', 'wires'].includes(key)) {
+        if (['x', 'y', 'name', 'wires', 'streamWires'].includes(key)) {
           nodeUpdates[key] = value;
         } else {
           configUpdates[key] = value;
@@ -483,7 +519,7 @@ export function RuntimeProvider({ children }) {
       flowDispatch({
         type: 'UPDATE_NODE',
         id: nodeId,
-        updates: {
+        changes: {
           _node: { ...node._node, ...nodeUpdates },
           ...configUpdates
         }
@@ -598,15 +634,35 @@ export function RuntimeProvider({ children }) {
     });
 
     peerRef.current.addHandler('mcpDeploy', async () => {
+      logger.log('[mcp] Deploy requested');
       if (!deployRef.current) {
         return { success: false, errors: ['Deploy function not ready - runtime may still be initializing'] };
       }
 
       try {
         const state = flowStateRef.current;
-        await deployRef.current(state.nodes, state.configNodes, []);
+
+        // Save to persistent storage FIRST (before deploy which may hang on async onInit)
+        const flowConfig = {
+          flows: state.flows,
+          nodes: Object.values(state.nodes).map(node => {
+            const { _node, ...config } = node;
+            return { ..._node, ...config };
+          }),
+          configNodes: Object.values(state.configNodes).map(node => {
+            const { _node, users: _users, ...config } = node;
+            return { ..._node, ...config };
+          })
+        };
+        logger.log(`[mcp] Saving ${flowConfig.nodes.length} nodes to storage`);
+        await storage.saveFlows(flowConfig);
+
+        // Now deploy (don't await - it may hang on async onInit)
+        deployRef.current(state.nodes, state.configNodes, []);
+
         return { success: true, message: 'Flows deployed to runtime' };
       } catch (err) {
+        logger.error('[mcp] Deploy error:', err);
         return { success: false, errors: [err.message || 'Deploy failed'] };
       }
     });
@@ -621,6 +677,15 @@ export function RuntimeProvider({ children }) {
       const errs = errorsRef.current || [];
       // Errors are newest-first, so slice from start
       return errs.slice(0, limit);
+    });
+
+    peerRef.current.addHandler('mcpGetLogs', (limit = 100, context = null, level = null) => {
+      return logger.getLogs(limit, context, level);
+    });
+
+    peerRef.current.addHandler('mcpClearLogs', () => {
+      logger.clear();
+      return { success: true };
     });
 
     peerRef.current.addHandler('mcpInject', async (nodeId, payload) => {
@@ -798,7 +863,7 @@ export function RuntimeProvider({ children }) {
   // Deploy flows to worker
   const deploy = useCallback(async (nodes, configNodes = {}, errorNodeIds = []) => {
     if (!peerRef.current || !isReady) {
-      console.warn('Worker not ready');
+      logger.warn( 'Worker not ready');
       return;
     }
 
@@ -858,20 +923,18 @@ export function RuntimeProvider({ children }) {
       });
 
       // Build audio graph from streamWires after nodes are created
-      // Give a small delay to ensure all createAudioNode calls have been processed
-      setTimeout(() => {
-        audioManager.buildGraph(nodes);
-      }, 50);
+      // The worker awaits all async onInit promises before returning, so nodes are ready
+      audioManager.buildGraph(nodes);
 
-      console.log('Flows deployed:', result.nodeCount, 'nodes,', result.configCount || 0, 'config nodes');
+      logger.log( `Flows deployed: ${result.nodeCount} nodes, ${result.configCount || 0} config nodes`);
       if (result.reusedConfigCount > 0) {
-        console.log('Preserved', result.reusedConfigCount, 'unchanged config node connections');
+        logger.log( `Preserved ${result.reusedConfigCount} unchanged config node connections`);
       }
       if (errorNodeIds.length > 0) {
-        console.warn('Skipped', errorNodeIds.length, 'nodes with errors');
+        logger.warn( `Skipped ${errorNodeIds.length} nodes with errors`);
       }
     } catch (err) {
-      console.error('Deploy failed:', err);
+      logger.error( 'Deploy failed:', err);
     }
   }, [isReady]);
 
@@ -883,7 +946,7 @@ export function RuntimeProvider({ children }) {
   // Inject into a node (trigger inject nodes)
   const inject = useCallback((nodeId, msg = {}) => {
     if (!peerRef.current || !isRunning) {
-      console.warn('Runtime not running');
+      logger.warn( 'Runtime not running');
       return;
     }
 
@@ -893,7 +956,7 @@ export function RuntimeProvider({ children }) {
   // Inject text to all inject nodes with allowDebugInput enabled
   const injectText = useCallback((text) => {
     if (!peerRef.current || !isRunning) {
-      console.warn('Runtime not running');
+      logger.warn( 'Runtime not running');
       return;
     }
 
@@ -904,14 +967,15 @@ export function RuntimeProvider({ children }) {
   const callMainThread = useCallback(async (nodeType, action, nodeId, params) => {
     const nodeDef = nodeRegistry.get(nodeType);
     if (!nodeDef?.mainThread?.[action]) {
-      console.warn(`No mainThread handler for ${nodeType}.${action}`);
+      logger.warn(`No mainThread handler for ${nodeType}.${action}`);
       return;
     }
 
     try {
-      return await nodeDef.mainThread[action](peerRef, nodeId, params);
+      const PN = createMainThreadPN();
+      return await nodeDef.mainThread[action](peerRef, nodeId, params, PN);
     } catch (err) {
-      console.error(`Error in mainThread handler ${nodeType}.${action}:`, err);
+      logger.error(`Error in mainThread handler ${nodeType}.${action}:`, err);
     }
   }, []);
 
@@ -924,7 +988,7 @@ export function RuntimeProvider({ children }) {
 
     await peerRef.current.methods.stop();
     setIsRunning(false);
-    console.log('Runtime stopped');
+    logger.log( 'Runtime stopped');
   }, []);
 
   // Connect to MCP server

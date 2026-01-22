@@ -44,7 +44,7 @@ export const cameraNode = {
   },
 
   mainThread: {
-    async capture(peerRef, nodeId, { width, height, facingMode, format, quality, focusDelay }) {
+    async capture(peerRef, nodeId, { width, height, facingMode, format, quality, focusDelay }, PN) {
       let stream = null;
       let video = null;
 
@@ -78,7 +78,7 @@ export const cameraNode = {
           height: video.videoHeight
         });
       } catch (err) {
-        console.error('Camera capture error:', err);
+        PN.error('Camera capture error:', err);
       } finally {
         // Clean up to prevent memory leaks
         if (stream) {

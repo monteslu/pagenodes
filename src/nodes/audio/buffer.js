@@ -86,7 +86,7 @@ export const audioBufferRuntime = {
     }
 
     // Handle stop command
-    if (msg.stop === true) {
+    if (msg.stop) {
       await this.mainThread('stopAudioBuffer', {});
       return;
     }

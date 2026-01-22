@@ -125,6 +125,16 @@ import { audioPannerNode } from './audio/panner.jsx';
 import { audioCompressorNode } from './audio/compressor.jsx';
 import { audioWaveShaperNode } from './audio/waveshaper.jsx';
 import { audioBufferNode } from './audio/buffer.jsx';
+import { audioConvolverNode } from './audio/convolver.jsx';
+import { audioPanner3dNode } from './audio/panner3d.jsx';
+import { audioConstantNode } from './audio/constant.jsx';
+import { audioRecorderNode } from './audio/recorder.jsx';
+import { audioSplitterNode } from './audio/splitter.jsx';
+import { audioMergerNode } from './audio/merger.jsx';
+import { audioIIRFilterNode } from './audio/iirfilter.jsx';
+import { audioWorkletNode } from './audio/worklet.jsx';
+import { audioMediaElementNode } from './audio/mediaelement.jsx';
+import { audioStemsNode } from './audio/stems.jsx';
 
 [
   // Core
@@ -223,6 +233,16 @@ import { audioBufferNode } from './audio/buffer.jsx';
   audioCompressorNode,
   audioWaveShaperNode,
   audioBufferNode,
+  audioConvolverNode,
+  audioPanner3dNode,
+  audioConstantNode,
+  audioRecorderNode,
+  audioSplitterNode,
+  audioMergerNode,
+  audioIIRFilterNode,
+  audioWorkletNode,
+  audioMediaElementNode,
+  audioStemsNode,
 
   // Config nodes (not shown in palette, but registered for lookups)
   mqttBrokerNode,

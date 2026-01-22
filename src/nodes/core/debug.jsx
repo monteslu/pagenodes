@@ -48,7 +48,7 @@ export const debugNode = {
     }
 
     if (this.config.console) {
-      console.log('[debug]', this._node.name || this._node.id, output);
+      this.log(this._node.name || this._node.id, output);
     }
   },
 

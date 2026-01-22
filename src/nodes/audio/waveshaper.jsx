@@ -10,6 +10,9 @@ export const audioWaveShaperNode = {
   type: 'waveshaper',
   category: 'audio',
   description: 'Applies waveshaping distortion to audio',
+  relatedDocs: () => [
+    { label: 'WaveShaperNode (MDN)', url: 'https://developer.mozilla.org/en-US/docs/Web/API/WaveShaperNode' }
+  ],
   label: (node) => node._node.name || 'waveshaper',
   color: '#2d9a2d',  // Green for audio nodes
   fontColor: '#fff',  // White text for contrast

@@ -24,11 +24,11 @@ export const audioMicRuntime = {
   },
 
   onInput(msg) {
-    if (msg.start === true) {
+    if (msg.start) {
       this.mainThread('startMicNode', {});
     }
 
-    if (msg.stop === true) {
+    if (msg.stop) {
       this.mainThread('stopMicNode', {});
     }
   },

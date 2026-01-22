@@ -7,7 +7,7 @@ export const socketioClientRuntime = {
   onInit() {
     const server = this.config.server;
     if (!server) {
-      console.warn('socketio-client: missing server url');
+      this.warn('socketio-client: missing server url');
       return;
     }
 
@@ -45,7 +45,7 @@ export const socketioClientRuntime = {
       });
     } catch (err) {
       this._connecting = false;
-      console.error('socketio connection failed:', err);
+      this.error('socketio connection failed:', err);
       this.emit('sio_error', err);
     }
   },

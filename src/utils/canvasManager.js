@@ -3,6 +3,7 @@
  *
  * Used by both CanvasContext (React) and mainThread handlers (runtime)
  */
+import { logger } from './logger';
 
 class CanvasManager {
   constructor() {
@@ -167,7 +168,7 @@ class CanvasManager {
     const config = this.canvases[configId];
 
     if (!canvas || !config) {
-      console.warn('Canvas not found for resize:', configId);
+      logger.warn('Canvas: Canvas not found for resize:', configId);
       return;
     }
 
@@ -348,7 +349,7 @@ class CanvasManager {
   async executeCommands(configId, commands) {
     const canvas = this.canvasRefs[configId];
     if (!canvas) {
-      console.warn('Canvas not found:', configId);
+      logger.warn('Canvas: Canvas not found:', configId);
       return;
     }
 
@@ -477,10 +478,10 @@ class CanvasManager {
           // It's a property - set it
           ctx[command] = params[0];
         } else {
-          console.warn('Unknown canvas command:', command);
+          logger.warn('Canvas: Unknown canvas command:', command);
         }
       } catch (err) {
-        console.error('Canvas command error:', command, err);
+        logger.error('Canvas: Canvas command error:', command, err);
       }
     }
 

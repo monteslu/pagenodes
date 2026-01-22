@@ -13,26 +13,26 @@ export const hsyncConnectionRuntime = {
     const port = this.config.port || 3000;
 
     if (!dynamic && (!hostname || !secret)) {
-      console.warn('hsync-connection: missing hostname or secret for manual mode');
+      this.warn('hsync-connection: missing hostname or secret for manual mode');
       return;
     }
 
     // Track connection state internally so dependent nodes can check on init
     this.on('hsync_connected', (url) => {
-      console.log('[hsync-connection] hsync_connected event received, url:', url);
+      this.log('[hsync-connection] hsync_connected event received, url:', url);
       this._connecting = false;
       this._connected = true;
       this._url = url;
     });
 
     this.on('hsync_disconnected', () => {
-      console.log('[hsync-connection] hsync_disconnected event received');
+      this.log('[hsync-connection] hsync_disconnected event received');
       this._connected = false;
       this._url = null;
     });
 
     this.on('hsync_error', () => {
-      console.log('[hsync-connection] hsync_error event received');
+      this.log('[hsync-connection] hsync_error event received');
       this._connecting = false;
     });
 
@@ -95,7 +95,7 @@ export const hsyncInRuntime = {
     });
 
     // Set initial status based on config node's current state
-    console.log('[hsync in] init - configNode._connected:', configNode._connected, '_connecting:', configNode._connecting, '_url:', configNode._url);
+    this.log('[hsync in] init - configNode._connected:', configNode._connected, '_connecting:', configNode._connecting, '_url:', configNode._url);
     if (configNode._connected) {
       this.status({ fill: 'green', shape: 'dot', text: configNode._url || 'connected' });
     } else if (configNode._connecting) {
@@ -105,13 +105,13 @@ export const hsyncInRuntime = {
 
   _getHsyncConnection() {
     const configData = this.getConfigNode(this.config.connection);
-    console.log('[hsync in] _getHsyncConnection configData:', configData?.id);
+    this.log('[hsync in] _getHsyncConnection configData:', configData?.id);
     if (!configData) {
       this.status({ fill: 'red', shape: 'ring', text: 'no connection' });
       return null;
     }
     const node = this.getNode(configData.id);
-    console.log('[hsync in] _getHsyncConnection node:', node?.id, '_connected:', node?._connected);
+    this.log('[hsync in] _getHsyncConnection node:', node?.id, '_connected:', node?._connected);
     return node;
   },
 

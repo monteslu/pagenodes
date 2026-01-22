@@ -11,6 +11,9 @@ export const audioAnalyserNode = {
   type: 'analyser',
   category: 'audio',
   description: 'FFT analysis for audio visualization',
+  relatedDocs: () => [
+    { label: 'AnalyserNode (MDN)', url: 'https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode' }
+  ],
   label: (node) => node._node.name || 'analyser',
   color: '#2d9a2d',  // Green for audio nodes
   fontColor: '#fff',  // White text for contrast

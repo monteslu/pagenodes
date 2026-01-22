@@ -9,6 +9,7 @@ import { Wire } from './Wire';
 import { SVGDefs } from './SVGDefs';
 import { getPortPosition, getStreamPortPosition, calcNodeHeight, calcNodeHeightWithAudio, calcNodeWidth, normalizeRect, isNodeInSelection, wouldCreateCycle } from '../../utils/geometry';
 import { nodeRegistry } from '../../nodes';
+import { logger } from '../../utils/logger';
 import './Canvas.css';
 
 export function Canvas({ onEditNode, onInject, onFileDrop }) {
@@ -263,7 +264,7 @@ export function Canvas({ onEditNode, onInject, onFileDrop }) {
 
       // Validate connection: no self-connections, no cycles
       if (sourceId === nodeId) {
-        console.warn('Cannot connect a node to itself');
+        logger.warn( 'Cannot connect a node to itself');
         dispatch({ type: 'STOP_CONNECTING' });
         setTempWire(null);
         setHoverPort(null);
@@ -271,7 +272,7 @@ export function Canvas({ onEditNode, onInject, onFileDrop }) {
       }
 
       if (wouldCreateCycle(nodes, sourceId, nodeId, false)) {
-        console.warn('Connection would create a cycle');
+        logger.warn( 'Connection would create a cycle');
         dispatch({ type: 'STOP_CONNECTING' });
         setTempWire(null);
         setHoverPort(null);
@@ -323,7 +324,7 @@ export function Canvas({ onEditNode, onInject, onFileDrop }) {
 
       // Validate connection: no self-connections, no cycles
       if (sourceId === nodeId) {
-        console.warn('Cannot connect a node to itself');
+        logger.warn( 'Cannot connect a node to itself');
         dispatch({ type: 'STOP_CONNECTING' });
         setTempWire(null);
         setHoverPort(null);
@@ -331,7 +332,7 @@ export function Canvas({ onEditNode, onInject, onFileDrop }) {
       }
 
       if (wouldCreateCycle(nodes, sourceId, nodeId, true)) {
-        console.warn('Audio connection would create a cycle');
+        logger.warn( 'Audio connection would create a cycle');
         dispatch({ type: 'STOP_CONNECTING' });
         setTempWire(null);
         setHoverPort(null);
@@ -363,6 +364,7 @@ export function Canvas({ onEditNode, onInject, onFileDrop }) {
   const handleWireMouseDown = useCallback((e, wireId) => {
     e.stopPropagation();
     dispatch({ type: 'DESELECT_ALL' });
+    console.log('Wire selected:', wireId);
     setSelectedWire(wireId);
   }, [dispatch]);
 
@@ -374,14 +376,24 @@ export function Canvas({ onEditNode, onInject, onFileDrop }) {
   // Delete selected wire with keyboard
   const handleKeyDown = useCallback((e) => {
     if ((e.key === 'Delete' || e.key === 'Backspace') && selectedWire) {
-      // Check if it's a stream wire (prefixed with 'stream-')
-      if (selectedWire.startsWith('stream-')) {
-        const parts = selectedWire.slice(7).split('-'); // Remove 'stream-' prefix
-        const [sourceId, sourcePort, targetId] = parts;
-        streamDisconnect(sourceId, parseInt(sourcePort), targetId);
-      } else {
-        const [sourceId, sourcePort, targetId] = selectedWire.split('-');
-        disconnect(sourceId, parseInt(sourcePort), targetId);
+      e.preventDefault();
+      e.stopPropagation();
+
+      // Wire ID format: sourceId-portIndex-targetId (but IDs can contain hyphens!)
+      // Parse by finding the port number between the two node IDs
+      // Port is always a single digit, so find pattern: -digit-
+      const isStream = selectedWire.startsWith('stream-');
+      const wireId = isStream ? selectedWire.slice(7) : selectedWire;
+
+      // Match: (sourceId)-(port)-(targetId) where port is a number
+      const match = wireId.match(/^(.+)-(\d+)-(.+)$/);
+      if (match) {
+        const [, sourceId, sourcePort, targetId] = match;
+        if (isStream) {
+          streamDisconnect(sourceId, parseInt(sourcePort), targetId);
+        } else {
+          disconnect(sourceId, parseInt(sourcePort), targetId);
+        }
       }
       setSelectedWire(null);
     }

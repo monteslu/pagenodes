@@ -9,6 +9,9 @@ export const audioSpeakersNode = {
   type: 'speakers',
   category: 'audio',
   description: 'Outputs audio to system speakers',
+  relatedDocs: () => [
+    { label: 'AudioDestinationNode (MDN)', url: 'https://developer.mozilla.org/en-US/docs/Web/API/AudioDestinationNode' }
+  ],
   label: (node) => node._node.name || 'speakers',
   color: '#2d9a2d',  // Green for audio nodes
   fontColor: '#fff',  // White text for contrast

@@ -10,6 +10,9 @@ export const audioFilterNode = {
   type: 'filter',
   category: 'audio',
   description: 'Frequency filter (lowpass, highpass, etc.)',
+  relatedDocs: () => [
+    { label: 'BiquadFilterNode (MDN)', url: 'https://developer.mozilla.org/en-US/docs/Web/API/BiquadFilterNode' }
+  ],
   label: (node) => node._node.name || 'filter',
   color: '#2d9a2d',  // Green for audio nodes
   fontColor: '#fff',  // White text for contrast

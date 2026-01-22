@@ -102,7 +102,7 @@ export function calcStackedPortPositions(messagePorts, audioPorts, height) {
 }
 
 // Calculate port position on a node
-export function getPortPosition(node, portIndex, isOutput, nodeHeight, nodeWidth) {
+export function getPortPosition(node, portIndex, isOutput, nodeHeight, nodeWidth, nodeDef) {
   const height = nodeHeight || calcNodeHeight(
     isOutput ? (node._node.wires?.length || 1) : 1
   );
@@ -116,6 +116,19 @@ export function getPortPosition(node, portIndex, isOutput, nodeHeight, nodeWidth
       y: node._node.y + (positions[portIndex] || height / 2)
     };
   } else {
+    // For input ports, check if node has both message and audio inputs
+    const msgInputs = nodeDef?.inputs || 1;
+    const streamInputs = nodeDef?.getStreamInputs ? nodeDef.getStreamInputs(node) : (nodeDef?.streamInputs || 0);
+
+    if (streamInputs > 0 && msgInputs > 0) {
+      // Use stacked positions when there are both message and audio inputs
+      const positions = calcStackedPortPositions(msgInputs, streamInputs, height);
+      return {
+        x: node._node.x,
+        y: node._node.y + (positions.message[portIndex] || height / 2)
+      };
+    }
+
     return {
       x: node._node.x,
       y: node._node.y + height / 2

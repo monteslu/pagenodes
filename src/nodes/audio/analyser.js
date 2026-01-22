@@ -44,17 +44,17 @@ export const audioAnalyserRuntime = {
     }
 
     // Single data request
-    if (msg.get === true) {
+    if (msg.get) {
       this._requestData();
     }
 
     // Start continuous output
-    if (msg.start === true) {
+    if (msg.start) {
       this._startInterval();
     }
 
     // Stop continuous output
-    if (msg.stop === true) {
+    if (msg.stop) {
       this._stopInterval();
     }
   },

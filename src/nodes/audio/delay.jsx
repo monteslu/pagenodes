@@ -10,6 +10,9 @@ export const audioDelayNode = {
   type: 'delay',
   category: 'audio',
   description: 'Delays audio signal by specified time',
+  relatedDocs: () => [
+    { label: 'DelayNode (MDN)', url: 'https://developer.mozilla.org/en-US/docs/Web/API/DelayNode' }
+  ],
   label: (node) => node._node.name || 'delay',
   color: '#2d9a2d',  // Green for audio nodes
   fontColor: '#fff',  // White text for contrast

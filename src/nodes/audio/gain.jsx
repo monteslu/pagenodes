@@ -10,6 +10,9 @@ export const audioGainNode = {
   type: 'gain',
   category: 'audio',
   description: 'Controls audio volume/amplitude',
+  relatedDocs: () => [
+    { label: 'GainNode (MDN)', url: 'https://developer.mozilla.org/en-US/docs/Web/API/GainNode' }
+  ],
   label: (node) => node._node.name || 'gain',
   color: '#2d9a2d',  // Green for audio nodes
   fontColor: '#fff',  // White text for contrast

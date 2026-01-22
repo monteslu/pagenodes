@@ -42,17 +42,26 @@ export const audioOscillatorRuntime = {
       });
     }
 
+    // Handle PeriodicWave for custom waveforms (FFT-based synthesis)
+    // realTable = real (cosine) coefficients, imagTable = imaginary (sine) coefficients
+    if (Array.isArray(msg.realTable)) {
+      this.mainThread('setPeriodicWave', {
+        realTable: msg.realTable,
+        imagTable: msg.imagTable || null
+      });
+    }
+
     // One-shot mode: play for a duration then stop
     if (msg.duration !== undefined) {
       this.mainThread('playAudioNode', {
         duration: msg.duration
       });
-    } else if (msg.start === true) {
+    } else if (msg.start) {
       // Continuous mode: start and keep playing
       this.mainThread('startAudioNode', {});
     }
 
-    if (msg.stop === true) {
+    if (msg.stop) {
       this.mainThread('stopAudioNode', {});
     }
   },

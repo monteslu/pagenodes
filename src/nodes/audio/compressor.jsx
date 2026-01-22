@@ -10,6 +10,9 @@ export const audioCompressorNode = {
   type: 'compressor',
   category: 'audio',
   description: 'Compresses audio dynamic range',
+  relatedDocs: () => [
+    { label: 'DynamicsCompressorNode (MDN)', url: 'https://developer.mozilla.org/en-US/docs/Web/API/DynamicsCompressorNode' }
+  ],
   label: (node) => node._node.name || 'compressor',
   color: '#2d9a2d',  // Green for audio nodes
   fontColor: '#fff',  // White text for contrast

@@ -73,7 +73,7 @@ function getOrCreateWorker(configId, config) {
   // Handle ready notification
   peer.notifications.onready(() => {
     state.ready = true;
-    console.log('[LLM] Sub-worker ready for config:', configId);
+    self.PN?.log('llm', 'Sub-worker ready for config:', configId);
   });
 
   llmWorkers.set(configId, state);

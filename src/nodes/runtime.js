@@ -100,6 +100,16 @@ import { audioPannerRuntime } from './audio/panner.js';
 import { audioCompressorRuntime } from './audio/compressor.js';
 import { audioWaveShaperRuntime } from './audio/waveshaper.js';
 import { audioBufferRuntime } from './audio/buffer.js';
+import { audioConvolverRuntime } from './audio/convolver.js';
+import { audioPanner3dRuntime } from './audio/panner3d.js';
+import { audioConstantRuntime } from './audio/constant.js';
+import { audioRecorderRuntime } from './audio/recorder.js';
+import { audioSplitterRuntime } from './audio/splitter.js';
+import { audioMergerRuntime } from './audio/merger.js';
+import { audioIIRFilterRuntime } from './audio/iirfilter.js';
+import { audioWorkletRuntime } from './audio/worklet.js';
+import { audioMediaElementRuntime } from './audio/mediaelement.js';
+import { audioStemsRuntime } from './audio/stems.js';
 
 // Register all runtime implementations
 [
@@ -199,6 +209,16 @@ import { audioBufferRuntime } from './audio/buffer.js';
   audioCompressorRuntime,
   audioWaveShaperRuntime,
   audioBufferRuntime,
+  audioConvolverRuntime,
+  audioPanner3dRuntime,
+  audioConstantRuntime,
+  audioRecorderRuntime,
+  audioSplitterRuntime,
+  audioMergerRuntime,
+  audioIIRFilterRuntime,
+  audioWorkletRuntime,
+  audioMediaElementRuntime,
+  audioStemsRuntime,
 
   // Config nodes (AI)
   imageAiConfigRuntime,

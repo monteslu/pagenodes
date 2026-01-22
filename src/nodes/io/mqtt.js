@@ -9,7 +9,7 @@ export const mqttBrokerRuntime = {
   onInit() {
     const broker = this.config.broker;
     if (!broker) {
-      console.warn('mqtt-broker: missing broker url');
+      this.warn('mqtt-broker: missing broker url');
       return;
     }
 
@@ -54,7 +54,7 @@ export const mqttBrokerRuntime = {
       });
     } catch (err) {
       this._connecting = false;
-      console.error('mqtt connection failed:', err);
+      this.error('mqtt connection failed:', err);
       this.emit('mqtt_error', err);
     }
   },

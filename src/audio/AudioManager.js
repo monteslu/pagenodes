@@ -6,12 +6,25 @@
  * PageNodes node IDs and actual WebAudio node instances.
  */
 
+import * as Extractor from 'm4a-stems/extractor';
+import { createLogger } from '../utils/logger';
+
+const logger = createLogger('audio');
+
 class AudioManager {
   constructor() {
     this.ctx = null;
     this.nodes = new Map();  // nodeId -> { audioNode, type, config, gainNode? }
     this.connections = new Map();  // nodeId -> Set of target nodeIds
     this.isInitialized = false;
+    this.peer = null;  // Reference to worker peer for sending events back
+  }
+
+  /**
+   * Set the peer reference for sending events to worker
+   */
+  setPeer(peer) {
+    this.peer = peer;
   }
 
   /**
@@ -23,12 +36,12 @@ class AudioManager {
       this.ctx = new (window.AudioContext || window.webkitAudioContext)();
     }
 
+    // Don't await resume - it will hang until user gesture if suspended due to autoplay policy
+    // Just try to resume and let it happen when it can
     if (this.ctx.state === 'suspended') {
-      try {
-        await this.ctx.resume();
-      } catch (e) {
-        console.warn('AudioContext resume failed:', e);
-      }
+      this.ctx.resume().catch(e => {
+        logger.warn('AudioContext resume failed:', e);
+      });
     }
 
     this.isInitialized = true;
@@ -166,6 +179,65 @@ class AudioManager {
         return nodeData;
       }
 
+      case 'ConvolverNode':
+        audioNode = ctx.createConvolver();
+        if (options.normalize !== undefined) audioNode.normalize = options.normalize;
+        // Buffer is loaded separately via loadConvolverBuffer
+        break;
+
+      case 'PannerNode':
+        audioNode = ctx.createPanner();
+        if (options.panningModel) audioNode.panningModel = options.panningModel;
+        if (options.distanceModel) audioNode.distanceModel = options.distanceModel;
+        if (options.refDistance !== undefined) audioNode.refDistance = options.refDistance;
+        if (options.maxDistance !== undefined) audioNode.maxDistance = options.maxDistance;
+        if (options.rolloffFactor !== undefined) audioNode.rolloffFactor = options.rolloffFactor;
+        if (options.coneInnerAngle !== undefined) audioNode.coneInnerAngle = options.coneInnerAngle;
+        if (options.coneOuterAngle !== undefined) audioNode.coneOuterAngle = options.coneOuterAngle;
+        if (options.coneOuterGain !== undefined) audioNode.coneOuterGain = options.coneOuterGain;
+        // Position and orientation are set via setParam
+        if (options.positionX !== undefined) audioNode.positionX.value = options.positionX;
+        if (options.positionY !== undefined) audioNode.positionY.value = options.positionY;
+        if (options.positionZ !== undefined) audioNode.positionZ.value = options.positionZ;
+        if (options.orientationX !== undefined) audioNode.orientationX.value = options.orientationX;
+        if (options.orientationY !== undefined) audioNode.orientationY.value = options.orientationY;
+        if (options.orientationZ !== undefined) audioNode.orientationZ.value = options.orientationZ;
+        break;
+
+      case 'ConstantSourceNode': {
+        const source = ctx.createConstantSource();
+        const gate = ctx.createGain();
+        gate.gain.value = 0;  // Start silent
+
+        if (options.offset !== undefined) source.offset.value = options.offset;
+
+        source.connect(gate);
+        source.start();
+
+        const nodeData = {
+          audioNode: gate,
+          source: source,
+          gate: gate,
+          type: nodeType,
+          config: options,
+          started: false
+        };
+
+        this.nodes.set(nodeId, nodeData);
+        this.connections.set(nodeId, new Set());
+        return nodeData;
+      }
+
+      case 'IIRFilterNode':
+        // IIR filter requires feedforward and feedback coefficients
+        if (options.feedforward && options.feedback) {
+          audioNode = ctx.createIIRFilter(options.feedforward, options.feedback);
+        } else {
+          logger.warn('IIRFilterNode requires feedforward and feedback arrays');
+          return null;
+        }
+        break;
+
       case 'AnalyserNode':
         audioNode = ctx.createAnalyser();
         if (options.fftSize) audioNode.fftSize = options.fftSize;
@@ -191,7 +263,7 @@ class AudioManager {
         break;
 
       default:
-        console.warn(`Unknown audio node type: ${nodeType}`);
+        logger.warn(`Unknown audio node type: ${nodeType}`);
         return null;
     }
 
@@ -249,6 +321,12 @@ class AudioManager {
         }
       });
 
+      // User granted mic permission - this counts as a user gesture
+      // Resume AudioContext if it was suspended due to autoplay policy
+      if (ctx.state === 'suspended') {
+        await ctx.resume();
+      }
+
       // Create MediaStreamSourceNode
       const audioNode = ctx.createMediaStreamSource(stream);
       nodeData.audioNode = audioNode;
@@ -268,7 +346,7 @@ class AudioManager {
 
       return true;
     } catch (e) {
-      console.error('Mic access error:', e);
+      logger.error('Mic access error:', e);
       return false;
     }
   }
@@ -446,20 +524,41 @@ class AudioManager {
     const targetData = this.nodes.get(targetId);
 
     if (!sourceData || !targetData) {
-      console.warn(`Cannot connect: source or target not found`, { sourceId, targetId });
+      logger.warn( `Cannot connect: source or target not found`, { sourceId, targetId });
       return false;
     }
 
+    // Always record the connection for later (e.g., when mic starts)
+    this.connections.get(sourceId).add(targetId);
+
     try {
+      // Special handling for StemsNode - each output index maps to a stem gain
+      if (sourceData.type === 'StemsNode' && sourceData.stemGains) {
+        const stemGain = sourceData.stemGains[outputIndex];
+        if (!stemGain) {
+          logger.error(`Stems node has no output at index ${outputIndex}`);
+          return false;
+        }
+        if (targetData.audioNode) {
+          stemGain.connect(targetData.audioNode, 0, inputIndex);
+        }
+        return true;
+      }
+
       // Use outputNode if available (for nodes with separate input/output like delay)
       const outputNode = sourceData.outputNode || sourceData.audioNode;
       const inputNode = targetData.audioNode;
 
+      // If either node isn't ready yet, skip the actual connection
+      // The connection is recorded above and will be established when nodes are ready
+      if (!outputNode || !inputNode) {
+        return true; // Connection recorded, will connect later
+      }
+
       outputNode.connect(inputNode, outputIndex, inputIndex);
-      this.connections.get(sourceId).add(targetId);
       return true;
     } catch (e) {
-      console.error('Audio connect error:', e);
+      logger.error( 'Connect error:', e);
       return false;
     }
   }
@@ -485,7 +584,7 @@ class AudioManager {
       }
       return true;
     } catch (e) {
-      console.error('Audio disconnect error:', e);
+      logger.error('Audio disconnect error:', e);
       return false;
     }
   }
@@ -558,7 +657,7 @@ class AudioManager {
       }
       return true;
     } catch (e) {
-      console.error('Set option error:', e);
+      logger.error('Set option error:', e);
       return false;
     }
   }
@@ -594,7 +693,7 @@ class AudioManager {
         nodeData.started = true;
         return true;
       } catch (e) {
-        console.error('Start node error:', e);
+        logger.error('Start node error:', e);
         return false;
       }
     }
@@ -702,7 +801,7 @@ class AudioManager {
         // It's a typed array like Uint8Array
         arrayBuffer = source.buffer.slice(source.byteOffset, source.byteOffset + source.byteLength);
       } else {
-        console.error('loadBuffer: Invalid source type');
+        logger.error('loadBuffer: Invalid source type');
         return false;
       }
 
@@ -711,7 +810,7 @@ class AudioManager {
       nodeData.buffer = audioBuffer;
       return true;
     } catch (e) {
-      console.error('Load buffer error:', e);
+      logger.error('Load buffer error:', e);
       return false;
     }
   }
@@ -724,7 +823,7 @@ class AudioManager {
     const nodeData = this.nodes.get(nodeId);
     if (!nodeData || nodeData.type !== 'AudioBufferSourceNode') return false;
     if (!nodeData.buffer) {
-      console.warn('playBuffer: No buffer loaded');
+      logger.warn('playBuffer: No buffer loaded');
       return false;
     }
 
@@ -811,6 +910,494 @@ class AudioManager {
   }
 
   /**
+   * Load an impulse response buffer for a ConvolverNode
+   */
+  async loadConvolverBuffer(nodeId, source) {
+    const nodeData = this.nodes.get(nodeId);
+    if (!nodeData || nodeData.type !== 'ConvolverNode') return false;
+
+    const ctx = await this.ensureContext();
+
+    try {
+      let arrayBuffer;
+
+      if (source instanceof ArrayBuffer) {
+        arrayBuffer = source;
+      } else if (typeof source === 'string') {
+        const response = await fetch(source);
+        arrayBuffer = await response.arrayBuffer();
+      } else if (source && source.buffer instanceof ArrayBuffer) {
+        arrayBuffer = source.buffer.slice(source.byteOffset, source.byteOffset + source.byteLength);
+      } else {
+        logger.error('loadConvolverBuffer: Invalid source type');
+        return false;
+      }
+
+      const audioBuffer = await ctx.decodeAudioData(arrayBuffer);
+      nodeData.audioNode.buffer = audioBuffer;
+      return true;
+    } catch (e) {
+      logger.error('Load convolver buffer error:', e);
+      return false;
+    }
+  }
+
+  /**
+   * Create a MediaStreamDestination node for recording
+   */
+  createMediaStreamDestination(nodeId, options = {}) {
+    if (!this.ctx) {
+      logger.warn('createMediaStreamDestination: AudioContext not initialized');
+      return null;
+    }
+
+    const destination = this.ctx.createMediaStreamDestination();
+
+    const nodeData = {
+      audioNode: destination,
+      stream: destination.stream,
+      type: 'MediaStreamAudioDestinationNode',
+      config: options,
+      mediaRecorder: null,
+      recordedChunks: [],
+      isRecording: false
+    };
+
+    this.nodes.set(nodeId, nodeData);
+    this.connections.set(nodeId, new Set());
+
+    return nodeData;
+  }
+
+  /**
+   * Start recording from a MediaStreamDestination
+   */
+  startRecording(nodeId, options = {}) {
+    const nodeData = this.nodes.get(nodeId);
+    if (!nodeData || nodeData.type !== 'MediaStreamAudioDestinationNode') return false;
+    if (nodeData.isRecording) return true;
+
+    const mimeType = options.mimeType || 'audio/webm';
+    nodeData.recordedChunks = [];
+
+    try {
+      nodeData.mediaRecorder = new MediaRecorder(nodeData.stream, { mimeType });
+
+      nodeData.mediaRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) {
+          nodeData.recordedChunks.push(e.data);
+        }
+      };
+
+      nodeData.mediaRecorder.start(options.timeslice || 1000);
+      nodeData.isRecording = true;
+      return true;
+    } catch (e) {
+      logger.error('Start recording error:', e);
+      return false;
+    }
+  }
+
+  /**
+   * Stop recording and return the recorded blob
+   */
+  async stopRecording(nodeId) {
+    const nodeData = this.nodes.get(nodeId);
+    if (!nodeData || nodeData.type !== 'MediaStreamAudioDestinationNode') return null;
+    if (!nodeData.isRecording || !nodeData.mediaRecorder) return null;
+
+    return new Promise((resolve) => {
+      nodeData.mediaRecorder.onstop = () => {
+        const blob = new Blob(nodeData.recordedChunks, { type: nodeData.mediaRecorder.mimeType });
+        nodeData.recordedChunks = [];
+        nodeData.isRecording = false;
+        resolve(blob);
+      };
+
+      nodeData.mediaRecorder.stop();
+    });
+  }
+
+  /**
+   * Create an AudioWorklet node with custom processor
+   */
+  async createAudioWorklet(nodeId, processorName, processorCode, options = {}) {
+    const ctx = await this.ensureContext();
+
+    try {
+      // Create a blob URL for the processor code
+      const blob = new Blob([processorCode], { type: 'application/javascript' });
+      const url = URL.createObjectURL(blob);
+
+      // Register the worklet module
+      await ctx.audioWorklet.addModule(url);
+      URL.revokeObjectURL(url);
+
+      // Create the worklet node
+      const workletNode = new AudioWorkletNode(ctx, processorName, options);
+
+      const nodeData = {
+        audioNode: workletNode,
+        type: 'AudioWorkletNode',
+        config: { processorName, ...options },
+        messageHandler: null
+      };
+
+      this.nodes.set(nodeId, nodeData);
+      this.connections.set(nodeId, new Set());
+
+      // Return cloneable result, not the nodeData with AudioWorkletNode
+      return { success: true, nodeId };
+    } catch (e) {
+      logger.error('Create AudioWorklet error:', e);
+      return { success: false, error: e.message };
+    }
+  }
+
+  /**
+   * Set up message handler for AudioWorklet communication
+   * Messages from the worklet are sent back to the worker via peer.methods.emitEvent
+   */
+  setWorkletMessageHandler(nodeId) {
+    const nodeData = this.nodes.get(nodeId);
+    if (!nodeData || nodeData.type !== 'AudioWorkletNode') return false;
+
+    nodeData.audioNode.port.onmessage = (e) => {
+      // Send worklet messages back to the worker node via emitEvent
+      if (this.peer) {
+        this.peer.methods.emitEvent(nodeId, 'workletMessage', e.data);
+      }
+    };
+
+    return true;
+  }
+
+  /**
+   * Post message to AudioWorklet processor
+   */
+  postToWorklet(nodeId, data) {
+    const nodeData = this.nodes.get(nodeId);
+    if (!nodeData || nodeData.type !== 'AudioWorkletNode') return false;
+
+    nodeData.audioNode.port.postMessage(data);
+    return true;
+  }
+
+  /**
+   * Create a MediaElementAudioSourceNode
+   */
+  async createMediaElementSource(nodeId, selector, crossOrigin = false) {
+    const ctx = await this.ensureContext();
+
+    try {
+      const element = document.querySelector(selector);
+      if (!element) {
+        logger.error('createMediaElementSource: Element not found:', selector);
+        return null;
+      }
+
+      if (crossOrigin) {
+        element.crossOrigin = 'anonymous';
+      }
+
+      const sourceNode = ctx.createMediaElementSource(element);
+
+      const nodeData = {
+        audioNode: sourceNode,
+        element: element,
+        type: 'MediaElementAudioSourceNode',
+        config: { selector, crossOrigin }
+      };
+
+      this.nodes.set(nodeId, nodeData);
+      this.connections.set(nodeId, new Set());
+
+      return nodeData;
+    } catch (e) {
+      logger.error('Create MediaElementSource error:', e);
+      return null;
+    }
+  }
+
+  /**
+   * Control media element playback
+   */
+  mediaElementControl(nodeId, action, property, value) {
+    const nodeData = this.nodes.get(nodeId);
+    if (!nodeData || nodeData.type !== 'MediaElementAudioSourceNode') return false;
+
+    const element = nodeData.element;
+    if (!element) return false;
+
+    switch (action) {
+      case 'play':
+        element.play();
+        return true;
+      case 'pause':
+        element.pause();
+        return true;
+      case 'stop':
+        element.pause();
+        element.currentTime = 0;
+        return true;
+      case 'setProperty':
+        element[property] = value;
+        return true;
+      default:
+        return false;
+    }
+  }
+
+  /**
+   * Create a Stems node for multi-track audio playback
+   * Uses m4a-stems Extractor to parse NI Stems files (5 AAC tracks in M4A container)
+   * Following loukai.com / Native Instruments Stems track order:
+   * - Track 0: Master (original mix)
+   * - Track 1: Drums
+   * - Track 2: Bass
+   * - Track 3: Other (instruments, melody)
+   * - Track 4: Vocals
+   */
+  async createStemsNode(nodeId, options = {}) {
+    await this.ensureContext();
+
+    // Stem names matching NI Stems track order
+    const stemNames = ['master', 'drums', 'bass', 'other', 'vocals'];
+
+    // Create individual gain nodes for mute/solo control (one per stem)
+    const stemGains = stemNames.map(() => {
+      const gain = this.ctx.createGain();
+      gain.gain.value = 1;
+      return gain;
+    });
+
+    // Create a merger to combine all stems for output
+    const merger = this.ctx.createChannelMerger(2);
+
+    const nodeData = {
+      audioNode: merger,  // Output node for connections
+      stemGains,
+      stemNames,
+      stemBuffers: [],    // Array of AudioBuffers (one per track)
+      stemSources: [],    // Array of active BufferSourceNodes
+      type: 'StemsNode',
+      config: options,
+      loop: options.loop || false,
+      isPlaying: false
+    };
+
+    this.nodes.set(nodeId, nodeData);
+    this.connections.set(nodeId, new Set());
+
+    // Return success indicator, not the nodeData (which contains non-cloneable AudioNodes)
+    return { success: true, nodeId };
+  }
+
+  /**
+   * Load stems audio file using m4a-stems Extractor
+   */
+  async loadStems(nodeId, source) {
+    const nodeData = this.nodes.get(nodeId);
+    if (!nodeData || nodeData.type !== 'StemsNode') return false;
+
+    const ctx = await this.ensureContext();
+
+    try {
+      let arrayBuffer;
+
+      if (source instanceof ArrayBuffer) {
+        arrayBuffer = source;
+      } else if (source instanceof Uint8Array) {
+        // Convert Uint8Array to ArrayBuffer
+        arrayBuffer = source.buffer.slice(
+          source.byteOffset,
+          source.byteOffset + source.byteLength
+        );
+      } else if (typeof source === 'string') {
+        const response = await fetch(source);
+        arrayBuffer = await response.arrayBuffer();
+      } else {
+        logger.error('loadStems: Invalid source type', typeof source);
+        return false;
+      }
+
+      // Extract individual tracks from M4A container using m4a-stems
+      const trackBuffers = Extractor.extractAllTracks(arrayBuffer);
+      logger.log( `Extracted ${trackBuffers.length} tracks from stems file`);
+
+      // Decode each track into an AudioBuffer
+      const stemBuffers = await Promise.all(
+        trackBuffers.map(async (trackData, i) => {
+          // extractAllTracks returns Uint8Array, need ArrayBuffer for decodeAudioData
+          const buffer = trackData.buffer.slice(
+            trackData.byteOffset,
+            trackData.byteOffset + trackData.byteLength
+          );
+          try {
+            const audioBuffer = await ctx.decodeAudioData(buffer);
+            logger.log( `  Track ${i}: ${audioBuffer.duration.toFixed(2)}s, ${audioBuffer.numberOfChannels}ch`);
+            return audioBuffer;
+          } catch (e) {
+            logger.error( `Failed to decode track ${i}:`, e);
+            return null;
+          }
+        })
+      );
+
+      // Filter out any failed decodes
+      nodeData.stemBuffers = stemBuffers.filter(b => b !== null);
+
+      if (nodeData.stemBuffers.length === 0) {
+        logger.error('loadStems: No tracks could be decoded');
+        return false;
+      }
+
+      logger.log( `Loaded ${nodeData.stemBuffers.length} stem buffers`);
+      return true;
+    } catch (e) {
+      logger.error( 'Load stems error:', e);
+      return false;
+    }
+  }
+
+  /**
+   * Control stems playback
+   */
+  controlStems(nodeId, action, params = {}) {
+    const nodeData = this.nodes.get(nodeId);
+    if (!nodeData || nodeData.type !== 'StemsNode') return false;
+
+    const ctx = this.ctx;
+
+    switch (action) {
+      case 'play': {
+        if (nodeData.stemBuffers.length === 0) return false;
+
+        // Stop any existing playback
+        this._stopStemSources(nodeData);
+
+        // Create and start a buffer source for each stem, all at the same time
+        const startTime = ctx.currentTime;
+        const offset = params.offset || 0;
+
+        nodeData.stemSources = nodeData.stemBuffers.map((buffer, i) => {
+          const source = ctx.createBufferSource();
+          source.buffer = buffer;
+          source.loop = nodeData.loop;
+
+          // Connect: source -> gain -> merger (for stereo output)
+          source.connect(nodeData.stemGains[i]);
+          nodeData.stemGains[i].connect(nodeData.audioNode, 0, 0);
+          nodeData.stemGains[i].connect(nodeData.audioNode, 0, 1);
+
+          source.start(startTime, offset);
+          return source;
+        });
+
+        nodeData.isPlaying = true;
+
+        // Track when playback ends (use first stem as reference)
+        if (nodeData.stemSources[0]) {
+          nodeData.stemSources[0].onended = () => {
+            if (!nodeData.loop) {
+              nodeData.isPlaying = false;
+            }
+          };
+        }
+        return true;
+      }
+
+      case 'stop':
+        this._stopStemSources(nodeData);
+        nodeData.isPlaying = false;
+        return true;
+
+      case 'pause':
+        // Web Audio doesn't support pause, would need to track position
+        this._stopStemSources(nodeData);
+        nodeData.isPlaying = false;
+        return true;
+
+      case 'seek':
+        if (nodeData.isPlaying && nodeData.stemBuffers.length > 0) {
+          this.controlStems(nodeId, 'play', { offset: params.time });
+        }
+        return true;
+
+      case 'mute': {
+        const mutes = params.mutes || {};
+        nodeData.stemNames.forEach((name, i) => {
+          if (mutes[name] !== undefined && nodeData.stemGains[i]) {
+            nodeData.stemGains[i].gain.value = mutes[name] ? 0 : 1;
+          }
+        });
+        return true;
+      }
+
+      case 'solo': {
+        const soloStem = params.stem;
+        const soloIndex = nodeData.stemNames.indexOf(soloStem);
+        if (soloIndex >= 0) {
+          nodeData.stemGains.forEach((gain, i) => {
+            gain.gain.value = i === soloIndex ? 1 : 0;
+          });
+        }
+        return true;
+      }
+
+      default:
+        return false;
+    }
+  }
+
+  /**
+   * Stop all stem buffer sources
+   * @private
+   */
+  _stopStemSources(nodeData) {
+    if (nodeData.stemSources) {
+      nodeData.stemSources.forEach(source => {
+        try { source.stop(); } catch { /* ignore already stopped */ }
+      });
+      nodeData.stemSources = [];
+    }
+  }
+
+  /**
+   * Set a PeriodicWave on an oscillator for custom waveforms
+   * realTable = cosine coefficients (amplitude at each harmonic)
+   * imagTable = sine coefficients (optional, defaults to zeros)
+   *
+   * This allows FFT-based synthesis - pass the FFT of an instrument sound
+   * to make the oscillator produce that timbre at any frequency.
+   */
+  setPeriodicWave(nodeId, realTable, imagTable = null) {
+    const nodeData = this.nodes.get(nodeId);
+    if (!nodeData || !nodeData.oscillator) return false;
+
+    try {
+      // Convert to Float32Array if needed
+      const real = realTable instanceof Float32Array
+        ? realTable
+        : new Float32Array(realTable);
+
+      // If no imagTable provided, create zeros array of same length
+      const imag = imagTable
+        ? (imagTable instanceof Float32Array ? imagTable : new Float32Array(imagTable))
+        : new Float32Array(real.length);
+
+      // Create and apply the PeriodicWave
+      const periodicWave = this.ctx.createPeriodicWave(real, imag);
+      nodeData.oscillator.setPeriodicWave(periodicWave);
+
+      return true;
+    } catch (e) {
+      logger.error('setPeriodicWave error:', e);
+      return false;
+    }
+  }
+
+  /**
    * Set muted state for a destination node
    */
   setMuted(nodeId, muted) {
@@ -857,7 +1444,7 @@ class AudioManager {
       this.nodes.delete(nodeId);
       return true;
     } catch (e) {
-      console.error('Destroy node error:', e);
+      logger.error('Destroy node error:', e);
       this.nodes.delete(nodeId);
       return false;
     }
@@ -967,6 +1554,9 @@ class AudioManager {
       case 'playAudioNode':
         return this.playNode(nodeId, params.duration);
 
+      case 'setPeriodicWave':
+        return this.setPeriodicWave(nodeId, params.realTable, params.imagTable);
+
       case 'setMuted':
         return this.setMuted(nodeId, params.muted);
 
@@ -1019,8 +1609,49 @@ class AudioManager {
       case 'stopAudioBuffer':
         return this.stopBuffer(nodeId);
 
+      // Convolver actions
+      case 'loadConvolverBuffer':
+        return this.loadConvolverBuffer(nodeId, params.source);
+
+      // MediaStreamDestination actions
+      case 'createMediaStreamDestination':
+        return this.createMediaStreamDestination(nodeId, params.options);
+
+      case 'startRecording':
+        return this.startRecording(nodeId, params.options);
+
+      case 'stopRecording':
+        return this.stopRecording(nodeId);
+
+      // AudioWorklet actions
+      case 'createAudioWorklet':
+        return this.createAudioWorklet(nodeId, params.processorName, params.processorCode, params.options);
+
+      case 'setWorkletMessageHandler':
+        return this.setWorkletMessageHandler(nodeId);
+
+      case 'postToWorklet':
+        return this.postToWorklet(nodeId, params.data);
+
+      // MediaElementSource actions
+      case 'createMediaElementSource':
+        return this.createMediaElementSource(nodeId, params.selector, params.crossOrigin);
+
+      case 'mediaElementControl':
+        return this.mediaElementControl(nodeId, params.action, params.property, params.value);
+
+      // Stems actions
+      case 'createStemsNode':
+        return this.createStemsNode(nodeId, params.options);
+
+      case 'loadStems':
+        return this.loadStems(nodeId, params.source);
+
+      case 'controlStems':
+        return this.controlStems(nodeId, params.action, params);
+
       default:
-        console.warn(`Unknown audio action: ${action}`);
+        logger.warn(`Unknown audio action: ${action}`);
         return null;
     }
   }

@@ -9,6 +9,9 @@ export const audioMicNode = {
   type: 'mic',
   category: 'audio',
   description: 'Captures audio from microphone',
+  relatedDocs: () => [
+    { label: 'MediaStreamAudioSourceNode (MDN)', url: 'https://developer.mozilla.org/en-US/docs/Web/API/MediaStreamAudioSourceNode' }
+  ],
   label: (node) => node._node.name || 'mic',
   color: '#2d9a2d',  // Green for audio nodes
   fontColor: '#fff',  // White text for contrast

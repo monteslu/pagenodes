@@ -6,7 +6,7 @@ export const websocketClientRuntime = {
   onInit() {
     const url = this.config.url;
     if (!url) {
-      console.warn('websocket-client: missing url');
+      this.warn('websocket-client: missing url');
       return;
     }
 
@@ -37,7 +37,7 @@ export const websocketClientRuntime = {
       };
     } catch (err) {
       this._connecting = false;
-      console.error('websocket connection failed:', err);
+      this.error('websocket connection failed:', err);
       this.emit('ws_error', err);
     }
   },

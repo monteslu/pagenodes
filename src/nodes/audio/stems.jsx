@@ -16,6 +16,7 @@ export const audioStemsNode = {
   description: 'Plays multi-track audio stems (loukai.com format)',
   relatedDocs: () => [
     { label: 'loukai.com Stems Format', url: 'https://loukai.com/format' },
+    { label: 'Native Instruments Stems', url: 'https://www.native-instruments.com/en/specials/stems/' },
     { label: 'Web Audio API (MDN)', url: 'https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API' }
   ],
   label: (node) => node._node.name || 'stems',
@@ -91,13 +92,17 @@ export const audioStemsNode = {
       <>
         <p>Plays multi-track audio stems with separate outputs for each track.</p>
 
-        <h5>loukai.com Format</h5>
-        <p>Compatible with the <a href="https://loukai.com/format" target="_blank" rel="noopener noreferrer">loukai.com M4A stems format</a>:</p>
+        <h5>Stems Format</h5>
+        <p>Compatible with:</p>
         <ul>
-          <li>Standard MPEG-4 (.m4a) container with AAC compression</li>
-          <li>5 AAC tracks following Native Instruments Stems ordering</li>
+          <li><a href="https://loukai.com/format" target="_blank" rel="noopener noreferrer">loukai.com M4A stems format</a></li>
+          <li><a href="https://www.native-instruments.com/en/specials/stems/" target="_blank" rel="noopener noreferrer">Native Instruments Stems</a> (.stem.mp4)</li>
+        </ul>
+        <p>Both use 5 tracks following the N.I. Stems ordering:</p>
+        <ul>
+          <li>Standard MPEG-4 container with AAC compression</li>
+          <li>5 AAC tracks: master, drums, bass, other, vocals</li>
           <li>Includes metadata for title, artist, key, BPM</li>
-          <li>Optional karaoke lyrics with word-level timing</li>
         </ul>
 
         <h5>Stream Outputs</h5>

@@ -91,7 +91,6 @@ import { gamepadNode } from './browser/gamepad.jsx';
 import { geolocateNode } from './browser/geolocate.jsx';
 import { accelerometerNode, gyroscopeNode, orientationNode } from './browser/accelerometer.jsx';
 import { vibrateNode } from './browser/vibrate.jsx';
-import { oscillatorNode } from './browser/oscillator.jsx';
 import { midiInNode, midiOutNode } from './browser/midi.jsx';
 import { voicerecNode, speechNode } from './browser/voicerec.jsx';
 import { bluetoothInNode, bluetoothOutNode } from './browser/bluetooth.jsx';
@@ -187,7 +186,6 @@ import { audioStemsNode } from './audio/stems.jsx';
   gyroscopeNode,
   orientationNode,
   vibrateNode,
-  oscillatorNode,
   midiInNode,
   midiOutNode,
   voicerecNode,

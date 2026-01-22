@@ -66,7 +66,6 @@ import { gamepadRuntime } from './browser/gamepad.js';
 import { geolocateRuntime } from './browser/geolocate.js';
 import { accelerometerRuntime, gyroscopeRuntime, orientationRuntime } from './browser/accelerometer.js';
 import { vibrateRuntime } from './browser/vibrate.js';
-import { oscillatorRuntime } from './browser/oscillator.js';
 import { midiInRuntime, midiOutRuntime } from './browser/midi.js';
 import { voicerecRuntime, speechRuntime } from './browser/voicerec.js';
 import { bluetoothInRuntime, bluetoothOutRuntime } from './browser/bluetooth.js';
@@ -163,7 +162,6 @@ import { audioStemsRuntime } from './audio/stems.js';
   gyroscopeRuntime,
   orientationRuntime,
   vibrateRuntime,
-  oscillatorRuntime,
   midiInRuntime,
   midiOutRuntime,
   voicerecRuntime,

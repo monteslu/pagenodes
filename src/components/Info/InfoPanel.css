@@ -187,6 +187,16 @@
   font-weight: 600;
 }
 
+.info-help-content a {
+  color: var(--accent-color);
+  text-decoration: none;
+}
+
+.info-help-content a:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
+}
+
 .info-help-content pre {
   background: var(--code-bg, rgba(0, 0, 0, 0.15));
   color: var(--code-color, inherit);

@@ -4,7 +4,8 @@ import { PaletteNode } from './PaletteNode';
 import './Palette.css';
 
 // Category display order - matches pagenodes1 style (input/output first, then function, etc.)
-const CATEGORY_ORDER = ['common', 'input', 'output', 'ai', 'logic', 'transforms', 'networking', 'hardware', 'storage', 'other'];
+// Audio at the bottom as per design spec
+const CATEGORY_ORDER = ['common', 'input', 'output', 'ai', 'logic', 'transforms', 'networking', 'hardware', 'storage', 'audio', 'other'];
 
 // Display names for categories (when different from internal name)
 const CATEGORY_DISPLAY_NAMES = {
@@ -22,7 +23,8 @@ const DEFAULT_EXPANDED = {
   transforms: true,
   networking: true,
   hardware: true,
-  storage: true
+  storage: true,
+  audio: false  // Collapsed by default as per design spec
 };
 
 export function Palette() {

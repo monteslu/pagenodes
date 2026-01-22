@@ -14,7 +14,7 @@ const initialState = {
 // Actions that should trigger history snapshots
 const HISTORY_ACTIONS = [
   'ADD_NODE', 'UPDATE_NODE', 'UPDATE_NODE_PROPS', 'DELETE_NODES',
-  'MOVE_NODES', 'CONNECT', 'DISCONNECT',
+  'MOVE_NODES', 'CONNECT', 'DISCONNECT', 'CONNECT_STREAM', 'DISCONNECT_STREAM',
   'ADD_CONFIG_NODE', 'UPDATE_CONFIG_NODE', 'DELETE_CONFIG_NODE',
   'IMPORT_FLOWS', 'DELETE_FLOW'
 ];
@@ -114,11 +114,16 @@ function flowReducer(state, action) {
         }
       });
 
-      // Clean up wires pointing to deleted nodes
+      // Clean up wires and streamWires pointing to deleted nodes
       const deletedNodeIds = Object.keys(state.nodes).filter(id => state.nodes[id]._node.z === action.id);
       Object.values(nodes).forEach(node => {
         if (node._node.wires) {
           node._node.wires = node._node.wires.map(outputs =>
+            outputs.filter(targetId => !deletedNodeIds.includes(targetId))
+          );
+        }
+        if (node._node.streamWires) {
+          node._node.streamWires = node._node.streamWires.map(outputs =>
             outputs.filter(targetId => !deletedNodeIds.includes(targetId))
           );
         }
@@ -200,10 +205,15 @@ function flowReducer(state, action) {
         delete nodes[id];
         delete configNodes[id];
       });
-      // Clean up wires referencing deleted nodes
+      // Clean up wires and streamWires referencing deleted nodes
       Object.values(nodes).forEach(node => {
         if (node._node.wires) {
           node._node.wires = node._node.wires.map(outputs =>
+            outputs.filter(targetId => !action.ids.includes(targetId))
+          );
+        }
+        if (node._node.streamWires) {
+          node._node.streamWires = node._node.streamWires.map(outputs =>
             outputs.filter(targetId => !action.ids.includes(targetId))
           );
         }
@@ -265,6 +275,45 @@ function flowReducer(state, action) {
         nodes: {
           ...state.nodes,
           [action.sourceId]: { ...node, _node: { ...node._node, wires } }
+        }
+      };
+    }
+
+    // Audio stream wire connections
+    case 'CONNECT_STREAM': {
+      const node = state.nodes[action.sourceId];
+      if (!node) return state;
+
+      const streamWires = [...(node._node.streamWires || [])];
+      while (streamWires.length <= action.sourcePort) streamWires.push([]);
+      if (!streamWires[action.sourcePort].includes(action.targetId)) {
+        streamWires[action.sourcePort] = [...streamWires[action.sourcePort], action.targetId];
+      }
+
+      return {
+        ...state,
+        nodes: {
+          ...state.nodes,
+          [action.sourceId]: { ...node, _node: { ...node._node, streamWires } }
+        }
+      };
+    }
+
+    case 'DISCONNECT_STREAM': {
+      const node = state.nodes[action.sourceId];
+      if (!node || !node._node.streamWires) return state;
+
+      const streamWires = node._node.streamWires.map((outputs, portIndex) =>
+        portIndex === action.sourcePort
+          ? outputs.filter(id => id !== action.targetId)
+          : outputs
+      );
+
+      return {
+        ...state,
+        nodes: {
+          ...state.nodes,
+          [action.sourceId]: { ...node, _node: { ...node._node, streamWires } }
         }
       };
     }

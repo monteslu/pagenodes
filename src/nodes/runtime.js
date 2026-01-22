@@ -88,6 +88,15 @@ import { llmConfigRuntime, llmRuntime } from './ai/llm.js';
 // Output nodes
 import { canvasConfigRuntime, canvasRuntime } from './output/canvas.js';
 
+// Audio nodes
+import { audioOscillatorRuntime } from './audio/oscillator.js';
+import { audioGainRuntime } from './audio/gain.js';
+import { audioSpeakersRuntime } from './audio/speakers.js';
+import { audioMicRuntime } from './audio/mic.js';
+import { audioFilterRuntime } from './audio/filter.js';
+import { audioAnalyserRuntime } from './audio/analyser.js';
+import { audioDelayRuntime } from './audio/delay.js';
+
 // Register all runtime implementations
 [
   // Core
@@ -173,6 +182,15 @@ import { canvasConfigRuntime, canvasRuntime } from './output/canvas.js';
 
   // Output
   canvasRuntime,
+
+  // Audio
+  audioOscillatorRuntime,
+  audioGainRuntime,
+  audioSpeakersRuntime,
+  audioMicRuntime,
+  audioFilterRuntime,
+  audioAnalyserRuntime,
+  audioDelayRuntime,
 
   // Config nodes (AI)
   imageAiConfigRuntime,

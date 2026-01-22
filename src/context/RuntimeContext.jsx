@@ -7,6 +7,7 @@ import { nodeRegistry } from '../nodes';
 import { storage } from '../utils/storage';
 import { generateId } from '../utils/id';
 import { validateNode } from '../utils/validation';
+import { audioManager } from '../audio/AudioManager';
 
 const RuntimeContext = createContext(null);
 
@@ -98,9 +99,26 @@ export function RuntimeProvider({ children }) {
       addError(nodeId, nodeName, nodeType, message, stack, _msgid);
     });
 
+    // Audio actions that should be routed to AudioManager
+    const audioActions = new Set([
+      'createAudioNode', 'setAudioParam', 'rampAudioParam', 'setAudioOption',
+      'startAudioNode', 'stopAudioNode', 'setMuted', 'destroyAudioNode',
+      'connectAudio', 'disconnectAudio'
+    ]);
+
     // Generic mainThread request handler (fire-and-forget)
     // Routes requests from worker to the appropriate node type's mainThread action handlers
     peerRef.current.notifications.onmainThreadRequest(async ({ nodeId, nodeType, action, params }) => {
+      // Route audio actions to AudioManager
+      if (audioActions.has(action)) {
+        try {
+          await audioManager.handleMainThreadCall(nodeId, action, params);
+        } catch (err) {
+          console.error(`Error in audio action ${action}:`, err);
+        }
+        return;
+      }
+
       const nodeDef = nodeRegistry.get(nodeType);
       if (!nodeDef?.mainThread?.[action]) {
         console.warn(`No mainThread handler for ${nodeType}.${action}`);
@@ -819,6 +837,9 @@ export function RuntimeProvider({ children }) {
     setHasButtonsNodes(deployedTypes.has('buttons'));
 
     try {
+      // Destroy previous audio graph before deploying new one
+      audioManager.destroyAll();
+
       const result = await peerRef.current.methods.deploy(flowNodes, flowConfigNodes, errorNodeIds);
       setIsRunning(true);
 
@@ -835,6 +856,12 @@ export function RuntimeProvider({ children }) {
         }
         return kept;
       });
+
+      // Build audio graph from streamWires after nodes are created
+      // Give a small delay to ensure all createAudioNode calls have been processed
+      setTimeout(() => {
+        audioManager.buildGraph(nodes);
+      }, 50);
 
       console.log('Flows deployed:', result.nodeCount, 'nodes,', result.configCount || 0, 'config nodes');
       if (result.reusedConfigCount > 0) {
@@ -891,6 +918,9 @@ export function RuntimeProvider({ children }) {
   // Stop the runtime
   const stop = useCallback(async () => {
     if (!peerRef.current) return;
+
+    // Clean up audio graph
+    audioManager.destroyAll();
 
     await peerRef.current.methods.stop();
     setIsRunning(false);

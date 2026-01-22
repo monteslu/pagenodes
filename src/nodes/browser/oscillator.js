@@ -2,7 +2,7 @@
 // Delegates to main thread for Web Audio API
 
 export const oscillatorRuntime = {
-  type: 'oscillator',
+  type: 'osc-old',
 
   onInput(msg) {
     this.mainThread('play', {

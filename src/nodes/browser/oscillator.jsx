@@ -1,9 +1,9 @@
 export const oscillatorNode = {
-  type: 'oscillator',
+  type: 'osc-old',
   category: 'output',
   description: 'Generates audio tones',
   requiresGesture: true,
-  label: (node) => node._node.name || 'oscillator',
+  label: (node) => node._node.name || 'osc-old',
   color: '#FFA07A', // light salmon
   icon: true,
   faChar: '\uf028', // volume-up

@@ -113,6 +113,15 @@ import { llmConfigNode, llmNode } from './ai/llm.jsx';
 // Output nodes
 import { canvasConfigNode, canvasNode } from './output/canvas.jsx';
 
+// Audio nodes
+import { audioOscillatorNode } from './audio/oscillator.jsx';
+import { audioGainNode } from './audio/gain.jsx';
+import { audioSpeakersNode } from './audio/speakers.jsx';
+import { audioMicNode } from './audio/mic.jsx';
+import { audioFilterNode } from './audio/filter.jsx';
+import { audioAnalyserNode } from './audio/analyser.jsx';
+import { audioDelayNode } from './audio/delay.jsx';
+
 [
   // Core
   injectNode,
@@ -197,6 +206,15 @@ import { canvasConfigNode, canvasNode } from './output/canvas.jsx';
 
   // Output
   canvasNode,
+
+  // Audio
+  audioOscillatorNode,
+  audioGainNode,
+  audioSpeakersNode,
+  audioMicNode,
+  audioFilterNode,
+  audioAnalyserNode,
+  audioDelayNode,
 
   // Config nodes (not shown in palette, but registered for lookups)
   mqttBrokerNode,

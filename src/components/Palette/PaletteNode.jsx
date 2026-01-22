@@ -1,5 +1,5 @@
 import { useRef, useCallback } from 'react';
-import { NodeShape, NODE_WIDTH, calcNodeHeight } from '../Canvas/NodeShape';
+import { NodeShape, NODE_WIDTH, calcNodeHeight, calcNodeHeightWithAudio } from '../Canvas/NodeShape';
 
 const PALETTE_NODE_WIDTH = 120;
 
@@ -8,7 +8,14 @@ export function PaletteNode({ nodeDef, onTouchDrag }) {
   const ghostRef = useRef(null);
 
   const outputs = nodeDef.outputs || 0;
-  const height = calcNodeHeight(outputs);
+  const inputs = nodeDef.inputs || 0;
+  const streamOutputs = nodeDef.streamOutputs || 0;
+  const streamInputs = nodeDef.streamInputs || 0;
+  const hasAudioPorts = streamInputs > 0 || streamOutputs > 0;
+
+  const height = hasAudioPorts
+    ? calcNodeHeightWithAudio(outputs, streamOutputs, inputs, streamInputs)
+    : calcNodeHeight(outputs);
 
   // Add padding for ports
   const svgWidth = PALETTE_NODE_WIDTH + 20;

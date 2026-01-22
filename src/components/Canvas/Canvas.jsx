@@ -7,7 +7,7 @@ import { useDrag } from '../../hooks/useDrag';
 import { Node } from './Node';
 import { Wire } from './Wire';
 import { SVGDefs } from './SVGDefs';
-import { getPortPosition, calcNodeHeight, calcNodeWidth, normalizeRect, isNodeInSelection } from '../../utils/geometry';
+import { getPortPosition, getStreamPortPosition, calcNodeHeight, calcNodeHeightWithAudio, calcNodeWidth, normalizeRect, isNodeInSelection, wouldCreateCycle } from '../../utils/geometry';
 import { nodeRegistry } from '../../nodes';
 import './Canvas.css';
 
@@ -16,7 +16,7 @@ export function Canvas({ onEditNode, onInject, onFileDrop }) {
   const containerRef = useRef(null);
   const { state: editor, dispatch } = useEditor();
   const { nodeStatuses } = useRuntime();
-  const { activeNodes, nodes, connect, disconnect } = useNodes();
+  const { activeNodes, nodes, connect, disconnect, streamConnect, streamDisconnect } = useNodes();
   const { screenToCanvas, handlers: canvasHandlers } = useCanvas(svgRef);
   const { startDrag, onDrag, endDrag } = useDrag(screenToCanvas);
 
@@ -35,7 +35,7 @@ export function Canvas({ onEditNode, onInject, onFileDrop }) {
   // Track if we just finished a selection drag (to prevent click from clearing it)
   const justSelectedRef = useRef(false);
 
-  // Build wire list from node._node.wires
+  // Build wire list from node._node.wires (message wires)
   const wires = useMemo(() => {
     const result = [];
     activeNodes.forEach(node => {
@@ -46,7 +46,29 @@ export function Canvas({ onEditNode, onInject, onFileDrop }) {
               id: `${node._node.id}-${portIndex}-${targetId}`,
               sourceId: node._node.id,
               sourcePort: portIndex,
-              targetId
+              targetId,
+              isStream: false
+            });
+          }
+        });
+      });
+    });
+    return result;
+  }, [activeNodes, nodes]);
+
+  // Build stream wire list from node._node.streamWires (audio wires)
+  const streamWires = useMemo(() => {
+    const result = [];
+    activeNodes.forEach(node => {
+      (node._node.streamWires || []).forEach((targets, portIndex) => {
+        targets.forEach(targetId => {
+          if (nodes[targetId]) {
+            result.push({
+              id: `stream-${node._node.id}-${portIndex}-${targetId}`,
+              sourceId: node._node.id,
+              sourcePort: portIndex,
+              targetId,
+              isStream: true
             });
           }
         });
@@ -206,45 +228,133 @@ export function Canvas({ onEditNode, onInject, onFileDrop }) {
     }
   }, [onEditNode, nodes]);
 
+  // Helper to get node height with audio ports
+  const getNodeHeight = useCallback((node, def) => {
+    const outputs = def?.getOutputs ? def.getOutputs(node) : (def?.outputs || 0);
+    const inputs = def?.inputs || 0;
+    const streamOutputs = def?.getStreamOutputs ? def.getStreamOutputs(node) : (def?.streamOutputs || 0);
+    const streamInputs = def?.getStreamInputs ? def.getStreamInputs(node) : (def?.streamInputs || 0);
+    if (streamOutputs > 0 || streamInputs > 0) {
+      return calcNodeHeightWithAudio(outputs, streamOutputs, inputs, streamInputs);
+    }
+    return calcNodeHeight(outputs);
+  }, []);
+
+  // Message port handlers
   const handlePortMouseDown = useCallback((e, nodeId, portIndex, isOutput) => {
     e.stopPropagation();
     if (isOutput) {
-      dispatch({ type: 'START_CONNECTING', sourceId: nodeId, sourcePort: portIndex });
+      dispatch({ type: 'START_CONNECTING', sourceId: nodeId, sourcePort: portIndex, isStream: false });
       const node = nodes[nodeId];
       const def = nodeRegistry.get(node._node.type);
-      const outputs = def?.getOutputs ? def.getOutputs(node) : (def?.outputs || 1);
-      const height = calcNodeHeight(outputs);
-      // Calculate width for proper port position
+      const height = getNodeHeight(node, def);
       const label = node._node.name || (typeof def?.label === 'function' ? def.label(node) : def?.label) || node._node.type;
       const hasIcon = def?.icon && def?.faChar;
       const width = calcNodeWidth(label, hasIcon);
       const pos = getPortPosition(node, portIndex, true, height, width);
       setTempWire({ x: pos.x, y: pos.y });
     }
-  }, [dispatch, nodes]);
+  }, [dispatch, nodes, getNodeHeight]);
 
   const handlePortMouseUp = useCallback((e, nodeId, portIndex, isOutput) => {
     e.stopPropagation();
-    if (!isOutput && editor.connecting) {
-      // Complete the connection
+    if (!isOutput && editor.connecting && !editor.connecting.isStream) {
       const { sourceId, sourcePort } = editor.connecting;
+
+      // Validate connection: no self-connections, no cycles
+      if (sourceId === nodeId) {
+        console.warn('Cannot connect a node to itself');
+        dispatch({ type: 'STOP_CONNECTING' });
+        setTempWire(null);
+        setHoverPort(null);
+        return;
+      }
+
+      if (wouldCreateCycle(nodes, sourceId, nodeId, false)) {
+        console.warn('Connection would create a cycle');
+        dispatch({ type: 'STOP_CONNECTING' });
+        setTempWire(null);
+        setHoverPort(null);
+        return;
+      }
+
+      // Complete the message wire connection
       connect(sourceId, sourcePort, nodeId);
-      // Mark wire as pending (not yet deployed)
       const wireId = `${sourceId}-${sourcePort}-${nodeId}`;
       dispatch({ type: 'ADD_PENDING_WIRE', wireId });
       dispatch({ type: 'STOP_CONNECTING' });
       setTempWire(null);
       setHoverPort(null);
     }
-  }, [editor.connecting, connect, dispatch]);
+  }, [editor.connecting, connect, dispatch, nodes]);
 
   const handlePortMouseEnter = useCallback((e, nodeId, portIndex, isOutput) => {
-    if (!isOutput && editor.connecting) {
-      setHoverPort({ nodeId, portIndex });
+    if (!isOutput && editor.connecting && !editor.connecting.isStream) {
+      setHoverPort({ nodeId, portIndex, isStream: false });
     }
   }, [editor.connecting]);
 
   const handlePortMouseLeave = useCallback((e, nodeId, portIndex, isOutput) => {
+    if (!isOutput) {
+      setHoverPort(null);
+    }
+  }, []);
+
+  // Audio stream port handlers
+  const handleStreamPortMouseDown = useCallback((e, nodeId, portIndex, isOutput) => {
+    e.stopPropagation();
+    if (isOutput) {
+      dispatch({ type: 'START_CONNECTING', sourceId: nodeId, sourcePort: portIndex, isStream: true });
+      const node = nodes[nodeId];
+      const def = nodeRegistry.get(node._node.type);
+      const height = getNodeHeight(node, def);
+      const label = node._node.name || (typeof def?.label === 'function' ? def.label(node) : def?.label) || node._node.type;
+      const hasIcon = def?.icon && def?.faChar;
+      const width = calcNodeWidth(label, hasIcon);
+      const pos = getStreamPortPosition(node, portIndex, true, def, height, width);
+      setTempWire({ x: pos.x, y: pos.y });
+    }
+  }, [dispatch, nodes, getNodeHeight]);
+
+  const handleStreamPortMouseUp = useCallback((e, nodeId, portIndex, isOutput) => {
+    e.stopPropagation();
+    if (!isOutput && editor.connecting && editor.connecting.isStream) {
+      const { sourceId, sourcePort } = editor.connecting;
+
+      // Validate connection: no self-connections, no cycles
+      if (sourceId === nodeId) {
+        console.warn('Cannot connect a node to itself');
+        dispatch({ type: 'STOP_CONNECTING' });
+        setTempWire(null);
+        setHoverPort(null);
+        return;
+      }
+
+      if (wouldCreateCycle(nodes, sourceId, nodeId, true)) {
+        console.warn('Audio connection would create a cycle');
+        dispatch({ type: 'STOP_CONNECTING' });
+        setTempWire(null);
+        setHoverPort(null);
+        return;
+      }
+
+      // Complete the stream wire connection
+      streamConnect(sourceId, sourcePort, nodeId);
+      const wireId = `stream-${sourceId}-${sourcePort}-${nodeId}`;
+      dispatch({ type: 'ADD_PENDING_WIRE', wireId });
+      dispatch({ type: 'STOP_CONNECTING' });
+      setTempWire(null);
+      setHoverPort(null);
+    }
+  }, [editor.connecting, streamConnect, dispatch, nodes]);
+
+  const handleStreamPortMouseEnter = useCallback((e, nodeId, portIndex, isOutput) => {
+    if (!isOutput && editor.connecting && editor.connecting.isStream) {
+      setHoverPort({ nodeId, portIndex, isStream: true });
+    }
+  }, [editor.connecting]);
+
+  const handleStreamPortMouseLeave = useCallback((e, nodeId, portIndex, isOutput) => {
     if (!isOutput) {
       setHoverPort(null);
     }
@@ -264,12 +374,18 @@ export function Canvas({ onEditNode, onInject, onFileDrop }) {
   // Delete selected wire with keyboard
   const handleKeyDown = useCallback((e) => {
     if ((e.key === 'Delete' || e.key === 'Backspace') && selectedWire) {
-      // Parse wire ID to get source and target
-      const [sourceId, sourcePort, targetId] = selectedWire.split('-');
-      disconnect(sourceId, parseInt(sourcePort), targetId);
+      // Check if it's a stream wire (prefixed with 'stream-')
+      if (selectedWire.startsWith('stream-')) {
+        const parts = selectedWire.slice(7).split('-'); // Remove 'stream-' prefix
+        const [sourceId, sourcePort, targetId] = parts;
+        streamDisconnect(sourceId, parseInt(sourcePort), targetId);
+      } else {
+        const [sourceId, sourcePort, targetId] = selectedWire.split('-');
+        disconnect(sourceId, parseInt(sourcePort), targetId);
+      }
       setSelectedWire(null);
     }
-  }, [selectedWire, disconnect]);
+  }, [selectedWire, disconnect, streamDisconnect]);
 
   // Add keyboard listener
   useEffect(() => {
@@ -335,6 +451,7 @@ export function Canvas({ onEditNode, onInject, onFileDrop }) {
 
           {/* Wires */}
           <g className="wires">
+            {/* Message wires (yellow) */}
             {wires.map(wire => (
               <Wire
                 key={wire.id}
@@ -343,6 +460,22 @@ export function Canvas({ onEditNode, onInject, onFileDrop }) {
                 targetNode={nodes[wire.targetId]}
                 selected={selectedWire === wire.id}
                 isPending={editor.pendingWires.has(wire.id)}
+                isStream={false}
+                onMouseDown={(e) => handleWireMouseDown(e, wire.id)}
+                onMouseUp={(e) => handleWireMouseUp(e, wire.id)}
+              />
+            ))}
+
+            {/* Stream wires (green) */}
+            {streamWires.map(wire => (
+              <Wire
+                key={wire.id}
+                sourceNode={nodes[wire.sourceId]}
+                sourcePort={wire.sourcePort}
+                targetNode={nodes[wire.targetId]}
+                selected={selectedWire === wire.id}
+                isPending={editor.pendingWires.has(wire.id)}
+                isStream={true}
                 onMouseDown={(e) => handleWireMouseDown(e, wire.id)}
                 onMouseUp={(e) => handleWireMouseUp(e, wire.id)}
               />
@@ -357,6 +490,7 @@ export function Canvas({ onEditNode, onInject, onFileDrop }) {
                 targetNode={hoverPort ? nodes[hoverPort.nodeId] : null}
                 isTemp={true}
                 isConnecting={!!hoverPort}
+                isStream={editor.connecting.isStream}
               />
             )}
           </g>
@@ -377,6 +511,10 @@ export function Canvas({ onEditNode, onInject, onFileDrop }) {
                 onPortMouseUp={handlePortMouseUp}
                 onPortMouseEnter={handlePortMouseEnter}
                 onPortMouseLeave={handlePortMouseLeave}
+                onStreamPortMouseDown={handleStreamPortMouseDown}
+                onStreamPortMouseUp={handleStreamPortMouseUp}
+                onStreamPortMouseEnter={handleStreamPortMouseEnter}
+                onStreamPortMouseLeave={handleStreamPortMouseLeave}
                 onInject={onInject}
                 onFileDrop={onFileDrop}
               />

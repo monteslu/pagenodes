@@ -27,6 +27,8 @@ npm run preview
 
 **Hardware** - Access device sensors and peripherals via browser APIs: camera, serial ports, Bluetooth, USB, gamepad, accelerometer, MIDI, geolocation, microphone, and speakers. Note: Hardware APIs have varying browser support and may require HTTPS or user permissions.
 
+**Audio** - Full Web Audio API integration with visual stream wiring. Nodes include oscillator, gain, filter, delay, compressor, convolver (reverb), waveshaper, stereo panner, 3D spatial panner, analyser (FFT/waveform), audio worklet for custom DSP, channel splitter/merger, mic input, speakers output, recorder, buffer player, media element source, and multi-track stems player (compatible with Native Instruments Stems and loukai.com format).
+
 **Network** - Connect to external services via HTTP, WebSocket, MQTT, Socket.IO, Server-Sent Events, and hsync for peer-to-peer communication.
 
 **Logic & Flow Control** - Route, transform, and control message flow with switches, functions, templates, delays, triggers, and JavaScript expressions.

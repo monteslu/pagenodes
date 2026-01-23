@@ -55,6 +55,21 @@ export const audioOscillatorNode = {
         description: 'Set detune in cents',
         optional: true
       },
+      rampFrequency: {
+        type: 'number',
+        description: 'Target frequency to ramp/glide to',
+        optional: true
+      },
+      rampDetune: {
+        type: 'number',
+        description: 'Target detune to ramp/glide to',
+        optional: true
+      },
+      rampTime: {
+        type: 'number',
+        description: 'Duration of ramp in seconds (default 0.1)',
+        optional: true
+      },
       realTable: {
         type: 'array',
         description: 'Cosine (real) Fourier coefficients for custom waveform',
@@ -63,6 +78,11 @@ export const audioOscillatorNode = {
       imagTable: {
         type: 'array',
         description: 'Sine (imaginary) Fourier coefficients for custom waveform',
+        optional: true
+      },
+      harmonics: {
+        type: 'array',
+        description: 'Harmonic amplitudes [fundamental, 2nd, 3rd, ...] - shorthand for imagTable',
         optional: true
       },
       start: {
@@ -120,24 +140,39 @@ export const audioOscillatorNode = {
           <li><code>msg.frequency</code> - Change frequency (Hz)</li>
           <li><code>msg.waveType</code> - Change wave type</li>
           <li><code>msg.detune</code> - Change detune (cents)</li>
+          <li><code>msg.rampFrequency</code> - Glide to target frequency</li>
+          <li><code>msg.rampDetune</code> - Glide to target detune</li>
+          <li><code>msg.rampTime</code> - Glide duration in seconds (default 0.1)</li>
           <li><code>msg.start</code> - Start continuous playback</li>
           <li><code>msg.stop</code> - Stop the oscillator</li>
           <li><code>msg.duration</code> - Play for this many milliseconds</li>
         </ul>
 
-        <h5>Custom Waveforms (PeriodicWave)</h5>
-        <p>Create instrument-like timbres using Fourier coefficients:</p>
+        <h5>Frequency Sweeps</h5>
+        <p>Use ramps for sound effects like lasers, power-ups, or portamento:</p>
+        <pre>{`// Laser sound: high to low sweep
+{ frequency: 880, rampFrequency: 110, rampTime: 0.3, duration: 300 }
+
+// Power-up sound: low to high sweep
+{ frequency: 220, rampFrequency: 880, rampTime: 0.5, duration: 500 }`}</pre>
+
+        <h5>Custom Waveforms (FFT/PeriodicWave)</h5>
+        <p>Create custom timbres using Fourier coefficients:</p>
+
+        <p><strong>Harmonics shorthand</strong> - array of harmonic amplitudes:</p>
+        <pre>{`// [fundamental, 2nd harmonic, 3rd, ...]
+{ harmonics: [1, 0.5, 0.3, 0.25, 0.2], start: true }
+
+// Odd harmonics only (hollow sound)
+{ harmonics: [1, 0, 0.33, 0, 0.2, 0, 0.14], start: true }`}</pre>
+
+        <p><strong>Raw FFT coefficients</strong> - full control:</p>
         <ul>
-          <li><code>msg.realTable</code> - Array of cosine (real) coefficients</li>
-          <li><code>msg.imagTable</code> - Array of sine (imaginary) coefficients (optional)</li>
+          <li><code>msg.realTable</code> - Cosine (real) coefficients</li>
+          <li><code>msg.imagTable</code> - Sine (imaginary) coefficients</li>
         </ul>
-        <p>The first element is DC offset (usually 0), subsequent elements are harmonic amplitudes.
-        You can extract these from an FFT of an instrument sound to synthesize that timbre at any pitch.</p>
-        <pre>{`// Example: simple organ-like timbre
-{
-  realTable: [0, 1, 0.5, 0.3, 0.25, 0.2],
-  start: true
-}`}</pre>
+        <p>First element is DC offset (usually 0), subsequent elements are harmonic amplitudes.
+        You can extract these from an FFT analyser to recreate that timbre at any pitch.</p>
 
         <h5>Audio Output</h5>
         <p>Connect the green audio port to other audio nodes like Gain or Speakers.</p>

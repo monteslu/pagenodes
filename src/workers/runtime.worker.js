@@ -556,6 +556,9 @@ async function deployFlows(flowNodes, flowConfigNodes = [], skipNodeIds = []) {
   }
   PN.log(`Deploy complete: found ${catchNodes.length} catch node(s) for error routing`);
 
+  // Broadcast current MCP status to any newly deployed MCP nodes
+  broadcastMcpStatus(mcpCurrentStatus);
+
   const skippedCount = skipNodeIds.length;
   const reusedConfigCount = unchangedConfigIds.size;
   return {
@@ -708,12 +711,32 @@ function broadcastToType(nodeType, action, params) {
   }
 }
 
+/**
+ * Broadcast MCP connection status to all mcp-input and mcp-output nodes
+ */
+function broadcastMcpStatus(status) {
+  mcpCurrentStatus = status;
+  for (const node of nodes.values()) {
+    if (node.type === 'mcp-input' || node.type === 'mcp-output') {
+      node.emit('mcpConnectionStatus', { status });
+    }
+  }
+}
+
+/**
+ * Get current MCP connection status
+ */
+function getMcpStatus() {
+  return mcpCurrentStatus;
+}
+
 // MCP WebSocket connection
 let mcpSocket = null;
 let mcpPeer = null;
 let mcpReconnectTimer = null;
 let mcpPort = null;
 let mcpClientUrl = null;
+let mcpCurrentStatus = 'disabled'; // Track current status for queries
 
 /**
  * Connect to MCP server
@@ -742,6 +765,7 @@ function connectMcp(options) {
   }
 
   peer.notifiers.mcpStatus({ status: 'connecting' });
+  broadcastMcpStatus('connecting');
 
   try {
     const socket = new WebSocket(`ws://localhost:${port}`);
@@ -851,6 +875,14 @@ function connectMcp(options) {
         return await peer.methods.mcpGetNodeDetails(type);
       });
 
+      mcpPeer.addHandler('getMessages', async (limit, clear) => {
+        return await peer.methods.mcpGetMessages(limit, clear);
+      });
+
+      mcpPeer.addHandler('sendMessage', async (payload, topic) => {
+        return await peer.methods.mcpSendMessage(payload, topic);
+      });
+
       // Register this client with the MCP server
       if (mcpClientUrl) {
         mcpPeer.methods.registerClient({ url: mcpClientUrl }).catch(err => {
@@ -859,6 +891,7 @@ function connectMcp(options) {
       }
 
       peer.notifiers.mcpStatus({ status: 'connected' });
+      broadcastMcpStatus('connected');
     };
 
     socket.onclose = () => {
@@ -867,6 +900,7 @@ function connectMcp(options) {
 
       PN.log('mcp WebSocket closed');
       peer.notifiers.mcpStatus({ status: 'error' });
+      broadcastMcpStatus('error');
       mcpSocket = null;
       mcpPeer = null;
       // Try to reconnect after 3 seconds
@@ -881,10 +915,12 @@ function connectMcp(options) {
 
       PN.error('mcp WebSocket error:', err);
       peer.notifiers.mcpStatus({ status: 'error' });
+      broadcastMcpStatus('error');
     };
   } catch (err) {
     PN.error('mcp Failed to connect:', err);
     peer.notifiers.mcpStatus({ status: 'error' });
+    broadcastMcpStatus('error');
   }
 }
 
@@ -906,6 +942,7 @@ function disconnectMcp() {
 
   mcpPeer = null;
   peer.notifiers.mcpStatus({ status: 'disabled' });
+  broadcastMcpStatus('disabled');
 }
 
 // Initialize rawr peer
@@ -932,6 +969,7 @@ peer.addHandler('emitEvent', handleMainThreadEvent);
 peer.addHandler('broadcastToType', broadcastToType);
 peer.addHandler('connectMcp', connectMcp);
 peer.addHandler('disconnectMcp', disconnectMcp);
+peer.addHandler('getMcpStatus', getMcpStatus);
 
 // Notify main thread that worker is ready
 peer.notifiers.ready();

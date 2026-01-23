@@ -83,6 +83,8 @@ import { hsyncConnectionRuntime, hsyncPeerRuntime, hsyncInRuntime, hsyncOutRunti
 // AI nodes
 import { imageAiConfigRuntime, imageAiRuntime } from './ai/image-ai.js';
 import { llmConfigRuntime, llmRuntime } from './ai/llm.js';
+import { mcpOutputRuntime } from './ai/mcp-output.js';
+import { mcpInputRuntime } from './ai/mcp-input.js';
 
 // Output nodes
 import { canvasConfigRuntime, canvasRuntime } from './output/canvas.js';
@@ -191,6 +193,8 @@ import { audioStemsRuntime } from './audio/stems.js';
   // AI
   imageAiRuntime,
   llmRuntime,
+  mcpOutputRuntime,
+  mcpInputRuntime,
 
   // Output
   canvasRuntime,

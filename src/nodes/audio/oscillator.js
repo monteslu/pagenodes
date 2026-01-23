@@ -42,12 +42,41 @@ export const audioOscillatorRuntime = {
       });
     }
 
+    // Handle frequency ramp (for sweeps/glides)
+    if (msg.rampFrequency !== undefined) {
+      this.mainThread('rampAudioParam', {
+        param: 'frequency',
+        value: msg.rampFrequency,
+        duration: msg.rampTime || 0.1
+      });
+    }
+
+    // Handle detune ramp
+    if (msg.rampDetune !== undefined) {
+      this.mainThread('rampAudioParam', {
+        param: 'detune',
+        value: msg.rampDetune,
+        duration: msg.rampTime || 0.1
+      });
+    }
+
     // Handle PeriodicWave for custom waveforms (FFT-based synthesis)
     // realTable = real (cosine) coefficients, imagTable = imaginary (sine) coefficients
     if (Array.isArray(msg.realTable)) {
       this.mainThread('setPeriodicWave', {
         realTable: msg.realTable,
         imagTable: msg.imagTable || null
+      });
+    }
+
+    // Harmonics shorthand - array of harmonic amplitudes [fundamental, 2nd, 3rd, ...]
+    // Automatically builds imagTable for sine-phase harmonics
+    if (Array.isArray(msg.harmonics)) {
+      const imagTable = [0, ...msg.harmonics]; // DC offset of 0, then harmonics
+      const realTable = new Array(imagTable.length).fill(0); // All cosine terms zero
+      this.mainThread('setPeriodicWave', {
+        realTable,
+        imagTable
       });
     }
 

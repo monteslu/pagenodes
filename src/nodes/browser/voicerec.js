@@ -5,9 +5,15 @@ export const voicerecRuntime = {
   type: 'voicerec',
 
   onInit() {
+    // Listen for status updates from main thread
+    this.on('status', (status) => {
+      this.status(status);
+    });
+
+    this.status({ text: 'Starting...', fill: 'yellow' });
     this.mainThread('start', {
       lang: this.config.lang || 'en-US',
-      continuous: this.config.continuous || false,
+      continuous: this.config.continuous !== false,
       interimResults: this.config.interimResults || false
     });
   },
@@ -16,9 +22,10 @@ export const voicerecRuntime = {
     if (msg.payload === 'stop') {
       this.mainThread('stop', {});
     } else {
+      this.status({ text: 'Starting...', fill: 'yellow' });
       this.mainThread('start', {
         lang: this.config.lang || 'en-US',
-        continuous: this.config.continuous || false,
+        continuous: this.config.continuous !== false,
         interimResults: this.config.interimResults || false
       });
     }

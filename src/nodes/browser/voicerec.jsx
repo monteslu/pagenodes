@@ -63,34 +63,92 @@ export const voicerecNode = {
   },
 
   mainThread: (() => {
+    // Track recognition instance and session ID per node
     const voiceRecognitions = new Map();
+    const nodeSessions = new Map();  // nodeId -> current session ID
 
     return {
-      start(peerRef, nodeId, { lang, continuous, interimResults }, PN) {
+      start(peerRef, nodeId, { lang, continuous: _continuous, interimResults }, PN) {
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (!SpeechRecognition) return;
+        if (!SpeechRecognition) {
+          peerRef.current.methods.emitEvent(nodeId, 'status', { text: 'Not supported', fill: 'red' });
+          return;
+        }
+
+        // Create a new session ID - this invalidates any previous session's onend handlers
+        const sessionId = Date.now() + Math.random();
+        nodeSessions.set(nodeId, sessionId);
 
         // Stop existing recognition for this node
         if (voiceRecognitions.has(nodeId)) {
-          voiceRecognitions.get(nodeId).stop();
+          try {
+            voiceRecognitions.get(nodeId).stop();
+          } catch {
+            // Ignore - may already be stopped
+          }
+          voiceRecognitions.delete(nodeId);
         }
 
         const recognition = new SpeechRecognition();
         recognition.lang = lang;
-        recognition.continuous = continuous;
+        // Don't use continuous mode - use restart-on-end pattern instead (more reliable)
+        recognition.continuous = false;
         recognition.interimResults = interimResults;
+        recognition.maxAlternatives = 1;
+
+        recognition.onstart = () => {
+          // Only update status if this is still the active session
+          if (nodeSessions.get(nodeId) === sessionId) {
+            peerRef.current.methods.emitEvent(nodeId, 'status', { text: 'Listening', fill: 'green' });
+          }
+        };
 
         recognition.onresult = (event) => {
-          const result = event.results[event.results.length - 1];
+          // Only send results if this is still the active session
+          if (nodeSessions.get(nodeId) !== sessionId) return;
+
+          const result = event.results[0][0];
           peerRef.current.methods.sendResult(nodeId, {
-            payload: result[0].transcript,
-            confidence: result[0].confidence,
-            isFinal: result.isFinal
+            payload: result.transcript,
+            topic: 'voicerec',
+            confidence: result.confidence,
+            isFinal: true
           });
         };
 
         recognition.onerror = (event) => {
+          // Ignore errors from stale sessions
+          if (nodeSessions.get(nodeId) !== sessionId) return;
+
+          // 'no-speech' means silence timeout - just restart
+          if (event.error === 'no-speech') {
+            return;
+          }
+          // 'aborted' means something interrupted - will restart in onend
+          if (event.error === 'aborted') {
+            return;
+          }
           PN.error('Speech recognition error:', event.error);
+          peerRef.current.methods.emitEvent(nodeId, 'status', { text: event.error, fill: 'red' });
+        };
+
+        recognition.onend = () => {
+          // Only restart if this is still the active session
+          if (nodeSessions.get(nodeId) !== sessionId) {
+            return;  // Stale session, ignore
+          }
+
+          // Restart with small delay to prevent rapid loop
+          setTimeout(() => {
+            // Double-check we're still the active session after delay
+            if (nodeSessions.get(nodeId) === sessionId) {
+              try {
+                recognition.start();
+              } catch {
+                // May fail if already started or stopped, ignore
+              }
+            }
+          }, 100);
         };
 
         recognition.start();
@@ -98,9 +156,16 @@ export const voicerecNode = {
       },
 
       stop(peerRef, nodeId, _params, _PN) {
+        // Clear session to prevent any pending onend from restarting
+        nodeSessions.delete(nodeId);
         if (voiceRecognitions.has(nodeId)) {
-          voiceRecognitions.get(nodeId).stop();
+          try {
+            voiceRecognitions.get(nodeId).stop();
+          } catch {
+            // Ignore
+          }
           voiceRecognitions.delete(nodeId);
+          peerRef.current.methods.emitEvent(nodeId, 'status', { text: 'Stopped', fill: 'grey' });
         }
       }
     };

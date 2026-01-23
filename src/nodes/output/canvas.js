@@ -42,19 +42,35 @@ export const canvasRuntime = {
     }
 
     try {
-      // Send commands to UI and get canvas dataURL back
-      const dataUrl = await this.mainThreadCall('executeCanvasCommands', {
+      // Check if we have any output wires to avoid unnecessary image generation
+      const hasOutputWires = this.wires && this.wires[0] && this.wires[0].length > 0;
+
+      // Send commands to UI and get result back
+      const result = await this.mainThreadCall('executeCanvasCommands', {
         canvasId: this.id,
         commands: commands,
-        format: this.config.format || 'png',
+        format: hasOutputWires ? (this.config.format || 'png') : null,
         quality: this.config.quality || 0.92
       });
 
+      // Update status based on errors
+      if (result.errors && result.errors.length > 0) {
+        const errorCount = result.errors.length;
+        const firstError = result.errors[0];
+        this.status({
+          text: `${errorCount} error${errorCount > 1 ? 's' : ''}: ${firstError.command}`,
+          fill: 'red'
+        });
+      } else {
+        this.status({ text: 'OK', fill: 'green' });
+      }
+
       // Send canvas image to output (same format as camera)
-      if (dataUrl) {
-        this.send({ ...msg, payload: dataUrl });
+      if (result.dataUrl) {
+        this.send({ ...msg, payload: result.dataUrl });
       }
     } catch (err) {
+      this.status({ text: 'Error', fill: 'red' });
       this.error('Canvas command error: ' + err.message);
     }
   },

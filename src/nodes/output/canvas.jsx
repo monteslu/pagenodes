@@ -71,12 +71,20 @@ export const canvasNode = {
     },
 
     async executeCanvasCommands(peerRef, nodeId, params) {
-      await canvasManager.executeCommands(params.canvasId, params.commands);
+      const result = await canvasManager.executeCommands(params.canvasId, params.commands);
 
-      // Return dataURL like camera does
+      // Only generate dataURL if format is specified (indicates output wires exist)
       const { format, quality, canvasId } = params;
-      const mimeType = format === 'png' ? 'image/png' : 'image/jpeg';
-      return canvasManager.getDataURL(canvasId, mimeType, quality);
+      let dataUrl = null;
+      if (format) {
+        const mimeType = format === 'png' ? 'image/png' : 'image/jpeg';
+        dataUrl = canvasManager.getDataURL(canvasId, mimeType, quality);
+      }
+
+      return {
+        dataUrl,
+        errors: result.errors
+      };
     }
   },
 

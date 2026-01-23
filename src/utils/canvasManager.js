@@ -346,11 +346,14 @@ class CanvasManager {
   //   { command: 'fillRect', params: [x, y, w, h] }  - strict format
   //   { type: 'fillRect', x: 10, y: 10, width: 50, height: 50 }  - friendly format
   //   { cmd: 'fillRect', ... }  - alternative key
+  // Returns: { imageData, errors: [{command, message}] }
   async executeCommands(configId, commands) {
     const canvas = this.canvasRefs[configId];
+    const errors = [];
+
     if (!canvas) {
       logger.warn('Canvas: Canvas not found:', configId);
-      return;
+      return { imageData: null, errors: [{ command: 'init', message: 'Canvas not found' }] };
     }
 
     const ctx = canvas.getContext('2d');
@@ -482,11 +485,12 @@ class CanvasManager {
         }
       } catch (err) {
         logger.error('Canvas: Canvas command error:', command, err);
+        errors.push({ command, message: err.message });
       }
     }
 
-    // Return image data for output
-    return this.getImageData(configId);
+    // Return image data and any errors
+    return { imageData: this.getImageData(configId), errors };
   }
 }
 

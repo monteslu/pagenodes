@@ -108,6 +108,8 @@ import { hsyncConnectionNode, hsyncPeerNode, hsyncInNode, hsyncOutNode, hsyncP2P
 // AI nodes
 import { imageAiConfigNode, imageAiNode } from './ai/image-ai.jsx';
 import { llmConfigNode, llmNode } from './ai/llm.jsx';
+import { mcpOutputNode } from './ai/mcp-output.jsx';
+import { mcpInputNode } from './ai/mcp-input.jsx';
 
 // Output nodes
 import { canvasConfigNode, canvasNode } from './output/canvas.jsx';
@@ -215,6 +217,8 @@ import { audioStemsNode } from './audio/stems.jsx';
   // AI
   imageAiNode,
   llmNode,
+  mcpOutputNode,
+  mcpInputNode,
 
   // Output
   canvasNode,

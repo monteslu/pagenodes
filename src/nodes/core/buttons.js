@@ -1,26 +1,23 @@
 // Buttons node - Runtime implementation
-// Receives button press events from the Buttons panel
+// Receives button press events from the interactive button grid on the node
 
 export const buttonsRuntime = {
   type: 'buttons',
 
-  // Called when the node receives a button press from mainThread
-  fromMainThread(action, params) {
-    if (action === 'buttonPress') {
-      const { button } = params;
-
-      // Check filter if configured
-      if (this.config.filter) {
-        const allowedButtons = this.config.filter.split(',').map(b => b.trim());
-        if (!allowedButtons.includes(button)) {
-          return; // Filtered out
-        }
+  onInit() {
+    // Listen for buttonPress events from the UI
+    this.on('buttonPress', ({ button, state }) => {
+      // In press-only mode, only send on 'down'
+      // In both mode, send on both 'down' and 'up'
+      if (this.config.mode === 'press' && state === 'up') {
+        return; // Skip 'up' events in press-only mode
       }
 
       this.send({
         payload: button,
+        state,
         topic: 'buttons'
       });
-    }
+    });
   }
 };

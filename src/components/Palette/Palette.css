@@ -1,5 +1,5 @@
 .palette {
-  width: 150px;
+  width: 165px;
   background: var(--sidebar-bg);
   border-right: 1px solid var(--border-color);
   display: flex;

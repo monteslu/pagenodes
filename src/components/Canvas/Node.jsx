@@ -11,7 +11,7 @@ const createStatusPN = (status) => ({
   }
 });
 
-export function Node({ node, status, selected, isPending, hasErrors, onMouseDown, onDoubleClick, onPortMouseDown, onPortMouseUp, onPortMouseEnter, onPortMouseLeave, onStreamPortMouseDown, onStreamPortMouseUp, onStreamPortMouseEnter, onStreamPortMouseLeave, onInject, onFileDrop }) {
+export function Node({ node, status, selected, isPending, hasErrors, onMouseDown, onDoubleClick, onPortMouseDown, onPortMouseUp, onPortMouseEnter, onPortMouseLeave, onStreamPortMouseDown, onStreamPortMouseUp, onStreamPortMouseEnter, onStreamPortMouseLeave, onInject, onFileDrop, onNodeInteraction }) {
   const def = nodeRegistry.get(node._node.type);
   const [isDragOver, setIsDragOver] = useState(false);
 
@@ -68,6 +68,13 @@ export function Node({ node, status, selected, isPending, hasErrors, onMouseDown
     return def.renderStatusSVG(PN);
   }, [status, def]);
 
+  // Handler for interactive node body elements (buttons, sliders, etc.)
+  const handleBodyInteraction = useCallback((eventName, data) => {
+    if (onNodeInteraction) {
+      onNodeInteraction(node._node.id, eventName, data);
+    }
+  }, [node._node.id, onNodeInteraction]);
+
   const label = useMemo(() => {
     if (node._node.name) return node._node.name;
     if (def?.label) {
@@ -84,15 +91,17 @@ export function Node({ node, status, selected, isPending, hasErrors, onMouseDown
   const streamInputs = def?.getStreamInputs ? def.getStreamInputs(node) : (def?.streamInputs || 0);
   const streamOutputs = def?.getStreamOutputs ? def.getStreamOutputs(node) : (def?.streamOutputs || 0);
 
-  // Calculate height based on all ports
+  // Calculate height - use custom getNodeHeight if available, otherwise based on ports
   const hasAudioPorts = streamInputs > 0 || streamOutputs > 0;
-  const height = hasAudioPorts
+  const portBasedHeight = hasAudioPorts
     ? calcNodeHeightWithAudio(outputs, streamOutputs, inputs, streamInputs)
     : calcNodeHeight(outputs);
+  const height = def?.getNodeHeight ? def.getNodeHeight(node, portBasedHeight) : portBasedHeight;
 
-  // Calculate dynamic width based on label (only on canvas, not palette)
+  // Calculate dynamic width - use custom getNodeWidth if available, otherwise based on label
   const hasIcon = def?.icon && def?.faChar;
-  const width = calcNodeWidth(label, hasIcon);
+  const labelBasedWidth = calcNodeWidth(label, hasIcon);
+  const width = def?.getNodeWidth ? def.getNodeWidth(node, labelBasedWidth) : labelBasedWidth;
   const displayLabel = truncateLabel(label, hasIcon);
 
   return (
@@ -117,10 +126,12 @@ export function Node({ node, status, selected, isPending, hasErrors, onMouseDown
         hasErrors={hasErrors}
         showButton={true}
         width={width}
+        height={height}
         outputs={outputs}
         streamInputs={streamInputs}
         streamOutputs={streamOutputs}
         onButtonClick={handleButtonClick}
+        onBodyInteraction={handleBodyInteraction}
         onPortMouseDown={(e, portIndex, isOutput) => onPortMouseDown(e, node._node.id, portIndex, isOutput)}
         onPortMouseUp={(e, portIndex, isOutput) => onPortMouseUp(e, node._node.id, portIndex, isOutput)}
         onPortMouseEnter={(e, portIndex, isOutput) => onPortMouseEnter?.(e, node._node.id, portIndex, isOutput)}

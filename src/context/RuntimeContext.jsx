@@ -21,7 +21,6 @@ export function RuntimeProvider({ children }) {
   const [mcpStatus, setMcpStatus] = useState('disabled'); // disabled, connecting, connected, error
   const mcpMessagesRef = useRef([]); // Queue for mcp-output node messages
   const [hasCanvasNodes, setHasCanvasNodes] = useState(false);
-  const [hasButtonsNodes, setHasButtonsNodes] = useState(false)
   const { addMessage, addDownload, addError, clear, clearErrors, messages, errors } = useDebug();
   const { state: flowState, dispatch: flowDispatch } = useFlows();
 
@@ -959,7 +958,6 @@ export function RuntimeProvider({ children }) {
     // Check which special node types are being deployed
     const deployedTypes = new Set(flowNodes.map(n => n._node.type));
     setHasCanvasNodes(deployedTypes.has('canvas'));
-    setHasButtonsNodes(deployedTypes.has('buttons'));
 
     try {
       // Destroy previous audio graph before deploying new one
@@ -1071,18 +1069,24 @@ export function RuntimeProvider({ children }) {
     peerRef.current.methods.broadcastToType(nodeType, action, params);
   }, [isRunning]);
 
+  // Emit event to a specific node (for interactive UI elements like buttons/sliders)
+  const emitNodeEvent = useCallback((nodeId, eventName, data) => {
+    if (!peerRef.current || !isRunning) return;
+    peerRef.current.methods.emitEvent(nodeId, eventName, data);
+  }, [isRunning]);
+
   const value = {
     isReady,
     isRunning,
     nodeStatuses,
     mcpStatus,
     hasCanvasNodes,
-    hasButtonsNodes,
     deploy,
     inject,
     injectText,
     callMainThread,
     broadcastToType,
+    emitNodeEvent,
     stop,
     connectMcp,
     disconnectMcp

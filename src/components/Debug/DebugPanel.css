@@ -30,27 +30,41 @@
 
 .debug-toggle,
 .debug-clear {
-  padding: 4px 8px;
+  padding: 5px 10px;
   font-size: 11px;
   font-weight: 500;
-  border-radius: 3px;
+  border-radius: 4px;
   cursor: pointer;
-  border: 1px solid var(--border-color);
-  background: var(--bg-color);
+  border: 1px solid #555;
+  background: linear-gradient(to bottom, #4a4a4a 0%, #3a3a3a 50%, #2a2a2a 100%);
   color: var(--text-muted);
   transition: all 0.15s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
 }
 
 .debug-toggle:hover,
 .debug-clear:hover {
-  background: var(--hover-bg);
+  background: linear-gradient(to bottom, #555 0%, #454545 50%, #353535 100%);
   color: var(--text-color);
+  border-color: #666;
+}
+
+.debug-toggle:active,
+.debug-clear:active {
+  background: linear-gradient(to bottom, #2a2a2a 0%, #333 50%, #3a3a3a 100%);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .debug-toggle.active {
-  background: #4a9;
+  background: linear-gradient(to bottom, #5ba 0%, #4a9 50%, #398 100%);
   border-color: #3a8;
   color: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.debug-toggle.active:hover {
+  background: linear-gradient(to bottom, #6cb 0%, #5ba 50%, #4a9 100%);
 }
 
 .debug-input-bar {
@@ -76,19 +90,21 @@
 .debug-input-field {
   flex: 1 1 0;
   min-width: 0;
-  padding: 6px 8px;
+  padding: 6px 10px;
   font-size: 12px;
-  border: 1px solid var(--border-color);
-  border-radius: 3px;
-  background: var(--bg-color);
+  border: 1px solid #3a3a3a;
+  border-radius: 4px;
+  background: linear-gradient(to bottom, #1a1a1a 0%, #222 100%);
   color: var(--text-color);
   outline: none;
   height: 30px;
   box-sizing: border-box;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .debug-input-field:focus {
   border-color: #4a9;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3), 0 0 0 2px rgba(74, 153, 153, 0.2);
 }
 
 .debug-input-field:disabled {
@@ -103,21 +119,28 @@
 .debug-input-send {
   padding: 6px 12px;
   font-size: 14px;
-  border-radius: 3px;
+  border-radius: 4px;
   cursor: pointer;
   border: 1px solid #8aa8be;
-  background: #a6bbcf;
+  background: linear-gradient(to bottom, #c6dbe9 0%, #a6bbcf 50%, #96abbd 100%);
   color: #333;
   transition: all 0.15s ease;
   height: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
 .debug-input-send:hover:not(:disabled) {
-  background: #96abbd;
+  background: linear-gradient(to bottom, #d6ebf9 0%, #b6cbdf 50%, #a6bbcf 100%);
   border-color: #7a98ad;
+}
+
+.debug-input-send:active:not(:disabled) {
+  background: linear-gradient(to bottom, #96abbd 0%, #a6bbcf 50%, #b6cbdf 100%);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .debug-input-send:disabled {
@@ -160,12 +183,13 @@
 }
 
 .debug-message {
-  background: var(--bg-color);
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
+  background: linear-gradient(to bottom, #2a2a2a 0%, #222 100%);
+  border: 1px solid #3a3a3a;
+  border-radius: 5px;
   padding: 8px;
   margin-bottom: 6px;
   font-size: 11px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.03);
 }
 
 .debug-message-header {

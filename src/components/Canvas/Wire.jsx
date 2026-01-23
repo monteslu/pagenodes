@@ -11,31 +11,48 @@ function getNodeLabel(node, def) {
   return node._node.type;
 }
 
-// Calculate node height considering audio ports
+// Calculate node height considering audio ports and custom getNodeHeight
 function getNodeHeightWithDef(node, def) {
   const outputs = def?.getOutputs ? def.getOutputs(node) : (def?.outputs || 0);
   const inputs = def?.inputs || 0;
   const streamOutputs = def?.getStreamOutputs ? def.getStreamOutputs(node) : (def?.streamOutputs || 0);
   const streamInputs = def?.getStreamInputs ? def.getStreamInputs(node) : (def?.streamInputs || 0);
 
+  // Calculate port-based height
+  let portBasedHeight;
   if (streamOutputs > 0 || streamInputs > 0) {
-    return calcNodeHeightWithAudio(outputs, streamOutputs, inputs, streamInputs);
+    portBasedHeight = calcNodeHeightWithAudio(outputs, streamOutputs, inputs, streamInputs);
+  } else {
+    portBasedHeight = calcNodeHeight(outputs);
   }
-  return calcNodeHeight(outputs);
+
+  // Use custom height if node definition provides one (e.g., slider, button nodes)
+  if (def?.getNodeHeight) {
+    return def.getNodeHeight(node, portBasedHeight);
+  }
+  return portBasedHeight;
+}
+
+// Calculate node width considering custom getNodeWidth
+function getNodeWidthWithDef(node, def) {
+  if (def?.getNodeWidth) {
+    return def.getNodeWidth(node);
+  }
+  const label = getNodeLabel(node, def);
+  const hasIcon = def?.icon && def?.faChar;
+  return calcNodeWidth(label, hasIcon);
 }
 
 export function Wire({ sourceNode, sourcePort, targetNode, targetPort = 0, targetPos, selected, onMouseDown, onMouseUp, isTemp, isConnecting, isPending, isStream = false }) {
   const pathData = useMemo(() => {
     const sourceDef = nodeRegistry.get(sourceNode._node.type);
-    const sourceLabel = getNodeLabel(sourceNode, sourceDef);
-    const sourceHasIcon = sourceDef?.icon && sourceDef?.faChar;
-    const sourceWidth = calcNodeWidth(sourceLabel, sourceHasIcon);
+    const sourceWidth = getNodeWidthWithDef(sourceNode, sourceDef);
     const sourceHeight = getNodeHeightWithDef(sourceNode, sourceDef);
 
     // Get source port position based on wire type
     const sourcePos = isStream
       ? getStreamPortPosition(sourceNode, sourcePort, true, sourceDef, sourceHeight, sourceWidth)
-      : getPortPosition(sourceNode, sourcePort, true, sourceHeight, sourceWidth);
+      : getPortPosition(sourceNode, sourcePort, true, sourceHeight, sourceWidth, sourceDef);
 
     let endPos;
     if (targetNode && !targetPos) {

@@ -11,7 +11,6 @@ import { NodeEditor } from './components/Editor';
 import { DebugPanel } from './components/Debug';
 import { InfoPanel } from './components/Info';
 import { CanvasPanel } from './components/Canvases/CanvasPanel';
-import { ButtonsPanel } from './components/Buttons';
 import { generateId } from './utils/id';
 import { storage } from './utils/storage';
 import { nodeRegistry } from './nodes';
@@ -27,7 +26,7 @@ function AppContent() {
   const { state: editor, dispatch: editorDispatch } = useEditor();
   const { dispatch: flowDispatch } = useFlows();
   const { messages, downloads } = useDebug();
-  const { inject: runtimeInject, callMainThread, isRunning, isReady, deploy, hasCanvasNodes, hasButtonsNodes } = useRuntime();
+  const { inject: runtimeInject, callMainThread, isRunning, isReady, deploy, hasCanvasNodes, emitNodeEvent } = useRuntime();
   const { state: flowState } = useFlows();
   const { addNode, deleteSelected, nodes } = useNodes();
 
@@ -274,8 +273,31 @@ function AppContent() {
     }
   }, [isRunning, callMainThread]);
 
-  // Get undo/redo from flow context
-  const { undo, redo, canUndo, canRedo } = useFlows();
+  // Get undo/redo and runtime update from flow context
+  const { undo, redo, canUndo, canRedo, updateNodeRuntime } = useFlows();
+
+  // Handle interactive node events (buttons, sliders, etc.)
+  const handleNodeInteraction = useCallback((nodeId, eventName, data) => {
+    // Update visual state if requested (for sliders, buttons, etc.)
+    if (data?.updateValue) {
+      const runtimeProps = {};
+      if (data.value !== undefined) {
+        runtimeProps._currentValue = data.value;
+      }
+      if (data.activeButton !== undefined) {
+        runtimeProps._activeButton = data.activeButton;
+      }
+      if (Object.keys(runtimeProps).length > 0) {
+        updateNodeRuntime(nodeId, runtimeProps);
+      }
+    }
+
+    if (!isRunning) {
+      logger.warn('Runtime not running - deploy first');
+      return;
+    }
+    emitNodeEvent(nodeId, eventName, data);
+  }, [isRunning, emitNodeEvent, updateNodeRuntime]);
 
   // Copy selected nodes
   const copyNodes = useCallback(() => {
@@ -422,9 +444,8 @@ function AppContent() {
   // Compute effective tab - fall back to debug if selected tab is unavailable
   const effectiveTab = useMemo(() => {
     if (sidebarTab === 'canvases' && !hasCanvasNodes) return 'debug';
-    if (sidebarTab === 'buttons' && !hasButtonsNodes) return 'debug';
     return sidebarTab;
-  }, [sidebarTab, hasCanvasNodes, hasButtonsNodes]);
+  }, [sidebarTab, hasCanvasNodes]);
 
   return (
     <div className="app">
@@ -436,7 +457,7 @@ function AppContent() {
           onDrop={handleDrop}
           onDragOver={handleDragOver}
         >
-          <Canvas onEditNode={handleEditNode} onInject={handleInject} onFileDrop={handleFileDrop} />
+          <Canvas onEditNode={handleEditNode} onInject={handleInject} onFileDrop={handleFileDrop} onNodeInteraction={handleNodeInteraction} />
         </div>
         <div
           className={`resize-handle ${isResizing ? 'resizing' : ''}`}
@@ -468,14 +489,6 @@ function AppContent() {
                 Canvases
               </button>
             )}
-            {hasButtonsNodes && (
-              <button
-                className={`sidebar-tab ${effectiveTab === 'buttons' ? 'active' : ''}`}
-                onClick={() => setSidebarTab('buttons')}
-              >
-                Buttons
-              </button>
-            )}
           </div>
           {effectiveTab === 'debug' && <DebugPanel />}
           {effectiveTab === 'info' && <InfoPanel onEditNode={handleEditNode} />}
@@ -485,7 +498,6 @@ function AppContent() {
               <CanvasPanel />
             </div>
           )}
-          {hasButtonsNodes && effectiveTab === 'buttons' && <ButtonsPanel />}
         </div>
 
         {/* Node editor dialog */}

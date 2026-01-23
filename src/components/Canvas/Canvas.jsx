@@ -12,7 +12,7 @@ import { nodeRegistry } from '../../nodes';
 import { logger } from '../../utils/logger';
 import './Canvas.css';
 
-export function Canvas({ onEditNode, onInject, onFileDrop }) {
+export function Canvas({ onEditNode, onInject, onFileDrop, onNodeInteraction }) {
   const svgRef = useRef(null);
   const containerRef = useRef(null);
   const { state: editor, dispatch } = useEditor();
@@ -529,6 +529,7 @@ export function Canvas({ onEditNode, onInject, onFileDrop }) {
                 onStreamPortMouseLeave={handleStreamPortMouseLeave}
                 onInject={onInject}
                 onFileDrop={onFileDrop}
+                onNodeInteraction={onNodeInteraction}
               />
             ))}
           </g>

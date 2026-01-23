@@ -1,1 +1,0 @@
-export { ButtonsPanel } from './ButtonsPanel';

@@ -59,6 +59,7 @@ import { triggerNode } from './core/trigger.jsx';
 import { notifyNode } from './core/notify.jsx';
 import { catchNode } from './core/catch.jsx';
 import { buttonsNode } from './core/buttons.jsx';
+import { sliderNode } from './core/slider.jsx';
 
 // Logic nodes
 import { switchNode } from './logic/switch.jsx';
@@ -149,6 +150,7 @@ import { audioStemsNode } from './audio/stems.jsx';
   notifyNode,
   catchNode,
   buttonsNode,
+  sliderNode,
 
   // Logic
   switchNode,

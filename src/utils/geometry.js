@@ -7,7 +7,7 @@ export const MIN_NODE_HEIGHT = 30;
 export const STEP_HEIGHT = 15;
 export const PORT_SIZE = 10;
 export const WIRE_CURVE_OFFSET = 60;
-export const CHAR_WIDTH = 6; // Approximate width per character at font-size 10
+export const CHAR_WIDTH = 7; // Approximate width per character at font-size 12
 
 // Audio port constants
 export const AUDIO_PORT_OFFSET = 8; // Vertical offset between message and audio ports
@@ -170,18 +170,21 @@ export function getWirePath(sourcePos, targetPos) {
 }
 
 // Get wire control points for more control
+// Wire extends straight out from port before curving
+const WIRE_PORT_EXTEND = 8; // How far wire extends straight out from port
+
 export function getWireControlPoints(sourcePos, targetPos) {
   const dx = targetPos.x - sourcePos.x;
   const controlOffset = Math.max(WIRE_CURVE_OFFSET, Math.abs(dx) * 0.4);
 
   return {
-    x1: sourcePos.x,
+    x1: sourcePos.x + WIRE_PORT_EXTEND,  // Start slightly right of output port
     y1: sourcePos.y,
     x2: sourcePos.x + controlOffset,
     y2: sourcePos.y,
     x3: targetPos.x - controlOffset,
     y3: targetPos.y,
-    x4: targetPos.x,
+    x4: targetPos.x - WIRE_PORT_EXTEND,  // End slightly left of input port
     y4: targetPos.y
   };
 }

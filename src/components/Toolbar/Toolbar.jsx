@@ -10,6 +10,7 @@ import { ImportDialog } from './ImportDialog';
 import { ConfigNodesDialog } from './ConfigNodesDialog';
 import { ConfirmDialog } from './ConfirmDialog';
 import { SettingsDialog } from './SettingsDialog';
+import { FlowEditDialog } from './FlowEditDialog';
 import { FlowMinimap } from './FlowMinimap';
 import { logger } from '../../utils/logger';
 import './Toolbar.css';
@@ -22,8 +23,8 @@ export function Toolbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [showImportDialog, setShowImportDialog] = useState(false);
   const [showConfigDialog, setShowConfigDialog] = useState(false);
-  const [showDeleteFlowDialog, setShowDeleteFlowDialog] = useState(false);
-  const [showSettingsDialog, setShowSettingsDialog] = useState(false);
+    const [showSettingsDialog, setShowSettingsDialog] = useState(false);
+  const [showFlowEditDialog, setShowFlowEditDialog] = useState(false);
   const menuRef = useRef(null);
 
   // Close menu when clicking outside
@@ -52,8 +53,19 @@ export function Toolbar() {
     // Get list of error node IDs to exclude from runtime
     const errorNodeIds = Array.from(errors.keys());
 
-    // Deploy both nodes and config nodes, passing error IDs to skip
-    deploy(flowState.nodes, flowState.configNodes, errorNodeIds);
+    // Get list of disabled flow IDs
+    const disabledFlowIds = flowState.flows.filter(f => f.disabled).map(f => f.id);
+
+    // Get node IDs that belong to disabled flows
+    const disabledFlowNodeIds = Object.values(flowState.nodes)
+      .filter(node => disabledFlowIds.includes(node._node.z))
+      .map(node => node._node.id);
+
+    // Combine error and disabled node IDs
+    const skipNodeIds = [...errorNodeIds, ...disabledFlowNodeIds];
+
+    // Deploy both nodes and config nodes, passing skip IDs
+    deploy(flowState.nodes, flowState.configNodes, skipNodeIds);
     dispatch({ type: 'MARK_CLEAN' });
 
     // Save flows to storage (including config nodes)
@@ -99,6 +111,21 @@ export function Toolbar() {
     flowDispatch({ type: 'ADD_FLOW', flow: newFlow });
     dispatch({ type: 'SET_ACTIVE_FLOW', id: newFlow.id });
   }, [flowState.flows.length, flowDispatch, dispatch]);
+
+  const handleFlowEdit = useCallback((updates) => {
+    flowDispatch({ type: 'UPDATE_FLOW', id: editor.activeFlow, updates });
+    dispatch({ type: 'MARK_DIRTY' });
+    setShowFlowEditDialog(false);
+  }, [flowDispatch, dispatch, editor.activeFlow]);
+
+  const handleFlowDelete = useCallback(() => {
+    const otherFlow = flowState.flows.find(f => f.id !== editor.activeFlow);
+    if (otherFlow) {
+      dispatch({ type: 'SET_ACTIVE_FLOW', id: otherFlow.id });
+    }
+    flowDispatch({ type: 'DELETE_FLOW', id: editor.activeFlow });
+    setShowFlowEditDialog(false);
+  }, [flowState.flows, editor.activeFlow, flowDispatch, dispatch]);
 
   const handleExport = useCallback(() => {
     // Convert nodes, config nodes, and flows to export format
@@ -233,14 +260,10 @@ export function Toolbar() {
               </button>
               <div className="dropdown-divider" />
               <button
-                className="dropdown-item dropdown-item-danger"
-                onClick={() => {
-                  setShowDeleteFlowDialog(true);
-                  setMenuOpen(false);
-                }}
-                disabled={flowState.flows.length <= 1}
+                className="dropdown-item"
+                onClick={() => { setShowFlowEditDialog(true); setMenuOpen(false); }}
               >
-                Delete Flow ({flowState.flows.find(f => f.id === editor.activeFlow)?.label})
+                Edit Flow ({flowState.flows.find(f => f.id === editor.activeFlow)?.label})
               </button>
               <div className="dropdown-divider" />
               <button
@@ -292,8 +315,13 @@ export function Toolbar() {
           {flowState.flows.map(flow => (
             <div
               key={flow.id}
-              className={`toolbar-tab-wrapper ${editor.activeFlow === flow.id ? 'active' : ''}`}
+              className={`toolbar-tab-wrapper ${editor.activeFlow === flow.id ? 'active' : ''} ${flow.disabled ? 'disabled' : ''}`}
               onClick={() => dispatch({ type: 'SET_ACTIVE_FLOW', id: flow.id })}
+              onDoubleClick={() => {
+                dispatch({ type: 'SET_ACTIVE_FLOW', id: flow.id });
+                setShowFlowEditDialog(true);
+              }}
+              title={flow.disabled ? `${flow.label} (disabled)` : flow.label}
             >
               <div className="toolbar-tab-label">{flow.label}</div>
               <FlowMinimap
@@ -364,28 +392,22 @@ export function Toolbar() {
         />
       )}
 
-      {showDeleteFlowDialog && (
-        <ConfirmDialog
-          title="Delete Flow"
-          message={`Are you sure you want to delete "${flowState.flows.find(f => f.id === editor.activeFlow)?.label}" and all its nodes? This cannot be undone.`}
-          confirmLabel="Delete"
-          danger
-          onCancel={() => setShowDeleteFlowDialog(false)}
-          onConfirm={() => {
-            const otherFlow = flowState.flows.find(f => f.id !== editor.activeFlow);
-            if (otherFlow) {
-              dispatch({ type: 'SET_ACTIVE_FLOW', id: otherFlow.id });
-            }
-            flowDispatch({ type: 'DELETE_FLOW', id: editor.activeFlow });
-            setShowDeleteFlowDialog(false);
-          }}
-        />
-      )}
-
+      
       {showSettingsDialog && (
         <SettingsDialog
           onClose={() => setShowSettingsDialog(false)}
           onSettingsChange={handleSettingsChange}
+        />
+      )}
+
+      {showFlowEditDialog && (
+        <FlowEditDialog
+          flow={flowState.flows.find(f => f.id === editor.activeFlow)}
+          nodes={flowState.nodes}
+          onSave={handleFlowEdit}
+          onClose={() => setShowFlowEditDialog(false)}
+          onDelete={handleFlowDelete}
+          canDelete={flowState.flows.length > 1}
         />
       )}
     </div>

@@ -102,21 +102,11 @@
 
 .port {
   cursor: crosshair;
-  stroke: #555;
-  stroke-width: 1;
   transition: fill 0.15s ease, stroke 0.15s ease, transform 0.1s ease;
 }
 
-.port-input {
-  fill: #ddd;
-}
-
-.port-output {
-  fill: #ddd;
-}
-
 .port:hover {
-  fill: #ff9900;
+  fill: #cc6600;
   stroke: #333;
   stroke-width: 2;
 }

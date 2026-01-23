@@ -17,8 +17,8 @@ export function PaletteNode({ nodeDef, onTouchDrag }) {
     ? calcNodeHeightWithAudio(outputs, streamOutputs, inputs, streamInputs)
     : calcNodeHeight(outputs);
 
-  // Add padding for ports
-  const svgWidth = PALETTE_NODE_WIDTH + 20;
+  // Add padding for ports (extra space for larger ports extending beyond node body)
+  const svgWidth = PALETTE_NODE_WIDTH + 30;
   const svgHeight = height + 4;
 
   // Build tooltip text
@@ -103,9 +103,9 @@ export function PaletteNode({ nodeDef, onTouchDrag }) {
 
   const handleDragStart = useCallback((e) => {
     // Store the offset within the node shape where drag started
-    // Account for SVG viewBox offset (-10, -2) - the node shape starts 10px from left, 2px from top
+    // Account for SVG viewBox offset (-15, -2) - the node shape starts 15px from left, 2px from top
     const rect = e.currentTarget.getBoundingClientRect();
-    const offsetX = e.clientX - rect.left - 10;
+    const offsetX = e.clientX - rect.left - 15;
     const offsetY = e.clientY - rect.top - 2;
 
     e.dataTransfer.setData('nodeType', nodeDef.type);
@@ -127,7 +127,7 @@ export function PaletteNode({ nodeDef, onTouchDrag }) {
       <svg
         width={svgWidth}
         height={svgHeight}
-        viewBox={`-10 -2 ${svgWidth} ${svgHeight}`}
+        viewBox={`-15 -2 ${svgWidth} ${svgHeight}`}
       >
         <NodeShape
           def={nodeDef}

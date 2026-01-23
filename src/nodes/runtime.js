@@ -34,6 +34,7 @@ import { notifyRuntime } from './core/notify.js';
 import { commentRuntime } from './core/comment.js';
 import { catchRuntime } from './core/catch.js';
 import { buttonsRuntime } from './core/buttons.js';
+import { sliderRuntime } from './core/slider.js';
 
 // Logic nodes
 import { switchRuntime } from './logic/switch.js';
@@ -125,6 +126,7 @@ import { audioStemsRuntime } from './audio/stems.js';
   commentRuntime,
   catchRuntime,
   buttonsRuntime,
+  sliderRuntime,
 
   // Logic
   switchRuntime,

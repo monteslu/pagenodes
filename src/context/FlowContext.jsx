@@ -99,6 +99,14 @@ function flowReducer(state, action) {
         flows: [...state.flows, action.flow]
       };
 
+    case 'UPDATE_FLOW':
+      return {
+        ...state,
+        flows: state.flows.map(f =>
+          f.id === action.id ? { ...f, ...action.updates } : f
+        )
+      };
+
     case 'DELETE_FLOW': {
       // Don't delete the last flow
       if (state.flows.length <= 1) return state;
@@ -191,6 +199,24 @@ function flowReducer(state, action) {
             [action.id]: {
               ...state.configNodes[action.id],
               _node: { ...state.configNodes[action.id]._node, ...action.nodeProps }
+            }
+          }
+        };
+      }
+      return state;
+    }
+
+    case 'UPDATE_NODE_RUNTIME': {
+      // Update runtime-only properties on node wrapper (not _node)
+      // Used for live UI updates like slider position, doesn't affect history
+      if (state.nodes[action.id]) {
+        return {
+          ...state,
+          nodes: {
+            ...state.nodes,
+            [action.id]: {
+              ...state.nodes[action.id],
+              ...action.props
             }
           }
         };
@@ -462,14 +488,20 @@ export function FlowProvider({ children }) {
     baseDispatch({ type: 'REDO' });
   }, []);
 
+  // Update runtime-only node properties (for live UI feedback, no history)
+  const updateNodeRuntime = useCallback((id, props) => {
+    baseDispatch({ type: 'UPDATE_NODE_RUNTIME', id, props });
+  }, []);
+
   const value = useMemo(() => ({
     state,
     dispatch,
     undo,
     redo,
     canUndo: state._historyPosition >= 0,
-    canRedo: state._historyPosition < state._history.length - 1
-  }), [state, dispatch, undo, redo]);
+    canRedo: state._historyPosition < state._history.length - 1,
+    updateNodeRuntime
+  }), [state, dispatch, undo, redo, updateNodeRuntime]);
 
   return (
     <FlowContext.Provider value={value}>

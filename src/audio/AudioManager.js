@@ -1531,10 +1531,14 @@ class AudioManager {
   /**
    * Handle mainThread calls from runtime nodes
    */
-  handleMainThreadCall(nodeId, action, params) {
+  async handleMainThreadCall(nodeId, action, params) {
     switch (action) {
-      case 'createAudioNode':
-        return this.createNode(nodeId, params.nodeType, params.options);
+      case 'createAudioNode': {
+        // createNode returns nodeData with non-cloneable AudioNodes
+        // Return a simple success indicator instead
+        const result = await this.createNode(nodeId, params.nodeType, params.options);
+        return result ? { success: true, nodeId } : { success: false };
+      }
 
       case 'setAudioParam':
         return this.setParam(nodeId, params.param, params.value);
@@ -1649,6 +1653,19 @@ class AudioManager {
 
       case 'controlStems':
         return this.controlStems(nodeId, params.action, params);
+
+      case 'getAudioContextState':
+        return this.ctx?.state || null;
+
+      case 'hasActiveSources': {
+        // Check if any source nodes are currently playing
+        for (const [, nodeData] of this.nodes) {
+          if (nodeData.started) {
+            return true;
+          }
+        }
+        return false;
+      }
 
       default:
         logger.warn(`Unknown audio action: ${action}`);

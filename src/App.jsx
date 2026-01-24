@@ -100,15 +100,20 @@ function AppContent() {
         if (savedFlows && savedFlows.flows && savedFlows.flows.length > 0) {
           // Convert saved nodes to internal format
           // Check if each node is a config node and strip z/x/y if so
+          // Also filter out runtime-only properties (starting with _) that may have been saved
           const internalNodes = (savedFlows.nodes || []).map(node => {
             const { id, type, name, z, x, y, wires, streamWires, ...config } = node;
+            // Filter out runtime-only properties (e.g., _currentValue, _activeButton)
+            const cleanConfig = Object.fromEntries(
+              Object.entries(config).filter(([key]) => !key.startsWith('_'))
+            );
             const nodeDef = nodeRegistry.get(type);
             const isConfigNode = nodeDef?.category === 'config';
             // Config nodes shouldn't have z, x, y - they don't render on canvas
             if (isConfigNode) {
               return {
                 _node: { id, type, name: name || '', wires: wires || [] },
-                ...config
+                ...cleanConfig
               };
             }
             return {
@@ -116,16 +121,20 @@ function AppContent() {
                 id, type, name: name || '', z, x: x || 0, y: y || 0, wires: wires || [],
                 ...(streamWires ? { streamWires } : {})
               },
-              ...config
+              ...cleanConfig
             };
           });
 
           // Convert saved config nodes to internal format
           const internalConfigNodes = (savedFlows.configNodes || []).map(node => {
             const { id, type, name, ...config } = node;
+            // Filter out runtime-only properties
+            const cleanConfig = Object.fromEntries(
+              Object.entries(config).filter(([key]) => !key.startsWith('_'))
+            );
             return {
               _node: { id, type, name: name || '' },
-              ...config
+              ...cleanConfig
             };
           });
 

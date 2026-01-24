@@ -248,6 +248,11 @@ class RuntimeNode {
   }
 
   receive(msg) {
+    // Clear error status when node receives new input
+    if (this._hasErrorStatus) {
+      this._hasErrorStatus = false;
+      this.status({});
+    }
     try {
       if (this.onInput) {
         const result = this.onInput(msg);
@@ -271,6 +276,10 @@ class RuntimeNode {
 
   error(text, msg, errorObj) {
     peer.notifiers.log({ nodeId: this.id, level: 'error', text });
+    // Set error status on the node
+    this._hasErrorStatus = true;
+    const errorText = typeof text === 'string' ? text : (text?.message || 'error');
+    this.status({ fill: 'red', shape: 'dot', text: errorText });
     // Route error to catch nodes
     handleError(this, text, msg, errorObj || (text instanceof Error ? text : null));
   }
@@ -687,11 +696,18 @@ function handleMainThreadResult(nodeId, result) {
 
 /**
  * Handle events from main thread for specific node types
+ * Special handling for 'error' events - route to node.error() for catch node support
  */
 function handleMainThreadEvent(nodeId, event, data) {
   const node = nodes.get(nodeId);
   if (node) {
-    node.emit(event, data);
+    // Route 'error' events through node.error() so catch nodes can handle them
+    if (event === 'error') {
+      const errorMsg = typeof data === 'string' ? data : (data?.message || 'Unknown error');
+      node.error(errorMsg, null, new Error(errorMsg));
+    } else {
+      node.emit(event, data);
+    }
   }
 }
 
@@ -883,12 +899,66 @@ function connectMcp(options) {
         return await peer.methods.mcpSendMessage(payload, topic);
       });
 
-      // Register this client with the MCP server
-      if (mcpClientUrl) {
-        mcpPeer.methods.registerClient({ url: mcpClientUrl }).catch(err => {
-          PN.warn('Failed to register client with MCP server:', err);
+      // Register this device with the MCP server (Ainura multi-device architecture)
+      // Just send node names - Claude uses get_node_details for implementation specifics
+      peer.methods.mcpGetState().then(state => {
+        const nodeTypes = (state.nodeCatalog || []).map(n => n.type);
+
+        // Detect environment and build meta info for user identification
+        // Browser: userAgent helps identify Chrome vs Firefox, etc.
+        // Node/Electron: hostname helps identify the machine
+        // Note: In web workers, we detect Node.js/Electron via globalThis.process
+        const nodeProcess = typeof globalThis !== 'undefined' ? globalThis.process : undefined;
+        const isBrowser = typeof navigator !== 'undefined';
+        const isNode = nodeProcess?.versions?.node;
+        const isElectron = nodeProcess?.versions?.electron;
+
+        let deviceType = 'browser';
+        const meta = { runtime: 'pagenodes' };
+
+        if (isElectron) {
+          deviceType = 'electron';
+          // Electron has access to Node.js APIs - hostname via globalThis
+          if (typeof globalThis !== 'undefined' && globalThis.require) {
+            try {
+              const os = globalThis.require('os');
+              meta.hostname = os.hostname();
+            } catch { /* ignore if os not available */ }
+          }
+          if (typeof navigator !== 'undefined') {
+            meta.userAgent = navigator.userAgent;
+          }
+        } else if (isNode) {
+          deviceType = 'nodejs';
+          if (typeof globalThis !== 'undefined' && globalThis.require) {
+            try {
+              const os = globalThis.require('os');
+              meta.hostname = os.hostname();
+            } catch { /* ignore if os not available */ }
+          }
+        } else if (isBrowser) {
+          meta.userAgent = navigator.userAgent;
+        }
+
+        mcpPeer.methods.registerDevice({
+          type: deviceType,
+          name: mcpClientUrl ? new URL(mcpClientUrl).hostname : `PageNodes ${deviceType}`,
+          description: `PageNodes ${deviceType} instance`,
+          url: mcpClientUrl || null,
+          nodes: nodeTypes,  // Just the names - details come from get_node_details
+          meta
+        }).catch(err => {
+          // Fall back to legacy registration for older MCP servers
+          PN.warn('registerDevice failed, trying legacy registerClient:', err.message);
+          mcpPeer.methods.registerClient({ url: mcpClientUrl }).catch(err2 => {
+            PN.warn('Failed to register with MCP server:', err2);
+          });
         });
-      }
+      }).catch(err => {
+        PN.warn('Failed to get state for device registration:', err);
+        // Still try to register with basic info
+        mcpPeer.methods.registerClient({ url: mcpClientUrl }).catch(() => {});
+      });
 
       peer.notifiers.mcpStatus({ status: 'connected' });
       broadcastMcpStatus('connected');

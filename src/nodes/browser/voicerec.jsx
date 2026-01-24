@@ -72,6 +72,7 @@ export const voicerecNode = {
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         if (!SpeechRecognition) {
           peerRef.current.methods.emitEvent(nodeId, 'status', { text: 'Not supported', fill: 'red' });
+          peerRef.current.methods.emitEvent(nodeId, 'error', 'Speech recognition not supported');
           return;
         }
 
@@ -130,6 +131,7 @@ export const voicerecNode = {
           }
           PN.error('Speech recognition error:', event.error);
           peerRef.current.methods.emitEvent(nodeId, 'status', { text: event.error, fill: 'red' });
+          peerRef.current.methods.emitEvent(nodeId, 'error', event.error);
         };
 
         recognition.onend = () => {

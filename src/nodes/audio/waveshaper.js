@@ -121,8 +121,12 @@ export const audioWaveShaperRuntime = {
       needsUpdate = true;
     }
 
-    if (msg.amount !== undefined) {
-      amount = Math.max(0, Math.min(100, msg.amount));
+    // amount - payload is treated as amount (primary param)
+    const newAmount = msg.amount !== undefined ? msg.amount :
+                      (typeof msg.payload === 'number' ? msg.payload : undefined);
+
+    if (newAmount !== undefined) {
+      amount = Math.max(0, Math.min(100, newAmount));
       needsUpdate = true;
     }
 

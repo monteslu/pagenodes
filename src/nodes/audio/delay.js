@@ -10,7 +10,7 @@
  *                  +-- fbGain -+
  */
 export const audioDelayRuntime = {
-  type: 'delay',
+  type: 'audiodelay',
 
   onInit() {
     // Create the delay effect on the main thread
@@ -27,18 +27,21 @@ export const audioDelayRuntime = {
   onInput(msg) {
     const rampTime = msg.rampTime;
 
-    // Handle delay time changes
-    if (msg.delayTime !== undefined) {
+    // Handle delay time changes - payload is treated as delayTime (primary param)
+    const delayTime = msg.delayTime !== undefined ? msg.delayTime :
+                      (typeof msg.payload === 'number' ? msg.payload : undefined);
+
+    if (delayTime !== undefined) {
       if (rampTime) {
         this.mainThread('rampDelayParam', {
           param: 'delayTime',
-          value: msg.delayTime,
+          value: delayTime,
           duration: rampTime
         });
       } else {
         this.mainThread('setDelayParam', {
           param: 'delayTime',
-          value: msg.delayTime
+          value: delayTime
         });
       }
     }

@@ -69,11 +69,16 @@ export function Toolbar() {
     dispatch({ type: 'MARK_CLEAN' });
 
     // Save flows to storage (including config nodes)
+    // Filter out runtime-only properties (starting with _) from config
     const flowConfig = {
       flows: flowState.flows,
       nodes: Object.values(flowState.nodes).map(node => {
         const { _node, ...config } = node;
-        return { ..._node, ...config };
+        // Filter out runtime-only properties (e.g., _currentValue, _activeButton)
+        const cleanConfig = Object.fromEntries(
+          Object.entries(config).filter(([key]) => !key.startsWith('_'))
+        );
+        return { ..._node, ...cleanConfig };
       }),
       configNodes: Object.values(flowState.configNodes).map(node => {
         const { _node, users: _users, ...config } = node;

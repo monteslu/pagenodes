@@ -7,14 +7,14 @@
  * - 1 audio stream output
  */
 export const audioBufferNode = {
-  type: 'buffer',
+  type: 'audiobuffer',
   category: 'audio',
   description: 'Plays audio from files or samples',
   relatedDocs: () => [
     { label: 'AudioBufferSourceNode (MDN)', url: 'https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode' },
     { label: 'AudioBuffer (MDN)', url: 'https://developer.mozilla.org/en-US/docs/Web/API/AudioBuffer' }
   ],
-  label: (node) => node._node.name || 'buffer',
+  label: (node) => node._node.name || 'audiobuffer',
   color: '#2d9a2d',  // Green for audio nodes
   fontColor: '#fff',  // White text for contrast
   icon: true,

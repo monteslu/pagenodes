@@ -21,7 +21,7 @@ describe('geometry constants', () => {
     expect(NODE_WIDTH).toBe(100);
     expect(NODE_HEIGHT).toBe(30);
     expect(MIN_NODE_HEIGHT).toBe(30);
-    expect(STEP_HEIGHT).toBe(15);
+    expect(STEP_HEIGHT).toBe(20);
   });
 });
 
@@ -104,11 +104,13 @@ describe('getWirePath', () => {
 });
 
 describe('getWireControlPoints', () => {
-  it('returns all 4 control points', () => {
+  it('returns all 4 control points with port extension offset', () => {
     const points = getWireControlPoints({ x: 0, y: 0 }, { x: 100, y: 50 });
-    expect(points).toHaveProperty('x1', 0);
+    // x1 is offset by WIRE_PORT_EXTEND (8) from source
+    expect(points).toHaveProperty('x1', 8);
     expect(points).toHaveProperty('y1', 0);
-    expect(points).toHaveProperty('x4', 100);
+    // x4 is offset by -WIRE_PORT_EXTEND from target
+    expect(points).toHaveProperty('x4', 92);
     expect(points).toHaveProperty('y4', 50);
   });
 

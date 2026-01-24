@@ -58,17 +58,19 @@ export function Wire({ sourceNode, sourcePort, targetNode, targetPort = 0, targe
     if (targetNode && !targetPos) {
       // Connected to a target node (saved wire)
       const targetDef = nodeRegistry.get(targetNode._node.type);
+      const targetWidth = getNodeWidthWithDef(targetNode, targetDef);
       const targetHeight = getNodeHeightWithDef(targetNode, targetDef);
       endPos = isStream
-        ? getStreamPortPosition(targetNode, targetPort, false, targetDef, targetHeight)
-        : getPortPosition(targetNode, targetPort, false, targetHeight, undefined, targetDef);
+        ? getStreamPortPosition(targetNode, targetPort, false, targetDef, targetHeight, targetWidth)
+        : getPortPosition(targetNode, targetPort, false, targetHeight, targetWidth, targetDef);
     } else if (targetNode && targetPos) {
       // Temp wire hovering over a valid input - snap to port
       const targetDef = nodeRegistry.get(targetNode._node.type);
+      const targetWidth = getNodeWidthWithDef(targetNode, targetDef);
       const targetHeight = getNodeHeightWithDef(targetNode, targetDef);
       endPos = isStream
-        ? getStreamPortPosition(targetNode, targetPort, false, targetDef, targetHeight)
-        : getPortPosition(targetNode, targetPort, false, targetHeight, undefined, targetDef);
+        ? getStreamPortPosition(targetNode, targetPort, false, targetDef, targetHeight, targetWidth)
+        : getPortPosition(targetNode, targetPort, false, targetHeight, targetWidth, targetDef);
     } else if (targetPos) {
       // Temp wire following mouse
       endPos = targetPos;

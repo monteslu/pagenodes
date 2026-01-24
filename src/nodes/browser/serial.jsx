@@ -129,6 +129,7 @@ export const serialInNode = {
           } catch (err) {
             if (err.name !== 'NetworkError') {
               PN.error('Serial read error:', err);
+              peerRef.current.methods.emitEvent(nodeId, 'error', err?.message || 'read failed');
             }
           }
         };
@@ -309,6 +310,7 @@ export const serialOutNode = {
         await entry.writer.write(data);
       } catch (err) {
         PN.error('Serial write error:', err);
+        peerRef.current.methods.emitEvent(nodeId, 'error', err?.message || 'write failed');
       }
     },
 

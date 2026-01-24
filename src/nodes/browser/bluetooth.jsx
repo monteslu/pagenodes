@@ -262,6 +262,7 @@ export const bluetoothOutNode = {
         await entry.characteristic.writeValue(data);
       } catch (err) {
         PN.error('Bluetooth Out write error:', err);
+        peerRef.current.methods.emitEvent(nodeId, 'error', err?.message || 'write failed');
       }
     },
 

@@ -23,18 +23,21 @@ export const audioFilterRuntime = {
   onInput(msg) {
     const rampTime = msg.rampTime;
 
-    // Handle frequency changes
-    if (msg.frequency !== undefined) {
+    // Handle frequency changes - payload is treated as frequency (primary param)
+    const frequency = msg.frequency !== undefined ? msg.frequency :
+                      (typeof msg.payload === 'number' ? msg.payload : undefined);
+
+    if (frequency !== undefined) {
       if (rampTime) {
         this.mainThread('rampAudioParam', {
           param: 'frequency',
-          value: msg.frequency,
+          value: frequency,
           duration: rampTime
         });
       } else {
         this.mainThread('setAudioParam', {
           param: 'frequency',
-          value: msg.frequency
+          value: frequency
         });
       }
     }

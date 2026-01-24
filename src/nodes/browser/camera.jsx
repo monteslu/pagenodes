@@ -79,6 +79,7 @@ export const cameraNode = {
         });
       } catch (err) {
         PN.error('Camera capture error:', err);
+        peerRef.current.methods.emitEvent(nodeId, 'error', err?.message || 'capture failed');
       } finally {
         // Clean up to prevent memory leaks
         if (stream) {

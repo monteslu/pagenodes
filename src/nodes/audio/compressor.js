@@ -25,11 +25,18 @@ export const audioCompressorRuntime = {
     const rampTime = msg.rampTime;
 
     // Handle each parameter if provided
+    // payload is treated as threshold (primary param)
     const params = ['threshold', 'knee', 'ratio', 'attack', 'release'];
 
     for (const param of params) {
-      if (msg[param] !== undefined) {
-        const value = msg[param];
+      let value = msg[param];
+
+      // payload maps to threshold (primary compressor control)
+      if (param === 'threshold' && value === undefined && typeof msg.payload === 'number') {
+        value = msg.payload;
+      }
+
+      if (value !== undefined) {
 
         if (rampTime) {
           this.mainThread('rampAudioParam', {

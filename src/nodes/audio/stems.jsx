@@ -10,6 +10,21 @@
  *
  * Also works with 5-channel audio files (WAV/FLAC).
  */
+// Stem track icons using FontAwesome characters
+// Index: 0=master, 1=drums, 2=bass, 3=other, 4=vocals
+const STEM_ICONS = [
+  // 0: Master - star (f005)
+  { faChar: '\uf005', color: '#ffd700' },
+  // 1: Drums - drum (f569)
+  { faChar: '\uf569', color: '#ff6b6b' },
+  // 2: Bass - guitar (f7a6)
+  { faChar: '\uf7a6', color: '#4ecdc4' },
+  // 3: Other/instruments - music note (f001)
+  { faChar: '\uf001', color: '#a78bfa' },
+  // 4: Vocals - microphone (f130)
+  { faChar: '\uf130', color: '#f472b6' }
+];
+
 export const audioStemsNode = {
   type: 'stems',
   category: 'audio',
@@ -31,6 +46,27 @@ export const audioStemsNode = {
 
   streamInputs: 0,
   streamOutputs: 5,  // master, drums, bass, other, vocals
+
+  // Custom port rendering for stem outputs - shows instrument icons
+  renderStreamPort({ index, isOutput, x, y }) {
+    if (!isOutput || index >= STEM_ICONS.length) return null;
+    const icon = STEM_ICONS[index];
+    return (
+      <text
+        className="node-icon"
+        x={x}
+        y={y}
+        fontSize="9"
+        fill={icon.color}
+        dominantBaseline="central"
+        textAnchor="middle"
+        pointerEvents="none"
+        style={{ textShadow: '0 1px 1px rgba(0,0,0,0.5)' }}
+      >
+        {icon.faChar}
+      </text>
+    );
+  },
 
   defaults: {
     url: { type: 'string', default: '' },

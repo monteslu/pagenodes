@@ -321,6 +321,8 @@ export function NodeShape({
           x={0}
           y={yPos}
           isOutput={false}
+          index={i}
+          customRender={def?.renderStreamPort}
           onMouseDown={onStreamPortMouseDown ? (e) => onStreamPortMouseDown(e, i, false) : undefined}
           onMouseUp={onStreamPortMouseUp ? (e) => onStreamPortMouseUp(e, i, false) : undefined}
           onMouseEnter={onStreamPortMouseEnter ? (e) => onStreamPortMouseEnter(e, i, false) : undefined}
@@ -347,6 +349,8 @@ export function NodeShape({
           x={width}
           y={yPos}
           isOutput={true}
+          index={i}
+          customRender={def?.renderStreamPort}
           onMouseDown={onStreamPortMouseDown ? (e) => onStreamPortMouseDown(e, i, true) : undefined}
           onMouseUp={onStreamPortMouseUp ? (e) => onStreamPortMouseUp(e, i, true) : undefined}
         />

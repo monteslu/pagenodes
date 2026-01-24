@@ -132,7 +132,11 @@ export function RuntimeProvider({ children }) {
       // MediaElementSource actions
       'createMediaElementSource', 'mediaElementControl',
       // Stems actions
-      'createStemsNode', 'loadStems', 'controlStems'
+      'createStemsNode', 'loadStems', 'controlStems',
+      // Context state
+      'getAudioContextState',
+      // Speaker status
+      'hasActiveSources'
     ]);
 
     // Generic mainThread request handler (fire-and-forget)
@@ -661,15 +665,23 @@ export function RuntimeProvider({ children }) {
         const state = flowStateRef.current;
 
         // Save to persistent storage FIRST (before deploy which may hang on async onInit)
+        // Filter out runtime-only properties (starting with _) from config
         const flowConfig = {
           flows: state.flows,
           nodes: Object.values(state.nodes).map(node => {
             const { _node, ...config } = node;
-            return { ..._node, ...config };
+            // Filter out runtime-only properties (e.g., _currentValue, _activeButton)
+            const cleanConfig = Object.fromEntries(
+              Object.entries(config).filter(([key]) => !key.startsWith('_'))
+            );
+            return { ..._node, ...cleanConfig };
           }),
           configNodes: Object.values(state.configNodes).map(node => {
             const { _node, users: _users, ...config } = node;
-            return { ..._node, ...config };
+            const cleanConfig = Object.fromEntries(
+              Object.entries(config).filter(([key]) => !key.startsWith('_'))
+            );
+            return { ..._node, ...cleanConfig };
           })
         };
         logger.log(`[mcp] Saving ${flowConfig.nodes.length} nodes to storage`);

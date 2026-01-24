@@ -20,11 +20,14 @@ export const audioOscillatorRuntime = {
   },
 
   onInput(msg) {
-    // Handle control messages
-    if (msg.frequency !== undefined) {
+    // Handle frequency - payload is treated as frequency (primary param)
+    const frequency = msg.frequency !== undefined ? msg.frequency :
+                      (typeof msg.payload === 'number' ? msg.payload : undefined);
+
+    if (frequency !== undefined) {
       this.mainThread('setAudioParam', {
         param: 'frequency',
-        value: msg.frequency
+        value: frequency
       });
     }
 

@@ -4,11 +4,11 @@ import { calcNodeHeight, calcNodeHeightWithAudio, calcNodeWidth } from '../../ut
 
 // Helper to get node label
 function getNodeLabel(node, def) {
-  if (node._node.name) return node._node.name;
+  if (node.name) return node.name;
   if (def?.label) {
     return typeof def.label === 'function' ? def.label(node) : def.label;
   }
-  return node._node.type;
+  return node.type;
 }
 
 // Helper to calculate node height including audio ports
@@ -29,7 +29,7 @@ const PADDING = 50; // Padding around nodes
 export function FlowMinimap({ flowId, nodes, size = 50, onClick }) {
   // Filter nodes for this flow
   const flowNodes = useMemo(() => {
-    return Object.values(nodes).filter(n => n._node.z === flowId);
+    return Object.values(nodes).filter(n => n.z === flowId);
   }, [nodes, flowId]);
 
   // Calculate bounds from nodes
@@ -42,13 +42,13 @@ export function FlowMinimap({ flowId, nodes, size = 50, onClick }) {
     let maxY = 0;
 
     for (const node of flowNodes) {
-      const def = nodeRegistry.get(node._node.type);
+      const def = nodeRegistry.get(node.type);
       const nodeHeight = getNodeHeight(node, def);
       const label = getNodeLabel(node, def);
       const hasIcon = def?.icon && def?.faChar;
       const nodeWidth = calcNodeWidth(label, hasIcon);
-      maxX = Math.max(maxX, node._node.x + nodeWidth);
-      maxY = Math.max(maxY, node._node.y + nodeHeight);
+      maxX = Math.max(maxX, node.x + nodeWidth);
+      maxY = Math.max(maxY, node.y + nodeHeight);
     }
 
     // Make it square using the larger dimension, add padding
@@ -91,7 +91,7 @@ export function FlowMinimap({ flowId, nodes, size = 50, onClick }) {
 
       {/* Nodes as simple colored rectangles */}
       {flowNodes.map(node => {
-        const def = nodeRegistry.get(node._node.type);
+        const def = nodeRegistry.get(node.type);
         const color = def?.color || '#ddd';
         const nodeHeight = getNodeHeight(node, def);
         const label = getNodeLabel(node, def);
@@ -100,9 +100,9 @@ export function FlowMinimap({ flowId, nodes, size = 50, onClick }) {
 
         return (
           <rect
-            key={node._node.id}
-            x={node._node.x}
-            y={node._node.y}
+            key={node.id}
+            x={node.x}
+            y={node.y}
             width={nodeWidth}
             height={nodeHeight}
             fill={color}

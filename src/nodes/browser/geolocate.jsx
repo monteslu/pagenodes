@@ -3,7 +3,7 @@ export const geolocateNode = {
   category: 'hardware',
   description: 'Gets device GPS location',
   requiresGesture: true,
-  label: (node) => node._node.name || 'geolocation',
+  label: (node) => node.name || 'geolocation',
   color: 'lightblue', // light blue
   icon: true,
   faChar: '\uf124', // location-arrow

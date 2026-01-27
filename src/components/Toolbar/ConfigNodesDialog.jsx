@@ -16,20 +16,20 @@ export function ConfigNodesDialog({ onClose }) {
       const actualUsers = nodes.filter(node => {
         // Check all properties for references to this config ID
         for (const [key, value] of Object.entries(node)) {
-          if (key === '_node') continue;
-          if (value === config._node.id) return true;
+          if (['id', 'type', 'name'].includes(key)) continue;
+          if (value === config.id) return true;
         }
         return false;
       });
 
       // Get node definition for label
-      const nodeDef = nodeRegistry.get(config._node.type);
-      const label = nodeDef?.label?.(config) || config._node.name || config._node.type;
+      const nodeDef = nodeRegistry.get(config.type);
+      const label = nodeDef?.label?.(config) || config.name || config.type;
 
       return {
-        id: config._node.id,
-        type: config._node.type,
-        name: config._node.name,
+        id: config.id,
+        type: config.type,
+        name: config.name,
         label,
         userCount: actualUsers.length,
         isOrphaned: actualUsers.length === 0

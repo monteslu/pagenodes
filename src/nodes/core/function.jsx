@@ -79,7 +79,7 @@ export const functionNode = {
   type: 'function',
   category: 'logic',
   description: 'Run custom JavaScript to transform, filter, or route messages. Access persistent storage via context/flow/global.',
-  label: (node) => node._node.name || 'function',
+  label: (node) => node.name || 'function',
   color: '#fdd0a2',
   icon: true,
   faChar: 'ƒ', // function symbol

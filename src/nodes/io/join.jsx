@@ -2,7 +2,7 @@ export const joinNode = {
   type: 'join',
   category: 'transforms',
   description: 'Joins message sequences into a single message',
-  label: (node) => node._node.name || 'join',
+  label: (node) => node.name || 'join',
   color: '#e2d96e',
   icon: true,
   faChar: '\uf247', // object-group

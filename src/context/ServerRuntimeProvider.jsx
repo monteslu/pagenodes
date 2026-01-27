@@ -306,22 +306,19 @@ export function RuntimeProvider({ children }) {
           const flowConfig = await serverStorage.getFlows();
           if (!flowConfig) return;
 
-          // Convert storage format (flat nodes) to FlowContext format (_node wrapper)
+          // Storage format is already flat - just ensure defaults
           const flows = flowConfig.flows || [];
-          const internalNodes = (flowConfig.nodes || []).map(node => {
-            const { id, type, name, z, x, y, wires, ...config } = node;
-            return {
-              _node: { id, type, name: name || '', z, x: x || 0, y: y || 0, wires: wires || [] },
-              ...config
-            };
-          });
-          const internalConfigNodes = (flowConfig.configNodes || []).map(node => {
-            const { id, type, name, ...config } = node;
-            return {
-              _node: { id, type, name: name || '' },
-              ...config
-            };
-          });
+          const internalNodes = (flowConfig.nodes || []).map(node => ({
+            ...node,
+            name: node.name || '',
+            x: node.x || 0,
+            y: node.y || 0,
+            wires: node.wires || []
+          }));
+          const internalConfigNodes = (flowConfig.configNodes || []).map(node => ({
+            ...node,
+            name: node.name || ''
+          }));
 
           flowDispatch({
             type: 'SET_FLOWS',
@@ -357,7 +354,7 @@ export function RuntimeProvider({ children }) {
         const state = flowStateRef.current;
         const node = state.nodes[nodeId];
         if (!node) return { success: false, errors: ['Node not found'] };
-        if (node._node.type !== 'inject') {
+        if (node.type !== 'inject') {
           return { success: false, errors: ['Not an inject node'] };
         }
         const msg = (payload !== undefined && payload !== null) ? { payload } : {};
@@ -404,12 +401,12 @@ export function RuntimeProvider({ children }) {
 
       peerRef.current.addHandler('mcpSendMessage', (payload, topic = '') => {
         const state = flowStateRef.current;
-        const mcpInputNodes = Object.values(state.nodes).filter(n => n._node.type === 'mcp-input');
+        const mcpInputNodes = Object.values(state.nodes).filter(n => n.type === 'mcp-input');
         if (mcpInputNodes.length === 0) {
           return { success: false, error: 'No mcp-input nodes' };
         }
         for (const node of mcpInputNodes) {
-          peerRef.current.methods.emitEvent(node._node.id, 'mcpMessage', { payload, topic });
+          peerRef.current.methods.emitEvent(node.id, 'mcpMessage', { payload, topic });
         }
         return { success: true, nodeCount: mcpInputNodes.length };
       });
@@ -431,11 +428,11 @@ export function RuntimeProvider({ children }) {
         const state = flowStateRef.current;
         if (!state?.nodes) return [];
         return Object.values(state.nodes)
-          .filter(n => n._node.type === 'inject')
+          .filter(n => n.type === 'inject')
           .map(n => ({
-            id: n._node.id,
-            name: n._node.name || 'inject',
-            flowId: n._node.z,
+            id: n.id,
+            name: n.name || 'inject',
+            flowId: n.z,
             payload: n.payload,
             payloadType: n.payloadType,
             topic: n.topic
@@ -504,22 +501,13 @@ export function RuntimeProvider({ children }) {
     }
 
     const flowNodes = Object.values(nodes).map(node => {
-      const { x: _x, y: _y, ...runtimeNodeProps } = node._node;
-      return {
-        _node: runtimeNodeProps,
-        ...Object.fromEntries(
-          Object.entries(node).filter(([key]) => key !== '_node')
-        )
-      };
+      const { x: _x, y: _y, ...rest } = node;
+      return rest;
     });
 
     const flowConfigNodes = Object.values(configNodes).map(node => {
-      return {
-        _node: { ...node._node },
-        ...Object.fromEntries(
-          Object.entries(node).filter(([key]) => key !== '_node' && key !== 'users')
-        )
-      };
+      const { users: _users, ...rest } = node;
+      return rest;
     });
 
     const deployedNodeIds = new Set([
@@ -527,7 +515,7 @@ export function RuntimeProvider({ children }) {
       ...Object.keys(configNodes)
     ]);
 
-    const deployedTypes = new Set(flowNodes.map(n => n._node.type));
+    const deployedTypes = new Set(flowNodes.map(n => n.type));
     setHasCanvasNodes(deployedTypes.has('canvas'));
 
     try {

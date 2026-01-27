@@ -8,12 +8,12 @@ export function useNodes() {
   const { state: flowState, dispatch: flowDispatch } = useFlows();
   const { state: editorState, dispatch: editorDispatch } = useEditor();
 
-  // Nodes for current flow (filter by _node.z, exclude config nodes)
+  // Nodes for current flow (filter by z, exclude config nodes)
   const activeNodes = useMemo(() =>
     Object.values(flowState.nodes).filter(n => {
-      if (n._node.z !== editorState.activeFlow) return false;
+      if (n.z !== editorState.activeFlow) return false;
       // Never render config nodes on canvas
-      const def = nodeRegistry.get(n._node.type);
+      const def = nodeRegistry.get(n.type);
       return def?.category !== 'config';
     }),
     [flowState.nodes, editorState.activeFlow]
@@ -21,7 +21,7 @@ export function useNodes() {
 
   // Config nodes (no z property)
   const configNodes = useMemo(() =>
-    Object.values(flowState.nodes).filter(n => !n._node.z),
+    Object.values(flowState.nodes).filter(n => !n.z),
     [flowState.nodes]
   );
 
@@ -37,16 +37,14 @@ export function useNodes() {
     const streamOutputs = def.getStreamOutputs ? def.getStreamOutputs({}) : (def.streamOutputs || 0);
 
     const node = {
-      // Reserved properties in _node
-      _node: {
-        id: generateId(),
-        type,
-        name: '',
-        ...(isConfigNode ? {} : { z: editorState.activeFlow, x, y }),
-        wires: Array(def.outputs || 0).fill().map(() => []),
-        // Only add streamWires if node has stream outputs
-        ...(streamOutputs > 0 ? { streamWires: Array(streamOutputs).fill().map(() => []) } : {})
-      },
+      // All properties flat
+      id: generateId(),
+      type,
+      name: '',
+      ...(isConfigNode ? {} : { z: editorState.activeFlow, x, y }),
+      wires: Array(def.outputs || 0).fill().map(() => []),
+      // Only add streamWires if node has stream outputs
+      ...(streamOutputs > 0 ? { streamWires: Array(streamOutputs).fill().map(() => []) } : {}),
       // Custom config from defaults
       ...Object.fromEntries(
         Object.entries(def.defaults || {}).map(([key, prop]) => [key, prop.default])
@@ -54,7 +52,7 @@ export function useNodes() {
     };
 
     flowDispatch({ type: 'ADD_NODE', node });
-    editorDispatch({ type: 'ADD_PENDING_NODE', nodeId: node._node.id });
+    editorDispatch({ type: 'ADD_PENDING_NODE', nodeId: node.id });
     editorDispatch({ type: 'MARK_DIRTY' });
     return node;
   }, [flowDispatch, editorDispatch, editorState.activeFlow]);
@@ -65,7 +63,7 @@ export function useNodes() {
     editorDispatch({ type: 'MARK_DIRTY' });
   }, [flowDispatch, editorDispatch]);
 
-  // Update node _node properties (position, name, etc.)
+  // Update node system properties (position, name, etc.)
   const updateNodeProps = useCallback((id, nodeProps) => {
     flowDispatch({ type: 'UPDATE_NODE_PROPS', id, nodeProps });
     editorDispatch({ type: 'MARK_DIRTY' });

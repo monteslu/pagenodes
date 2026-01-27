@@ -37,7 +37,7 @@ export function ConfigNodeDialog({ configType, configId, onClose, onSave }) {
   }, [existingConfig, def]);
 
   const [values, setValues] = useState(initialValues);
-  const [nodeName, setNodeName] = useState(existingConfig?._node?.name || '');
+  const [nodeName, setNodeName] = useState(existingConfig?.name || '');
 
   // Validate dependent selects - ensure their values are valid for current options
   useEffect(() => {
@@ -74,11 +74,9 @@ export function ConfigNodeDialog({ configType, configId, onClose, onSave }) {
       // Create new config node
       const newId = generateId();
       const newConfig = {
-        _node: {
-          id: newId,
-          type: configType,
-          name: nodeName || values.name || ''
-        },
+        id: newId,
+        type: configType,
+        name: nodeName || values.name || '',
         ...values
       };
       dispatch({ type: 'ADD_CONFIG_NODE', node: newConfig });
@@ -90,10 +88,9 @@ export function ConfigNodeDialog({ configType, configId, onClose, onSave }) {
         id: configId,
         changes: {
           ...values,
-          _node: {
-            ...existingConfig._node,
-            name: nodeName || values.name || ''
-          }
+          id: existingConfig.id,
+          type: existingConfig.type,
+          name: nodeName || values.name || ''
         }
       });
       onSave?.(configId);

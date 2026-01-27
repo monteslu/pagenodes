@@ -104,16 +104,16 @@ export function calcStackedPortPositions(messagePorts, audioPorts, height) {
 // Calculate port position on a node
 export function getPortPosition(node, portIndex, isOutput, nodeHeight, nodeWidth, nodeDef) {
   const height = nodeHeight || calcNodeHeight(
-    isOutput ? (node._node.wires?.length || 1) : 1
+    isOutput ? (node.wires?.length || 1) : 1
   );
   const width = nodeWidth || NODE_WIDTH;
 
   if (isOutput) {
-    const outputs = node._node.wires?.length || 1;
+    const outputs = node.wires?.length || 1;
     const positions = calcOutputYPositions(outputs, height);
     return {
-      x: node._node.x + width,
-      y: node._node.y + (positions[portIndex] || height / 2)
+      x: node.x + width,
+      y: node.y + (positions[portIndex] || height / 2)
     };
   } else {
     // For input ports, check if node has both message and audio inputs
@@ -124,14 +124,14 @@ export function getPortPosition(node, portIndex, isOutput, nodeHeight, nodeWidth
       // Use stacked positions when there are both message and audio inputs
       const positions = calcStackedPortPositions(msgInputs, streamInputs, height);
       return {
-        x: node._node.x,
-        y: node._node.y + (positions.message[portIndex] || height / 2)
+        x: node.x,
+        y: node.y + (positions.message[portIndex] || height / 2)
       };
     }
 
     return {
-      x: node._node.x,
-      y: node._node.y + height / 2
+      x: node.x,
+      y: node.y + height / 2
     };
   }
 }
@@ -149,14 +149,14 @@ export function getStreamPortPosition(node, portIndex, isOutput, nodeDef, nodeHe
   if (isOutput) {
     const positions = calcStackedPortPositions(msgOutputs, streamOutputs, height);
     return {
-      x: node._node.x + width,
-      y: node._node.y + (positions.audio[portIndex] || height / 2)
+      x: node.x + width,
+      y: node.y + (positions.audio[portIndex] || height / 2)
     };
   } else {
     const positions = calcStackedPortPositions(msgInputs, streamInputs, height);
     return {
-      x: node._node.x,
-      y: node._node.y + (positions.audio[portIndex] || height / 2)
+      x: node.x,
+      y: node.y + (positions.audio[portIndex] || height / 2)
     };
   }
 }
@@ -191,13 +191,13 @@ export function getWireControlPoints(sourcePos, targetPos) {
 
 // Check if a point is inside a node
 export function isPointInNode(x, y, node, nodeWidth) {
-  const height = calcNodeHeight(node._node.wires?.length || 1);
+  const height = calcNodeHeight(node.wires?.length || 1);
   const width = nodeWidth || NODE_WIDTH;
   return (
-    x >= node._node.x &&
-    x <= node._node.x + width &&
-    y >= node._node.y &&
-    y <= node._node.y + height
+    x >= node.x &&
+    x <= node.x + width &&
+    y >= node.y &&
+    y <= node.y + height
   );
 }
 
@@ -213,11 +213,11 @@ export function rectsOverlap(rect1, rect2) {
 
 // Check if a node is within a selection rectangle
 export function isNodeInSelection(node, selectionRect, nodeWidth) {
-  const height = calcNodeHeight(node._node.wires?.length || 1);
+  const height = calcNodeHeight(node.wires?.length || 1);
   const width = nodeWidth || NODE_WIDTH;
   const nodeRect = {
-    x: node._node.x,
-    y: node._node.y,
+    x: node.x,
+    y: node.y,
     width: width,
     height: height
   };
@@ -232,11 +232,11 @@ export function getNodesBounds(nodes) {
   let maxX = -Infinity, maxY = -Infinity;
 
   for (const node of nodes) {
-    const height = calcNodeHeight(node._node.wires?.length || 1);
-    minX = Math.min(minX, node._node.x);
-    minY = Math.min(minY, node._node.y);
-    maxX = Math.max(maxX, node._node.x + NODE_WIDTH);
-    maxY = Math.max(maxY, node._node.y + height);
+    const height = calcNodeHeight(node.wires?.length || 1);
+    minX = Math.min(minX, node.x);
+    minY = Math.min(minY, node.y);
+    maxX = Math.max(maxX, node.x + NODE_WIDTH);
+    maxY = Math.max(maxY, node.y + height);
   }
 
   return { x: minX, y: minY, width: maxX - minX, height: maxY - minY };
@@ -279,7 +279,7 @@ export function wouldCreateCycle(nodes, sourceId, targetId, isStream = false) {
     const node = nodes[currentId];
     if (!node) return false;
 
-    const wires = node._node[wireKey] || [];
+    const wires = node[wireKey] || [];
     for (const portWires of wires) {
       if (!Array.isArray(portWires)) continue;
       for (const nextId of portWires) {

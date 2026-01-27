@@ -3,7 +3,7 @@ export const cameraNode = {
   category: 'hardware',
   description: 'Captures images from device camera',
   requiresGesture: true,
-  label: (node) => node._node.name || 'camera',
+  label: (node) => node.name || 'camera',
   color: '#aeaee7', // light lavender-blue
   icon: true,
   faChar: '\uf030', // camera

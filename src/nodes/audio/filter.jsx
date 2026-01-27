@@ -13,7 +13,7 @@ export const audioFilterNode = {
   relatedDocs: () => [
     { label: 'BiquadFilterNode (MDN)', url: 'https://developer.mozilla.org/en-US/docs/Web/API/BiquadFilterNode' }
   ],
-  label: (node) => node._node.name || 'filter',
+  label: (node) => node.name || 'filter',
   color: '#2d9a2d',  // Green for audio nodes
   fontColor: '#fff',  // White text for contrast
   icon: true,

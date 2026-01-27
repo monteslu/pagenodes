@@ -13,7 +13,7 @@ export const audioCompressorNode = {
   relatedDocs: () => [
     { label: 'DynamicsCompressorNode (MDN)', url: 'https://developer.mozilla.org/en-US/docs/Web/API/DynamicsCompressorNode' }
   ],
-  label: (node) => node._node.name || 'compressor',
+  label: (node) => node.name || 'compressor',
   color: '#2d9a2d',  // Green for audio nodes
   fontColor: '#fff',  // White text for contrast
   icon: true,

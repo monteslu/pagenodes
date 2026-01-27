@@ -14,7 +14,7 @@ export const audioAnalyserNode = {
   relatedDocs: () => [
     { label: 'AnalyserNode (MDN)', url: 'https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode' }
   ],
-  label: (node) => node._node.name || 'analyser',
+  label: (node) => node.name || 'analyser',
   color: '#2d9a2d',  // Green for audio nodes
   fontColor: '#fff',  // White text for contrast
   icon: true,

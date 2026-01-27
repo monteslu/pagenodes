@@ -60,7 +60,7 @@ export function NodeShape({
   const rightPortPositions = calcStackedPortPositions(outputs, streamOutputs, height);
 
   // Generate unique gradient ID for this node (sanitize to remove spaces/special chars)
-  const nodeId = (node?._node?.id || type || 'node').replace(/[^a-zA-Z0-9-_]/g, '-');
+  const nodeId = (node?.id || type || 'node').replace(/[^a-zA-Z0-9-_]/g, '-');
   const gradientId = `node-grad-${nodeId}`;
   const darkGradientId = `node-dark-grad-${nodeId}`;
 

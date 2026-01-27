@@ -13,7 +13,7 @@ export const audioPannerNode = {
   relatedDocs: () => [
     { label: 'StereoPannerNode (MDN)', url: 'https://developer.mozilla.org/en-US/docs/Web/API/StereoPannerNode' }
   ],
-  label: (node) => node._node.name || 'panner',
+  label: (node) => node.name || 'panner',
   color: '#2d9a2d',  // Green for audio nodes
   fontColor: '#fff',  // White text for contrast
   icon: true,

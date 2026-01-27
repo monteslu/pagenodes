@@ -11,7 +11,7 @@ export const audioPanner3dNode = {
     { label: 'PannerNode (MDN)', url: 'https://developer.mozilla.org/en-US/docs/Web/API/PannerNode' },
     { label: 'AudioListener (MDN)', url: 'https://developer.mozilla.org/en-US/docs/Web/API/AudioListener' }
   ],
-  label: (node) => node._node.name || 'panner3d',
+  label: (node) => node.name || 'panner3d',
   color: '#2d9a2d',
   fontColor: '#fff',
   icon: true,

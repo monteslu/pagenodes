@@ -2,7 +2,7 @@ export const delayNode = {
   type: 'delay',
   category: 'logic',
   description: 'Delays or rate-limits messages',
-  label: (node) => node._node.name || 'delay',
+  label: (node) => node.name || 'delay',
   color: '#E6E0F8', // light purple
   icon: true,
   faChar: '\uf017', // clock-o

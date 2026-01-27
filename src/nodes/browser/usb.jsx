@@ -13,7 +13,7 @@ export const usbDeviceNode = {
   category: 'config',
   description: 'USB device configuration',
   requiresGesture: true,
-  label: (node) => node._node.name || node.productName || 'usb-device',
+  label: (node) => node.name || node.productName || 'usb-device',
 
   defaults: {
     name: { type: 'string', default: '' },
@@ -142,7 +142,7 @@ export const usbInNode = {
   category: 'hardware',
   description: 'Receives USB device data',
   requiresGesture: true,
-  label: (node) => node._node.name || 'usb in',
+  label: (node) => node.name || 'usb in',
   color: '#8FBC8F', // DarkSeaGreen
   icon: true,
   faChar: '\uf287', // usb
@@ -247,7 +247,7 @@ export const usbOutNode = {
   category: 'hardware',
   description: 'Sends USB device data',
   requiresGesture: true,
-  label: (node) => node._node.name || 'usb out',
+  label: (node) => node.name || 'usb out',
   color: '#8FBC8F', // DarkSeaGreen
   icon: true,
   faChar: '\uf287', // usb

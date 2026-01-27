@@ -2,7 +2,7 @@ export const bufferNode = {
   type: 'buffer',
   category: 'transforms',
   description: 'Creates and manipulates binary buffers',
-  label: (node) => node._node.name || 'buffer',
+  label: (node) => node.name || 'buffer',
   color: '#DEBD5C', // light tan/gold
   icon: true,
   faChar: '\uf0c5', // files-o

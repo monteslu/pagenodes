@@ -22,7 +22,7 @@ export const injectNode = {
   type: 'inject',
   category: 'input',
   description: 'Injects a message into the flow manually or on a timer',
-  label: (node) => node._node.name || 'inject',
+  label: (node) => node.name || 'inject',
   color: '#a6bbcf', // light grayish-blue
   icon: true,
   faChar: '\uf061', // arrow-right

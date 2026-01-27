@@ -2,7 +2,7 @@ export const linkInNode = {
   type: 'link in',
   category: 'common',
   description: 'Receives messages from link out nodes',
-  label: (node) => node._node.name || 'link in',
+  label: (node) => node.name || 'link in',
   color: '#ddd',
   icon: true,
   faChar: '\uf090', // sign-in
@@ -25,7 +25,7 @@ export const linkInNode = {
   onInit() {
     // Register this node to receive messages from link out nodes
     if (this.flow?.linkNodes) {
-      this.flow.linkNodes.set(this._node.id, this);
+      this.flow.linkNodes.set(this.id, this);
     }
   },
 
@@ -36,7 +36,7 @@ export const linkInNode = {
 
   onClose() {
     if (this.flow?.linkNodes) {
-      this.flow.linkNodes.delete(this._node.id);
+      this.flow.linkNodes.delete(this.id);
     }
   },
 
@@ -67,7 +67,7 @@ export const linkOutNode = {
   type: 'link out',
   category: 'common',
   description: 'Sends messages to link in nodes',
-  label: (node) => node._node.name || 'link out',
+  label: (node) => node.name || 'link out',
   color: '#ddd',
   icon: true,
   faChar: '\uf08b', // sign-out
@@ -119,7 +119,7 @@ export const linkCallNode = {
   type: 'link call',
   category: 'common',
   description: 'Calls a link in and waits for response',
-  label: (node) => node._node.name || 'link call',
+  label: (node) => node.name || 'link call',
   color: '#ddd',
   icon: true,
   faChar: '\uf0c1', // link
@@ -160,7 +160,7 @@ export const linkCallNode = {
     const callId = Math.random().toString(36).slice(2);
     msg._linkCall = {
       id: callId,
-      source: this._node.id
+      source: this.id
     };
 
     // Set up timeout

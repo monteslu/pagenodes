@@ -2,7 +2,7 @@ export const httpRequestNode = {
   type: 'http request',
   category: 'networking',
   description: 'Makes HTTP requests',
-  label: (node) => node._node.name || node.method || 'http request',
+  label: (node) => node.name || node.method || 'http request',
   color: '#e7e7ae',
   icon: true,
   faChar: '\uf0ac', // globe

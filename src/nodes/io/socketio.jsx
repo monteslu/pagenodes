@@ -9,7 +9,7 @@ export const socketioClientNode = {
   type: 'socketio-client',
   category: 'config',
   description: 'Socket.IO client connection configuration',
-  label: (node) => node._node.name || node._node.server || 'socketio-client',
+  label: (node) => node.name || node.server || 'socketio-client',
 
   defaults: {
     name: { type: 'string', default: '' },
@@ -40,7 +40,7 @@ export const socketioInNode = {
   type: 'socketio in',
   category: 'networking',
   description: 'Receives Socket.IO events',
-  label: (node) => node._node.name || node.eventName || 'socket.io',
+  label: (node) => node.name || node.eventName || 'socket.io',
   color: '#d7d7a0', // pale yellowish
   icon: true,
   faChar: '\uf192', // dot-circle-o
@@ -96,7 +96,7 @@ export const socketioOutNode = {
   type: 'socketio out',
   category: 'networking',
   description: 'Sends Socket.IO events',
-  label: (node) => node._node.name || node.eventName || 'socket.io',
+  label: (node) => node.name || node.eventName || 'socket.io',
   color: '#d7d7a0', // pale yellowish
   icon: true,
   faChar: '\uf192', // dot-circle-o

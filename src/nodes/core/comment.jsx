@@ -2,7 +2,7 @@ export const commentNode = {
   type: 'comment',
   category: 'common',
   description: 'Adds a comment to the flow',
-  label: (node) => node._node.name || '',
+  label: (node) => node.name || '',
   color: '#ffffff',
   icon: true,
   faChar: '\uf075', // comment

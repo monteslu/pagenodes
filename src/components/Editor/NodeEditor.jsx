@@ -21,7 +21,7 @@ export function NodeEditor({ node, onClose }) {
   const { updateNode, updateNodeProps } = useNodes();
   const { state: flowState, dispatch } = useFlows();
   const runtime = useRuntime();
-  const def = node ? nodeRegistry.get(node._node.type) : null;
+  const def = node ? nodeRegistry.get(node.type) : null;
 
   // Config node dialog state: { type, id, key } or null
   const [configDialog, setConfigDialog] = useState(null);
@@ -37,7 +37,7 @@ export function NodeEditor({ node, onClose }) {
   }, [node, def]);
 
   const [values, setValues] = useState(initialValues);
-  const [nodeName, setNodeName] = useState(node?._node?.name || '');
+  const [nodeName, setNodeName] = useState(node?.name || '');
 
   // Validate dependent selects - ensure their values are valid for current options
   useEffect(() => {
@@ -73,11 +73,11 @@ export function NodeEditor({ node, onClose }) {
     if (!node) return;
 
     // Update custom properties
-    updateNode(node._node.id, values);
+    updateNode(node.id, values);
 
     // Update node name if changed
-    if (nodeName !== node._node.name) {
-      updateNodeProps(node._node.id, { name: nodeName });
+    if (nodeName !== node.name) {
+      updateNodeProps(node.id, { name: nodeName });
     }
 
     onClose?.();
@@ -97,7 +97,7 @@ export function NodeEditor({ node, onClose }) {
     handleValueChange(configDialog.key, configId);
     // Track this node as a user of the config node
     if (node && configId) {
-      dispatch({ type: 'ADD_CONFIG_USER', configId, nodeId: node._node.id });
+      dispatch({ type: 'ADD_CONFIG_USER', configId, nodeId: node.id });
     }
   }, [configDialog, handleValueChange, node, dispatch]);
 
@@ -155,7 +155,7 @@ export function NodeEditor({ node, onClose }) {
       config: {
         node,
         nodeDef: def,
-        flowId: node?._node?.z,
+        flowId: node?.z,
         nodeRegistry,
       },
       mode: runtime.mode,
@@ -166,24 +166,26 @@ export function NodeEditor({ node, onClose }) {
   const previewLabel = useMemo(() => {
     if (!def || !node) return '';
     const mockNode = {
-      _node: { ...node._node, name: nodeName },
+      ...node,
+      name: nodeName,
       ...values
     };
     if (typeof def.label === 'function') {
       try {
         return def.label(mockNode);
       } catch {
-        return nodeName || node._node.type;
+        return nodeName || node.type;
       }
     }
-    return nodeName || node._node.type;
+    return nodeName || node.type;
   }, [def, node, nodeName, values]);
 
   // Compute dynamic outputs if node defines getOutputs or outputs as function - must be before early return
   const previewOutputs = useMemo(() => {
     if (!def || !node) return 0;
     const mockNode = {
-      _node: { ...node._node, name: nodeName },
+      ...node,
+      name: nodeName,
       ...values
     };
     // Check for getOutputs method first (preferred pattern)
@@ -209,7 +211,8 @@ export function NodeEditor({ node, onClose }) {
   const previewStreamPorts = useMemo(() => {
     if (!def || !node) return { inputs: 0, outputs: 0 };
     const mockNode = {
-      _node: { ...node._node, name: nodeName },
+      ...node,
+      name: nodeName,
       ...values
     };
     const streamInputs = def.getStreamInputs ? def.getStreamInputs(mockNode) : (def.streamInputs || 0);
@@ -372,7 +375,7 @@ export function NodeEditor({ node, onClose }) {
           >
             <NodeShape
               def={{ ...def, outputs: previewOutputs }}
-              type={node._node.type}
+              type={node.type}
               label={displayLabel}
               width={previewWidth}
               selected={false}

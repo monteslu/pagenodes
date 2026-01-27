@@ -14,7 +14,6 @@ import { InfoPanel } from './components/Info';
 import { CanvasPanel } from './components/Canvases/CanvasPanel';
 import { PasswordPrompt } from './components/Auth/PasswordPrompt';
 import { generateId } from './utils/id';
-import { nodeRegistry } from './nodes';
 import { logger } from './utils/logger';
 import './App.css';
 
@@ -104,39 +103,27 @@ function AppContent() {
           // Check if each node is a config node and strip z/x/y if so
           // Also filter out runtime-only properties (starting with _) that may have been saved
           const internalNodes = (savedFlows.nodes || []).map(node => {
-            const { id, type, name, z, x, y, wires, streamWires, ...config } = node;
             // Filter out runtime-only properties (e.g., _currentValue, _activeButton)
-            const cleanConfig = Object.fromEntries(
-              Object.entries(config).filter(([key]) => !key.startsWith('_'))
+            const cleanNode = Object.fromEntries(
+              Object.entries(node).filter(([key]) => !key.startsWith('_'))
             );
-            const nodeDef = nodeRegistry.get(type);
-            const isConfigNode = nodeDef?.category === 'config';
-            // Config nodes shouldn't have z, x, y - they don't render on canvas
-            if (isConfigNode) {
-              return {
-                _node: { id, type, name: name || '', wires: wires || [] },
-                ...cleanConfig
-              };
-            }
             return {
-              _node: {
-                id, type, name: name || '', z, x: x || 0, y: y || 0, wires: wires || [],
-                ...(streamWires ? { streamWires } : {})
-              },
-              ...cleanConfig
+              ...cleanNode,
+              name: cleanNode.name || '',
+              x: cleanNode.x || 0,
+              y: cleanNode.y || 0,
+              wires: cleanNode.wires || []
             };
           });
 
-          // Convert saved config nodes to internal format
+          // Config nodes are already flat
           const internalConfigNodes = (savedFlows.configNodes || []).map(node => {
-            const { id, type, name, ...config } = node;
-            // Filter out runtime-only properties
-            const cleanConfig = Object.fromEntries(
-              Object.entries(config).filter(([key]) => !key.startsWith('_'))
+            const cleanNode = Object.fromEntries(
+              Object.entries(node).filter(([key]) => !key.startsWith('_'))
             );
             return {
-              _node: { id, type, name: name || '' },
-              ...cleanConfig
+              ...cleanNode,
+              name: cleanNode.name || ''
             };
           });
 
@@ -255,17 +242,17 @@ function AppContent() {
       return;
     }
 
-    const nodeType = node._node.type;
+    const nodeType = node.type;
 
     if (nodeType === 'file read') {
       // File read: call mainThread.pick directly to open file picker
-      callMainThread(nodeType, 'pick', node._node.id, {
+      callMainThread(nodeType, 'pick', node.id, {
         accept: node.accept || '',
         format: node.format || 'utf8'
       });
     } else {
       // Default: send inject message to runtime worker
-      runtimeInject(node._node.id);
+      runtimeInject(node.id);
     }
   }, [isRunning, runtimeInject, callMainThread]);
 
@@ -276,8 +263,8 @@ function AppContent() {
       return;
     }
 
-    if (node._node.type === 'file read') {
-      callMainThread('file read', 'readFile', node._node.id, {
+    if (node.type === 'file read') {
+      callMainThread('file read', 'readFile', node.id, {
         file,
         format: node.format || 'utf8'
       });
@@ -333,30 +320,27 @@ function AppContent() {
     // Create ID mapping for wires
     const idMap = new Map();
     clipboardRef.current.forEach(node => {
-      idMap.set(node._node.id, generateId());
+      idMap.set(node.id, generateId());
     });
 
     const newNodeIds = [];
 
     clipboardRef.current.forEach(node => {
-      const newId = idMap.get(node._node.id);
+      const newId = idMap.get(node.id);
 
       // Update wire targets to new IDs
-      const newWires = (node._node.wires || []).map(outputs =>
+      const newWires = (node.wires || []).map(outputs =>
         outputs.map(targetId => idMap.get(targetId) || targetId)
-          .filter(targetId => idMap.has(targetId) || !clipboardRef.current.some(n => n._node.id === targetId))
+          .filter(targetId => idMap.has(targetId) || !clipboardRef.current.some(n => n.id === targetId))
       );
 
       const newNode = {
         ...node,
-        _node: {
-          ...node._node,
-          id: newId,
-          x: node._node.x + offset,
-          y: node._node.y + offset,
-          z: editor.activeFlow,
-          wires: newWires
-        }
+        id: newId,
+        x: node.x + offset,
+        y: node.y + offset,
+        z: editor.activeFlow,
+        wires: newWires
       };
 
       flowDispatch({ type: 'ADD_NODE', node: newNode });
@@ -392,8 +376,8 @@ function AppContent() {
         if (!isInput) {
           e.preventDefault();
           const allIds = Object.values(nodes)
-            .filter(n => n._node.z === editor.activeFlow)
-            .map(n => n._node.id);
+            .filter(n => n.z === editor.activeFlow)
+            .map(n => n.id);
           editorDispatch({ type: 'SELECT_NODES', ids: allIds });
         }
       }
@@ -446,7 +430,7 @@ function AppContent() {
 
   // When selection changes, update editing node if it's still selected
   useEffect(() => {
-    if (editingNode && !editor.selectedNodes.includes(editingNode._node.id)) {
+    if (editingNode && !editor.selectedNodes.includes(editingNode.id)) {
       // Node was deselected, close editor
       // setEditingNode(null);
     }
@@ -526,7 +510,7 @@ function AppContent() {
         {/* Node editor dialog */}
         {editingNode && (
           <NodeEditor
-            key={editingNode._node.id}
+            key={editingNode.id}
             node={editingNode}
             onClose={handleCloseEditor}
           />

@@ -2,7 +2,7 @@ export const debugNode = {
   type: 'debug',
   category: 'output',
   description: 'Displays messages in the debug panel',
-  label: (node) => node._node.name || 'debug',
+  label: (node) => node.name || 'debug',
   color: '#87a980',
   icon: true,
   faChar: '\uf188', // bug
@@ -48,7 +48,7 @@ export const debugNode = {
     }
 
     if (this.config.console) {
-      this.log(this._node.name || this._node.id, output);
+      this.log(this.name || this.id, output);
     }
   },
 

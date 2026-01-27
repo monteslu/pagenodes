@@ -10,7 +10,7 @@ export const audioIIRFilterNode = {
   relatedDocs: () => [
     { label: 'IIRFilterNode (MDN)', url: 'https://developer.mozilla.org/en-US/docs/Web/API/IIRFilterNode' }
   ],
-  label: (node) => node._node.name || 'iirfilter',
+  label: (node) => node.name || 'iirfilter',
   color: '#2d9a2d',
   fontColor: '#fff',
   icon: true,

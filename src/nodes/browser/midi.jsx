@@ -14,7 +14,7 @@ export const midiInNode = {
   category: 'hardware',
   description: 'Receives MIDI messages',
   requiresGesture: true,
-  label: (node) => node._node.name || 'midi in',
+  label: (node) => node.name || 'midi in',
   color: '#DDD', // light gray
   icon: true,
   faChar: '\uf001', // music
@@ -149,7 +149,7 @@ export const midiOutNode = {
   category: 'hardware',
   description: 'Sends MIDI messages',
   requiresGesture: true,
-  label: (node) => node._node.name || 'midi out',
+  label: (node) => node.name || 'midi out',
   color: '#DDD', // light gray
   icon: true,
   faChar: '\uf001', // music

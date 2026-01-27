@@ -6,7 +6,7 @@ export const mcpOutputNode = {
   category: 'ai',
   description: 'Sends text to the MCP message queue for AI agents',
   paletteLabel: 'mcp-out',
-  label: (node) => node._node.name || 'mcp-out',
+  label: (node) => node.name || 'mcp-out',
   color: '#a66bbf',  // Purple for AI nodes
   fontColor: '#fff',
   icon: true,

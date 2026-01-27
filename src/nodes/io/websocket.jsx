@@ -3,7 +3,7 @@ export const websocketClientNode = {
   type: 'websocket-client',
   category: 'config',
   description: 'WebSocket client connection configuration',
-  label: (node) => node._node.name || node._node.url || 'websocket-client',
+  label: (node) => node.name || node.url || 'websocket-client',
 
   defaults: {
     name: { type: 'string', default: '' },
@@ -32,7 +32,7 @@ export const websocketInNode = {
   type: 'websocket in',
   category: 'networking',
   description: 'Receives WebSocket messages',
-  label: (node) => node._node.name || 'websocket',
+  label: (node) => node.name || 'websocket',
   color: '#d7d7a0', // pale yellowish
   icon: true,
   faChar: '\uf0ec', // exchange
@@ -84,7 +84,7 @@ export const websocketOutNode = {
   type: 'websocket out',
   category: 'networking',
   description: 'Sends WebSocket messages',
-  label: (node) => node._node.name || 'websocket',
+  label: (node) => node.name || 'websocket',
   color: '#d7d7a0', // pale yellowish
   icon: true,
   faChar: '\uf0ec', // exchange

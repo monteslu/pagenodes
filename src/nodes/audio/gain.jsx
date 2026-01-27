@@ -13,7 +13,7 @@ export const audioGainNode = {
   relatedDocs: () => [
     { label: 'GainNode (MDN)', url: 'https://developer.mozilla.org/en-US/docs/Web/API/GainNode' }
   ],
-  label: (node) => node._node.name || 'gain',
+  label: (node) => node.name || 'gain',
   color: '#2d9a2d',  // Green for audio nodes
   fontColor: '#fff',  // White text for contrast
   icon: true,

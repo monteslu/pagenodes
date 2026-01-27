@@ -71,7 +71,7 @@ export const llmConfigNode = {
   type: 'llm-config',
   category: 'config',
   description: 'LOCAL language model configuration',
-  label: (node) => node._node.name || node.model || 'llm-config',
+  label: (node) => node.name || node.model || 'llm-config',
 
   defaults: {
     name: { type: 'string', default: '' },
@@ -157,7 +157,7 @@ export const llmNode = {
   category: 'ai',
   description: 'Sends prompts to LOCAL language models',
   paletteLabel: 'llm',
-  label: (node) => node._node.name || 'llm',
+  label: (node) => node.name || 'llm',
   color: '#C8E6C9', // light green
   icon: true,
   faChar: '\uf075', // comment

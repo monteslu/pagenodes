@@ -4,11 +4,11 @@ import { nodeRegistry } from '../../nodes';
 
 // Helper to get node label for width calculation
 function getNodeLabel(node, def) {
-  if (node._node.name) return node._node.name;
+  if (node.name) return node.name;
   if (def?.label) {
     return typeof def.label === 'function' ? def.label(node) : def.label;
   }
-  return node._node.type;
+  return node.type;
 }
 
 // Calculate node height considering audio ports and custom getNodeHeight
@@ -45,7 +45,7 @@ function getNodeWidthWithDef(node, def) {
 
 export function Wire({ sourceNode, sourcePort, targetNode, targetPort = 0, targetPos, selected, onMouseDown, onMouseUp, isTemp, isConnecting, isPending, isStream = false }) {
   const pathData = useMemo(() => {
-    const sourceDef = nodeRegistry.get(sourceNode._node.type);
+    const sourceDef = nodeRegistry.get(sourceNode.type);
     const sourceWidth = getNodeWidthWithDef(sourceNode, sourceDef);
     const sourceHeight = getNodeHeightWithDef(sourceNode, sourceDef);
 
@@ -57,7 +57,7 @@ export function Wire({ sourceNode, sourcePort, targetNode, targetPort = 0, targe
     let endPos;
     if (targetNode && !targetPos) {
       // Connected to a target node (saved wire)
-      const targetDef = nodeRegistry.get(targetNode._node.type);
+      const targetDef = nodeRegistry.get(targetNode.type);
       const targetWidth = getNodeWidthWithDef(targetNode, targetDef);
       const targetHeight = getNodeHeightWithDef(targetNode, targetDef);
       endPos = isStream
@@ -65,7 +65,7 @@ export function Wire({ sourceNode, sourcePort, targetNode, targetPort = 0, targe
         : getPortPosition(targetNode, targetPort, false, targetHeight, targetWidth, targetDef);
     } else if (targetNode && targetPos) {
       // Temp wire hovering over a valid input - snap to port
-      const targetDef = nodeRegistry.get(targetNode._node.type);
+      const targetDef = nodeRegistry.get(targetNode.type);
       const targetWidth = getNodeWidthWithDef(targetNode, targetDef);
       const targetHeight = getNodeHeightWithDef(targetNode, targetDef);
       endPos = isStream

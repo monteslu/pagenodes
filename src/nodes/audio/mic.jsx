@@ -12,7 +12,7 @@ export const audioMicNode = {
   relatedDocs: () => [
     { label: 'MediaStreamAudioSourceNode (MDN)', url: 'https://developer.mozilla.org/en-US/docs/Web/API/MediaStreamAudioSourceNode' }
   ],
-  label: (node) => node._node.name || 'mic',
+  label: (node) => node.name || 'mic',
   color: '#2d9a2d',  // Green for audio nodes
   fontColor: '#fff',  // White text for contrast
   icon: true,

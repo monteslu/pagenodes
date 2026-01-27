@@ -94,7 +94,7 @@ let mcpCurrentStatus = 'disabled';
 // Storage reference (set when first browser connects)
 let storageRef = null;
 
-// Server-side flow state (storage format: flat nodes, no _node wrapper)
+// Server-side flow state (flat nodes)
 let serverFlowState = { flows: [], nodes: [], configNodes: [] };
 
 // Debug/error message buffers for MCP queries
@@ -188,14 +188,20 @@ function handleError(sourceNode, errorText, originalMsg, errorObj) {
 /**
  * Compare two config nodes to see if connection-relevant properties changed.
  */
+const RESERVED_PROPS = new Set(['id', 'type', 'name', 'z', 'x', 'y', 'wires', 'streamWires']);
+
 function configsEqual(prevNode, newNode) {
   if (!prevNode || !newNode) return false;
-  if (prevNode._node.type !== newNode._node.type) return false;
+  if (prevNode.type !== newNode.type) return false;
 
-  const prevConfig = { ...prevNode };
-  const newConfig = { ...newNode };
-  delete prevConfig._node;
-  delete newConfig._node;
+  const prevConfig = {};
+  const newConfig = {};
+  for (const key of Object.keys(prevNode)) {
+    if (!RESERVED_PROPS.has(key)) prevConfig[key] = prevNode[key];
+  }
+  for (const key of Object.keys(newNode)) {
+    if (!RESERVED_PROPS.has(key)) newConfig[key] = newNode[key];
+  }
 
   return JSON.stringify(prevConfig) === JSON.stringify(newConfig);
 }
@@ -204,13 +210,7 @@ function configsEqual(prevNode, newNode) {
  * Store config node state for future comparison
  */
 function storeConfigState(configNode) {
-  previousConfigStates.set(configNode._node.id, {
-    _node: {
-      id: configNode._node.id,
-      type: configNode._node.type
-    },
-    ...configNode
-  });
+  previousConfigStates.set(configNode.id, { ...configNode });
 }
 
 /**
@@ -218,14 +218,17 @@ function storeConfigState(configNode) {
  */
 class RuntimeNode {
   constructor(nodeDef, runtimeDef) {
-    this.id = nodeDef._node.id;
-    this.type = nodeDef._node.type;
-    this.name = nodeDef._node.name || '';
-    this.z = nodeDef._node.z;
-    this.wires = nodeDef._node.wires || [];
+    this.id = nodeDef.id;
+    this.type = nodeDef.type;
+    this.name = nodeDef.name || '';
+    this.z = nodeDef.z;
+    this.wires = nodeDef.wires || [];
 
-    this.config = { ...nodeDef };
-    delete this.config._node;
+    // Extract config (everything except reserved system props)
+    this.config = {};
+    for (const key of Object.keys(nodeDef)) {
+      if (!RESERVED_PROPS.has(key)) this.config[key] = nodeDef[key];
+    }
 
     this._closeCallbacks = [];
     this._eventListeners = new Map();
@@ -442,10 +445,10 @@ class RuntimeNode {
  * Create a node instance from definition
  */
 function createNode(nodeDef) {
-  const runtimeDef = runtimeRegistry.get(nodeDef._node.type);
+  const runtimeDef = runtimeRegistry.get(nodeDef.type);
 
   if (!runtimeDef) {
-    PN.warn(`Unknown node type: ${nodeDef._node.type}`);
+    PN.warn(`Unknown node type: ${nodeDef.type}`);
     return new RuntimeNode(nodeDef, null);
   }
 
@@ -461,14 +464,14 @@ async function deployFlows(flowNodes, flowConfigNodes = [], skipNodeIds = []) {
   errorNodeIds = new Set(skipNodeIds);
 
   const unchangedConfigIds = new Set();
-  const incomingConfigIds = new Set(flowConfigNodes.map(c => c._node.id));
+  const incomingConfigIds = new Set(flowConfigNodes.map(c => c.id));
 
   // Determine which config nodes have changed
   for (const configNode of flowConfigNodes) {
-    const prevState = previousConfigStates.get(configNode._node.id);
+    const prevState = previousConfigStates.get(configNode.id);
     if (prevState && configsEqual(prevState, configNode)) {
-      unchangedConfigIds.add(configNode._node.id);
-      PN.log(`Config node ${configNode._node.id} unchanged, keeping connection`);
+      unchangedConfigIds.add(configNode.id);
+      PN.log(`Config node ${configNode.id} unchanged, keeping connection`);
     }
   }
 
@@ -512,18 +515,13 @@ async function deployFlows(flowNodes, flowConfigNodes = [], skipNodeIds = []) {
   // Update configNodes map
   configNodes.clear();
   for (const configNode of flowConfigNodes) {
-    configNodes.set(configNode._node.id, {
-      id: configNode._node.id,
-      type: configNode._node.type,
-      name: configNode._node.name,
-      ...configNode
-    });
+    configNodes.set(configNode.id, configNode);
   }
 
   // Create new/changed config node instances
   for (const configNode of flowConfigNodes) {
-    if (errorNodeIds.has(configNode._node.id)) continue;
-    if (unchangedConfigIds.has(configNode._node.id)) {
+    if (errorNodeIds.has(configNode.id)) continue;
+    if (unchangedConfigIds.has(configNode.id)) {
       storeConfigState(configNode);
       continue;
     }
@@ -535,10 +533,10 @@ async function deployFlows(flowNodes, flowConfigNodes = [], skipNodeIds = []) {
 
   // Initialize new/changed config nodes
   for (const configNode of flowConfigNodes) {
-    if (errorNodeIds.has(configNode._node.id)) continue;
-    if (unchangedConfigIds.has(configNode._node.id)) continue;
+    if (errorNodeIds.has(configNode.id)) continue;
+    if (unchangedConfigIds.has(configNode.id)) continue;
 
-    const node = nodes.get(configNode._node.id);
+    const node = nodes.get(configNode.id);
     if (node && node.onInit) {
       try {
         node.onInit();
@@ -550,7 +548,7 @@ async function deployFlows(flowNodes, flowConfigNodes = [], skipNodeIds = []) {
 
   // Create regular node instances
   for (const nodeDef of flowNodes) {
-    if (errorNodeIds.has(nodeDef._node.id)) continue;
+    if (errorNodeIds.has(nodeDef.id)) continue;
     const node = createNode(nodeDef);
     nodes.set(node.id, node);
   }
@@ -558,8 +556,8 @@ async function deployFlows(flowNodes, flowConfigNodes = [], skipNodeIds = []) {
   // Initialize all regular nodes
   const initPromises = [];
   for (const nodeDef of flowNodes) {
-    if (errorNodeIds.has(nodeDef._node.id)) continue;
-    const node = nodes.get(nodeDef._node.id);
+    if (errorNodeIds.has(nodeDef.id)) continue;
+    const node = nodes.get(nodeDef.id);
     if (node && node.onInit) {
       try {
         const result = node.onInit();
@@ -756,30 +754,6 @@ function notifyAllBrowsers(notification, data) {
 
 
 /**
- * Convert a flat storage-format node to runtime format with _node wrapper
- */
-function storageNodeToRuntime(item) {
-  const nodeDef = {
-    _node: {
-      id: item.id,
-      type: item.type,
-      name: item.name,
-      z: item.z,
-      wires: item.wires || []
-    }
-  };
-
-  // Copy all other properties to config
-  for (const key of Object.keys(item)) {
-    if (!['id', 'type', 'name', 'z', 'wires', 'x', 'y'].includes(key)) {
-      nodeDef[key] = item[key];
-    }
-  }
-
-  return nodeDef;
-}
-
-/**
  * Save serverFlowState to storage and notify connected browsers
  */
 async function saveAndNotifyBrowsers() {
@@ -831,14 +805,12 @@ export async function deployFlowsFromStorage(flowConfig) {
       continue;
     }
 
-    const nodeDef = storageNodeToRuntime(item);
-
-    // Check if this is a config node (no z property means it's a config node)
+    // Nodes are already flat - use directly
     if (!item.z) {
-      flowConfigNodes.push(nodeDef);
+      flowConfigNodes.push(item);
       storedConfigNodes.push(item);
     } else {
-      flowNodes.push(nodeDef);
+      flowNodes.push(item);
       storedNodes.push(item);
     }
   }

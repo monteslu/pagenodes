@@ -8,7 +8,7 @@ export const httpInNode = {
   label: (node) => {
     const method = node.method || 'GET';
     const url = node.url || '';
-    if (node._node.name) return node._node.name;
+    if (node.name) return node.name;
     return url ? `[${method}] ${url}` : 'http in';
   },
   color: '#e7e7ae',
@@ -88,7 +88,7 @@ export const httpResponseNode = {
   type: 'http response',
   category: 'networking',
   description: 'Sends HTTP response (server mode only)',
-  label: (node) => node._node.name || 'http response',
+  label: (node) => node.name || 'http response',
   color: '#e7e7ae',
   icon: true,
   faChar: '\uf08b', // sign-out

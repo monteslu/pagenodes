@@ -12,7 +12,7 @@ export const audioOscillatorNode = {
   relatedDocs: () => [
     { label: 'OscillatorNode (MDN)', url: 'https://developer.mozilla.org/en-US/docs/Web/API/OscillatorNode' }
   ],
-  label: (node) => node._node.name || 'oscillator',
+  label: (node) => node.name || 'oscillator',
   color: '#2d9a2d',  // Green for audio nodes
   fontColor: '#fff',  // White text for contrast
   icon: true,

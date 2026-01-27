@@ -2,7 +2,7 @@ export const mathNode = {
   type: 'math',
   category: 'logic',
   description: 'Performs mathematical operations',
-  label: (node) => node._node.name || 'math',
+  label: (node) => node.name || 'math',
   color: '#778899', // light slate gray
   icon: true,
   faChar: '\uf1ec', // calculator

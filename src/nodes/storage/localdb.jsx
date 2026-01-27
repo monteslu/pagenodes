@@ -2,7 +2,7 @@ export const localreadNode = {
   type: 'localread',
   category: 'storage',
   description: 'Reads from browser local storage',
-  label: (node) => node._node.name || 'local read',
+  label: (node) => node.name || 'local read',
   color: '#7E57C2', // purple
   icon: true,
   faChar: '\uf1c0', // database
@@ -88,7 +88,7 @@ export const localwriteNode = {
   type: 'localwrite',
   category: 'storage',
   description: 'Writes to browser local storage',
-  label: (node) => node._node.name || 'local write',
+  label: (node) => node.name || 'local write',
   color: '#7E57C2', // purple
   icon: true,
   faChar: '\uf1c0', // database

@@ -2,7 +2,7 @@ export const collectionsNode = {
   type: 'collections',
   category: 'logic',
   description: 'Works with arrays/objects using lodash',
-  label: (node) => node._node.name || 'collections',
+  label: (node) => node.name || 'collections',
   color: '#66d9ef', // light blue
   icon: true,
   faChar: '\uf1b3', // cubes

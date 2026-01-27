@@ -2,7 +2,7 @@ export const xmlNode = {
   type: 'xml',
   category: 'transforms',
   description: 'Converts between XML string and object',
-  label: (node) => node._node.name || 'xml',
+  label: (node) => node.name || 'xml',
   color: '#DEBD5C', // light tan/gold
   icon: true,
   faChar: '\uf1c9', // file-code-o

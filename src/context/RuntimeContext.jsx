@@ -295,13 +295,11 @@ export function RuntimeProvider({ children }) {
       }
 
       const newNode = {
-        _node: {
-          id: generateId(),
-          type,
-          name: name || '',
-          ...(isConfigNode ? {} : { z: flowId, x: x || 100, y: y || 100 }),
-          wires: []
-        },
+        id: generateId(),
+        type,
+        name: name || '',
+        ...(isConfigNode ? {} : { z: flowId, x: x || 100, y: y || 100 }),
+        wires: [],
         ...defaults,
         ...config
       };
@@ -469,14 +467,12 @@ export function RuntimeProvider({ children }) {
         const isConfigNode = _nodeDef.category === 'config';
 
         const newNode = {
-          _node: {
-            id: _realId,
-            type,
-            name: name || '',
-            ...(isConfigNode ? {} : { z: flowId, x: x || 100, y: y || 100 }),
-            wires: mappedWires,
-            ...(mappedStreamWires ? { streamWires: mappedStreamWires } : {})
-          },
+          id: _realId,
+          type,
+          name: name || '',
+          ...(isConfigNode ? {} : { z: flowId, x: x || 100, y: y || 100 }),
+          wires: mappedWires,
+          ...(mappedStreamWires ? { streamWires: mappedStreamWires } : {}),
           ...defaults,
           ...config
         };
@@ -530,24 +526,13 @@ export function RuntimeProvider({ children }) {
         return { success: false, errors: [`Node not found: "${nodeId}"`] };
       }
 
-      // Separate _node updates from config updates
-      const nodeUpdates = {};
-      const configUpdates = {};
-      for (const [key, value] of Object.entries(updates)) {
-        if (['x', 'y', 'name', 'wires', 'streamWires'].includes(key)) {
-          nodeUpdates[key] = value;
-        } else {
-          configUpdates[key] = value;
-        }
-      }
+      // All updates go directly to the flat node
+      const allUpdates = { ...updates };
 
       flowDispatch({
         type: 'UPDATE_NODE',
         id: nodeId,
-        changes: {
-          _node: { ...node._node, ...nodeUpdates },
-          ...configUpdates
-        }
+        changes: allUpdates
       });
       return { success: true };
     });
@@ -597,7 +582,7 @@ export function RuntimeProvider({ children }) {
       }
 
       // Update wires
-      const wires = [...(sourceNode._node.wires || [])];
+      const wires = [...(sourceNode.wires || [])];
       while (wires.length <= sourcePort) {
         wires.push([]);
       }
@@ -608,13 +593,13 @@ export function RuntimeProvider({ children }) {
       flowDispatch({
         type: 'UPDATE_NODE',
         id: sourceId,
-        updates: { _node: { ...sourceNode._node, wires } }
+        updates: { wires }
       });
       return {
         success: true,
         connection: {
-          from: `${sourceNode._node.type}(${sourceId})`,
-          to: `${targetNode._node.type}(${targetId})`,
+          from: `${sourceNode.type}(${sourceId})`,
+          to: `${targetNode.type}(${targetId})`,
           port: sourcePort
         },
         sourceWires: wires
@@ -645,7 +630,7 @@ export function RuntimeProvider({ children }) {
         return { success: false, errors: [`Source node not found: "${sourceId}"`] };
       }
 
-      const wires = [...(sourceNode._node.wires || [])];
+      const wires = [...(sourceNode.wires || [])];
       if (wires[sourcePort]) {
         wires[sourcePort] = wires[sourcePort].filter(id => id !== targetId);
       }
@@ -653,7 +638,7 @@ export function RuntimeProvider({ children }) {
       flowDispatch({
         type: 'UPDATE_NODE',
         id: sourceId,
-        updates: { _node: { ...sourceNode._node, wires } }
+        updates: { wires }
       });
       return { success: true };
     });
@@ -672,19 +657,16 @@ export function RuntimeProvider({ children }) {
         const flowConfig = {
           flows: state.flows,
           nodes: Object.values(state.nodes).map(node => {
-            const { _node, ...config } = node;
             // Filter out runtime-only properties (e.g., _currentValue, _activeButton)
-            const cleanConfig = Object.fromEntries(
-              Object.entries(config).filter(([key]) => !key.startsWith('_'))
+            return Object.fromEntries(
+              Object.entries(node).filter(([key]) => !key.startsWith('_'))
             );
-            return { ..._node, ...cleanConfig };
           }),
           configNodes: Object.values(state.configNodes).map(node => {
-            const { _node, users: _users, ...config } = node;
-            const cleanConfig = Object.fromEntries(
-              Object.entries(config).filter(([key]) => !key.startsWith('_'))
+            // Filter out runtime-only properties and 'users' tracking
+            return Object.fromEntries(
+              Object.entries(node).filter(([key]) => !key.startsWith('_') && key !== 'users')
             );
-            return { ..._node, ...cleanConfig };
           })
         };
         logger.log(`[mcp] Saving ${flowConfig.nodes.length} nodes to storage`);
@@ -737,8 +719,8 @@ export function RuntimeProvider({ children }) {
       if (!node) {
         return { success: false, errors: [`Node not found: "${nodeId}"`] };
       }
-      if (node._node.type !== 'inject') {
-        return { success: false, errors: [`Node "${nodeId}" is not an inject node (type: ${node._node.type}). Use trigger_node for non-inject nodes.`] };
+      if (node.type !== 'inject') {
+        return { success: false, errors: [`Node "${nodeId}" is not an inject node (type: ${node.type}). Use trigger_node for non-inject nodes.`] };
       }
 
       // Build message object (check both undefined and null since RPC converts undefined to null)
@@ -808,10 +790,10 @@ export function RuntimeProvider({ children }) {
 
         // Find all mcp-output nodes and update their status
         const state = flowStateRef.current;
-        const mcpOutputNodes = Object.values(state.nodes).filter(n => n._node.type === 'mcp-output');
+        const mcpOutputNodes = Object.values(state.nodes).filter(n => n.type === 'mcp-output');
         for (const node of mcpOutputNodes) {
-          const count = remainingByNode[node._node.id] || 0;
-          peerRef.current.methods.emitEvent(node._node.id, 'queueUpdate', { count });
+          const count = remainingByNode[node.id] || 0;
+          peerRef.current.methods.emitEvent(node.id, 'queueUpdate', { count });
         }
       }
       return messages;
@@ -820,7 +802,7 @@ export function RuntimeProvider({ children }) {
     peerRef.current.addHandler('mcpSendMessage', (payload, topic = '') => {
       // Find all mcp-input nodes and send message to them
       const state = flowStateRef.current;
-      const mcpInputNodes = Object.values(state.nodes).filter(n => n._node.type === 'mcp-input');
+      const mcpInputNodes = Object.values(state.nodes).filter(n => n.type === 'mcp-input');
 
       if (mcpInputNodes.length === 0) {
         return { success: false, error: 'No mcp-input nodes found in flows' };
@@ -828,7 +810,7 @@ export function RuntimeProvider({ children }) {
 
       // Emit message to each mcp-input node
       for (const node of mcpInputNodes) {
-        peerRef.current.methods.emitEvent(node._node.id, 'mcpMessage', { payload, topic });
+        peerRef.current.methods.emitEvent(node.id, 'mcpMessage', { payload, topic });
       }
 
       return { success: true, nodeCount: mcpInputNodes.length };
@@ -853,11 +835,11 @@ export function RuntimeProvider({ children }) {
       if (!state?.nodes) return [];
       // Return all inject nodes with their IDs and names
       return Object.values(state.nodes)
-        .filter(n => n._node.type === 'inject')
+        .filter(n => n.type === 'inject')
         .map(n => ({
-          id: n._node.id,
-          name: n._node.name || 'inject',
-          flowId: n._node.z,
+          id: n.id,
+          name: n.name || 'inject',
+          flowId: n.z,
           payload: n.payload,
           payloadType: n.payloadType,
           topic: n.topic
@@ -941,27 +923,16 @@ export function RuntimeProvider({ children }) {
       return;
     }
 
-    // Convert nodes object to array and strip editor-only props
+    // Convert nodes object to array and strip editor-only props (x, y)
     const flowNodes = Object.values(nodes).map(node => {
-      // Keep _node with runtime-relevant props, keep config at top level
-      const { x: _x, y: _y, ...runtimeNodeProps } = node._node;
-      return {
-        _node: runtimeNodeProps,
-        ...Object.fromEntries(
-          Object.entries(node).filter(([key]) => key !== '_node')
-        )
-      };
+      const { x: _x, y: _y, ...rest } = node;
+      return rest;
     });
 
-    // Convert config nodes object to array
+    // Convert config nodes object to array (strip 'users' tracking)
     const flowConfigNodes = Object.values(configNodes).map(node => {
-      // Config nodes don't have x, y, z, wires - just _node and config
-      return {
-        _node: { ...node._node },
-        ...Object.fromEntries(
-          Object.entries(node).filter(([key]) => key !== '_node' && key !== 'users')
-        )
-      };
+      const { users: _users, ...rest } = node;
+      return rest;
     });
 
     // Get all node IDs that are being deployed (for cleanup after)
@@ -971,7 +942,7 @@ export function RuntimeProvider({ children }) {
     ]);
 
     // Check which special node types are being deployed
-    const deployedTypes = new Set(flowNodes.map(n => n._node.type));
+    const deployedTypes = new Set(flowNodes.map(n => n.type));
     setHasCanvasNodes(deployedTypes.has('canvas'));
 
     try {

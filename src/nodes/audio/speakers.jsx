@@ -12,7 +12,7 @@ export const audioSpeakersNode = {
   relatedDocs: () => [
     { label: 'AudioDestinationNode (MDN)', url: 'https://developer.mozilla.org/en-US/docs/Web/API/AudioDestinationNode' }
   ],
-  label: (node) => node._node.name || 'speakers',
+  label: (node) => node.name || 'speakers',
   color: '#2d9a2d',  // Green for audio nodes
   fontColor: '#fff',  // White text for contrast
   icon: true,

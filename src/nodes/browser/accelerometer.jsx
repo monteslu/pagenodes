@@ -15,7 +15,7 @@ export const accelerometerNode = {
   category: 'hardware',
   description: 'Reads device accelerometer',
   requiresGesture: true,
-  label: (node) => node._node.name || 'accelerometer',
+  label: (node) => node.name || 'accelerometer',
   color: '#C7E9C0', // light green
   icon: true,
   faChar: '\uf10b', // mobile
@@ -108,7 +108,7 @@ export const gyroscopeNode = {
   category: 'hardware',
   description: 'Reads device gyroscope',
   requiresGesture: true,
-  label: (node) => node._node.name || 'gyroscope',
+  label: (node) => node.name || 'gyroscope',
   color: '#C7E9C0', // light green
   icon: true,
   faChar: '\uf021', // refresh
@@ -186,7 +186,7 @@ export const orientationNode = {
   category: 'hardware',
   description: 'Reads device orientation',
   requiresGesture: true,
-  label: (node) => node._node.name || 'orientation',
+  label: (node) => node.name || 'orientation',
   color: '#C7E9C0', // light green
   icon: true,
   faChar: '\uf14e', // compass

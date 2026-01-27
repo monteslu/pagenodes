@@ -26,7 +26,7 @@ export const changeNode = {
   type: 'change',
   category: 'transforms',
   description: 'Sets, changes, or deletes message properties',
-  label: (node) => node._node.name || 'change',
+  label: (node) => node.name || 'change',
   color: '#fdd0a2',
   icon: true,
   faChar: '\uf074', // random

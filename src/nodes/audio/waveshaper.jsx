@@ -13,7 +13,7 @@ export const audioWaveShaperNode = {
   relatedDocs: () => [
     { label: 'WaveShaperNode (MDN)', url: 'https://developer.mozilla.org/en-US/docs/Web/API/WaveShaperNode' }
   ],
-  label: (node) => node._node.name || 'waveshaper',
+  label: (node) => node.name || 'waveshaper',
   color: '#2d9a2d',  // Green for audio nodes
   fontColor: '#fff',  // White text for contrast
   icon: true,

@@ -4,7 +4,7 @@ export const splitNode = {
   type: 'split',
   category: 'logic',
   description: 'Splits a message into a sequence',
-  label: (node) => node._node.name || 'split',
+  label: (node) => node.name || 'split',
   color: '#e2d96e',
   icon: true,
   faChar: '\uf248', // object-ungroup

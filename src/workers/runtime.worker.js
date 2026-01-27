@@ -1025,6 +1025,8 @@ PN = createWorkerLogger('worker', (entries) => {
   peer.notifiers.logs(entries);
 });
 
+PN.mode = 'browser';
+
 // Make PN available globally for node runtimes
 self.PN = PN;
 

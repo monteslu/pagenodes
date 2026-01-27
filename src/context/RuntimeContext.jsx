@@ -1091,6 +1091,7 @@ export function RuntimeProvider({ children }) {
   }, [isRunning]);
 
   const value = {
+    mode: 'browser',
     isReady,
     isRunning,
     nodeStatuses,

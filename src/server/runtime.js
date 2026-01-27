@@ -20,6 +20,7 @@ globalThis.io = io;
 
 // Server-side logger
 const PN = createLogger('server');
+PN.mode = 'server';
 globalThis.PN = PN;
 
 // Flow context storage

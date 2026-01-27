@@ -1,5 +1,6 @@
 import { useEditor } from '../../context/EditorContext';
 import { useFlows } from '../../context/FlowContext';
+import { useRuntime } from '../../context/runtime.js';
 import { nodeRegistry } from '../../nodes';
 import './InfoPanel.css';
 
@@ -9,6 +10,7 @@ const PRIMITIVE_TYPES = ['string', 'boolean', 'number', 'object', 'array', 'code
 export function InfoPanel({ onEditNode }) {
   const { state: editor } = useEditor();
   const { state: flowState } = useFlows();
+  const { mode } = useRuntime();
 
   // Get the selected node (if exactly one is selected)
   const selectedNode = editor.selectedNodes.length === 1
@@ -136,7 +138,7 @@ export function InfoPanel({ onEditNode }) {
           <div className="info-section info-help">
             <h4>About</h4>
             <div className="info-help-content">
-              {nodeDef.renderHelp()}
+              {nodeDef.renderHelp({ mode })}
             </div>
           </div>
         )}

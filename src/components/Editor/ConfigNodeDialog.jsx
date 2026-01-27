@@ -1,6 +1,7 @@
 import { useState, useCallback, useMemo, useEffect } from 'react';
 import { nodeRegistry } from '../../nodes';
 import { useFlows } from '../../context/FlowContext';
+import { useRuntime } from '../../context/runtime.js';
 import { generateId } from '../../utils/id';
 import { TextInput } from './inputs/TextInput';
 import { NumberInput } from './inputs/NumberInput';
@@ -12,6 +13,7 @@ import './ConfigNodeDialog.css';
 
 export function ConfigNodeDialog({ configType, configId, onClose, onSave }) {
   const { state, dispatch } = useFlows();
+  const runtime = useRuntime();
   const def = nodeRegistry.get(configType);
 
   const isNew = !configId;
@@ -154,9 +156,10 @@ export function ConfigNodeDialog({ configType, configId, onClose, onSave }) {
         configId,
         isNew,
         nodeRegistry,
-      }
+      },
+      mode: runtime.mode,
     };
-  }, [values, nodeName, handleValueChange, configType, configId, isNew]);
+  }, [values, nodeName, handleValueChange, configType, configId, isNew, runtime.mode]);
 
   const renderInput = (key, propDef) => {
     const value = values[key];

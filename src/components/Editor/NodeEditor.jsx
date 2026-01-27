@@ -2,6 +2,7 @@ import { useState, useCallback, useMemo, useEffect } from 'react';
 import { nodeRegistry } from '../../nodes';
 import { useNodes } from '../../hooks/useNodes';
 import { useFlows } from '../../context/FlowContext';
+import { useRuntime } from '../../context/runtime.js';
 import { TextInput } from './inputs/TextInput';
 import { NumberInput } from './inputs/NumberInput';
 import { SelectInput } from './inputs/SelectInput';
@@ -19,6 +20,7 @@ import './NodeEditor.css';
 export function NodeEditor({ node, onClose }) {
   const { updateNode, updateNodeProps } = useNodes();
   const { state: flowState, dispatch } = useFlows();
+  const runtime = useRuntime();
   const def = node ? nodeRegistry.get(node._node.type) : null;
 
   // Config node dialog state: { type, id, key } or null
@@ -155,9 +157,10 @@ export function NodeEditor({ node, onClose }) {
         nodeDef: def,
         flowId: node?._node?.z,
         nodeRegistry,
-      }
+      },
+      mode: runtime.mode,
     };
-  }, [values, nodeName, handleValueChange, node, def, flowState.configNodes]);
+  }, [values, nodeName, handleValueChange, node, def, flowState.configNodes, runtime.mode]);
 
   // Compute dynamic label for preview node - must be before early return
   const previewLabel = useMemo(() => {

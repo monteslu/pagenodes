@@ -891,6 +891,7 @@ export function RuntimeProvider({ children }) {
   }, [isRunning]);
 
   const value = {
+    mode: 'server',
     isReady,
     isRunning,
     nodeStatuses,

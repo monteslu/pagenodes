@@ -27,7 +27,7 @@ export const httpRequestNode = {
       default: '',
       label: 'URL',
       placeholder: 'https://example.com/api',
-      description: 'Target server must have CORS enabled for browser requests'
+      description: 'Target URL for the request'
     }
   },
 
@@ -107,18 +107,23 @@ export const httpRequestNode = {
     }
   },
 
-  renderHelp() {
+  renderHelp({ mode } = {}) {
     return (
       <>
         <p>Makes HTTP requests and returns the response. Supports GET, POST, PUT, DELETE, PATCH, and HEAD methods.</p>
 
-        <h5>CORS Requirement</h5>
-        <p><strong>Important:</strong> Since PageNodes runs in the browser, the target server must have CORS (Cross-Origin Resource Sharing) enabled. If you get network errors, the server likely blocks cross-origin requests. Solutions:</p>
-        <ul>
-          <li>Use APIs that support CORS (most public APIs do)</li>
-          <li>Use a CORS proxy service</li>
-          <li>Add CORS headers to your own server</li>
-        </ul>
+        {mode === 'browser' && (
+          <>
+            <h5>CORS Requirement</h5>
+            <p><strong>Important:</strong> Since PageNodes is running in browser mode, the target server must have CORS (Cross-Origin Resource Sharing) enabled. If you get network errors, the server likely blocks cross-origin requests. Solutions:</p>
+            <ul>
+              <li>Use APIs that support CORS (most public APIs do)</li>
+              <li>Use a CORS proxy service</li>
+              <li>Add CORS headers to your own server</li>
+              <li>Run PageNodes in server mode (no CORS restrictions)</li>
+            </ul>
+          </>
+        )}
 
         <h5>Configuration</h5>
         <ul>

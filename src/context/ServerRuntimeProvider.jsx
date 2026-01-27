@@ -304,6 +304,181 @@ export function RuntimeProvider({ children }) {
         return { success: true, node: newNode };
       });
 
+      peerRef.current.addHandler('mcpAddNodes', (flowId, nodesArr) => {
+        const errors = [];
+        const warnings = [];
+
+        if (!Array.isArray(nodesArr)) {
+          return { success: false, errors: ['nodes must be an array'] };
+        }
+        if (nodesArr.length === 0) {
+          return { success: false, errors: ['nodes array cannot be empty'] };
+        }
+
+        if (!flowId || typeof flowId !== 'string') {
+          errors.push('flowId is required and must be a string');
+        } else {
+          const flowExists = flowStateRef.current.flows.some(f => f.id === flowId);
+          if (!flowExists) {
+            errors.push(`Flow not found: "${flowId}"`);
+          }
+        }
+
+        if (errors.length > 0) {
+          return { success: false, errors };
+        }
+
+        // First pass: validate all nodes and collect tempIds
+        const tempIds = new Set();
+        const nodeValidations = [];
+
+        for (let i = 0; i < nodesArr.length; i++) {
+          const node = nodesArr[i];
+          const nodeErrors = [];
+          const nodeLabel = node.tempId || node.name || `node[${i}]`;
+
+          if (!node || typeof node !== 'object') {
+            errors.push(`${nodeLabel}: must be an object`);
+            nodeValidations.push({ valid: false });
+            continue;
+          }
+
+          if (!node.type || typeof node.type !== 'string') {
+            nodeErrors.push('type is required and must be a string');
+          }
+
+          if (!node.tempId || typeof node.tempId !== 'string') {
+            nodeErrors.push('tempId is required and must be a string');
+          } else if (tempIds.has(node.tempId)) {
+            nodeErrors.push(`duplicate tempId: "${node.tempId}"`);
+          } else {
+            tempIds.add(node.tempId);
+          }
+
+          const nodeDef = node.type ? nodeRegistry.get(node.type) : null;
+          if (node.type && !nodeDef) {
+            nodeErrors.push(`unknown node type: "${node.type}"`);
+          }
+
+          if (nodeDef && nodeDef.category !== 'config') {
+            if (typeof node.x !== 'number' || typeof node.y !== 'number') {
+              nodeErrors.push('x and y coordinates are required for non-config nodes');
+            }
+          }
+
+          if (nodeErrors.length > 0) {
+            errors.push(`${nodeLabel}: ${nodeErrors.join('; ')}`);
+            nodeValidations.push({ valid: false });
+          } else {
+            nodeValidations.push({ valid: true, nodeDef });
+          }
+        }
+
+        if (errors.length > 0) {
+          return { success: false, errors };
+        }
+
+        // Second pass: validate wires reference valid tempIds or existing nodes
+        const existingNodes = flowStateRef.current.nodes;
+        for (let i = 0; i < nodesArr.length; i++) {
+          const node = nodesArr[i];
+          const nodeLabel = node.tempId || `node[${i}]`;
+
+          if (node.wires && Array.isArray(node.wires)) {
+            for (let port = 0; port < node.wires.length; port++) {
+              const outputWires = node.wires[port];
+              if (!Array.isArray(outputWires)) {
+                errors.push(`${nodeLabel}: wires[${port}] must be an array`);
+                continue;
+              }
+              for (const targetId of outputWires) {
+                if (typeof targetId !== 'string') {
+                  errors.push(`${nodeLabel}: wire target must be a string`);
+                } else if (!tempIds.has(targetId) && !existingNodes[targetId]) {
+                  warnings.push(`${nodeLabel}: wire target "${targetId}" not found`);
+                }
+              }
+            }
+          }
+        }
+
+        if (errors.length > 0) {
+          return { success: false, errors, warnings: warnings.length > 0 ? warnings : undefined };
+        }
+
+        // Third pass: generate real IDs and map tempIds
+        const tempToReal = {};
+        const nodesWithIds = nodesArr.map((node, i) => {
+          const realId = generateId();
+          tempToReal[node.tempId] = realId;
+          return { ...node, _realId: realId, _nodeDef: nodeValidations[i].nodeDef };
+        });
+
+        // Fourth pass: create nodes with mapped wires
+        const createdNodes = [];
+        const validationErrors = [];
+
+        for (const node of nodesWithIds) {
+          const { tempId, type, x, y, name, wires, streamWires, _realId, _nodeDef, ...config } = node;
+
+          const defaults = {};
+          if (_nodeDef.defaults) {
+            for (const [key, def] of Object.entries(_nodeDef.defaults)) {
+              defaults[key] = config[key] ?? def.default;
+            }
+          }
+
+          const mappedWires = (wires || []).map(outputWires =>
+            (outputWires || []).map(targetTempId => tempToReal[targetTempId] || targetTempId)
+          );
+
+          const mappedStreamWires = streamWires
+            ? streamWires.map(outputWires =>
+                (outputWires || []).map(targetTempId => tempToReal[targetTempId] || targetTempId)
+              )
+            : undefined;
+
+          const isConfigNode = _nodeDef.category === 'config';
+
+          const newNode = {
+            _node: {
+              id: _realId,
+              type,
+              name: name || '',
+              ...(isConfigNode ? {} : { z: flowId, x: x || 100, y: y || 100 }),
+              wires: mappedWires,
+              ...(mappedStreamWires ? { streamWires: mappedStreamWires } : {})
+            },
+            ...defaults,
+            ...config
+          };
+
+          const nodeValErrors = validateNode(newNode);
+          if (nodeValErrors.length > 0) {
+            validationErrors.push(`${tempId}: ${nodeValErrors.join('; ')}`);
+          }
+
+          createdNodes.push({ tempId, id: _realId, node: newNode, errors: nodeValErrors });
+        }
+
+        if (validationErrors.length > 0) {
+          return { success: false, errors: validationErrors, warnings: warnings.length > 0 ? warnings : undefined };
+        }
+
+        for (const { node } of createdNodes) {
+          flowDispatch({ type: 'ADD_NODE', node });
+        }
+
+        const result = {
+          success: true,
+          nodes: createdNodes.map(({ tempId, id, node }) => ({ tempId, id, node }))
+        };
+        if (warnings.length > 0) {
+          result.warnings = warnings;
+        }
+        return result;
+      });
+
       peerRef.current.addHandler('mcpUpdateNode', (nodeId, updates) => {
         if (!nodeId || typeof nodeId !== 'string') {
           return { success: false, errors: ['nodeId is required and must be a string'] };

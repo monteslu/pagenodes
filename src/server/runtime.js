@@ -815,6 +815,7 @@ export function handleBrowserConnection(socket, storage, log = console.log) {
  * Get the first connected browser peer (for proxying MCP flow-edit operations)
  */
 function getActiveBrowserPeer() {
+  PN.log(`getActiveBrowserPeer: ${browserPeers.size} browser(s) connected`);
   for (const { peer } of browserPeers.values()) {
     return peer;
   }

@@ -21,6 +21,9 @@ export default defineConfig({
       }
     }
   ],
+  server: {
+    allowedHosts: true
+  },
   build: {
     outDir: 'dist-server',
     rollupOptions: {

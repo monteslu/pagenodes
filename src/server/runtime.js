@@ -94,6 +94,9 @@ let mcpCurrentStatus = 'disabled';
 // Storage reference (set when first browser connects)
 let storageRef = null;
 
+// Server-side flow state (storage format: flat nodes, no _node wrapper)
+let serverFlowState = { flows: [], nodes: [], configNodes: [] };
+
 // Debug/error message buffers for MCP queries
 const debugMessages = [];
 const errorMessages = [];
@@ -753,47 +756,100 @@ function notifyAllBrowsers(notification, data) {
 
 
 /**
- * Deploy flows from storage format (used on server startup)
+ * Convert a flat storage-format node to runtime format with _node wrapper
+ */
+function storageNodeToRuntime(item) {
+  const nodeDef = {
+    _node: {
+      id: item.id,
+      type: item.type,
+      name: item.name,
+      z: item.z,
+      wires: item.wires || []
+    }
+  };
+
+  // Copy all other properties to config
+  for (const key of Object.keys(item)) {
+    if (!['id', 'type', 'name', 'z', 'wires', 'x', 'y'].includes(key)) {
+      nodeDef[key] = item[key];
+    }
+  }
+
+  return nodeDef;
+}
+
+/**
+ * Save serverFlowState to storage and notify connected browsers
+ */
+async function saveAndNotifyBrowsers() {
+  if (storageRef) {
+    await storageRef.saveFlows(serverFlowState);
+  }
+  notifyAllBrowsers('flowsChanged', null);
+}
+
+/**
+ * Deploy flows from storage format (used on server startup and MCP deploy)
+ * Accepts both flat array format and structured { flows, nodes, configNodes } format
  */
 export async function deployFlowsFromStorage(flowConfig) {
-  if (!flowConfig || !Array.isArray(flowConfig)) {
+  if (!flowConfig) {
     return { nodeCount: 0, configCount: 0, skippedCount: 0 };
+  }
+
+  let allItems;
+
+  if (Array.isArray(flowConfig)) {
+    // Legacy flat array format
+    allItems = flowConfig;
+  } else {
+    // Structured format: { flows, nodes, configNodes }
+    allItems = [
+      ...(flowConfig.flows || []),
+      ...(flowConfig.nodes || []),
+      ...(flowConfig.configNodes || [])
+    ];
+    // Update serverFlowState from structured format
+    serverFlowState = {
+      flows: flowConfig.flows || [],
+      nodes: flowConfig.nodes || [],
+      configNodes: flowConfig.configNodes || []
+    };
   }
 
   // Separate flows, config nodes, and regular nodes
   const flowNodes = [];
   const flowConfigNodes = [];
+  const storedFlows = [];
+  const storedNodes = [];
+  const storedConfigNodes = [];
 
-  for (const item of flowConfig) {
+  for (const item of allItems) {
     if (item.type === 'tab') {
-      // Flow tabs are not deployed as nodes
+      storedFlows.push(item);
       continue;
     }
 
-    // Convert to runtime format with _node wrapper
-    const nodeDef = {
-      _node: {
-        id: item.id,
-        type: item.type,
-        name: item.name,
-        z: item.z,
-        wires: item.wires || []
-      }
-    };
-
-    // Copy all other properties to config
-    for (const key of Object.keys(item)) {
-      if (!['id', 'type', 'name', 'z', 'wires', 'x', 'y'].includes(key)) {
-        nodeDef[key] = item[key];
-      }
-    }
+    const nodeDef = storageNodeToRuntime(item);
 
     // Check if this is a config node (no z property means it's a config node)
     if (!item.z) {
       flowConfigNodes.push(nodeDef);
+      storedConfigNodes.push(item);
     } else {
       flowNodes.push(nodeDef);
+      storedNodes.push(item);
     }
+  }
+
+  // If we parsed from flat array, update serverFlowState
+  if (Array.isArray(flowConfig)) {
+    serverFlowState = {
+      flows: storedFlows,
+      nodes: storedNodes,
+      configNodes: storedConfigNodes
+    };
   }
 
   return deployFlows(flowNodes, flowConfigNodes, []);
@@ -821,6 +877,14 @@ function registerAuthenticatedHandlers(peer, storage, peerId, log) {
   peer.addHandler('saveFlows', async (flowConfig) => {
     PN.log('saveFlows:', flowConfig?.nodes?.length || 0, 'nodes');
     await storage.saveFlows(flowConfig);
+    // Keep server flow state in sync with browser saves
+    if (flowConfig && !Array.isArray(flowConfig)) {
+      serverFlowState = {
+        flows: flowConfig.flows || [],
+        nodes: flowConfig.nodes || [],
+        configNodes: flowConfig.configNodes || []
+      };
+    }
     return { success: true };
   });
   peer.addHandler('getCredentials', () => storage.getCredentials());
@@ -959,101 +1023,344 @@ function connectMcp(options, _callerPeer) {
       // Runtime operations (inject, debug, etc.) are handled directly.
 
       mcpPeer.addHandler('getState', async () => {
-        // Try browser peer first (has full editor state)
+        // Try browser peer first (has full editor state with unsaved changes)
         const bp = getActiveBrowserPeer();
         if (bp) {
           try { return await bp.methods.mcpGetState(); } catch { /* fall through */ }
         }
-        // Fallback: build state from server knowledge
+        // Fallback: use server flow state
         const nodeCatalog = runtimeRegistry.getAll().map(def => ({
           type: def.type,
           category: def.category,
           description: def.description || ''
         }));
-        const savedFlows = storageRef ? await storageRef.getFlows() : null;
         return {
           nodeCatalog,
-          flows: savedFlows?.flows || [],
-          nodes: savedFlows?.nodes || [],
-          configNodes: savedFlows?.configNodes || []
+          flows: serverFlowState.flows,
+          nodes: serverFlowState.nodes,
+          configNodes: serverFlowState.configNodes
         };
       });
 
       mcpPeer.addHandler('getFlows', async () => {
+        // Try browser peer first (has unsaved changes)
         const bp = getActiveBrowserPeer();
         if (bp) {
           try { return await bp.methods.mcpGetFlows(); } catch { /* fall through */ }
         }
-        const savedFlows = storageRef ? await storageRef.getFlows() : null;
         return {
-          flows: savedFlows?.flows || [],
-          nodes: savedFlows?.nodes || [],
-          configNodes: savedFlows?.configNodes || []
+          flows: serverFlowState.flows,
+          nodes: serverFlowState.nodes,
+          configNodes: serverFlowState.configNodes
         };
       });
 
       mcpPeer.addHandler('createFlow', async (label) => {
-        const bp = getActiveBrowserPeer();
-        if (bp) {
-          return await bp.methods.mcpCreateFlow(label);
-        }
-        return { success: false, errors: ['No browser connected - flow editing requires the editor UI'] };
+        const newFlow = {
+          id: generateId(),
+          type: 'tab',
+          label: label || `Flow ${serverFlowState.flows.length + 1}`
+        };
+        serverFlowState.flows.push(newFlow);
+        await saveAndNotifyBrowsers();
+        return { success: true, flow: newFlow };
       });
 
       mcpPeer.addHandler('addNode', async (args) => {
-        const bp = getActiveBrowserPeer();
-        if (bp) {
-          return await bp.methods.mcpAddNode(args);
+        const errors = [];
+        if (!args || typeof args !== 'object') {
+          return { success: false, errors: ['args must be an object'] };
         }
-        return { success: false, errors: ['No browser connected - flow editing requires the editor UI'] };
+
+        const { type, flowId, x, y, name, config } = args;
+        if (!type || typeof type !== 'string') {
+          errors.push('type is required and must be a string');
+        }
+
+        const runtimeDef = type ? runtimeRegistry.get(type) : null;
+        if (type && !runtimeDef) {
+          errors.push(`Unknown node type: "${type}"`);
+        }
+
+        // Config nodes have no z (flow ID)
+        const isConfigNode = !flowId;
+
+        if (!isConfigNode) {
+          if (!flowId || typeof flowId !== 'string') {
+            errors.push('flowId is required for non-config nodes');
+          } else {
+            const flowExists = serverFlowState.flows.some(f => f.id === flowId);
+            if (!flowExists) {
+              errors.push(`Flow not found: "${flowId}"`);
+            }
+          }
+        }
+
+        if (errors.length > 0) {
+          return { success: false, errors };
+        }
+
+        const newNode = {
+          id: generateId(),
+          type,
+          name: name || '',
+          ...(isConfigNode ? {} : { z: flowId, x: x || 100, y: y || 100 }),
+          wires: [],
+          ...config
+        };
+
+        if (isConfigNode) {
+          serverFlowState.configNodes.push(newNode);
+        } else {
+          serverFlowState.nodes.push(newNode);
+        }
+
+        await saveAndNotifyBrowsers();
+        return { success: true, node: newNode };
       });
 
       mcpPeer.addHandler('addNodes', async (flowId, nodesArr) => {
-        const bp = getActiveBrowserPeer();
-        if (bp) {
-          return await bp.methods.mcpAddNodes(flowId, nodesArr);
+        const errors = [];
+        const warnings = [];
+
+        if (!Array.isArray(nodesArr)) {
+          return { success: false, errors: ['nodes must be an array'] };
         }
-        return { success: false, errors: ['No browser connected - flow editing requires the editor UI'] };
+        if (nodesArr.length === 0) {
+          return { success: false, errors: ['nodes array cannot be empty'] };
+        }
+
+        if (!flowId || typeof flowId !== 'string') {
+          errors.push('flowId is required and must be a string');
+        } else {
+          const flowExists = serverFlowState.flows.some(f => f.id === flowId);
+          if (!flowExists) {
+            errors.push(`Flow not found: "${flowId}"`);
+          }
+        }
+
+        if (errors.length > 0) {
+          return { success: false, errors };
+        }
+
+        // First pass: validate all nodes and collect tempIds
+        const tempIds = new Set();
+        for (let i = 0; i < nodesArr.length; i++) {
+          const node = nodesArr[i];
+          const nodeLabel = node.tempId || node.name || `node[${i}]`;
+
+          if (!node || typeof node !== 'object') {
+            errors.push(`${nodeLabel}: must be an object`);
+            continue;
+          }
+          if (!node.type || typeof node.type !== 'string') {
+            errors.push(`${nodeLabel}: type is required and must be a string`);
+          }
+          if (!node.tempId || typeof node.tempId !== 'string') {
+            errors.push(`${nodeLabel}: tempId is required and must be a string`);
+          } else if (tempIds.has(node.tempId)) {
+            errors.push(`${nodeLabel}: duplicate tempId: "${node.tempId}"`);
+          } else {
+            tempIds.add(node.tempId);
+          }
+
+          const runtimeDef = node.type ? runtimeRegistry.get(node.type) : null;
+          if (node.type && !runtimeDef) {
+            errors.push(`${nodeLabel}: unknown node type: "${node.type}"`);
+          }
+        }
+
+        if (errors.length > 0) {
+          return { success: false, errors };
+        }
+
+        // Second pass: validate wires reference valid tempIds or existing nodes
+        const existingNodeIds = new Set(serverFlowState.nodes.map(n => n.id));
+        for (let i = 0; i < nodesArr.length; i++) {
+          const node = nodesArr[i];
+          const nodeLabel = node.tempId || `node[${i}]`;
+          if (node.wires && Array.isArray(node.wires)) {
+            for (let port = 0; port < node.wires.length; port++) {
+              const outputWires = node.wires[port];
+              if (!Array.isArray(outputWires)) {
+                errors.push(`${nodeLabel}: wires[${port}] must be an array`);
+                continue;
+              }
+              for (const targetId of outputWires) {
+                if (typeof targetId !== 'string') {
+                  errors.push(`${nodeLabel}: wire target must be a string`);
+                } else if (!tempIds.has(targetId) && !existingNodeIds.has(targetId)) {
+                  warnings.push(`${nodeLabel}: wire target "${targetId}" not found`);
+                }
+              }
+            }
+          }
+        }
+
+        if (errors.length > 0) {
+          return { success: false, errors, warnings: warnings.length > 0 ? warnings : undefined };
+        }
+
+        // Third pass: generate real IDs and map tempIds
+        const tempToReal = {};
+        for (const node of nodesArr) {
+          tempToReal[node.tempId] = generateId();
+        }
+
+        // Fourth pass: create nodes with mapped wires
+        const createdNodes = [];
+        for (const node of nodesArr) {
+          const { tempId, type, x, y, name, wires, streamWires, ...config } = node;
+          const realId = tempToReal[tempId];
+
+          const mappedWires = (wires || []).map(outputWires =>
+            (outputWires || []).map(targetTempId => tempToReal[targetTempId] || targetTempId)
+          );
+
+          const isConfigNode = !flowId;
+          const newNode = {
+            id: realId,
+            type,
+            name: name || '',
+            ...(isConfigNode ? {} : { z: flowId, x: x || 100, y: y || 100 }),
+            wires: mappedWires,
+            ...config
+          };
+
+          if (streamWires) {
+            newNode.streamWires = streamWires.map(outputWires =>
+              (outputWires || []).map(targetTempId => tempToReal[targetTempId] || targetTempId)
+            );
+          }
+
+          if (isConfigNode) {
+            serverFlowState.configNodes.push(newNode);
+          } else {
+            serverFlowState.nodes.push(newNode);
+          }
+
+          createdNodes.push({ tempId, id: realId, node: newNode });
+        }
+
+        await saveAndNotifyBrowsers();
+
+        const result = {
+          success: true,
+          nodes: createdNodes.map(({ tempId, id, node }) => ({ tempId, id, node }))
+        };
+        if (warnings.length > 0) {
+          result.warnings = warnings;
+        }
+        return result;
       });
 
       mcpPeer.addHandler('updateNode', async (nodeId, updates) => {
-        const bp = getActiveBrowserPeer();
-        if (bp) {
-          return await bp.methods.mcpUpdateNode(nodeId, updates);
+        if (!nodeId || typeof nodeId !== 'string') {
+          return { success: false, errors: ['nodeId is required and must be a string'] };
         }
-        return { success: false, errors: ['No browser connected - flow editing requires the editor UI'] };
+        if (!updates || typeof updates !== 'object') {
+          return { success: false, errors: ['updates is required and must be an object'] };
+        }
+
+        // Find node in serverFlowState (either regular or config)
+        let nodeIdx = serverFlowState.nodes.findIndex(n => n.id === nodeId);
+        let isConfig = false;
+        if (nodeIdx === -1) {
+          nodeIdx = serverFlowState.configNodes.findIndex(n => n.id === nodeId);
+          isConfig = true;
+        }
+        if (nodeIdx === -1) {
+          return { success: false, errors: [`Node not found: "${nodeId}"`] };
+        }
+
+        const arr = isConfig ? serverFlowState.configNodes : serverFlowState.nodes;
+        arr[nodeIdx] = { ...arr[nodeIdx], ...updates };
+
+        await saveAndNotifyBrowsers();
+        return { success: true };
       });
 
       mcpPeer.addHandler('deleteNode', async (nodeId) => {
-        const bp = getActiveBrowserPeer();
-        if (bp) {
-          return await bp.methods.mcpDeleteNode(nodeId);
+        if (!nodeId || typeof nodeId !== 'string') {
+          return { success: false, errors: ['nodeId is required and must be a string'] };
         }
-        return { success: false, errors: ['No browser connected - flow editing requires the editor UI'] };
+
+        // Try regular nodes first, then config nodes
+        let found = false;
+        const nodeIdx = serverFlowState.nodes.findIndex(n => n.id === nodeId);
+        if (nodeIdx !== -1) {
+          serverFlowState.nodes.splice(nodeIdx, 1);
+          found = true;
+        } else {
+          const configIdx = serverFlowState.configNodes.findIndex(n => n.id === nodeId);
+          if (configIdx !== -1) {
+            serverFlowState.configNodes.splice(configIdx, 1);
+            found = true;
+          }
+        }
+
+        if (!found) {
+          return { success: false, errors: [`Node not found: "${nodeId}"`] };
+        }
+
+        // Clean wires referencing deleted node
+        for (const node of serverFlowState.nodes) {
+          if (node.wires) {
+            node.wires = node.wires.map(outputWires =>
+              (outputWires || []).filter(id => id !== nodeId)
+            );
+          }
+        }
+
+        await saveAndNotifyBrowsers();
+        return { success: true };
       });
 
-      mcpPeer.addHandler('connectNodes', async (sourceId, targetId, sourcePort) => {
-        const bp = getActiveBrowserPeer();
-        if (bp) {
-          return await bp.methods.mcpConnectNodes(sourceId, targetId, sourcePort);
+      mcpPeer.addHandler('connectNodes', async (sourceId, targetId, sourcePort = 0) => {
+        const errors = [];
+        if (!sourceId || typeof sourceId !== 'string') errors.push('sourceId is required');
+        if (!targetId || typeof targetId !== 'string') errors.push('targetId is required');
+        if (typeof sourcePort !== 'number' || sourcePort < 0) errors.push('sourcePort must be non-negative');
+        if (errors.length > 0) return { success: false, errors };
+
+        const sourceNode = serverFlowState.nodes.find(n => n.id === sourceId);
+        if (!sourceNode) return { success: false, errors: [`Source node not found: "${sourceId}"`] };
+        const targetNode = serverFlowState.nodes.find(n => n.id === targetId);
+        if (!targetNode) return { success: false, errors: [`Target node not found: "${targetId}"`] };
+
+        if (!sourceNode.wires) sourceNode.wires = [];
+        while (sourceNode.wires.length <= sourcePort) sourceNode.wires.push([]);
+        if (!sourceNode.wires[sourcePort].includes(targetId)) {
+          sourceNode.wires[sourcePort].push(targetId);
         }
-        return { success: false, errors: ['No browser connected - flow editing requires the editor UI'] };
+
+        await saveAndNotifyBrowsers();
+        return { success: true };
       });
 
-      mcpPeer.addHandler('disconnectNodes', async (sourceId, targetId, sourcePort) => {
-        const bp = getActiveBrowserPeer();
-        if (bp) {
-          return await bp.methods.mcpDisconnectNodes(sourceId, targetId, sourcePort);
+      mcpPeer.addHandler('disconnectNodes', async (sourceId, targetId, sourcePort = 0) => {
+        const sourceNode = serverFlowState.nodes.find(n => n.id === sourceId);
+        if (!sourceNode) return { success: false, errors: ['Source node not found'] };
+
+        if (sourceNode.wires && sourceNode.wires[sourcePort]) {
+          sourceNode.wires[sourcePort] = sourceNode.wires[sourcePort].filter(id => id !== targetId);
         }
-        return { success: false, errors: ['No browser connected - flow editing requires the editor UI'] };
+
+        await saveAndNotifyBrowsers();
+        return { success: true };
       });
 
       mcpPeer.addHandler('deploy', async () => {
-        const bp = getActiveBrowserPeer();
-        if (bp) {
-          return await bp.methods.mcpDeploy();
+        try {
+          if (storageRef) {
+            await storageRef.saveFlows(serverFlowState);
+          }
+          const result = await deployFlowsFromStorage(serverFlowState);
+          notifyAllBrowsers('flowsChanged', null);
+          return { success: true, ...result };
+        } catch (err) {
+          return { success: false, errors: [err.message] };
         }
-        return { success: false, errors: ['No browser connected - deploy requires the editor UI'] };
       });
 
       // Runtime operations - handled directly by server

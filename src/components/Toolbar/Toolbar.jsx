@@ -18,7 +18,7 @@ import './Toolbar.css';
 export function Toolbar() {
   const { state: editor, dispatch } = useEditor();
   const { state: flowState, dispatch: flowDispatch, undo, redo, canUndo, canRedo } = useFlows();
-  const { deploy, isReady, isRunning, mcpStatus, connectMcp, disconnectMcp } = useRuntime();
+  const { deploy, isReady, isRunning, mcpStatus, connectMcp, disconnectMcp, mode, logout } = useRuntime();
   const storage = useStorage();
   const { deleteSelected } = useNodes();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -26,7 +26,16 @@ export function Toolbar() {
   const [showConfigDialog, setShowConfigDialog] = useState(false);
     const [showSettingsDialog, setShowSettingsDialog] = useState(false);
   const [showFlowEditDialog, setShowFlowEditDialog] = useState(false);
+  const [hasPassword, setHasPassword] = useState(false);
   const menuRef = useRef(null);
+
+  // Check if server has a password set (for showing logout option)
+  useEffect(() => {
+    if (mode !== 'server') return;
+    storage.getSettings().then(settings => {
+      setHasPassword(!!settings.hasPassword);
+    }).catch(() => {});
+  }, [mode, storage]);
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -170,6 +179,12 @@ export function Toolbar() {
     } else {
       disconnectMcp();
     }
+    // Refresh password status
+    if (settings.password === null) {
+      setHasPassword(false);
+    } else if (settings.password && settings.password !== true) {
+      setHasPassword(true);
+    }
   }, [connectMcp, disconnectMcp]);
 
   const handleImportComplete = useCallback((data) => {
@@ -301,6 +316,17 @@ export function Toolbar() {
               >
                 Settings
               </button>
+              {mode === 'server' && hasPassword && logout && (
+                <>
+                  <div className="dropdown-divider" />
+                  <button
+                    className="dropdown-item"
+                    onClick={() => { logout(); setMenuOpen(false); }}
+                  >
+                    Logout
+                  </button>
+                </>
+              )}
             </div>
           )}
         </div>

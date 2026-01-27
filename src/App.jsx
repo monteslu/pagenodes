@@ -12,6 +12,7 @@ import { NodeEditor } from './components/Editor';
 import { DebugPanel } from './components/Debug';
 import { InfoPanel } from './components/Info';
 import { CanvasPanel } from './components/Canvases/CanvasPanel';
+import { PasswordPrompt } from './components/Auth/PasswordPrompt';
 import { generateId } from './utils/id';
 import { nodeRegistry } from './nodes';
 import { logger } from './utils/logger';
@@ -26,7 +27,7 @@ function AppContent() {
   const { state: editor, dispatch: editorDispatch } = useEditor();
   const { dispatch: flowDispatch } = useFlows();
   const { messages, downloads } = useDebug();
-  const { inject: runtimeInject, callMainThread, isRunning, isReady, deploy, hasCanvasNodes, emitNodeEvent } = useRuntime();
+  const { inject: runtimeInject, callMainThread, isRunning, isReady, deploy, hasCanvasNodes, emitNodeEvent, authRequired } = useRuntime();
   const { state: flowState } = useFlows();
   const { addNode, deleteSelected, nodes } = useNodes();
   const storage = useStorage();
@@ -456,6 +457,18 @@ function AppContent() {
     if (sidebarTab === 'canvases' && !hasCanvasNodes) return 'debug';
     return sidebarTab;
   }, [sidebarTab, hasCanvasNodes]);
+
+  // Auth gate (server mode only — authRequired is undefined in browser mode)
+  if (authRequired === null) {
+    return (
+      <div className="app app-loading">
+        <div className="app-loading-text">Connecting...</div>
+      </div>
+    );
+  }
+  if (authRequired === true) {
+    return <PasswordPrompt />;
+  }
 
   return (
     <div className="app">

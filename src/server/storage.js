@@ -14,7 +14,8 @@ const STORAGE_DIR = process.env.PAGENODES_STORAGE_DIR || path.join(os.homedir(),
 
 const DEFAULT_SETTINGS = {
   mcpEnabled: false,
-  mcpPort: 7778
+  mcpPort: 7778,
+  password: null
 };
 
 async function ensureDir() {

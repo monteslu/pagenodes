@@ -1,11 +1,17 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useStorage } from '../../context/StorageContext';
+import { useRuntime } from '../../context/runtime.js';
 import './SettingsDialog.css';
 
 export function SettingsDialog({ onClose, onSettingsChange }) {
   const storage = useStorage();
+  const { mode } = useRuntime();
   const [mcpEnabled, setMcpEnabled] = useState(false);
   const [mcpPort, setMcpPort] = useState(7778);
+  const [hasPassword, setHasPassword] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [passwordError, setPasswordError] = useState('');
   const [loading, setLoading] = useState(true);
 
   // Load settings on mount
@@ -13,12 +19,26 @@ export function SettingsDialog({ onClose, onSettingsChange }) {
     storage.getSettings().then(settings => {
       setMcpEnabled(settings.mcpEnabled);
       setMcpPort(settings.mcpPort);
+      setHasPassword(!!settings.hasPassword);
       setLoading(false);
     });
   }, [storage]);
 
   const handleSave = useCallback(async () => {
-    const settings = { mcpEnabled, mcpPort };
+    // Validate password fields
+    if (newPassword && newPassword !== confirmPassword) {
+      setPasswordError('Passwords do not match');
+      return;
+    }
+    setPasswordError('');
+
+    // password value: string = set/change, null = remove, true = unchanged
+    let passwordValue = true;
+    if (newPassword) {
+      passwordValue = newPassword;
+    }
+
+    const settings = { mcpEnabled, mcpPort, password: passwordValue };
     try {
       await storage.saveSettings(settings);
     } catch (err) {
@@ -26,7 +46,20 @@ export function SettingsDialog({ onClose, onSettingsChange }) {
     }
     onSettingsChange?.(settings);
     onClose();
-  }, [mcpEnabled, mcpPort, onClose, onSettingsChange, storage]);
+  }, [mcpEnabled, mcpPort, newPassword, confirmPassword, onClose, onSettingsChange, storage]);
+
+  const handleRemovePassword = useCallback(async () => {
+    const settings = { mcpEnabled, mcpPort, password: null };
+    try {
+      await storage.saveSettings(settings);
+      setHasPassword(false);
+      setNewPassword('');
+      setConfirmPassword('');
+      setPasswordError('');
+    } catch (err) {
+      console.error('Failed to remove password:', err);
+    }
+  }, [mcpEnabled, mcpPort, storage]);
 
   const handleOverlayClick = useCallback((e) => {
     if (e.target === e.currentTarget) {
@@ -53,6 +86,57 @@ export function SettingsDialog({ onClose, onSettingsChange }) {
         </div>
 
         <div className="settings-dialog-content">
+          {mode === 'server' && (
+            <div className="settings-section">
+              <h3 className="settings-section-title">Security</h3>
+              <p className="settings-section-desc">
+                Require a password to access the editor. Leave blank to keep unchanged.
+              </p>
+
+              {hasPassword && (
+                <div className="settings-info">
+                  A password is currently set.
+                  <button
+                    className="settings-remove-password"
+                    onClick={handleRemovePassword}
+                  >
+                    Remove password
+                  </button>
+                </div>
+              )}
+
+              <div className="settings-row settings-row-col">
+                <label className="settings-label">{hasPassword ? 'New Password' : 'Password'}</label>
+                <input
+                  type="password"
+                  className="settings-input settings-password-input"
+                  value={newPassword}
+                  onChange={(e) => { setNewPassword(e.target.value); setPasswordError(''); }}
+                  placeholder={hasPassword ? 'Leave blank to keep current' : 'No password set'}
+                  autoComplete="new-password"
+                />
+              </div>
+
+              {newPassword && (
+                <div className="settings-row settings-row-col">
+                  <label className="settings-label">Confirm Password</label>
+                  <input
+                    type="password"
+                    className="settings-input settings-password-input"
+                    value={confirmPassword}
+                    onChange={(e) => { setConfirmPassword(e.target.value); setPasswordError(''); }}
+                    placeholder="Confirm password"
+                    autoComplete="new-password"
+                  />
+                </div>
+              )}
+
+              {passwordError && (
+                <div className="settings-error">{passwordError}</div>
+              )}
+            </div>
+          )}
+
           <div className="settings-section">
             <h3 className="settings-section-title">MCP Integration</h3>
             <p className="settings-section-desc">

@@ -17,8 +17,9 @@ import fastifyWebsocket from '@fastify/websocket';
 import { parseArgs } from 'node:util';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
-import { handleBrowserConnection, getNodeTypes, deployFlowsFromStorage, initMcp } from './runtime.js';
+import { handleBrowserConnection, getNodeTypes, deployFlowsFromStorage, initMcp, loadPasswordHash, isAuthRequired, verifyPassword, validateSessionToken } from './runtime.js';
 import { storage } from './storage.js';
+import fastifyCookie from '@fastify/cookie';
 import { createServer as createViteServer } from 'vite';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -78,14 +79,55 @@ const fastify = Fastify({
   }
 });
 
+// Register cookie support
+await fastify.register(fastifyCookie);
+
 // Register WebSocket support
 await fastify.register(fastifyWebsocket);
 
+// Load password hash from storage on startup
+await loadPasswordHash(storage);
+
+// Auth endpoints
+fastify.get('/_pn/auth/check', async (request) => {
+  const required = isAuthRequired();
+  if (!required) return { required: false, valid: true };
+  const token = request.cookies?._pn_session;
+  const valid = validateSessionToken(token);
+  return { required: true, valid };
+});
+
+fastify.post('/_pn/auth/login', async (request, reply) => {
+  const { password } = request.body || {};
+  if (!password) {
+    return reply.code(400).send({ success: false, error: 'Password required' });
+  }
+  const result = await verifyPassword(password);
+  if (result.success) {
+    reply.setCookie('_pn_session', result.sessionToken, {
+      path: '/',
+      httpOnly: true,
+      sameSite: 'strict',
+      maxAge: 24 * 60 * 60 // 24 hours in seconds
+    });
+    return { success: true };
+  }
+  return reply.code(401).send(result);
+});
+
+fastify.post('/_pn/auth/logout', async (_request, reply) => {
+  reply.clearCookie('_pn_session', { path: '/' });
+  return { success: true };
+});
+
 // WebSocket endpoint for rawr connections from browser UI
 fastify.register(async function (fastify) {
-  fastify.get('/_pn/ws', { websocket: true }, (socket, _req) => {
-    // Set up rawr peer for this browser connection
-    handleBrowserConnection(socket, storage, (msg) => fastify.log.info(msg));
+  fastify.get('/_pn/ws', { websocket: true }, (socket, req) => {
+    // Check session cookie for pre-authentication
+    const sessionToken = req.cookies?._pn_session;
+    const preAuthenticated = !isAuthRequired() || validateSessionToken(sessionToken);
+
+    handleBrowserConnection(socket, storage, (msg) => fastify.log.info(msg), preAuthenticated);
   });
 });
 

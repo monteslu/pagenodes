@@ -9,10 +9,46 @@
 import rawr, { transports } from 'rawr';
 import mqtt from 'mqtt';
 import { io } from 'socket.io-client';
+import bcrypt from 'bcrypt';
+import crypto from 'crypto';
 import os from 'os';
 import { generateId } from '../utils/id.js';
 import { runtimeRegistry } from './runtime-registry.js';
 import { createLogger } from '../utils/logger.js';
+
+// Cached password hash (loaded from settings at startup)
+let cachedPasswordHash = null;
+
+// Session tokens: token -> { createdAt }
+const SESSION_MAX_AGE = 24 * 60 * 60 * 1000; // 24 hours
+const activeSessions = new Map();
+
+function createSessionToken() {
+  const token = crypto.randomUUID();
+  activeSessions.set(token, { createdAt: Date.now() });
+  return token;
+}
+
+function validateSessionToken(token) {
+  if (!token) return false;
+  const session = activeSessions.get(token);
+  if (!session) return false;
+  if (Date.now() - session.createdAt > SESSION_MAX_AGE) {
+    activeSessions.delete(token);
+    return false;
+  }
+  return true;
+}
+
+// Clean up expired sessions every hour
+setInterval(() => {
+  const now = Date.now();
+  for (const [token, session] of activeSessions) {
+    if (now - session.createdAt > SESSION_MAX_AGE) {
+      activeSessions.delete(token);
+    }
+  }
+}, 60 * 60 * 1000);
 
 // Make mqtt and io available globally for runtime implementations
 globalThis.mqtt = mqtt;
@@ -764,18 +800,9 @@ export async function deployFlowsFromStorage(flowConfig) {
 }
 
 /**
- * Handle a new browser WebSocket connection
+ * Register all authenticated handlers on a peer connection
  */
-export function handleBrowserConnection(socket, storage, log = console.log) {
-  storageRef = storage;
-  const peerId = generateId();
-  log(`Browser connected: ${peerId}`);
-
-  const transport = transports.websocket(socket);
-  const peer = rawr({ transport });
-
-  browserPeers.set(peerId, { peer, socket, transport });
-
+function registerAuthenticatedHandlers(peer, storage, peerId, log) {
   // Register handlers that the browser UI can call
   peer.addHandler('deploy', async (flows, configNodes, skipNodeIds) => {
     const result = await deployFlows(flows, configNodes, skipNodeIds);
@@ -801,8 +828,25 @@ export function handleBrowserConnection(socket, storage, log = console.log) {
     await storage.saveCredentials(creds);
     return { success: true };
   });
-  peer.addHandler('getSettings', () => storage.getSettings());
+  peer.addHandler('getSettings', async () => {
+    const settings = await storage.getSettings();
+    // Don't send password hash to browser
+    const { password, ...safeSettings } = settings;
+    return { ...safeSettings, hasPassword: !!password };
+  });
   peer.addHandler('saveSettings', async (settings) => {
+    // Handle password: hash if provided, null to remove
+    if (settings.password && settings.password !== true) {
+      settings.password = await bcrypt.hash(settings.password, 10);
+      cachedPasswordHash = settings.password;
+    } else if (settings.password === null || settings.password === '') {
+      settings.password = null;
+      cachedPasswordHash = null;
+    } else {
+      // password === true means "unchanged" — preserve existing
+      const existing = await storage.getSettings();
+      settings.password = existing.password;
+    }
     await storage.saveSettings(settings);
     return { success: true };
   });
@@ -812,8 +856,36 @@ export function handleBrowserConnection(socket, storage, log = console.log) {
   peer.addHandler('emitEvent', (nodeId, event, data) => handleMainThreadEvent(nodeId, event, data));
   peer.addHandler('broadcastToType', (type, event, data) => broadcastToType(type, event, data));
 
-  // Notify browser that runtime is ready
+  // Add to authenticated peers and notify ready
+  browserPeers.set(peerId, { ...browserPeers.get(peerId), authenticated: true });
   peer.notifiers.ready();
+  log(`Browser authenticated: ${peerId}`);
+}
+
+/**
+ * Handle a new browser WebSocket connection
+ * @param {object} socket - WebSocket connection
+ * @param {object} storage - Storage interface
+ * @param {Function} log - Logging function
+ * @param {boolean} preAuthenticated - Whether the connection was pre-authenticated (e.g. via session cookie)
+ */
+export function handleBrowserConnection(socket, storage, log = console.log, preAuthenticated = false) {
+  storageRef = storage;
+  const peerId = generateId();
+  log(`Browser connected: ${peerId} (preAuth: ${preAuthenticated})`);
+
+  const transport = transports.websocket(socket);
+  const peer = rawr({ transport });
+
+  browserPeers.set(peerId, { peer, socket, transport, authenticated: false });
+
+  if (preAuthenticated || !cachedPasswordHash) {
+    // No auth needed — register all handlers immediately
+    registerAuthenticatedHandlers(peer, storage, peerId, log);
+  }
+  // If auth is required and not pre-authenticated, the browser must call
+  // /_pn/auth/login first to get a session token, then reconnect.
+  // The WebSocket itself doesn't handle authentication.
 
   // Handle disconnect
   socket.on('close', () => {
@@ -1225,6 +1297,46 @@ export function queueMcpMessage(msg) {
   mcpMessageQueue.push(msg);
   if (mcpMessageQueue.length > MAX_BUFFER_SIZE) mcpMessageQueue.shift();
 }
+
+/**
+ * Load and cache the password hash from storage
+ */
+export async function loadPasswordHash(storage) {
+  const settings = await storage.getSettings();
+  cachedPasswordHash = settings.password || null;
+  return { required: !!cachedPasswordHash };
+}
+
+/**
+ * Check if auth is required
+ */
+export function isAuthRequired() {
+  return !!cachedPasswordHash;
+}
+
+/**
+ * Verify a password and return a session token if correct
+ */
+export async function verifyPassword(password) {
+  if (!cachedPasswordHash) {
+    return { success: true, sessionToken: createSessionToken() };
+  }
+  try {
+    const match = await bcrypt.compare(password, cachedPasswordHash);
+    if (match) {
+      return { success: true, sessionToken: createSessionToken() };
+    }
+    return { success: false, error: 'Incorrect password' };
+  } catch (err) {
+    PN.warn(`Auth error: ${err.message}`);
+    return { success: false, error: 'Authentication error' };
+  }
+}
+
+/**
+ * Validate a session token
+ */
+export { validateSessionToken };
 
 PN.log('Server runtime initialized');
 PN.log(`Available node types: ${runtimeRegistry.getAll().length}`);

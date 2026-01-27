@@ -85,6 +85,9 @@ export function RuntimeProvider({ children }) {
   const [mcpStatus, setMcpStatus] = useState('disabled');
   const mcpMessagesRef = useRef([]);
   const [hasCanvasNodes, setHasCanvasNodes] = useState(false);
+  const [authRequired, setAuthRequired] = useState(null); // null = checking, true = need password, false = authenticated
+  const [authError, setAuthError] = useState('');
+  const [connectTrigger, setConnectTrigger] = useState(0); // increment to force reconnect
   const { addMessage, addDownload, addError, clear, clearErrors, messages, errors } = useDebug();
   const { state: flowState, dispatch: flowDispatch } = useFlows();
 
@@ -99,12 +102,80 @@ export function RuntimeProvider({ children }) {
   useEffect(() => { errorsRef.current = errors; }, [errors]);
   useEffect(() => { nodeStatusesRef.current = nodeStatuses; }, [nodeStatuses]);
 
-  // Connect to server runtime via WebSocket
-  useEffect(() => {
-    const wsUrl = `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/_pn/ws`;
+  // Submit password for authentication
+  const submitPassword = useCallback(async (password) => {
+    setAuthError('');
+    try {
+      const res = await fetch('/_pn/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password })
+      });
+      const data = await res.json();
+      if (data.success) {
+        // Cookie is set by the server response. Force reconnect the WebSocket.
+        setAuthRequired(false);
+        if (socketRef.current) {
+          socketRef.current.close();
+        }
+        setConnectTrigger(prev => prev + 1);
+        return true;
+      }
+      setAuthError(data.error || 'Incorrect password');
+      return false;
+    } catch {
+      setAuthError('Connection error');
+      return false;
+    }
+  }, []);
 
-    const socket = new WebSocket(wsUrl);
-    socketRef.current = socket;
+  // Logout: clear session cookie and force re-auth
+  const logout = useCallback(async () => {
+    try {
+      await fetch('/_pn/auth/logout', { method: 'POST' });
+    } catch {
+      // ignore
+    }
+    if (socketRef.current) {
+      socketRef.current.close();
+    }
+    setIsReady(false);
+    setIsRunning(false);
+    setAuthRequired(true);
+  }, []);
+
+  // Check auth and connect WebSocket
+  useEffect(() => {
+    let cancelled = false;
+
+    async function connectWithAuth() {
+      // Check if auth is required and whether session cookie is valid
+      try {
+        const res = await fetch('/_pn/auth/check');
+        const { required, valid } = await res.json();
+        if (cancelled) return;
+
+        if (required && !valid) {
+          // Need password — don't bother opening WebSocket
+          setAuthRequired(true);
+          return;
+        }
+
+        // Either no auth required, or session cookie is valid
+        setAuthRequired(false);
+        connectWebSocket();
+      } catch {
+        if (!cancelled) {
+          setAuthRequired(null);
+        }
+      }
+    }
+
+    function connectWebSocket() {
+      const wsUrl = `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/_pn/ws`;
+
+      const socket = new WebSocket(wsUrl);
+      socketRef.current = socket;
 
     socket.onopen = () => {
       logger.log('Connected to server runtime');
@@ -765,11 +836,15 @@ export function RuntimeProvider({ children }) {
       setIsReady(false);
       setIsRunning(false);
     };
+    } // end connectWebSocket
+
+    connectWithAuth();
 
     return () => {
-      socket.close();
+      cancelled = true;
+      if (socketRef.current) socketRef.current.close();
     };
-  }, [addMessage, addDownload, addError]);
+  }, [addMessage, addDownload, addError, connectTrigger]);
 
   // Deploy flows to server
   const deploy = useCallback(async (nodes, configNodes = {}, errorNodeIds = []) => {
@@ -897,6 +972,10 @@ export function RuntimeProvider({ children }) {
     nodeStatuses,
     mcpStatus,
     hasCanvasNodes,
+    authRequired,
+    authError,
+    submitPassword,
+    logout,
     deploy,
     inject,
     injectText,

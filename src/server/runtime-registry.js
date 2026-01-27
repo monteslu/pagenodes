@@ -58,6 +58,7 @@ import { xmlRuntime } from '../nodes/parsers/xml.js';
 
 // IO nodes
 import { httpRequestRuntime } from '../nodes/io/http.js';
+import { httpInRuntime, httpResponseRuntime } from '../nodes/io/http-in.js';
 import { joinRuntime } from '../nodes/io/join.js';
 import { splitRuntime } from '../nodes/io/split.js';
 import { linkInRuntime, linkOutRuntime, linkCallRuntime } from '../nodes/io/link.js';
@@ -148,6 +149,8 @@ import { audioStemsRuntime } from '../nodes/audio/stems.js';
 
   // IO/Network
   httpRequestRuntime,
+  httpInRuntime,
+  httpResponseRuntime,
   joinRuntime,
   splitRuntime,
   linkInRuntime,

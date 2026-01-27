@@ -286,10 +286,17 @@ class RuntimeNode {
   }
 
   debug(output, topic = '', _msgid) {
+    // Strip non-serializable internal properties (e.g. _res from http-in)
+    let payload = output;
+    if (payload && typeof payload === 'object' && !Array.isArray(payload)) {
+      const { _res, ...rest } = payload;
+      if (_res) payload = rest;
+    }
+
     const msg = {
       nodeId: this.id,
       nodeName: this.name || this.type,
-      payload: output,
+      payload,
       topic,
       _msgid,
       timestamp: Date.now()
@@ -694,11 +701,16 @@ function getMcpStatus() {
  * Notify all connected browsers of something
  */
 function notifyAllBrowsers(notification, data) {
-  for (const { peer } of browserPeers.values()) {
+  for (const [, { peer }] of browserPeers.entries()) {
     try {
       peer.notifiers[notification](data);
-    } catch {
-      // Browser may have disconnected
+    } catch (err) {
+      // Only silence connection errors, log everything else
+      const msg = err?.message || '';
+      if (msg.includes('circular') || msg.includes('serialize') || msg.includes('convert')) {
+        PN.warn(`Failed to send '${notification}' to browser: ${msg}`);
+      }
+      // Connection errors (browser disconnected) are expected and silenced
     }
   }
 }

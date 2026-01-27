@@ -1,5 +1,6 @@
 import { useState, useCallback, useMemo, useEffect } from 'react';
 import { nodeRegistry } from '../../nodes';
+import { useRuntime } from '../../context/runtime.js';
 import { PaletteNode } from './PaletteNode';
 import './Palette.css';
 
@@ -28,6 +29,9 @@ const DEFAULT_EXPANDED = {
 };
 
 export function Palette() {
+  const { mode } = useRuntime();
+  const modeFilter = useCallback((nodeDef) => !nodeDef.modes || nodeDef.modes.includes(mode), [mode]);
+
   const [expandedCategories, setExpandedCategories] = useState(() => {
     try {
       const saved = localStorage.getItem(PALETTE_STATE_KEY);
@@ -67,6 +71,7 @@ export function Palette() {
     const result = {};
     categories.forEach(category => {
       const nodes = nodeRegistry.getByCategory(category).filter(nodeDef => {
+        if (!modeFilter(nodeDef)) return false;
         const label = (nodeDef.paletteLabel || nodeDef.type).toLowerCase();
         const type = nodeDef.type.toLowerCase();
         const desc = (nodeDef.description || '').toLowerCase();
@@ -77,7 +82,7 @@ export function Palette() {
       }
     });
     return result;
-  }, [searchQuery, categories]);
+  }, [searchQuery, categories, modeFilter]);
 
   const toggleCategory = useCallback((category) => {
     setExpandedCategories(prev => ({
@@ -128,7 +133,7 @@ export function Palette() {
         {categoriesToShow.map(category => {
           const nodes = isSearching
             ? filteredNodesByCategory[category]
-            : nodeRegistry.getByCategory(category);
+            : nodeRegistry.getByCategory(category).filter(modeFilter);
           const isExpanded = isSearching || expandedCategories[category];
 
           return (

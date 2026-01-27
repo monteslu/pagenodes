@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useDebug } from '../../context/DebugContext';
-import { useRuntime } from '../../context/RuntimeContext';
+import { useRuntime } from '../../context/runtime.js';
 import './DebugPanel.css';
 
 const PANEL_STATE_KEY = 'pagenodes2_debug_sections';

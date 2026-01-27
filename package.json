@@ -7,16 +7,25 @@
     "dev": "vite",
     "build": "npm run build:worker && vite build",
     "build:worker": "vite build --config vite.worker.config.js",
+    "build:server": "vite build --config vite.server.config.js",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest",
     "test:run": "vitest run",
-    "prepare": "husky"
+    "prepare": "husky",
+    "server": "node --watch src/server/index.js",
+    "server:dev": "node src/server/index.js --dev"
+  },
+  "engines": {
+    "node": ">=22.0.0"
   },
   "dependencies": {
+    "@fastify/static": "^8.1.1",
+    "@fastify/websocket": "^11.1.0",
     "@huggingface/transformers": "^3.8.1",
     "@mediapipe/tasks-vision": "^0.10.22-rc.20250304",
     "b64id": "^1.1.1",
+    "fastify": "^5.3.3",
     "firmata": "^2.3.0",
     "hsync": "^0.33.0",
     "http-web": "^0.5.2",
@@ -27,9 +36,10 @@
     "m4a-stems": "^0.3.0",
     "mqtt": "^5.14.1",
     "net-web": "^0.3.0",
+    "pino-pretty": "^13.0.0",
     "prettier": "^3.7.4",
     "prismjs": "^1.30.0",
-    "rawr": "^0.19.0",
+    "rawr": "^1.0.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-simple-code-editor": "^0.14.1",

@@ -1,8 +1,9 @@
 import { useState, useCallback, useEffect } from 'react';
-import { storage } from '../../utils/storage';
+import { useStorage } from '../../context/StorageContext';
 import './SettingsDialog.css';
 
 export function SettingsDialog({ onClose, onSettingsChange }) {
+  const storage = useStorage();
   const [mcpEnabled, setMcpEnabled] = useState(false);
   const [mcpPort, setMcpPort] = useState(7778);
   const [loading, setLoading] = useState(true);
@@ -14,14 +15,18 @@ export function SettingsDialog({ onClose, onSettingsChange }) {
       setMcpPort(settings.mcpPort);
       setLoading(false);
     });
-  }, []);
+  }, [storage]);
 
   const handleSave = useCallback(async () => {
     const settings = { mcpEnabled, mcpPort };
-    await storage.saveSettings(settings);
+    try {
+      await storage.saveSettings(settings);
+    } catch (err) {
+      console.error('Failed to save settings:', err);
+    }
     onSettingsChange?.(settings);
     onClose();
-  }, [mcpEnabled, mcpPort, onClose, onSettingsChange]);
+  }, [mcpEnabled, mcpPort, onClose, onSettingsChange, storage]);
 
   const handleOverlayClick = useCallback((e) => {
     if (e.target === e.currentTarget) {

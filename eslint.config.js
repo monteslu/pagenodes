@@ -5,7 +5,7 @@ import reactRefresh from 'eslint-plugin-react-refresh'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist', 'public/workers', 'public/@mediapipe']),
+  globalIgnores(['dist', 'dist-server', 'public/workers', 'public/@mediapipe']),
   {
     files: ['**/*.{js,jsx}'],
     extends: [
@@ -26,6 +26,13 @@ export default defineConfig([
       'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]', argsIgnorePattern: '^_' }],
       'react-refresh/only-export-components': 'off',
       'react-hooks/exhaustive-deps': 'off',
+    },
+  },
+  // Server files run in Node.js
+  {
+    files: ['src/server/**/*.js'],
+    languageOptions: {
+      globals: globals.nodeBuiltin,
     },
   },
   // Node definitions use renderEditor pattern that calls hooks in render functions

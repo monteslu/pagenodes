@@ -2,7 +2,8 @@ import { useEffect, useCallback, useState, useRef, useMemo } from 'react';
 import { useEditor } from './context/EditorContext';
 import { useFlows } from './context/FlowContext';
 import { useDebug } from './context/DebugContext';
-import { useRuntime } from './context/RuntimeContext';
+import { useRuntime } from './context/runtime.js';
+import { useStorage } from './context/StorageContext';
 import { useNodes } from './hooks/useNodes';
 import { Toolbar } from './components/Toolbar';
 import { Palette } from './components/Palette';
@@ -12,7 +13,6 @@ import { DebugPanel } from './components/Debug';
 import { InfoPanel } from './components/Info';
 import { CanvasPanel } from './components/Canvases/CanvasPanel';
 import { generateId } from './utils/id';
-import { storage } from './utils/storage';
 import { nodeRegistry } from './nodes';
 import { logger } from './utils/logger';
 import './App.css';
@@ -29,6 +29,7 @@ function AppContent() {
   const { inject: runtimeInject, callMainThread, isRunning, isReady, deploy, hasCanvasNodes, emitNodeEvent } = useRuntime();
   const { state: flowState } = useFlows();
   const { addNode, deleteSelected, nodes } = useNodes();
+  const storage = useStorage();
 
   // Node being edited in sidebar
   const [editingNode, setEditingNode] = useState(null);

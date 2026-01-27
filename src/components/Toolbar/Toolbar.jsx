@@ -1,10 +1,10 @@
 import { useCallback, useRef, useState, useEffect } from 'react';
 import { useEditor } from '../../context/EditorContext';
 import { useFlows } from '../../context/FlowContext';
-import { useRuntime } from '../../context/RuntimeContext';
+import { useRuntime } from '../../context/runtime.js';
+import { useStorage } from '../../context/StorageContext';
 import { useNodes } from '../../hooks/useNodes';
 import { generateId } from '../../utils/id';
-import { storage } from '../../utils/storage';
 import { validateAllNodes } from '../../utils/validation';
 import { ImportDialog } from './ImportDialog';
 import { ConfigNodesDialog } from './ConfigNodesDialog';
@@ -19,6 +19,7 @@ export function Toolbar() {
   const { state: editor, dispatch } = useEditor();
   const { state: flowState, dispatch: flowDispatch, undo, redo, canUndo, canRedo } = useFlows();
   const { deploy, isReady, isRunning, mcpStatus, connectMcp, disconnectMcp } = useRuntime();
+  const storage = useStorage();
   const { deleteSelected } = useNodes();
   const [menuOpen, setMenuOpen] = useState(false);
   const [showImportDialog, setShowImportDialog] = useState(false);
@@ -87,7 +88,7 @@ export function Toolbar() {
     };
     await storage.saveFlows(flowConfig);
     logger.log( 'Flows saved to storage');
-  }, [isReady, deploy, flowState.flows, flowState.nodes, flowState.configNodes, dispatch]);
+  }, [isReady, deploy, flowState.flows, flowState.nodes, flowState.configNodes, dispatch, storage]);
 
   const handleDelete = () => {
     deleteSelected();

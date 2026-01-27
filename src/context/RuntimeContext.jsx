@@ -1,16 +1,18 @@
-import { createContext, useContext, useRef, useEffect, useCallback, useState } from 'react';
+import { useRef, useEffect, useCallback, useState } from 'react';
+import { RuntimeContext } from './runtime.js';
 import { renderToStaticMarkup } from 'react-dom/server';
 import rawr, { transports } from 'rawr';
 import { useDebug } from './DebugContext';
 import { useFlows } from './FlowContext';
+import { useStorage } from './StorageContext';
 import { nodeRegistry } from '../nodes';
-import { storage } from '../utils/storage';
 import { generateId } from '../utils/id';
 import { validateNode } from '../utils/validation';
 import { audioManager } from '../audio/AudioManager';
 import { logger, createMainThreadPN } from '../utils/logger';
 
-const RuntimeContext = createContext(null);
+// Re-export useRuntime for backwards compatibility
+export { useRuntime } from './runtime.js';
 
 export function RuntimeProvider({ children }) {
   const workerRef = useRef(null);
@@ -23,6 +25,7 @@ export function RuntimeProvider({ children }) {
   const [hasCanvasNodes, setHasCanvasNodes] = useState(false);
   const { addMessage, addDownload, addError, clear, clearErrors, messages, errors } = useDebug();
   const { state: flowState, dispatch: flowDispatch } = useFlows();
+  const storage = useStorage();
 
   // Refs to access current state in handlers
   const flowStateRef = useRef(flowState);
@@ -929,7 +932,7 @@ export function RuntimeProvider({ children }) {
     return () => {
       workerRef.current?.terminate();
     };
-  }, [addMessage, addError, flowDispatch]);
+  }, [addMessage, addError, flowDispatch, storage]);
 
   // Deploy flows to worker
   const deploy = useCallback(async (nodes, configNodes = {}, errorNodeIds = []) => {
@@ -1111,10 +1114,3 @@ export function RuntimeProvider({ children }) {
   );
 }
 
-export function useRuntime() {
-  const context = useContext(RuntimeContext);
-  if (!context) {
-    throw new Error('useRuntime must be used within RuntimeProvider');
-  }
-  return context;
-}

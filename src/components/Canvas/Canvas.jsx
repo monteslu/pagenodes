@@ -1,6 +1,6 @@
 import { useRef, useCallback, useMemo, useState, useEffect } from 'react';
 import { useEditor } from '../../context/EditorContext';
-import { useRuntime } from '../../context/RuntimeContext';
+import { useRuntime } from '../../context/runtime.js';
 import { useNodes } from '../../hooks/useNodes';
 import { useCanvas } from '../../hooks/useCanvas';
 import { useDrag } from '../../hooks/useDrag';

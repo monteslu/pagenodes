@@ -658,6 +658,20 @@ function triggerNode(nodeId, msg = {}) {
 }
 
 /**
+ * Inject text to all inject nodes with allowDebugInput enabled
+ */
+function injectText(text) {
+  for (const node of nodes.values()) {
+    if (node.type === 'inject' && node.config.allowDebugInput) {
+      node.send({
+        topic: node.config.topic || '',
+        payload: text
+      });
+    }
+  }
+}
+
+/**
  * Stop the runtime
  */
 function stopRuntime() {
@@ -839,6 +853,7 @@ function registerAuthenticatedHandlers(peer, storage, peerId, log) {
 
   peer.addHandler('inject', (nodeId, payload) => injectNode(nodeId, payload));
   peer.addHandler('trigger', (nodeId, msg) => triggerNode(nodeId, msg));
+  peer.addHandler('injectText', (text) => injectText(text));
   peer.addHandler('stop', () => stopRuntime());
   peer.addHandler('connectMcp', (options) => connectMcp(options, peer));
   peer.addHandler('disconnectMcp', () => disconnectMcp());

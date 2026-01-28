@@ -33,7 +33,8 @@ export const mcpOutputRuntime = {
 
   updateStatus() {
     if (this.config.useGateway) {
-      this.status({ text: `Gateway: ${this.config.gatewayHost || '?'}`, fill: 'green' });
+      const displayUrl = (this.config.gatewayUrl || '').replace(/^https?:\/\//, '');
+      this.status({ text: displayUrl || 'gateway', fill: 'green' });
     } else if (!this.mcpConnected) {
       this.status({ text: 'MCP disconnected', fill: 'red' });
     } else if (this.queueCount > 0) {
@@ -69,16 +70,16 @@ export const mcpOutputRuntime = {
   },
 
   async sendToGateway(text, topic) {
-    const host = this.config.gatewayHost || '127.0.0.1:18789';
+    const url = this.config.gatewayUrl || 'http://localhost:18789/tools/invoke';
     const key = this.config.gatewayKey || '';
-    const url = `http://${host}/`;
 
+    const message = topic ? `[${topic}] ${text}` : text;
     const body = {
-      type: 'req',
-      id: `pn-${Date.now()}`,
-      method: 'send',
-      params: {
-        text: topic ? `[${topic}] ${text}` : text
+      tool: 'sessions_send',
+      args: {
+        message,
+        sessionKey: 'main',
+        timeoutSeconds: 0
       }
     };
 
@@ -95,7 +96,8 @@ export const mcpOutputRuntime = {
       });
 
       if (response.ok) {
-        this.status({ text: `Gateway: ${host}`, fill: 'green' });
+        const displayUrl = url.replace(/^https?:\/\//, '');
+        this.status({ text: displayUrl, fill: 'green' });
       } else {
         this.status({ text: `${response.status}`, fill: 'yellow' });
         this.warn(`Gateway responded ${response.status}`);

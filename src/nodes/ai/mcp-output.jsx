@@ -19,16 +19,16 @@ export const mcpOutputNode = {
   defaults: {
     topic: { type: 'string', default: '', label: 'Topic' },
     useGateway: {
-      type: 'checkbox',
+      type: 'boolean',
       default: false,
       label: 'Send to gateway',
       description: 'POST messages to an AI gateway (Moltbot/Clawdbot) instead of queueing for MCP polling'
     },
-    gatewayHost: {
+    gatewayUrl: {
       type: 'string',
-      default: '127.0.0.1:18789',
-      label: 'Gateway host:port',
-      placeholder: '127.0.0.1:18789'
+      default: 'http://localhost:18789/tools/invoke',
+      label: 'Gateway URL',
+      placeholder: 'http://localhost:18789/tools/invoke'
     },
     gatewayKey: {
       type: 'password',
@@ -80,7 +80,7 @@ export const mcpOutputNode = {
         which returns and clears the queue.</p>
 
         <h5>Gateway Mode</h5>
-        <p>Enable <strong>Send to gateway</strong> and configure the host:port and auth key.
+        <p>Enable <strong>Send to gateway</strong> and configure the gateway URL and auth key.
         Messages are POSTed to the gateway&apos;s WebSocket HTTP endpoint, immediately triggering
         an agent run. Compatible with Moltbot/Clawdbot gateways.</p>
 

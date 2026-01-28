@@ -10,7 +10,7 @@ export const mqttBrokerNode = {
   type: 'mqtt-broker',
   category: 'config',
   description: 'MQTT broker connection configuration',
-  label: (node) => node._node.name || node._node.broker || 'mqtt-broker',
+  label: (node) => node.name || node.broker || 'mqtt-broker',
 
   defaults: {
     name: { type: 'string', default: '' },
@@ -49,7 +49,7 @@ export const mqttInNode = {
   type: 'mqtt in',
   category: 'networking',
   description: 'Subscribes to MQTT topics',
-  label: (node) => node._node.name || node.topic || 'mqtt',
+  label: (node) => node.name || node.topic || 'mqtt',
   color: '#D8BFD8', // thistle purple
   icon: true,
   faChar: '\uf1eb', // wifi
@@ -120,7 +120,7 @@ export const mqttOutNode = {
   type: 'mqtt out',
   category: 'networking',
   description: 'Publishes to MQTT topics',
-  label: (node) => node._node.name || node.topic || 'mqtt',
+  label: (node) => node.name || node.topic || 'mqtt',
   color: '#D8BFD8', // thistle purple
   icon: true,
   faChar: '\uf1eb', // wifi

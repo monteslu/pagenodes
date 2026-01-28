@@ -1,6 +1,6 @@
 import { useRef, useCallback, useMemo, useState, useEffect } from 'react';
 import { useEditor } from '../../context/EditorContext';
-import { useRuntime } from '../../context/RuntimeContext';
+import { useRuntime } from '../../context/runtime.js';
 import { useNodes } from '../../hooks/useNodes';
 import { useCanvas } from '../../hooks/useCanvas';
 import { useDrag } from '../../hooks/useDrag';
@@ -36,16 +36,16 @@ export function Canvas({ onEditNode, onInject, onFileDrop, onNodeInteraction }) 
   // Track if we just finished a selection drag (to prevent click from clearing it)
   const justSelectedRef = useRef(false);
 
-  // Build wire list from node._node.wires (message wires)
+  // Build wire list from node.wires (message wires)
   const wires = useMemo(() => {
     const result = [];
     activeNodes.forEach(node => {
-      (node._node.wires || []).forEach((targets, portIndex) => {
+      (node.wires || []).forEach((targets, portIndex) => {
         targets.forEach(targetId => {
           if (nodes[targetId]) {
             result.push({
-              id: `${node._node.id}-${portIndex}-${targetId}`,
-              sourceId: node._node.id,
+              id: `${node.id}-${portIndex}-${targetId}`,
+              sourceId: node.id,
               sourcePort: portIndex,
               targetId,
               isStream: false
@@ -57,16 +57,16 @@ export function Canvas({ onEditNode, onInject, onFileDrop, onNodeInteraction }) 
     return result;
   }, [activeNodes, nodes]);
 
-  // Build stream wire list from node._node.streamWires (audio wires)
+  // Build stream wire list from node.streamWires (audio wires)
   const streamWires = useMemo(() => {
     const result = [];
     activeNodes.forEach(node => {
-      (node._node.streamWires || []).forEach((targets, portIndex) => {
+      (node.streamWires || []).forEach((targets, portIndex) => {
         targets.forEach(targetId => {
           if (nodes[targetId]) {
             result.push({
-              id: `stream-${node._node.id}-${portIndex}-${targetId}`,
-              sourceId: node._node.id,
+              id: `stream-${node.id}-${portIndex}-${targetId}`,
+              sourceId: node.id,
               sourcePort: portIndex,
               targetId,
               isStream: true
@@ -153,7 +153,7 @@ export function Canvas({ onEditNode, onInject, onFileDrop, onNodeInteraction }) 
       if (rect.width > 5 || rect.height > 5) {
         const selectedIds = activeNodes
           .filter(node => isNodeInSelection(node, rect))
-          .map(node => node._node.id);
+          .map(node => node.id);
         dispatch({ type: 'SELECT_NODES', ids: selectedIds });
         justSelectedRef.current = true;
       }
@@ -198,7 +198,7 @@ export function Canvas({ onEditNode, onInject, onFileDrop, onNodeInteraction }) 
         // Select nodes within the box
         const selectedIds = activeNodes
           .filter(node => isNodeInSelection(node, rect))
-          .map(node => node._node.id);
+          .map(node => node.id);
         dispatch({ type: 'SELECT_NODES', ids: selectedIds });
         // Prevent the click event from clearing the selection
         justSelectedRef.current = true;
@@ -247,9 +247,9 @@ export function Canvas({ onEditNode, onInject, onFileDrop, onNodeInteraction }) 
     if (isOutput) {
       dispatch({ type: 'START_CONNECTING', sourceId: nodeId, sourcePort: portIndex, isStream: false });
       const node = nodes[nodeId];
-      const def = nodeRegistry.get(node._node.type);
+      const def = nodeRegistry.get(node.type);
       const height = getNodeHeight(node, def);
-      const label = node._node.name || (typeof def?.label === 'function' ? def.label(node) : def?.label) || node._node.type;
+      const label = node.name || (typeof def?.label === 'function' ? def.label(node) : def?.label) || node.type;
       const hasIcon = def?.icon && def?.faChar;
       const width = calcNodeWidth(label, hasIcon);
       const pos = getPortPosition(node, portIndex, true, height, width);
@@ -307,9 +307,9 @@ export function Canvas({ onEditNode, onInject, onFileDrop, onNodeInteraction }) 
     if (isOutput) {
       dispatch({ type: 'START_CONNECTING', sourceId: nodeId, sourcePort: portIndex, isStream: true });
       const node = nodes[nodeId];
-      const def = nodeRegistry.get(node._node.type);
+      const def = nodeRegistry.get(node.type);
       const height = getNodeHeight(node, def);
-      const label = node._node.name || (typeof def?.label === 'function' ? def.label(node) : def?.label) || node._node.type;
+      const label = node.name || (typeof def?.label === 'function' ? def.label(node) : def?.label) || node.type;
       const hasIcon = def?.icon && def?.faChar;
       const width = calcNodeWidth(label, hasIcon);
       const pos = getStreamPortPosition(node, portIndex, true, def, height, width);
@@ -511,12 +511,12 @@ export function Canvas({ onEditNode, onInject, onFileDrop, onNodeInteraction }) 
           <g className="nodes">
             {activeNodes.map(node => (
               <Node
-                key={node._node.id}
+                key={node.id}
                 node={node}
-                status={nodeStatuses[node._node.id]}
-                selected={editor.selectedNodes.includes(node._node.id)}
-                isPending={editor.pendingNodes.has(node._node.id)}
-                hasErrors={editor.nodeErrors.has(node._node.id)}
+                status={nodeStatuses[node.id]}
+                selected={editor.selectedNodes.includes(node.id)}
+                isPending={editor.pendingNodes.has(node.id)}
+                hasErrors={editor.nodeErrors.has(node.id)}
                 onMouseDown={handleNodeMouseDown}
                 onDoubleClick={handleNodeDoubleClick}
                 onPortMouseDown={handlePortMouseDown}

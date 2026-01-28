@@ -5,6 +5,8 @@ import { FlowProvider } from './context/FlowContext';
 import { DebugProvider } from './context/DebugContext';
 import { RuntimeProvider } from './context/RuntimeContext';
 import { CanvasProvider } from './context/CanvasContext';
+import { StorageProvider } from './context/StorageContext';
+import { storage } from './utils/storage';
 import { logger } from './utils/logger';
 import App from './App.jsx';
 import './index.css';
@@ -18,16 +20,18 @@ if ('serviceWorker' in navigator) {
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <FlowProvider>
-      <EditorProvider>
-        <DebugProvider>
-          <RuntimeProvider>
-            <CanvasProvider>
-              <App />
-            </CanvasProvider>
-          </RuntimeProvider>
-        </DebugProvider>
-      </EditorProvider>
-    </FlowProvider>
+    <StorageProvider storage={storage}>
+      <FlowProvider>
+        <EditorProvider>
+          <DebugProvider>
+            <RuntimeProvider>
+              <CanvasProvider>
+                <App />
+              </CanvasProvider>
+            </RuntimeProvider>
+          </DebugProvider>
+        </EditorProvider>
+      </FlowProvider>
+    </StorageProvider>
   </StrictMode>
 );

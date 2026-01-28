@@ -11,7 +11,7 @@ export const audioWorkletNode = {
     { label: 'AudioWorkletNode (MDN)', url: 'https://developer.mozilla.org/en-US/docs/Web/API/AudioWorkletNode' },
     { label: 'AudioWorkletProcessor (MDN)', url: 'https://developer.mozilla.org/en-US/docs/Web/API/AudioWorkletProcessor' }
   ],
-  label: (node) => node._node.name || 'worklet',
+  label: (node) => node.name || 'worklet',
   color: '#2d9a2d',
   fontColor: '#fff',
   icon: true,

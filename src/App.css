@@ -6,6 +6,17 @@
   overflow: hidden;
 }
 
+.app-loading {
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-color, #1e1e1e);
+}
+
+.app-loading-text {
+  color: var(--text-muted, #888);
+  font-size: 14px;
+}
+
 .app-body {
   display: flex;
   flex: 1;

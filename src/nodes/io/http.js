@@ -22,6 +22,8 @@ export const httpRequestRuntime = {
       return value !== undefined ? encodeURIComponent(String(value)) : '';
     });
 
+    this.status({ fill: 'blue', shape: 'dot', text: `${method} ...` });
+
     try {
       const options = {
         method,
@@ -51,8 +53,12 @@ export const httpRequestRuntime = {
       msg.statusCode = response.status;
       msg.headers = Object.fromEntries(response.headers.entries());
 
+      const statusFill = response.status < 400 ? 'green' : 'yellow';
+      this.status({ fill: statusFill, shape: 'dot', text: `${response.status}` });
+
       this.send(msg);
     } catch (err) {
+      this.status({ fill: 'red', shape: 'ring', text: err.message });
       this.error(err.message);
       msg.payload = null;
       msg.statusCode = 0;

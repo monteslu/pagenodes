@@ -1,10 +1,10 @@
 import { useCallback, useRef, useState, useEffect } from 'react';
 import { useEditor } from '../../context/EditorContext';
 import { useFlows } from '../../context/FlowContext';
-import { useRuntime } from '../../context/RuntimeContext';
+import { useRuntime } from '../../context/runtime.js';
+import { useStorage } from '../../context/StorageContext';
 import { useNodes } from '../../hooks/useNodes';
 import { generateId } from '../../utils/id';
-import { storage } from '../../utils/storage';
 import { validateAllNodes } from '../../utils/validation';
 import { ImportDialog } from './ImportDialog';
 import { ConfigNodesDialog } from './ConfigNodesDialog';
@@ -18,14 +18,24 @@ import './Toolbar.css';
 export function Toolbar() {
   const { state: editor, dispatch } = useEditor();
   const { state: flowState, dispatch: flowDispatch, undo, redo, canUndo, canRedo } = useFlows();
-  const { deploy, isReady, isRunning, mcpStatus, connectMcp, disconnectMcp } = useRuntime();
+  const { deploy, isReady, isRunning, mcpStatus, connectMcp, disconnectMcp, mode, logout } = useRuntime();
+  const storage = useStorage();
   const { deleteSelected } = useNodes();
   const [menuOpen, setMenuOpen] = useState(false);
   const [showImportDialog, setShowImportDialog] = useState(false);
   const [showConfigDialog, setShowConfigDialog] = useState(false);
     const [showSettingsDialog, setShowSettingsDialog] = useState(false);
   const [showFlowEditDialog, setShowFlowEditDialog] = useState(false);
+  const [hasPassword, setHasPassword] = useState(false);
   const menuRef = useRef(null);
+
+  // Check if server has a password set (for showing logout option)
+  useEffect(() => {
+    if (mode !== 'server') return;
+    storage.getSettings().then(settings => {
+      setHasPassword(!!settings.hasPassword);
+    }).catch(() => {});
+  }, [mode, storage]);
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -58,8 +68,8 @@ export function Toolbar() {
 
     // Get node IDs that belong to disabled flows
     const disabledFlowNodeIds = Object.values(flowState.nodes)
-      .filter(node => disabledFlowIds.includes(node._node.z))
-      .map(node => node._node.id);
+      .filter(node => disabledFlowIds.includes(node.z))
+      .map(node => node.id);
 
     // Combine error and disabled node IDs
     const skipNodeIds = [...errorNodeIds, ...disabledFlowNodeIds];
@@ -73,21 +83,19 @@ export function Toolbar() {
     const flowConfig = {
       flows: flowState.flows,
       nodes: Object.values(flowState.nodes).map(node => {
-        const { _node, ...config } = node;
         // Filter out runtime-only properties (e.g., _currentValue, _activeButton)
-        const cleanConfig = Object.fromEntries(
-          Object.entries(config).filter(([key]) => !key.startsWith('_'))
+        return Object.fromEntries(
+          Object.entries(node).filter(([key]) => !key.startsWith('_'))
         );
-        return { ..._node, ...cleanConfig };
       }),
       configNodes: Object.values(flowState.configNodes).map(node => {
-        const { _node, users: _users, ...config } = node;
-        return { ..._node, ...config };
+        const { users: _users, ...config } = node;
+        return config;
       })
     };
     await storage.saveFlows(flowConfig);
     logger.log( 'Flows saved to storage');
-  }, [isReady, deploy, flowState.flows, flowState.nodes, flowState.configNodes, dispatch]);
+  }, [isReady, deploy, flowState.flows, flowState.nodes, flowState.configNodes, dispatch, storage]);
 
   const handleDelete = () => {
     deleteSelected();
@@ -137,15 +145,14 @@ export function Toolbar() {
     const exportData = {
       flows: flowState.flows,
       nodes: Object.values(flowState.nodes).map(node => {
-        // Convert internal format to export format
-        const exportNode = { ...node };
-        // Flatten _node properties for export (Node-RED compatible format)
-        const { _node, ...config } = exportNode;
-        return { ..._node, ...config };
+        // Filter out runtime-only properties for export
+        return Object.fromEntries(
+          Object.entries(node).filter(([key]) => !key.startsWith('_'))
+        );
       }),
       configNodes: Object.values(flowState.configNodes).map(node => {
-        const { _node, users: _users, ...config } = node;
-        return { ..._node, ...config };
+        const { users: _users, ...config } = node;
+        return config;
       })
     };
 
@@ -169,6 +176,12 @@ export function Toolbar() {
     } else {
       disconnectMcp();
     }
+    // Refresh password status
+    if (settings.password === null) {
+      setHasPassword(false);
+    } else if (settings.password && settings.password !== true) {
+      setHasPassword(true);
+    }
   }, [connectMcp, disconnectMcp]);
 
   const handleImportComplete = useCallback((data) => {
@@ -176,11 +189,11 @@ export function Toolbar() {
 
     // Calculate offset to avoid overlapping with existing nodes
     // Find the bounding box of existing nodes in the active flow
-    const existingNodes = Object.values(flowState.nodes).filter(n => n._node.z === editor.activeFlow);
+    const existingNodes = Object.values(flowState.nodes).filter(n => n.z === editor.activeFlow);
     let offsetX = 50;
     let offsetY = 50;
     if (existingNodes.length > 0 && nodes.length > 0) {
-      const maxX = Math.max(...existingNodes.map(n => n._node.x || 0));
+      const maxX = Math.max(...existingNodes.map(n => n.x || 0));
       // Find the min position of imported nodes to calculate relative offset
       const minImportX = Math.min(...nodes.map(n => n.x || 0));
       offsetX = maxX - minImportX + 150;
@@ -188,30 +201,19 @@ export function Toolbar() {
     }
 
     // Convert imported nodes to internal format with offset positions
-    const internalNodes = nodes.map(node => {
-      const { id, type, name, z, x, y, wires, ...config } = node;
-      return {
-        _node: {
-          id,
-          type,
-          name: name || '',
-          z,
-          x: (x || 0) + offsetX,
-          y: (y || 0) + offsetY,
-          wires: wires || []
-        },
-        ...config
-      };
-    });
+    const internalNodes = nodes.map(node => ({
+      ...node,
+      name: node.name || '',
+      x: (node.x || 0) + offsetX,
+      y: (node.y || 0) + offsetY,
+      wires: node.wires || []
+    }));
 
-    // Convert imported config nodes to internal format
-    const internalConfigNodes = configNodes.map(node => {
-      const { id, type, name, ...config } = node;
-      return {
-        _node: { id, type, name: name || '' },
-        ...config
-      };
-    });
+    // Config nodes are already flat
+    const internalConfigNodes = configNodes.map(node => ({
+      ...node,
+      name: node.name || ''
+    }));
 
     // Import nodes into current flow (don't create new flow tabs)
     flowDispatch({
@@ -223,7 +225,7 @@ export function Toolbar() {
     });
 
     // Mark imported nodes as pending and select them
-    const importedNodeIds = internalNodes.map(n => n._node.id);
+    const importedNodeIds = internalNodes.map(n => n.id);
     dispatch({ type: 'ADD_PENDING_NODES', nodeIds: importedNodeIds });
     dispatch({ type: 'SELECT_NODES', ids: importedNodeIds });
 
@@ -300,6 +302,17 @@ export function Toolbar() {
               >
                 Settings
               </button>
+              {mode === 'server' && hasPassword && logout && (
+                <>
+                  <div className="dropdown-divider" />
+                  <button
+                    className="dropdown-item"
+                    onClick={() => { logout(); setMenuOpen(false); }}
+                  >
+                    Logout
+                  </button>
+                </>
+              )}
             </div>
           )}
         </div>

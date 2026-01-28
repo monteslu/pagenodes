@@ -6,12 +6,12 @@ import { nodeRegistry } from '../nodes';
 
 /**
  * Validate a single node's configuration
- * @param {object} node - Node with _node and config properties
+ * @param {object} node - Flat node object with all properties at top level
  * @returns {string[]} - Array of error messages (empty if valid)
  */
 export function validateNode(node) {
   const errors = [];
-  const def = nodeRegistry.get(node._node.type);
+  const def = nodeRegistry.get(node.type);
 
   if (!def) return errors;
 

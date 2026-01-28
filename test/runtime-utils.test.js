@@ -19,35 +19,35 @@ describe('configsEqual', () => {
   });
 
   it('returns false for different node types', () => {
-    const prev = { _node: { type: 'mqtt-broker' }, host: 'localhost' };
-    const next = { _node: { type: 'websocket-client' }, host: 'localhost' };
+    const prev = { type: 'mqtt-broker', host: 'localhost' };
+    const next = { type: 'websocket-client', host: 'localhost' };
     expect(configsEqual(prev, next)).toBe(false);
   });
 
   it('returns true for identical configs', () => {
-    const prev = { _node: { type: 'mqtt-broker', id: '1' }, host: 'localhost', port: 1883 };
-    const next = { _node: { type: 'mqtt-broker', id: '1' }, host: 'localhost', port: 1883 };
+    const prev = { type: 'mqtt-broker', id: '1', host: 'localhost', port: 1883 };
+    const next = { type: 'mqtt-broker', id: '1', host: 'localhost', port: 1883 };
     expect(configsEqual(prev, next)).toBe(true);
   });
 
   it('returns false when config property changes', () => {
-    const prev = { _node: { type: 'mqtt-broker' }, host: 'localhost', port: 1883 };
-    const next = { _node: { type: 'mqtt-broker' }, host: 'localhost', port: 8883 };
+    const prev = { type: 'mqtt-broker', host: 'localhost', port: 1883 };
+    const next = { type: 'mqtt-broker', host: 'localhost', port: 8883 };
     expect(configsEqual(prev, next)).toBe(false);
   });
 
-  it('ignores _node property differences (like name, position)', () => {
-    const prev = { _node: { type: 'mqtt-broker', name: 'Old', x: 0 }, host: 'localhost' };
-    const next = { _node: { type: 'mqtt-broker', name: 'New', x: 100 }, host: 'localhost' };
+  it('ignores reserved property differences (like name, position)', () => {
+    const prev = { type: 'mqtt-broker', name: 'Old', x: 0, host: 'localhost' };
+    const next = { type: 'mqtt-broker', name: 'New', x: 100, host: 'localhost' };
     expect(configsEqual(prev, next)).toBe(true);
   });
 
   it('handles nested config objects', () => {
-    const prev = { _node: { type: 'test' }, options: { a: 1, b: { c: 2 } } };
-    const next = { _node: { type: 'test' }, options: { a: 1, b: { c: 2 } } };
+    const prev = { type: 'test', options: { a: 1, b: { c: 2 } } };
+    const next = { type: 'test', options: { a: 1, b: { c: 2 } } };
     expect(configsEqual(prev, next)).toBe(true);
 
-    const changed = { _node: { type: 'test' }, options: { a: 1, b: { c: 3 } } };
+    const changed = { type: 'test', options: { a: 1, b: { c: 3 } } };
     expect(configsEqual(prev, changed)).toBe(false);
   });
 });

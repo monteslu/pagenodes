@@ -2,7 +2,7 @@ export const jsonNode = {
   type: 'json',
   category: 'transforms',
   description: 'Converts between JSON string and object',
-  label: (node) => node._node.name || 'json',
+  label: (node) => node.name || 'json',
   color: '#DEBD5C', // light tan/gold
   icon: true,
   faChar: '\uf1c9', // file-code-o

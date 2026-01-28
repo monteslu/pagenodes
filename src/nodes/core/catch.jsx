@@ -4,7 +4,7 @@ export const catchNode = {
   type: 'catch',
   category: 'input',
   description: 'Catches errors from other nodes in the flow',
-  label: (node) => node._node.name || 'catch',
+  label: (node) => node.name || 'catch',
   color: '#e49191',
   icon: true,
   faChar: '\uf071', // warning triangle

@@ -9,7 +9,7 @@ export function ConfigNodeInput({ value, configType, onChange, onEditConfig }) {
 
   // Get all config nodes of this type
   const configNodes = Object.values(state.configNodes).filter(
-    cn => cn._node.type === configType
+    cn => cn.type === configType
   );
 
   const selectedConfig = value ? state.configNodes[value] : null;
@@ -22,7 +22,7 @@ export function ConfigNodeInput({ value, configType, onChange, onEditConfig }) {
         ? configDef.label(configNode)
         : configDef.label;
     }
-    return configNode._node.name || configNode._node.id;
+    return configNode.name || configNode.id;
   };
 
   const handleSelect = useCallback((configId) => {
@@ -37,7 +37,7 @@ export function ConfigNodeInput({ value, configType, onChange, onEditConfig }) {
 
   const handleEdit = useCallback(() => {
     if (selectedConfig) {
-      onEditConfig?.(selectedConfig._node.id);
+      onEditConfig?.(selectedConfig.id);
     }
   }, [selectedConfig, onEditConfig]);
 
@@ -72,9 +72,9 @@ export function ConfigNodeInput({ value, configType, onChange, onEditConfig }) {
           ) : (
             configNodes.map(cn => (
               <div
-                key={cn._node.id}
-                className={`config-node-option ${cn._node.id === value ? 'selected' : ''}`}
-                onClick={() => handleSelect(cn._node.id)}
+                key={cn.id}
+                className={`config-node-option ${cn.id === value ? 'selected' : ''}`}
+                onClick={() => handleSelect(cn.id)}
               >
                 {getConfigLabel(cn)}
               </div>

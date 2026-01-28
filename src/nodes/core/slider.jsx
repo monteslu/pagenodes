@@ -25,7 +25,7 @@ export const sliderNode = {
   type: 'slider',
   category: 'input',
   description: 'Interactive slider control',
-  label: (node) => node._node.name || 'slider',
+  label: (node) => node.name || 'slider',
   color: '#a6bbcf',
   icon: true,
   faChar: '\uf1de', // sliders icon
@@ -81,7 +81,7 @@ export const sliderNode = {
     const step = node?.step ?? 1;
     // Use _currentValue for live updates during dragging, fallback to configured value
     const currentValue = node?._currentValue ?? node?.value ?? 50;
-    const nodeId = node?._node?.id || 'slider';
+    const nodeId = node?.id || 'slider';
 
     // Calculate track and thumb positions
     const trackX = PADDING;

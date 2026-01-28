@@ -2,7 +2,7 @@ export const stringsNode = {
   type: 'strings',
   category: 'logic',
   description: 'Performs string operations using lodash',
-  label: (node) => node._node.name || 'strings',
+  label: (node) => node.name || 'strings',
   color: '#66d9ef', // light blue
   icon: true,
   faChar: '\uf031', // font

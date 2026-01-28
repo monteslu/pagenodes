@@ -22,7 +22,7 @@ export const audioBufferRuntime = {
 
     // Connect to downstream audio nodes (streamWires)
     // This is needed because buildGraph runs before async onInit completes
-    const streamWires = this._node?.streamWires || [];
+    const streamWires = this.streamWires || [];
     for (let outputIndex = 0; outputIndex < streamWires.length; outputIndex++) {
       const targets = streamWires[outputIndex] || [];
       for (const targetId of targets) {

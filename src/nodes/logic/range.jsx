@@ -2,7 +2,7 @@ export const rangeNode = {
   type: 'range',
   category: 'transforms',
   description: 'Maps a numeric value to a different range',
-  label: (node) => node._node.name || 'range',
+  label: (node) => node.name || 'range',
   color: '#e2d96e',
   icon: true,
   faChar: '\uf125', // crop

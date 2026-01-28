@@ -34,7 +34,7 @@ export const audioStemsNode = {
     { label: 'Native Instruments Stems', url: 'https://www.native-instruments.com/en/specials/stems/' },
     { label: 'Web Audio API (MDN)', url: 'https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API' }
   ],
-  label: (node) => node._node.name || 'stems',
+  label: (node) => node.name || 'stems',
   color: '#2d9a2d',
   fontColor: '#fff',
   icon: true,

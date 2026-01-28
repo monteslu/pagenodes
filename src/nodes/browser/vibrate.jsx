@@ -2,7 +2,7 @@ export const vibrateNode = {
   type: 'vibrate',
   category: 'output',
   description: 'Vibrates the device',
-  label: (node) => node._node.name || 'vibrate',
+  label: (node) => node.name || 'vibrate',
   color: '#8D5524', // fitzpatrick 5
   fontColor: '#fff',
   icon: true,

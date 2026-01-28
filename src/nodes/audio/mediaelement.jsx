@@ -10,7 +10,7 @@ export const audioMediaElementNode = {
   relatedDocs: () => [
     { label: 'MediaElementAudioSourceNode (MDN)', url: 'https://developer.mozilla.org/en-US/docs/Web/API/MediaElementAudioSourceNode' }
   ],
-  label: (node) => node._node.name || 'mediaelement',
+  label: (node) => node.name || 'mediaelement',
   color: '#2d9a2d',
   fontColor: '#fff',
   icon: true,

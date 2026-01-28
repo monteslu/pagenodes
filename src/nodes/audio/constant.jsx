@@ -10,7 +10,7 @@ export const audioConstantNode = {
   relatedDocs: () => [
     { label: 'ConstantSourceNode (MDN)', url: 'https://developer.mozilla.org/en-US/docs/Web/API/ConstantSourceNode' }
   ],
-  label: (node) => node._node.name || 'constant',
+  label: (node) => node.name || 'constant',
   color: '#2d9a2d',
   fontColor: '#fff',
   icon: true,

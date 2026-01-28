@@ -32,7 +32,7 @@ export function useDrag(screenToCanvas) {
     selected.forEach(id => {
       const node = nodes[id];
       if (node) {
-        nodeStartPositions.current[id] = { x: node._node.x, y: node._node.y };
+        nodeStartPositions.current[id] = { x: node.x, y: node.y };
       }
     });
 

@@ -12,7 +12,7 @@ const createStatusPN = (status) => ({
 });
 
 export function Node({ node, status, selected, isPending, hasErrors, onMouseDown, onDoubleClick, onPortMouseDown, onPortMouseUp, onPortMouseEnter, onPortMouseLeave, onStreamPortMouseDown, onStreamPortMouseUp, onStreamPortMouseEnter, onStreamPortMouseLeave, onInject, onFileDrop, onNodeInteraction }) {
-  const def = nodeRegistry.get(node._node.type);
+  const def = nodeRegistry.get(node.type);
   const [isDragOver, setIsDragOver] = useState(false);
 
   const handleButtonClick = useCallback((e) => {
@@ -29,11 +29,11 @@ export function Node({ node, status, selected, isPending, hasErrors, onMouseDown
     const touch = e.touches[0];
     // Simulate mousedown event
     const fakeEvent = { clientX: touch.clientX, clientY: touch.clientY, stopPropagation: () => {} };
-    onMouseDown(fakeEvent, node._node.id);
-  }, [onMouseDown, node._node.id]);
+    onMouseDown(fakeEvent, node.id);
+  }, [onMouseDown, node.id]);
 
   // Drag and drop handlers for file read node
-  const isFileRead = node._node.type === 'file read';
+  const isFileRead = node.type === 'file read';
 
   const handleDragOver = useCallback((e) => {
     if (!isFileRead) return;
@@ -71,16 +71,16 @@ export function Node({ node, status, selected, isPending, hasErrors, onMouseDown
   // Handler for interactive node body elements (buttons, sliders, etc.)
   const handleBodyInteraction = useCallback((eventName, data) => {
     if (onNodeInteraction) {
-      onNodeInteraction(node._node.id, eventName, data);
+      onNodeInteraction(node.id, eventName, data);
     }
-  }, [node._node.id, onNodeInteraction]);
+  }, [node.id, onNodeInteraction]);
 
   const label = useMemo(() => {
-    if (node._node.name) return node._node.name;
+    if (node.name) return node.name;
     if (def?.label) {
       return typeof def.label === 'function' ? def.label(node) : def.label;
     }
-    return node._node.type;
+    return node.type;
   }, [def, node]);
 
   // Use dynamic getOutputs if available, otherwise static outputs
@@ -107,10 +107,10 @@ export function Node({ node, status, selected, isPending, hasErrors, onMouseDown
   return (
     <g
       className={`node ${selected ? 'selected' : ''} ${hasErrors ? 'has-errors' : ''} ${isDragOver ? 'drag-over' : ''}`}
-      transform={`translate(${node._node.x}, ${node._node.y})`}
-      onMouseDown={(e) => onMouseDown(e, node._node.id)}
+      transform={`translate(${node.x}, ${node.y})`}
+      onMouseDown={(e) => onMouseDown(e, node.id)}
       onClick={(e) => e.stopPropagation()}
-      onDoubleClick={(e) => onDoubleClick?.(e, node._node.id)}
+      onDoubleClick={(e) => onDoubleClick?.(e, node.id)}
       onTouchStart={handleTouchStart}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
@@ -118,7 +118,7 @@ export function Node({ node, status, selected, isPending, hasErrors, onMouseDown
     >
       <NodeShape
         def={def}
-        type={node._node.type}
+        type={node.type}
         label={displayLabel}
         node={node}
         selected={selected}
@@ -132,14 +132,14 @@ export function Node({ node, status, selected, isPending, hasErrors, onMouseDown
         streamOutputs={streamOutputs}
         onButtonClick={handleButtonClick}
         onBodyInteraction={handleBodyInteraction}
-        onPortMouseDown={(e, portIndex, isOutput) => onPortMouseDown(e, node._node.id, portIndex, isOutput)}
-        onPortMouseUp={(e, portIndex, isOutput) => onPortMouseUp(e, node._node.id, portIndex, isOutput)}
-        onPortMouseEnter={(e, portIndex, isOutput) => onPortMouseEnter?.(e, node._node.id, portIndex, isOutput)}
-        onPortMouseLeave={(e, portIndex, isOutput) => onPortMouseLeave?.(e, node._node.id, portIndex, isOutput)}
-        onStreamPortMouseDown={(e, portIndex, isOutput) => onStreamPortMouseDown?.(e, node._node.id, portIndex, isOutput)}
-        onStreamPortMouseUp={(e, portIndex, isOutput) => onStreamPortMouseUp?.(e, node._node.id, portIndex, isOutput)}
-        onStreamPortMouseEnter={(e, portIndex, isOutput) => onStreamPortMouseEnter?.(e, node._node.id, portIndex, isOutput)}
-        onStreamPortMouseLeave={(e, portIndex, isOutput) => onStreamPortMouseLeave?.(e, node._node.id, portIndex, isOutput)}
+        onPortMouseDown={(e, portIndex, isOutput) => onPortMouseDown(e, node.id, portIndex, isOutput)}
+        onPortMouseUp={(e, portIndex, isOutput) => onPortMouseUp(e, node.id, portIndex, isOutput)}
+        onPortMouseEnter={(e, portIndex, isOutput) => onPortMouseEnter?.(e, node.id, portIndex, isOutput)}
+        onPortMouseLeave={(e, portIndex, isOutput) => onPortMouseLeave?.(e, node.id, portIndex, isOutput)}
+        onStreamPortMouseDown={(e, portIndex, isOutput) => onStreamPortMouseDown?.(e, node.id, portIndex, isOutput)}
+        onStreamPortMouseUp={(e, portIndex, isOutput) => onStreamPortMouseUp?.(e, node.id, portIndex, isOutput)}
+        onStreamPortMouseEnter={(e, portIndex, isOutput) => onStreamPortMouseEnter?.(e, node.id, portIndex, isOutput)}
+        onStreamPortMouseLeave={(e, portIndex, isOutput) => onStreamPortMouseLeave?.(e, node.id, portIndex, isOutput)}
       />
 
       {/* Status indicator below node */}

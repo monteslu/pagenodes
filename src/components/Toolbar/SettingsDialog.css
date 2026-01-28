@@ -130,6 +130,42 @@
   width: 80px;
 }
 
+.settings-password-input {
+  width: 100%;
+}
+
+.settings-row-col {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+}
+
+.settings-remove-password {
+  background: none;
+  border: none;
+  color: #e44;
+  cursor: pointer;
+  font-size: 12px;
+  padding: 0;
+  margin-left: 8px;
+  text-decoration: underline;
+}
+
+.settings-remove-password:hover {
+  color: #f66;
+}
+
+.settings-error {
+  font-size: 12px;
+  color: #e44;
+}
+
+.settings-section + .settings-section {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-color);
+}
+
 .settings-hint {
   font-size: 11px;
   color: var(--text-muted);

@@ -68,7 +68,7 @@ export const buttonsNode = {
   type: 'buttons',
   category: 'input',
   description: 'Interactive button grid',
-  label: (node) => node._node.name || 'buttons',
+  label: (node) => node.name || 'buttons',
   color: '#a6bbcf',
   icon: true,
   faChar: '\uf00a', // th (grid icon)
@@ -140,7 +140,7 @@ export const buttonsNode = {
     };
 
     // Generate unique gradient IDs for this node instance
-    const nodeId = node?._node?.id || 'btn';
+    const nodeId = node?.id || 'btn';
 
     const buttons = [];
     for (let row = 0; row < layoutDef.rows; row++) {

@@ -1,6 +1,7 @@
 import { useState, useCallback, useMemo, useEffect } from 'react';
 import { nodeRegistry } from '../../nodes';
 import { useFlows } from '../../context/FlowContext';
+import { useRuntime } from '../../context/runtime.js';
 import { generateId } from '../../utils/id';
 import { TextInput } from './inputs/TextInput';
 import { NumberInput } from './inputs/NumberInput';
@@ -12,6 +13,7 @@ import './ConfigNodeDialog.css';
 
 export function ConfigNodeDialog({ configType, configId, onClose, onSave }) {
   const { state, dispatch } = useFlows();
+  const runtime = useRuntime();
   const def = nodeRegistry.get(configType);
 
   const isNew = !configId;
@@ -35,7 +37,7 @@ export function ConfigNodeDialog({ configType, configId, onClose, onSave }) {
   }, [existingConfig, def]);
 
   const [values, setValues] = useState(initialValues);
-  const [nodeName, setNodeName] = useState(existingConfig?._node?.name || '');
+  const [nodeName, setNodeName] = useState(existingConfig?.name || '');
 
   // Validate dependent selects - ensure their values are valid for current options
   useEffect(() => {
@@ -72,11 +74,9 @@ export function ConfigNodeDialog({ configType, configId, onClose, onSave }) {
       // Create new config node
       const newId = generateId();
       const newConfig = {
-        _node: {
-          id: newId,
-          type: configType,
-          name: nodeName || values.name || ''
-        },
+        id: newId,
+        type: configType,
+        name: nodeName || values.name || '',
         ...values
       };
       dispatch({ type: 'ADD_CONFIG_NODE', node: newConfig });
@@ -88,10 +88,9 @@ export function ConfigNodeDialog({ configType, configId, onClose, onSave }) {
         id: configId,
         changes: {
           ...values,
-          _node: {
-            ...existingConfig._node,
-            name: nodeName || values.name || ''
-          }
+          id: existingConfig.id,
+          type: existingConfig.type,
+          name: nodeName || values.name || ''
         }
       });
       onSave?.(configId);
@@ -154,9 +153,10 @@ export function ConfigNodeDialog({ configType, configId, onClose, onSave }) {
         configId,
         isNew,
         nodeRegistry,
-      }
+      },
+      mode: runtime.mode,
     };
-  }, [values, nodeName, handleValueChange, configType, configId, isNew]);
+  }, [values, nodeName, handleValueChange, configType, configId, isNew, runtime.mode]);
 
   const renderInput = (key, propDef) => {
     const value = values[key];

@@ -12,7 +12,7 @@ export const serialInNode = {
   category: 'hardware',
   description: 'Receives serial port data',
   requiresGesture: true,
-  label: (node) => node._node.name || 'serial in',
+  label: (node) => node.name || 'serial in',
   color: 'BurlyWood', // tan
   icon: true,
   faChar: '\uf1e6', // plug
@@ -195,7 +195,7 @@ export const serialOutNode = {
   category: 'hardware',
   description: 'Sends serial port data',
   requiresGesture: true,
-  label: (node) => node._node.name || 'serial out',
+  label: (node) => node.name || 'serial out',
   color: 'BurlyWood', // tan
   icon: true,
   faChar: '\uf1e6', // plug

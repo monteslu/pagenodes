@@ -20,7 +20,7 @@ export const hsyncConnectionNode = {
   type: 'hsync-connection',
   category: 'config',
   description: 'hsync server connection configuration',
-  label: (node) => node._node.name || node.hostname || (node.dynamic ? 'dynamic' : 'hsync-connection'),
+  label: (node) => node.name || node.hostname || (node.dynamic ? 'dynamic' : 'hsync-connection'),
   defaults: {
     name: { type: 'string', default: '' },
     dynamic: { type: 'boolean', default: true, label: 'Get dynamic hostname' },
@@ -276,7 +276,7 @@ export const hsyncInNode = {
   type: 'hsync in',
   category: 'networking',
   description: 'Receives messages via hsync',
-  label: (node) => node._node.name || node.route || 'hsync in',
+  label: (node) => node.name || node.route || 'hsync in',
   color: '#b6dbcf', // mint green (matches node-red-contrib-hsync)
   icon: true,
   faChar: '\uf0ac', // globe
@@ -360,7 +360,7 @@ export const hsyncOutNode = {
   type: 'hsync out',
   category: 'networking',
   description: 'Sends messages via hsync',
-  label: (node) => node._node.name || 'hsync out',
+  label: (node) => node.name || 'hsync out',
   color: '#b6dbcf', // mint green (matches node-red-contrib-hsync)
   icon: true,
   faChar: '\uf0ac', // globe
@@ -453,7 +453,7 @@ export const hsyncPeerNode = {
   type: 'hsync-peer',
   category: 'config',
   description: 'hsync peer configuration',
-  label: (node) => node._node.name || node.peerHostname || 'hsync-peer',
+  label: (node) => node.name || node.peerHostname || 'hsync-peer',
   defaults: {
     name: { type: 'string', default: '' },
     peerHostname: { type: 'string', default: '', placeholder: 'peer-app.hsync.io' }
@@ -488,7 +488,7 @@ export const hsyncP2PInNode = {
   type: 'hsync p2p in',
   category: 'networking',
   description: 'Receives P2P messages via WebRTC, or TCP data when in stream mode',
-  label: (node) => node._node.name || (node.streamMode ? `p2p in :${node.listenPort}` : 'p2p in'),
+  label: (node) => node.name || (node.streamMode ? `p2p in :${node.listenPort}` : 'p2p in'),
   color: '#b6dbcf', // mint green (matches node-red-contrib-hsync)
   icon: true,
   faChar: '\uf1e0', // share-alt
@@ -658,7 +658,7 @@ export const hsyncP2POutNode = {
   type: 'hsync p2p out',
   category: 'networking',
   description: 'Sends P2P messages via WebRTC, or TCP data when in stream mode',
-  label: (node) => node._node.name || (node.streamMode ? `p2p out :${node.targetPort}` : 'p2p out'),
+  label: (node) => node.name || (node.streamMode ? `p2p out :${node.targetPort}` : 'p2p out'),
   color: '#b6dbcf', // mint green (matches node-red-contrib-hsync)
   icon: true,
   faChar: '\uf1e0', // share-alt

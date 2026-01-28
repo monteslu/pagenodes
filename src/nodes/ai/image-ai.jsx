@@ -83,7 +83,7 @@ export const imageAiConfigNode = {
   type: 'image-ai-config',
   category: 'config',
   description: 'AI vision model configuration',
-  label: (node) => node._node.name || node.task || 'image-ai-config',
+  label: (node) => node.name || node.task || 'image-ai-config',
 
   defaults: {
     name: { type: 'string', default: '' },
@@ -301,7 +301,7 @@ export const imageAiNode = {
   category: 'ai',
   description: 'Analyzes images with AI vision models',
   paletteLabel: 'image ai',
-  label: (node) => node._node.name || 'image ai',
+  label: (node) => node.name || 'image ai',
   color: '#E6E0F8', // light purple
   icon: true,
   faChar: '\uf03e', // image

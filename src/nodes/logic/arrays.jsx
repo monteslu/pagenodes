@@ -2,7 +2,7 @@ export const arraysNode = {
   type: 'arrays',
   category: 'logic',
   description: 'Performs array operations using lodash',
-  label: (node) => node._node.name || 'arrays',
+  label: (node) => node.name || 'arrays',
   color: '#66d9ef', // light blue
   icon: true,
   faChar: '\uf0ca', // list-ul

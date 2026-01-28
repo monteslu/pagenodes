@@ -3,6 +3,9 @@
  * These are pure functions used by the runtime worker
  */
 
+// Reserved system properties that should be excluded from config comparison
+const RESERVED_PROPS = new Set(['id', 'type', 'name', 'z', 'x', 'y', 'wires', 'streamWires']);
+
 /**
  * Compare two config nodes to see if connection-relevant properties changed.
  * Ignores cosmetic properties like name, position.
@@ -10,13 +13,17 @@
  */
 export function configsEqual(prevNode, newNode) {
   if (!prevNode || !newNode) return false;
-  if (prevNode._node.type !== newNode._node.type) return false;
+  if (prevNode.type !== newNode.type) return false;
 
-  // Get config properties (everything except _node)
-  const prevConfig = { ...prevNode };
-  const newConfig = { ...newNode };
-  delete prevConfig._node;
-  delete newConfig._node;
+  // Get config properties (everything except reserved system props)
+  const prevConfig = {};
+  const newConfig = {};
+  for (const key of Object.keys(prevNode)) {
+    if (!RESERVED_PROPS.has(key)) prevConfig[key] = prevNode[key];
+  }
+  for (const key of Object.keys(newNode)) {
+    if (!RESERVED_PROPS.has(key)) newConfig[key] = newNode[key];
+  }
 
   // Compare serialized config (handles nested objects)
   return JSON.stringify(prevConfig) === JSON.stringify(newConfig);

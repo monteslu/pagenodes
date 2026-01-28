@@ -2,7 +2,7 @@ export const triggerNode = {
   type: 'trigger',
   category: 'logic',
   description: 'Sends a message then optionally a second after delay',
-  label: (node) => node._node.name || 'trigger',
+  label: (node) => node.name || 'trigger',
   color: '#E6E0F8', // light purple
   icon: true,
   faChar: '\uf135', // rocket

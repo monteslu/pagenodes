@@ -22,7 +22,7 @@ export const canvasNode = {
   category: 'output',
   description: 'Draws graphics on an HTML canvas',
   paletteLabel: 'canvas',
-  label: (node) => node._node.name || `canvas ${node.width}x${node.height}`,
+  label: (node) => node.name || `canvas ${node.width}x${node.height}`,
   color: '#F0E68C', // khaki/light yellow
   icon: true,
   faChar: '\uf1fc', // paint-brush
@@ -206,7 +206,7 @@ export const canvasConfigNode = {
   type: 'canvas-config',
   category: 'config',
   deprecated: true,
-  label: (node) => node._node.name || `Canvas ${node.width}x${node.height}`,
+  label: (node) => node.name || `Canvas ${node.width}x${node.height}`,
 
   defaults: {
     name: { type: 'string', default: '', label: 'Name' },

@@ -1473,11 +1473,11 @@ class AudioManager {
     // Then connect based on streamWires
 
     for (const node of Object.values(nodes)) {
-      const streamWires = node._node.streamWires || [];
+      const streamWires = node.streamWires || [];
 
       streamWires.forEach((targets, outputIndex) => {
         targets.forEach(targetId => {
-          this.connectNodes(node._node.id, targetId, outputIndex, 0);
+          this.connectNodes(node.id, targetId, outputIndex, 0);
         });
       });
     }

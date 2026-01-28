@@ -36,7 +36,7 @@ export const switchNode = {
   type: 'switch',
   category: 'logic',
   description: 'Routes messages based on property values',
-  label: (node) => node._node.name || 'switch',
+  label: (node) => node.name || 'switch',
   color: '#e2d96e',
   icon: true,
   faChar: '\uf126', // code-fork

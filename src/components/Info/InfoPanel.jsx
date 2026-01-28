@@ -1,5 +1,6 @@
 import { useEditor } from '../../context/EditorContext';
 import { useFlows } from '../../context/FlowContext';
+import { useRuntime } from '../../context/runtime.js';
 import { nodeRegistry } from '../../nodes';
 import './InfoPanel.css';
 
@@ -9,6 +10,7 @@ const PRIMITIVE_TYPES = ['string', 'boolean', 'number', 'object', 'array', 'code
 export function InfoPanel({ onEditNode }) {
   const { state: editor } = useEditor();
   const { state: flowState } = useFlows();
+  const { mode } = useRuntime();
 
   // Get the selected node (if exactly one is selected)
   const selectedNode = editor.selectedNodes.length === 1
@@ -17,7 +19,7 @@ export function InfoPanel({ onEditNode }) {
 
   // Get the node definition from registry
   const nodeDef = selectedNode
-    ? nodeRegistry.get(selectedNode._node.type)
+    ? nodeRegistry.get(selectedNode.type)
     : null;
 
   if (!selectedNode) {
@@ -45,19 +47,19 @@ export function InfoPanel({ onEditNode }) {
           <h4>Node</h4>
           <table className="info-table">
             <tbody>
-              {selectedNode._node.name && (
+              {selectedNode.name && (
                 <tr>
                   <td className="info-label">Name</td>
-                  <td className="info-value">{selectedNode._node.name}</td>
+                  <td className="info-value">{selectedNode.name}</td>
                 </tr>
               )}
               <tr>
                 <td className="info-label">Type</td>
-                <td className="info-value">{selectedNode._node.type}</td>
+                <td className="info-value">{selectedNode.type}</td>
               </tr>
               <tr>
                 <td className="info-label">ID</td>
-                <td className="info-value info-id">{selectedNode._node.id}</td>
+                <td className="info-value info-id">{selectedNode.id}</td>
               </tr>
             </tbody>
           </table>
@@ -90,8 +92,8 @@ export function InfoPanel({ onEditNode }) {
                     const configNode = flowState.configNodes[value];
                     if (configNode) {
                       // Get the config node definition to use its label function
-                      const configDef = nodeRegistry.get(configNode._node.type);
-                      let configName = configNode._node?.name || configNode.name;
+                      const configDef = nodeRegistry.get(configNode.type);
+                      let configName = configNode?.name || configNode.name;
 
                       // If no name set, use label function (like "wss://..." for websocket)
                       if (!configName && configDef?.label) {
@@ -136,7 +138,7 @@ export function InfoPanel({ onEditNode }) {
           <div className="info-section info-help">
             <h4>About</h4>
             <div className="info-help-content">
-              {nodeDef.renderHelp()}
+              {nodeDef.renderHelp({ mode })}
             </div>
           </div>
         )}

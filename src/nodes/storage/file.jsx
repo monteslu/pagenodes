@@ -2,7 +2,7 @@ export const fileReadNode = {
   type: 'file read',
   category: 'storage',
   description: 'Reads files selected by user via file picker',
-  label: (node) => node._node.name || 'file read',
+  label: (node) => node.name || 'file read',
   color: '#008000', // green
   icon: true,
   faChar: '\uf15b', // file
@@ -146,7 +146,7 @@ export const fileWriteNode = {
   type: 'file write',
   category: 'storage',
   description: 'Downloads data as a file',
-  label: (node) => node._node.name || 'file write',
+  label: (node) => node.name || 'file write',
   color: '#008000', // green
   icon: true,
   faChar: '\uf0c7', // save

@@ -12,7 +12,7 @@ export const bluetoothInNode = {
   category: 'hardware',
   description: 'Receives Bluetooth data',
   requiresGesture: true,
-  label: (node) => node._node.name || 'bluetooth in',
+  label: (node) => node.name || 'bluetooth in',
   color: '#0000CC',
   icon: true,
   faChar: '\uf294', // bluetooth-b
@@ -158,7 +158,7 @@ export const bluetoothOutNode = {
   category: 'hardware',
   description: 'Sends Bluetooth data',
   requiresGesture: true,
-  label: (node) => node._node.name || 'bluetooth out',
+  label: (node) => node.name || 'bluetooth out',
   color: '#0000CC',
   icon: true,
   faChar: '\uf294', // bluetooth-b

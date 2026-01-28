@@ -6,7 +6,7 @@ export const mcpInputNode = {
   category: 'ai',
   description: 'Receives messages from AI agents via MCP',
   paletteLabel: 'mcp-in',
-  label: (node) => node._node.name || 'mcp-in',
+  label: (node) => node.name || 'mcp-in',
   color: '#a66bbf',  // Purple for AI nodes
   fontColor: '#fff',
   icon: true,

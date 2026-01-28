@@ -2,7 +2,7 @@ export const eventsourceNode = {
   type: 'eventsource',
   category: 'networking',
   description: 'Connects to Server-Sent Events stream',
-  label: (node) => node._node.name || 'SSE',
+  label: (node) => node.name || 'SSE',
   color: '#ffd7b4', // light peach/salmon
   icon: true,
   faChar: '\uf019', // download

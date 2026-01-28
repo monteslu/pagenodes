@@ -10,7 +10,7 @@ export const audioMergerNode = {
   relatedDocs: () => [
     { label: 'ChannelMergerNode (MDN)', url: 'https://developer.mozilla.org/en-US/docs/Web/API/ChannelMergerNode' }
   ],
-  label: (node) => node._node.name || 'merger',
+  label: (node) => node.name || 'merger',
   color: '#2d9a2d',
   fontColor: '#fff',
   icon: true,
@@ -22,7 +22,7 @@ export const audioMergerNode = {
 
   streamInputs: 2,  // Default, overridden by getStreamInputs
   streamOutputs: 1,
-  getStreamInputs: (node) => node?._node?.channels || 2,
+  getStreamInputs: (node) => node?.channels || 2,
 
   defaults: {
     channels: { type: 'number', default: 2, min: 2, max: 6 }

@@ -13,7 +13,7 @@ export const audioConvolverNode = {
   relatedDocs: () => [
     { label: 'ConvolverNode (MDN)', url: 'https://developer.mozilla.org/en-US/docs/Web/API/ConvolverNode' }
   ],
-  label: (node) => node._node.name || 'convolver',
+  label: (node) => node.name || 'convolver',
   color: '#2d9a2d',
   fontColor: '#fff',
   icon: true,

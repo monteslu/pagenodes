@@ -2,7 +2,7 @@ export const rbeNode = {
   type: 'rbe',
   category: 'logic',
   description: 'Report by exception - only sends on change',
-  label: (node) => node._node.name || 'rbe',
+  label: (node) => node.name || 'rbe',
   color: '#e2d96e',
   icon: true,
   faChar: '\uf074', // random

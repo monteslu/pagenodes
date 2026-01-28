@@ -11,7 +11,7 @@ export const voicerecNode = {
   category: 'input',
   description: 'Converts speech to text',
   requiresGesture: true,
-  label: (node) => node._node.name || 'voice rec',
+  label: (node) => node.name || 'voice rec',
   color: '#ffb6c1', // light pink
   icon: true,
   faChar: '\uf130', // microphone
@@ -206,7 +206,7 @@ export const speechNode = {
   category: 'output',
   description: 'Converts text to speech',
   requiresGesture: true,
-  label: (node) => node._node.name || 'speech',
+  label: (node) => node.name || 'speech',
   color: '#ffb6c1', // light pink
   icon: true,
   faChar: '\uf0a1', // bullhorn

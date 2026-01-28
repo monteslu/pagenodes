@@ -67,9 +67,7 @@ describe('calcOutputYPositions', () => {
 });
 
 describe('getPortPosition', () => {
-  const mockNode = {
-    _node: { x: 100, y: 50, wires: [['a'], ['b']] }
-  };
+  const mockNode = { x: 100, y: 50, wires: [['a'], ['b']] };
 
   it('returns input port at left edge, vertically centered', () => {
     const pos = getPortPosition(mockNode, 0, false, 30);
@@ -124,9 +122,7 @@ describe('getWireControlPoints', () => {
 });
 
 describe('isPointInNode', () => {
-  const mockNode = {
-    _node: { x: 100, y: 100, wires: [[]] }
-  };
+  const mockNode = { x: 100, y: 100, wires: [[]] };
 
   it('returns true for point inside node', () => {
     expect(isPointInNode(150, 115, mockNode)).toBe(true);
@@ -174,9 +170,7 @@ describe('rectsOverlap', () => {
 });
 
 describe('isNodeInSelection', () => {
-  const mockNode = {
-    _node: { x: 100, y: 100, wires: [[]] }
-  };
+  const mockNode = { x: 100, y: 100, wires: [[]] };
 
   it('returns true when node is inside selection', () => {
     const selection = { x: 50, y: 50, width: 200, height: 200 };
@@ -200,7 +194,7 @@ describe('getNodesBounds', () => {
   });
 
   it('returns bounds for single node', () => {
-    const nodes = [{ _node: { x: 100, y: 50, wires: [[]] } }];
+    const nodes = [{ x: 100, y: 50, wires: [[]] }];
     const bounds = getNodesBounds(nodes);
     expect(bounds.x).toBe(100);
     expect(bounds.y).toBe(50);
@@ -210,8 +204,8 @@ describe('getNodesBounds', () => {
 
   it('returns bounding box for multiple nodes', () => {
     const nodes = [
-      { _node: { x: 0, y: 0, wires: [[]] } },
-      { _node: { x: 200, y: 100, wires: [[]] } }
+      { x: 0, y: 0, wires: [[]] },
+      { x: 200, y: 100, wires: [[]] }
     ];
     const bounds = getNodesBounds(nodes);
     expect(bounds.x).toBe(0);

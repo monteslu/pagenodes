@@ -5,7 +5,7 @@ export const nodebotNode = {
   type: 'nodebot',
   category: 'config',
   description: 'Johnny-Five board connection via Web Serial',
-  label: (node) => node._node.name || 'nodebot',
+  label: (node) => node.name || 'nodebot',
 
   defaults: {
     name: { type: 'string', default: '' },
@@ -131,9 +131,9 @@ export const gpioInNode = {
   category: 'hardware',
   description: 'Read digital or analog values from GPIO pins',
   label: (node) => {
-    const pin = node._node.pin || node.pin;
-    const state = node._node.state || node.state || 'INPUT';
-    return node._node.name || `pin ${pin} (${state})`;
+    const pin = node.pin || node.pin;
+    const state = node.state || node.state || 'INPUT';
+    return node.name || `pin ${pin} (${state})`;
   },
   color: '#F3DF49',
   icon: true,
@@ -212,9 +212,9 @@ export const gpioOutNode = {
   category: 'hardware',
   description: 'Write digital, PWM, or servo values to GPIO pins',
   label: (node) => {
-    const pin = node._node.pin || node.pin;
-    const state = node._node.state || node.state || 'OUTPUT';
-    return node._node.name || `pin ${pin} (${state})`;
+    const pin = node.pin || node.pin;
+    const state = node.state || node.state || 'OUTPUT';
+    return node.name || `pin ${pin} (${state})`;
   },
   color: '#F3DF49',
   icon: true,
@@ -293,7 +293,7 @@ export const johnny5Node = {
   type: 'johnny5',
   category: 'hardware',
   description: 'Run custom Johnny-Five code',
-  label: (node) => node._node.name || 'johnny5',
+  label: (node) => node.name || 'johnny5',
   color: '#F3DF49',
   icon: true,
   faChar: '\uf544', // robot

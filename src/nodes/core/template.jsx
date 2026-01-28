@@ -2,7 +2,7 @@ export const templateNode = {
   type: 'template',
   category: 'transforms',
   description: 'Generates text using mustache templates',
-  label: (node) => node._node.name || 'template',
+  label: (node) => node.name || 'template',
   color: '#f3b567',
   icon: true,
   faChar: '\uf121', // code

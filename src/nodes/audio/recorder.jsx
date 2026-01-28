@@ -11,7 +11,7 @@ export const audioRecorderNode = {
     { label: 'MediaStreamAudioDestinationNode (MDN)', url: 'https://developer.mozilla.org/en-US/docs/Web/API/MediaStreamAudioDestinationNode' },
     { label: 'MediaRecorder (MDN)', url: 'https://developer.mozilla.org/en-US/docs/Web/API/MediaRecorder' }
   ],
-  label: (node) => node._node.name || 'recorder',
+  label: (node) => node.name || 'recorder',
   color: '#2d9a2d',
   fontColor: '#fff',
   icon: true,

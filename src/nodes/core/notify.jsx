@@ -10,7 +10,7 @@ export const notifyNode = {
   category: 'output',
   description: 'Shows browser notifications',
   requiresGesture: true,
-  label: (node) => node._node.name || node.tag || 'notify',
+  label: (node) => node.name || node.tag || 'notify',
   color: '#b7a990', // light tan/brown
   icon: true,
   faChar: '\uf0f3', // bell

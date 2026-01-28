@@ -5,7 +5,7 @@ export const gamepadNode = {
   type: 'gamepad',
   category: 'hardware',
   description: 'Reads gamepad/controller input',
-  label: (node) => node._node.name || 'gamepad',
+  label: (node) => node.name || 'gamepad',
   color: '#26C6DA', // cyan/turquoise
   icon: true,
   faChar: '\uf11b', // gamepad

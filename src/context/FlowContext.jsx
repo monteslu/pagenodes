@@ -33,19 +33,18 @@ function flowReducer(state, action) {
       const nodes = {};
       const configNodes = {};
       action.nodes.forEach(n => {
-        // Check if this is a config node using the node registry
-        const nodeDef = nodeRegistry.get(n._node.type);
+        const nodeDef = nodeRegistry.get(n.type);
         const isConfigNode = nodeDef?.category === 'config';
         if (isConfigNode) {
-          configNodes[n._node.id] = n;
+          configNodes[n.id] = n;
         } else {
-          nodes[n._node.id] = n;
+          nodes[n.id] = n;
         }
       });
       // Also handle explicitly passed config nodes
       if (action.configNodes) {
         action.configNodes.forEach(n => {
-          configNodes[n._node.id] = n;
+          configNodes[n.id] = n;
         });
       }
       return {
@@ -68,18 +67,18 @@ function flowReducer(state, action) {
       const mergedNodes = { ...state.nodes };
       for (const node of action.nodes) {
         // If targetFlow specified, override the node's z property (but not for config nodes)
-        const nodeDef = nodeRegistry.get(node._node.type);
+        const nodeDef = nodeRegistry.get(node.type);
         const isConfigNode = nodeDef?.category === 'config';
         if (action.targetFlow && !isConfigNode) {
-          node._node.z = action.targetFlow;
+          node.z = action.targetFlow;
         }
-        mergedNodes[node._node.id] = node;
+        mergedNodes[node.id] = node;
       }
 
       // Merge config nodes
       const mergedConfigNodes = { ...state.configNodes };
       for (const node of action.configNodes || []) {
-        mergedConfigNodes[node._node.id] = {
+        mergedConfigNodes[node.id] = {
           ...node,
           users: []
         };
@@ -117,21 +116,21 @@ function flowReducer(state, action) {
       // Remove all nodes in that flow
       const nodes = {};
       Object.entries(state.nodes).forEach(([id, node]) => {
-        if (node._node.z !== action.id) {
+        if (node.z !== action.id) {
           nodes[id] = node;
         }
       });
 
       // Clean up wires and streamWires pointing to deleted nodes
-      const deletedNodeIds = Object.keys(state.nodes).filter(id => state.nodes[id]._node.z === action.id);
+      const deletedNodeIds = Object.keys(state.nodes).filter(id => state.nodes[id].z === action.id);
       Object.values(nodes).forEach(node => {
-        if (node._node.wires) {
-          node._node.wires = node._node.wires.map(outputs =>
+        if (node.wires) {
+          node.wires = node.wires.map(outputs =>
             outputs.filter(targetId => !deletedNodeIds.includes(targetId))
           );
         }
-        if (node._node.streamWires) {
-          node._node.streamWires = node._node.streamWires.map(outputs =>
+        if (node.streamWires) {
+          node.streamWires = node.streamWires.map(outputs =>
             outputs.filter(targetId => !deletedNodeIds.includes(targetId))
           );
         }
@@ -142,17 +141,17 @@ function flowReducer(state, action) {
 
     case 'ADD_NODE': {
       // Check if this is a config node using the node registry
-      const nodeDef = nodeRegistry.get(action.node._node.type);
+      const nodeDef = nodeRegistry.get(action.node.type);
       const isConfigNode = nodeDef?.category === 'config';
       if (isConfigNode) {
         return {
           ...state,
-          configNodes: { ...state.configNodes, [action.node._node.id]: action.node }
+          configNodes: { ...state.configNodes, [action.node.id]: action.node }
         };
       }
       return {
         ...state,
-        nodes: { ...state.nodes, [action.node._node.id]: action.node }
+        nodes: { ...state.nodes, [action.node.id]: action.node }
       };
     }
 
@@ -179,7 +178,7 @@ function flowReducer(state, action) {
     }
 
     case 'UPDATE_NODE_PROPS': {
-      // Check if node is in nodes or configNodes
+      // Update system properties (name, x, y, etc.) directly on the flat node
       if (state.nodes[action.id]) {
         return {
           ...state,
@@ -187,7 +186,7 @@ function flowReducer(state, action) {
             ...state.nodes,
             [action.id]: {
               ...state.nodes[action.id],
-              _node: { ...state.nodes[action.id]._node, ...action.nodeProps }
+              ...action.nodeProps
             }
           }
         };
@@ -198,7 +197,7 @@ function flowReducer(state, action) {
             ...state.configNodes,
             [action.id]: {
               ...state.configNodes[action.id],
-              _node: { ...state.configNodes[action.id]._node, ...action.nodeProps }
+              ...action.nodeProps
             }
           }
         };
@@ -207,8 +206,7 @@ function flowReducer(state, action) {
     }
 
     case 'UPDATE_NODE_RUNTIME': {
-      // Update runtime-only properties on node wrapper (not _node)
-      // Used for live UI updates like slider position, doesn't affect history
+      // Update runtime-only properties (for live UI feedback, no history)
       if (state.nodes[action.id]) {
         return {
           ...state,
@@ -233,13 +231,13 @@ function flowReducer(state, action) {
       });
       // Clean up wires and streamWires referencing deleted nodes
       Object.values(nodes).forEach(node => {
-        if (node._node.wires) {
-          node._node.wires = node._node.wires.map(outputs =>
+        if (node.wires) {
+          node.wires = node.wires.map(outputs =>
             outputs.filter(targetId => !action.ids.includes(targetId))
           );
         }
-        if (node._node.streamWires) {
-          node._node.streamWires = node._node.streamWires.map(outputs =>
+        if (node.streamWires) {
+          node.streamWires = node.streamWires.map(outputs =>
             outputs.filter(targetId => !action.ids.includes(targetId))
           );
         }
@@ -255,11 +253,8 @@ function flowReducer(state, action) {
             if (action.ids.includes(id)) {
               return [id, {
                 ...node,
-                _node: {
-                  ...node._node,
-                  x: node._node.x + action.dx,
-                  y: node._node.y + action.dy
-                }
+                x: node.x + action.dx,
+                y: node.y + action.dy
               }];
             }
             return [id, node];
@@ -271,7 +266,7 @@ function flowReducer(state, action) {
       const node = state.nodes[action.sourceId];
       if (!node) return state;
 
-      const wires = [...(node._node.wires || [])];
+      const wires = [...(node.wires || [])];
       while (wires.length <= action.sourcePort) wires.push([]);
       if (!wires[action.sourcePort].includes(action.targetId)) {
         wires[action.sourcePort] = [...wires[action.sourcePort], action.targetId];
@@ -281,16 +276,16 @@ function flowReducer(state, action) {
         ...state,
         nodes: {
           ...state.nodes,
-          [action.sourceId]: { ...node, _node: { ...node._node, wires } }
+          [action.sourceId]: { ...node, wires }
         }
       };
     }
 
     case 'DISCONNECT': {
       const node = state.nodes[action.sourceId];
-      if (!node || !node._node.wires) return state;
+      if (!node || !node.wires) return state;
 
-      const wires = node._node.wires.map((outputs, portIndex) =>
+      const wires = node.wires.map((outputs, portIndex) =>
         portIndex === action.sourcePort
           ? outputs.filter(id => id !== action.targetId)
           : outputs
@@ -300,7 +295,7 @@ function flowReducer(state, action) {
         ...state,
         nodes: {
           ...state.nodes,
-          [action.sourceId]: { ...node, _node: { ...node._node, wires } }
+          [action.sourceId]: { ...node, wires }
         }
       };
     }
@@ -310,7 +305,7 @@ function flowReducer(state, action) {
       const node = state.nodes[action.sourceId];
       if (!node) return state;
 
-      const streamWires = [...(node._node.streamWires || [])];
+      const streamWires = [...(node.streamWires || [])];
       while (streamWires.length <= action.sourcePort) streamWires.push([]);
       if (!streamWires[action.sourcePort].includes(action.targetId)) {
         streamWires[action.sourcePort] = [...streamWires[action.sourcePort], action.targetId];
@@ -320,16 +315,16 @@ function flowReducer(state, action) {
         ...state,
         nodes: {
           ...state.nodes,
-          [action.sourceId]: { ...node, _node: { ...node._node, streamWires } }
+          [action.sourceId]: { ...node, streamWires }
         }
       };
     }
 
     case 'DISCONNECT_STREAM': {
       const node = state.nodes[action.sourceId];
-      if (!node || !node._node.streamWires) return state;
+      if (!node || !node.streamWires) return state;
 
-      const streamWires = node._node.streamWires.map((outputs, portIndex) =>
+      const streamWires = node.streamWires.map((outputs, portIndex) =>
         portIndex === action.sourcePort
           ? outputs.filter(id => id !== action.targetId)
           : outputs
@@ -339,7 +334,7 @@ function flowReducer(state, action) {
         ...state,
         nodes: {
           ...state.nodes,
-          [action.sourceId]: { ...node, _node: { ...node._node, streamWires } }
+          [action.sourceId]: { ...node, streamWires }
         }
       };
     }
@@ -350,7 +345,7 @@ function flowReducer(state, action) {
         ...state,
         configNodes: {
           ...state.configNodes,
-          [action.node._node.id]: {
+          [action.node.id]: {
             ...action.node,
             users: []  // Track nodes that use this config
           }

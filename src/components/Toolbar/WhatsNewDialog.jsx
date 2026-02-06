@@ -1,8 +1,8 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useEffect, useRef } from 'react';
 import './WhatsNewDialog.css';
 
-// Import version from package.json
-const APP_VERSION = '2.0.0';
+// Get version from Vite define or fallback
+const APP_VERSION = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '2.0.0';
 const LAST_SEEN_VERSION_KEY = 'pagenodes2_last_seen_version';
 
 // Changelog content - update this with each release
@@ -59,15 +59,28 @@ export function useWhatsNew() {
 
 export function WhatsNewDialog({ onClose }) {
   const versionData = CHANGELOG[APP_VERSION] || CHANGELOG[Object.keys(CHANGELOG)[0]];
+  const overlayRef = useRef(null);
+
+  // Handle escape key via document listener
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
+  // Auto-focus overlay for accessibility
+  useEffect(() => {
+    if (overlayRef.current) {
+      overlayRef.current.focus();
+    }
+  }, []);
 
   const handleOverlayClick = useCallback((e) => {
     if (e.target === e.currentTarget) {
-      onClose();
-    }
-  }, [onClose]);
-
-  const handleKeyDown = useCallback((e) => {
-    if (e.key === 'Escape') {
       onClose();
     }
   }, [onClose]);
@@ -89,7 +102,12 @@ export function WhatsNewDialog({ onClose }) {
   };
 
   return (
-    <div className="whatsnew-dialog-overlay" onClick={handleOverlayClick} onKeyDown={handleKeyDown}>
+    <div 
+      className="whatsnew-dialog-overlay" 
+      onClick={handleOverlayClick}
+      ref={overlayRef}
+      tabIndex={-1}
+    >
       <div className="whatsnew-dialog">
         <div className="whatsnew-dialog-header">
           <span className="whatsnew-dialog-title">What&apos;s New in v{APP_VERSION}</span>
@@ -114,7 +132,7 @@ export function WhatsNewDialog({ onClose }) {
 
         <div className="whatsnew-dialog-footer">
           <a 
-            href="https://github.com/monteslu/pagenodes/blob/main/CHANGELOG.md" 
+            href="https://github.com/monteslu/pagenodes/blob/master/CHANGELOG.md" 
             target="_blank" 
             rel="noopener noreferrer"
             className="whatsnew-link"

@@ -15,10 +15,26 @@ export const voicerecNode = {
   color: '#ffb6c1', // light pink
   icon: true,
   faChar: '\uf130', // microphone
-  inputs: 0,
+  inputs: 1,
   outputs: 1,
 
   defaults: {
+    mode: {
+      type: 'select',
+      default: 'continuous',
+      label: 'Mode',
+      options: [
+        { value: 'continuous', label: 'Continuous' },
+        { value: 'push-to-talk', label: 'Push-to-talk' }
+      ],
+      description: 'Continuous: always listening. Push-to-talk: only records while receiving "push" signal.'
+    },
+    topic: {
+      type: 'string',
+      default: '',
+      label: 'Topic',
+      description: 'Optional topic for p2p routing. Leave empty for default "voicerec" topic.'
+    },
     lang: { type: 'select', default: 'en-US', label: 'Language', options: [
       { value: 'en-US', label: 'English (US)' },
       { value: 'en-GB', label: 'English (UK)' },
@@ -34,7 +50,7 @@ export const voicerecNode = {
     continuous: {
       type: 'boolean',
       default: true,
-      label: 'Continuous',
+      label: 'Auto-restart',
       description: 'Keep listening after each result instead of stopping. Turn off for single-phrase recognition.'
     },
     interimResults: {
@@ -46,10 +62,20 @@ export const voicerecNode = {
   },
 
   messageInterface: {
+    reads: {
+      payload: {
+        type: 'string',
+        description: 'Control signal: "start", "stop", "push", or "release"'
+      }
+    },
     writes: {
       payload: {
         type: 'string',
         description: 'Transcribed text'
+      },
+      topic: {
+        type: 'string',
+        description: 'Topic for p2p routing (from config or default "voicerec")'
       },
       confidence: {
         type: 'number',
@@ -63,18 +89,24 @@ export const voicerecNode = {
   },
 
   mainThread: (() => {
-    // Track recognition instance and session ID per node
+    // Track recognition instance, session ID, and config per node
     const voiceRecognitions = new Map();
     const nodeSessions = new Map();  // nodeId -> current session ID
+    const nodeConfigs = new Map();   // nodeId -> { topic, mode, autoRestart }
 
     return {
-      start(peerRef, nodeId, { lang, continuous: _continuous, interimResults }, PN) {
+      start(peerRef, nodeId, { lang, topic, mode, autoRestart, interimResults }, PN) {
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         if (!SpeechRecognition) {
           peerRef.current.methods.emitEvent(nodeId, 'status', { text: 'Not supported', fill: 'red' });
           peerRef.current.methods.emitEvent(nodeId, 'error', 'Speech recognition not supported');
           return;
         }
+
+        // Store config for this node (topic defaults to 'voicerec' if empty)
+        const effectiveTopic = topic && topic.trim() ? topic.trim() : 'voicerec';
+        const isPushToTalk = mode === 'push-to-talk';
+        nodeConfigs.set(nodeId, { topic: effectiveTopic, mode, autoRestart: !isPushToTalk && autoRestart });
 
         // Create a new session ID - this invalidates any previous session's onend handlers
         const sessionId = Date.now() + Math.random();
@@ -100,7 +132,8 @@ export const voicerecNode = {
         recognition.onstart = () => {
           // Only update status if this is still the active session
           if (nodeSessions.get(nodeId) === sessionId) {
-            peerRef.current.methods.emitEvent(nodeId, 'status', { text: 'Listening', fill: 'green' });
+            const statusText = isPushToTalk ? 'Recording' : 'Listening';
+            peerRef.current.methods.emitEvent(nodeId, 'status', { text: statusText, fill: 'green' });
           }
         };
 
@@ -108,10 +141,11 @@ export const voicerecNode = {
           // Only send results if this is still the active session
           if (nodeSessions.get(nodeId) !== sessionId) return;
 
+          const config = nodeConfigs.get(nodeId) || { topic: 'voicerec' };
           const result = event.results[0][0];
           peerRef.current.methods.sendResult(nodeId, {
             payload: result.transcript,
-            topic: 'voicerec',
+            topic: config.topic,
             confidence: result.confidence,
             isFinal: true
           });
@@ -121,7 +155,7 @@ export const voicerecNode = {
           // Ignore errors from stale sessions
           if (nodeSessions.get(nodeId) !== sessionId) return;
 
-          // 'no-speech' means silence timeout - just restart
+          // 'no-speech' means silence timeout - just restart (unless PTT)
           if (event.error === 'no-speech') {
             return;
           }
@@ -138,6 +172,14 @@ export const voicerecNode = {
           // Only restart if this is still the active session
           if (nodeSessions.get(nodeId) !== sessionId) {
             return;  // Stale session, ignore
+          }
+
+          const config = nodeConfigs.get(nodeId) || { autoRestart: true };
+
+          // In push-to-talk mode, don't auto-restart - wait for next push
+          if (!config.autoRestart) {
+            peerRef.current.methods.emitEvent(nodeId, 'status', { text: 'Ready', fill: 'yellow' });
+            return;
           }
 
           // Restart with small delay to prevent rapid loop
@@ -178,16 +220,33 @@ export const voicerecNode = {
       <>
         <p>Speech recognition - converts speech to text using the Web Speech API.</p>
 
+        <h5>Modes</h5>
+        <ul>
+          <li><strong>Continuous</strong> - Always listening, auto-restarts after each result</li>
+          <li><strong>Push-to-talk</strong> - Only records while receiving "push" signal, stops on "release"</li>
+        </ul>
+
         <h5>Options</h5>
         <ul>
+          <li><strong>Mode</strong> - Continuous or push-to-talk operation</li>
+          <li><strong>Topic</strong> - Optional topic for p2p routing (default: "voicerec")</li>
           <li><strong>Language</strong> - Recognition language</li>
-          <li><strong>Continuous</strong> - Keep listening after first result</li>
+          <li><strong>Auto-restart</strong> - Keep listening after first result (continuous mode only)</li>
           <li><strong>Interim Results</strong> - Output partial results while speaking</li>
+        </ul>
+
+        <h5>Input</h5>
+        <ul>
+          <li><code>"start"</code> - Start listening</li>
+          <li><code>"stop"</code> - Stop listening</li>
+          <li><code>"push"</code> - Start recording (push-to-talk mode)</li>
+          <li><code>"release"</code> - Stop recording (push-to-talk mode)</li>
         </ul>
 
         <h5>Output</h5>
         <ul>
           <li><code>msg.payload</code> - Transcribed text</li>
+          <li><code>msg.topic</code> - Topic for p2p routing</li>
           <li><code>msg.confidence</code> - Recognition confidence (0-1)</li>
           <li><code>msg.isFinal</code> - Whether this is a final or interim result</li>
         </ul>

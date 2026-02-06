@@ -10,22 +10,42 @@ export const voicerecRuntime = {
       this.status(status);
     });
 
-    this.status({ text: 'Starting...', fill: 'yellow' });
-    this.mainThread('start', {
-      lang: this.config.lang || 'en-US',
-      continuous: this.config.continuous !== false,
-      interimResults: this.config.interimResults || false
-    });
-  },
+    const isPushToTalk = this.config.mode === 'push-to-talk';
 
-  onInput(msg) {
-    if (msg.payload === 'stop') {
-      this.mainThread('stop', {});
+    // In push-to-talk mode, don't auto-start - wait for push signal
+    if (isPushToTalk) {
+      this.status({ text: 'Ready', fill: 'yellow' });
     } else {
+      // Continuous mode - start immediately
       this.status({ text: 'Starting...', fill: 'yellow' });
       this.mainThread('start', {
         lang: this.config.lang || 'en-US',
-        continuous: this.config.continuous !== false,
+        topic: this.config.topic || '',
+        mode: this.config.mode || 'continuous',
+        autoRestart: this.config.continuous !== false,
+        interimResults: this.config.interimResults || false
+      });
+    }
+  },
+
+  onInput(msg) {
+    const payload = typeof msg.payload === 'string' ? msg.payload.toLowerCase() : '';
+    const isPushToTalk = this.config.mode === 'push-to-talk';
+
+    // Handle stop/release commands
+    if (payload === 'stop' || payload === 'release') {
+      this.mainThread('stop', {});
+      return;
+    }
+
+    // Handle start/push commands
+    if (payload === 'start' || payload === 'push' || payload === '') {
+      this.status({ text: isPushToTalk ? 'Recording...' : 'Starting...', fill: 'yellow' });
+      this.mainThread('start', {
+        lang: this.config.lang || 'en-US',
+        topic: this.config.topic || '',
+        mode: this.config.mode || 'continuous',
+        autoRestart: !isPushToTalk && this.config.continuous !== false,
         interimResults: this.config.interimResults || false
       });
     }

@@ -11,6 +11,7 @@ import { ConfigNodesDialog } from './ConfigNodesDialog';
 import { ConfirmDialog } from './ConfirmDialog';
 import { SettingsDialog } from './SettingsDialog';
 import { FlowEditDialog } from './FlowEditDialog';
+import { WhatsNewDialog, useWhatsNew } from './WhatsNewDialog';
 import { FlowMinimap } from './FlowMinimap';
 import { logger } from '../../utils/logger';
 import './Toolbar.css';
@@ -28,6 +29,7 @@ export function Toolbar() {
   const [showFlowEditDialog, setShowFlowEditDialog] = useState(false);
   const [hasPassword, setHasPassword] = useState(false);
   const menuRef = useRef(null);
+  const { showWhatsNew, dismissWhatsNew, openWhatsNew } = useWhatsNew();
 
   // Check if server has a password set (for showing logout option)
   useEffect(() => {
@@ -302,6 +304,12 @@ export function Toolbar() {
               >
                 Settings
               </button>
+              <button
+                className="dropdown-item"
+                onClick={() => { openWhatsNew(); setMenuOpen(false); }}
+              >
+                What&apos;s New
+              </button>
               {mode === 'server' && hasPassword && logout && (
                 <>
                   <div className="dropdown-divider" />
@@ -427,6 +435,10 @@ export function Toolbar() {
           onDelete={handleFlowDelete}
           canDelete={flowState.flows.length > 1}
         />
+      )}
+
+      {showWhatsNew && (
+        <WhatsNewDialog onClose={dismissWhatsNew} />
       )}
     </div>
   );

@@ -1,0 +1,150 @@
+.whatsnew-dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.whatsnew-dialog {
+  background: var(--panel-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  width: min(500px, 90vw);
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.whatsnew-dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-color);
+  background: linear-gradient(135deg, rgba(88, 170, 170, 0.15), rgba(88, 130, 170, 0.15));
+}
+
+.whatsnew-dialog-title {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text-color);
+}
+
+.whatsnew-dialog-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 20px;
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.whatsnew-dialog-close:hover {
+  color: var(--text-color);
+}
+
+.whatsnew-dialog-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.whatsnew-main-title {
+  margin: 0 0 4px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.whatsnew-date {
+  margin: 0 0 16px 0;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.whatsnew-section {
+  margin-bottom: 16px;
+}
+
+.whatsnew-section:last-child {
+  margin-bottom: 0;
+}
+
+.whatsnew-section-title {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.whatsnew-list {
+  margin: 0;
+  padding-left: 20px;
+  list-style-type: disc;
+}
+
+.whatsnew-list li {
+  margin-bottom: 6px;
+  font-size: 13px;
+  color: var(--text-color);
+  line-height: 1.4;
+}
+
+.whatsnew-list li:last-child {
+  margin-bottom: 0;
+}
+
+.whatsnew-list li strong {
+  color: #5aa;
+}
+
+.whatsnew-dialog-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-top: 1px solid var(--border-color);
+}
+
+.whatsnew-link {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+.whatsnew-link:hover {
+  color: var(--text-color);
+  text-decoration: underline;
+}
+
+.whatsnew-dialog-footer .btn {
+  padding: 8px 20px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
+}
+
+.whatsnew-dialog-footer .btn-primary {
+  background: #58a;
+  border-color: #58a;
+  color: white;
+}
+
+.whatsnew-dialog-footer .btn-primary:hover {
+  background: #479;
+}

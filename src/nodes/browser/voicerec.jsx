@@ -31,6 +31,13 @@ export const voicerecNode = {
       { value: 'zh-CN', label: 'Chinese (Simplified)' },
       { value: 'ko-KR', label: 'Korean' }
     ]},
+    topic: {
+      type: 'string',
+      default: '',
+      label: 'Topic',
+      placeholder: 'msg.topic',
+      description: 'Optional topic to set on output messages. Useful for routing voice input to specific flows.'
+    },
     continuous: {
       type: 'boolean',
       default: true,
@@ -51,6 +58,10 @@ export const voicerecNode = {
         type: 'string',
         description: 'Transcribed text'
       },
+      topic: {
+        type: 'string',
+        description: 'Topic from config (if set)'
+      },
       confidence: {
         type: 'number',
         description: 'Recognition confidence (0-1)'
@@ -68,7 +79,7 @@ export const voicerecNode = {
     const nodeSessions = new Map();  // nodeId -> current session ID
 
     return {
-      start(peerRef, nodeId, { lang, continuous: _continuous, interimResults }, PN) {
+      start(peerRef, nodeId, { lang, topic, continuous: _continuous, interimResults }, PN) {
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         if (!SpeechRecognition) {
           peerRef.current.methods.emitEvent(nodeId, 'status', { text: 'Not supported', fill: 'red' });
@@ -109,12 +120,16 @@ export const voicerecNode = {
           if (nodeSessions.get(nodeId) !== sessionId) return;
 
           const result = event.results[0][0];
-          peerRef.current.methods.sendResult(nodeId, {
+          const msg = {
             payload: result.transcript,
-            topic: 'voicerec',
             confidence: result.confidence,
             isFinal: true
-          });
+          };
+          // Only set topic if configured (allows downstream nodes to set it)
+          if (topic) {
+            msg.topic = topic;
+          }
+          peerRef.current.methods.sendResult(nodeId, msg);
         };
 
         recognition.onerror = (event) => {
@@ -181,6 +196,7 @@ export const voicerecNode = {
         <h5>Options</h5>
         <ul>
           <li><strong>Language</strong> - Recognition language</li>
+          <li><strong>Topic</strong> - Optional topic to set on output messages for routing</li>
           <li><strong>Continuous</strong> - Keep listening after first result</li>
           <li><strong>Interim Results</strong> - Output partial results while speaking</li>
         </ul>
@@ -188,6 +204,7 @@ export const voicerecNode = {
         <h5>Output</h5>
         <ul>
           <li><code>msg.payload</code> - Transcribed text</li>
+          <li><code>msg.topic</code> - Topic (if configured)</li>
           <li><code>msg.confidence</code> - Recognition confidence (0-1)</li>
           <li><code>msg.isFinal</code> - Whether this is a final or interim result</li>
         </ul>

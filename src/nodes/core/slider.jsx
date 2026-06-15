@@ -9,7 +9,6 @@ const SLIDER_WIDTH = 125;
 const SLIDER_HEIGHT = 28;
 const TRACK_HEIGHT = 8;
 const THUMB_WIDTH = 15;
-const THUMB_HEIGHT = 22;
 const PADDING = 5;
 const HEADER_HEIGHT = 30; // Standard node header height
 const VALUE_WIDTH = 45; // Width reserved for value display
@@ -81,7 +80,6 @@ export const sliderNode = {
     const step = node?.step ?? 1;
     // Use _currentValue for live updates during dragging, fallback to configured value
     const currentValue = node?._currentValue ?? node?.value ?? 50;
-    const nodeId = node?.id || 'slider';
 
     // Calculate track and thumb positions
     const trackX = PADDING;
@@ -92,7 +90,6 @@ export const sliderNode = {
     const clampedValue = Math.max(min, Math.min(max, currentValue));
     const ratio = max !== min ? (clampedValue - min) / (max - min) : 0;
     const thumbX = trackX + ratio * (trackWidth - THUMB_WIDTH);
-    const thumbY = PADDING + (SLIDER_HEIGHT - THUMB_HEIGHT) / 2;
     const thumbCenterX = thumbX + THUMB_WIDTH / 2;
 
     const calculateValue = (clientX, trackRect) => {
@@ -151,10 +148,10 @@ export const sliderNode = {
       document.addEventListener('mouseup', handleMouseUp);
     };
 
-    // Gradient IDs
-    const trackGradientId = `slider-track-${nodeId}`;
-    const trackFillGradientId = `slider-fill-${nodeId}`;
-    const thumbGradientId = `slider-thumb-${nodeId}`;
+    // Flat PATCHBAY slider: deep track, net fill, square knob, mono value box.
+    const knobW = THUMB_WIDTH;
+    const knobH = 18;
+    const knobY = PADDING + (SLIDER_HEIGHT - knobH) / 2;
 
     return (
       <g
@@ -162,29 +159,6 @@ export const sliderNode = {
         onClick={(e) => e.stopPropagation()}
         onDoubleClick={(e) => e.stopPropagation()}
       >
-        {/* Gradient definitions */}
-        <defs>
-          {/* Track inset gradient - darker at top for inset look */}
-          <linearGradient id={trackGradientId} x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#999" />
-            <stop offset="30%" stopColor="#bbb" />
-            <stop offset="100%" stopColor="#ddd" />
-          </linearGradient>
-          {/* Fill gradient - nice blue with shine */}
-          <linearGradient id={trackFillGradientId} x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#5dade2" />
-            <stop offset="50%" stopColor="#3498db" />
-            <stop offset="100%" stopColor="#2980b9" />
-          </linearGradient>
-          {/* Thumb gradient - metallic look */}
-          <linearGradient id={thumbGradientId} x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#fff" />
-            <stop offset="20%" stopColor="#f8f8f8" />
-            <stop offset="80%" stopColor="#e0e0e0" />
-            <stop offset="100%" stopColor="#ccc" />
-          </linearGradient>
-        </defs>
-
         {/* Clickable/draggable track area */}
         <rect
           className="slider-track-area"
@@ -197,136 +171,62 @@ export const sliderNode = {
           onMouseDown={handleMouseDown}
         />
 
-        {/* Track outer shadow/border */}
-        <rect
-          x={trackX - 1}
-          y={trackY - 1}
-          width={trackWidth + 2}
-          height={TRACK_HEIGHT + 2}
-          rx={TRACK_HEIGHT / 2 + 1}
-          ry={TRACK_HEIGHT / 2 + 1}
-          fill="rgba(0,0,0,0.3)"
-          pointerEvents="none"
-        />
-
-        {/* Track background with inset gradient */}
+        {/* Track */}
         <rect
           x={trackX}
           y={trackY}
           width={trackWidth}
           height={TRACK_HEIGHT}
-          rx={TRACK_HEIGHT / 2}
-          ry={TRACK_HEIGHT / 2}
-          fill={`url(#${trackGradientId})`}
+          fill="var(--deep)"
+          stroke="var(--edge)"
+          strokeWidth={1}
           pointerEvents="none"
         />
 
-        {/* Track fill (left of thumb) with gradient */}
+        {/* Fill (left of knob) */}
         <rect
           x={trackX}
           y={trackY}
           width={Math.max(0, thumbCenterX - trackX)}
           height={TRACK_HEIGHT}
-          rx={TRACK_HEIGHT / 2}
-          ry={TRACK_HEIGHT / 2}
-          fill={`url(#${trackFillGradientId})`}
+          fill="var(--sig-net)"
           pointerEvents="none"
         />
 
-        {/* Track fill shine overlay */}
-        <rect
-          x={trackX + 2}
-          y={trackY + 1}
-          width={Math.max(0, thumbCenterX - trackX - 4)}
-          height={TRACK_HEIGHT / 3}
-          rx={2}
-          ry={2}
-          fill="rgba(255,255,255,0.3)"
-          pointerEvents="none"
-        />
-
-        {/* Thumb shadow */}
-        <ellipse
-          cx={thumbCenterX}
-          cy={thumbY + THUMB_HEIGHT + 2}
-          rx={THUMB_WIDTH / 2 - 1}
-          ry={3}
-          fill="rgba(0,0,0,0.2)"
-          pointerEvents="none"
-        />
-
-        {/* Thumb outer border */}
-        <rect
-          x={thumbX - 1}
-          y={thumbY - 1}
-          width={THUMB_WIDTH + 2}
-          height={THUMB_HEIGHT + 2}
-          rx={4}
-          ry={4}
-          fill="#2980b9"
-          pointerEvents="none"
-        />
-
-        {/* Thumb body with gradient */}
+        {/* Knob */}
         <rect
           x={thumbX}
-          y={thumbY}
-          width={THUMB_WIDTH}
-          height={THUMB_HEIGHT}
-          rx={3}
-          ry={3}
-          fill={`url(#${thumbGradientId})`}
+          y={knobY}
+          width={knobW}
+          height={knobH}
+          rx={2}
+          ry={2}
+          fill="var(--card)"
+          stroke="var(--edge)"
+          strokeWidth={2}
           pointerEvents="none"
         />
 
-        {/* Thumb grip lines */}
-        <line
-          x1={thumbCenterX - 3}
-          y1={thumbY + THUMB_HEIGHT / 2 - 3}
-          x2={thumbCenterX - 3}
-          y2={thumbY + THUMB_HEIGHT / 2 + 3}
-          stroke="#aaa"
-          strokeWidth={1}
-          pointerEvents="none"
-        />
-        <line
-          x1={thumbCenterX}
-          y1={thumbY + THUMB_HEIGHT / 2 - 3}
-          x2={thumbCenterX}
-          y2={thumbY + THUMB_HEIGHT / 2 + 3}
-          stroke="#aaa"
-          strokeWidth={1}
-          pointerEvents="none"
-        />
-        <line
-          x1={thumbCenterX + 3}
-          y1={thumbY + THUMB_HEIGHT / 2 - 3}
-          x2={thumbCenterX + 3}
-          y2={thumbY + THUMB_HEIGHT / 2 + 3}
-          stroke="#aaa"
-          strokeWidth={1}
-          pointerEvents="none"
-        />
-
-        {/* Value display with background pill */}
+        {/* Value box */}
         <rect
-          x={trackX + trackWidth + 6}
+          x={trackX + trackWidth + 8}
           y={PADDING + SLIDER_HEIGHT / 2 - 10}
           width={VALUE_WIDTH - 10}
           height={20}
-          rx={4}
-          ry={4}
-          fill="rgba(52, 152, 219, 0.15)"
-          stroke="rgba(52, 152, 219, 0.3)"
+          rx={2}
+          ry={2}
+          fill="var(--board)"
+          stroke="var(--edge)"
           strokeWidth={1}
           pointerEvents="none"
         />
         <text
-          x={trackX + trackWidth + 6 + (VALUE_WIDTH - 10) / 2}
+          x={trackX + trackWidth + 8 + (VALUE_WIDTH - 10) / 2}
           y={PADDING + SLIDER_HEIGHT / 2}
           textAnchor="middle"
           dominantBaseline="central"
-          fill="#2980b9"
+          fill="var(--ink)"
+          fontFamily="var(--mono)"
           fontSize="12"
           fontWeight="600"
           pointerEvents="none"

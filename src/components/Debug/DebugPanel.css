@@ -1,7 +1,6 @@
 .debug-panel {
   flex: 1;
-  background: var(--sidebar-bg);
-  border-left: 1px solid var(--border-color);
+  background: var(--card);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -11,100 +10,96 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 12px;
-  background: var(--header-bg);
-  border-bottom: 1px solid var(--border-color);
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--hair);
 }
 
 .debug-header h3 {
   margin: 0;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-color);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--faint);
 }
 
 .debug-controls {
   display: flex;
-  gap: 6px;
+  border: 2px solid var(--edge);
+  border-radius: var(--r);
+  overflow: hidden;
 }
 
 .debug-toggle,
 .debug-clear {
-  padding: 5px 10px;
-  font-size: 11px;
-  font-weight: 500;
-  border-radius: 4px;
+  padding: 5px 12px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
   cursor: pointer;
-  border: 1px solid #555;
-  background: linear-gradient(to bottom, #4a4a4a 0%, #3a3a3a 50%, #2a2a2a 100%);
-  color: var(--text-muted);
-  transition: all 0.15s ease;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+  border: none;
+  background: var(--card);
+  color: var(--smoke);
+  transition: color 0.13s var(--ease), background 0.13s var(--ease);
+}
+
+.debug-clear {
+  border-left: 2px solid var(--edge);
 }
 
 .debug-toggle:hover,
 .debug-clear:hover {
-  background: linear-gradient(to bottom, #555 0%, #454545 50%, #353535 100%);
-  color: var(--text-color);
-  border-color: #666;
-}
-
-.debug-toggle:active,
-.debug-clear:active {
-  background: linear-gradient(to bottom, #2a2a2a 0%, #333 50%, #3a3a3a 100%);
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+  color: var(--ink);
 }
 
 .debug-toggle.active {
-  background: linear-gradient(to bottom, #5ba 0%, #4a9 50%, #398 100%);
-  border-color: #3a8;
-  color: white;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  background: var(--sig-out);
+  color: #06270f;
 }
 
-.debug-toggle.active:hover {
-  background: linear-gradient(to bottom, #6cb 0%, #5ba 50%, #4a9 100%);
-}
+:root[data-theme="dark"] .debug-toggle.active { color: #072a12; }
 
 .debug-input-bar {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 12px;
-  background: var(--header-bg);
-  border-bottom: 1px solid var(--border-color);
+  gap: 8px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--hair);
 }
 
 .debug-input-checkbox {
   display: flex;
   align-items: center;
   cursor: pointer;
+  accent-color: var(--volt);
 }
 
 .debug-input-checkbox input {
   margin: 0;
   cursor: pointer;
+  accent-color: var(--volt);
 }
 
 .debug-input-field {
   flex: 1 1 0;
   min-width: 0;
-  padding: 6px 10px;
+  padding: 8px 11px;
+  font-family: var(--mono);
   font-size: 12px;
-  border: 1px solid #3a3a3a;
-  border-radius: 4px;
-  background: linear-gradient(to bottom, #1a1a1a 0%, #222 100%);
-  color: var(--text-color);
+  border: 2px solid var(--edge);
+  border-radius: var(--r);
+  background: var(--board);
+  color: var(--ink);
   outline: none;
-  height: 30px;
+  height: 32px;
   box-sizing: border-box;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+  transition: box-shadow 0.13s var(--ease), border-color 0.13s var(--ease);
 }
 
 .debug-input-field:focus {
-  border-color: #4a9;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3), 0 0 0 2px rgba(74, 153, 153, 0.2);
+  border-color: var(--volt);
+  box-shadow: 0 0 0 3px var(--volt-soft);
 }
 
 .debug-input-field:disabled {
@@ -113,34 +108,35 @@
 }
 
 .debug-input-field::placeholder {
-  color: var(--text-muted);
+  color: var(--faint);
 }
 
 .debug-input-send {
-  padding: 6px 12px;
-  font-size: 14px;
-  border-radius: 4px;
+  padding: 0 12px;
+  font-size: 13px;
+  border-radius: var(--r);
   cursor: pointer;
-  border: 1px solid #8aa8be;
-  background: linear-gradient(to bottom, #c6dbe9 0%, #a6bbcf 50%, #96abbd 100%);
-  color: #333;
-  transition: all 0.15s ease;
-  height: 30px;
+  border: 2px solid var(--edge);
+  background: var(--volt);
+  color: #fff;
+  transition: transform 0.13s var(--ease), box-shadow 0.13s var(--ease);
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.4);
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+  box-shadow: var(--sh-sm);
 }
 
+:root[data-theme="dark"] .debug-input-send { color: #0F1217; }
+
 .debug-input-send:hover:not(:disabled) {
-  background: linear-gradient(to bottom, #d6ebf9 0%, #b6cbdf 50%, #a6bbcf 100%);
-  border-color: #7a98ad;
+  transform: translate(-1px, -1px);
+  box-shadow: var(--sh);
 }
 
 .debug-input-send:active:not(:disabled) {
-  background: linear-gradient(to bottom, #96abbd 0%, #a6bbcf 50%, #b6cbdf 100%);
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+  transform: translate(0, 0);
+  box-shadow: 1px 1px 0 var(--edge);
 }
 
 .debug-input-send:disabled {
@@ -170,9 +166,11 @@
   align-items: center;
   justify-content: center;
   height: 100%;
-  color: var(--text-muted);
+  color: var(--faint);
   text-align: center;
-  font-size: 12px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
   padding: 20px;
 }
 
@@ -183,13 +181,14 @@
 }
 
 .debug-message {
-  background: linear-gradient(to bottom, #2a2a2a 0%, #222 100%);
-  border: 1px solid #3a3a3a;
-  border-radius: 5px;
-  padding: 8px;
+  background: var(--board);
+  border: 1px solid var(--hair);
+  border-left: 3px solid var(--sig-out);
+  border-radius: 0 var(--r) var(--r) 0;
+  padding: 8px 10px;
   margin-bottom: 6px;
+  font-family: var(--mono);
   font-size: 11px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.03);
 }
 
 .debug-message-header {
@@ -201,29 +200,30 @@
 
 .debug-node-name {
   font-weight: 600;
-  color: var(--text-color);
+  color: var(--ink);
 }
 
 .debug-time {
-  color: var(--text-muted);
+  color: var(--faint);
   font-size: 10px;
-  font-family: monospace;
+  font-family: var(--mono);
 }
 
 .debug-topic {
-  color: var(--text-muted);
+  color: var(--smoke);
   font-size: 10px;
   margin-bottom: 4px;
 }
 
 .debug-payload {
   margin: 0;
-  padding: 6px;
-  background: rgba(0, 0, 0, 0.1);
-  border-radius: 3px;
-  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  padding: 6px 8px;
+  background: var(--card);
+  border: 1px solid var(--hair);
+  border-radius: var(--r-chip);
+  font-family: var(--mono);
   font-size: 11px;
-  color: var(--text-color);
+  color: var(--ink);
   white-space: pre-wrap;
   word-break: break-all;
   max-height: 150px;
@@ -233,18 +233,12 @@
 .debug-media {
   margin-top: 4px;
   padding: 4px;
-  background: rgba(0, 0, 0, 0.1);
-  border-radius: 3px;
+  background: var(--board);
+  border-radius: var(--r-chip);
   overflow: hidden;
 }
 
-.debug-media img {
-  max-width: 100%;
-  height: auto;
-  display: block;
-  border-radius: 2px;
-}
-
+.debug-media img,
 .debug-media video {
   max-width: 100%;
   height: auto;
@@ -266,20 +260,17 @@
   overflow: hidden;
 }
 
-/* Collapsible sections - accordion behavior */
 .debug-section {
   display: flex;
   flex-direction: column;
   min-height: 0;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--hair);
 }
 
-/* Collapsed sections only show header */
 .debug-section.collapsed {
   flex: 0 0 auto;
 }
 
-/* Expanded sections share space equally (50/50 when both open) */
 .debug-section.expanded {
   flex: 1 1 0;
   min-height: 0;
@@ -289,21 +280,25 @@
   flex-shrink: 0;
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 12px;
+  gap: 8px;
+  padding: 9px 12px;
   cursor: pointer;
   user-select: none;
-  background: var(--header-bg);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--smoke);
 }
 
 .debug-section-header:hover {
-  background: var(--hover-bg);
+  color: var(--ink);
 }
 
 .section-toggle {
-  font-size: 8px;
-  color: var(--text-muted);
-  transition: transform 0.15s ease;
+  font-size: 9px;
+  color: var(--faint);
+  transition: transform 0.18s var(--ease);
 }
 
 .section-toggle.expanded {
@@ -311,21 +306,22 @@
 }
 
 .section-name {
-  font-size: 12px;
   font-weight: 500;
-  color: var(--text-color);
 }
 
 .section-badge {
-  background: #c44;
-  color: white;
+  background: var(--volt);
+  color: #fff;
+  font-family: var(--mono);
   font-size: 10px;
   font-weight: 600;
   padding: 1px 5px;
-  border-radius: 8px;
+  border-radius: var(--r-chip);
   min-width: 16px;
   text-align: center;
 }
+
+:root[data-theme="dark"] .section-badge { color: #0F1217; }
 
 .debug-section-content {
   flex: 1;
@@ -335,7 +331,8 @@
 }
 
 .debug-empty-section {
-  color: var(--text-muted);
+  color: var(--faint);
+  font-family: var(--mono);
   font-size: 11px;
   text-align: center;
   padding: 12px;
@@ -346,11 +343,11 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: var(--bg-color);
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  padding: 6px 8px;
-  margin-bottom: 4px;
+  background: var(--board);
+  border: 2px solid var(--edge);
+  border-radius: var(--r);
+  padding: 7px 9px;
+  margin-bottom: 6px;
 }
 
 .download-info {
@@ -362,37 +359,38 @@
 }
 
 .download-filename {
+  font-family: var(--mono);
   font-size: 12px;
   font-weight: 500;
-  color: #4a9;
+  color: var(--volt);
   cursor: pointer;
-  text-decoration: underline;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .download-filename:hover {
-  color: #5ba;
+  color: var(--volt-ink);
 }
 
 .download-meta {
+  font-family: var(--mono);
   font-size: 10px;
-  color: var(--text-muted);
+  color: var(--faint);
 }
 
 .download-remove {
   background: none;
   border: none;
-  color: var(--text-muted);
+  color: var(--faint);
   font-size: 16px;
   cursor: pointer;
   padding: 2px 6px;
   line-height: 1;
-  border-radius: 3px;
+  border-radius: var(--r-chip);
 }
 
 .download-remove:hover {
-  background: rgba(200, 60, 60, 0.2);
-  color: #c44;
+  background: color-mix(in srgb, var(--danger) 16%, transparent);
+  color: var(--danger);
 }

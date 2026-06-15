@@ -75,7 +75,7 @@
   background: rgba(255, 152, 0, 0.1);
   border: 1px solid rgba(255, 152, 0, 0.3);
   border-radius: 4px;
-  color: #ff9800;
+  color: var(--warn);
   font-size: 12px;
 }
 
@@ -134,7 +134,7 @@
 }
 
 .config-node-item.orphaned .config-node-users {
-  color: #ff9800;
+  color: var(--warn);
 }
 
 .config-node-delete {
@@ -154,8 +154,8 @@
 }
 
 .config-node-delete:hover {
-  color: #e53935;
-  background: rgba(229, 57, 53, 0.1);
+  color: var(--danger);
+  background: color-mix(in srgb, var(--danger) 12%, transparent);
 }
 
 .config-dialog-footer {
@@ -171,23 +171,29 @@
 }
 
 .config-dialog-footer .btn {
-  padding: 8px 16px;
-  border-radius: 4px;
-  font-size: 13px;
-  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 16px;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-radius: var(--r);
   cursor: pointer;
-  border: 1px solid transparent;
-  transition: all 0.15s ease;
+  border: 2px solid var(--edge);
+  transition: transform 0.13s var(--ease), box-shadow 0.13s var(--ease), background 0.13s var(--ease);
 }
 
 .config-dialog-footer .btn-danger {
-  background: rgba(229, 57, 53, 0.1);
-  border-color: rgba(229, 57, 53, 0.3);
-  color: #e53935;
+  background: color-mix(in srgb, var(--danger) 12%, transparent);
+  border-color: color-mix(in srgb, var(--danger) 32%, transparent);
+  color: var(--danger);
 }
 
 .config-dialog-footer .btn-danger:hover {
-  background: rgba(229, 57, 53, 0.2);
+  background: color-mix(in srgb, var(--danger) 22%, transparent);
 }
 
 .config-dialog-footer .btn-close {

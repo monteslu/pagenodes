@@ -27,16 +27,17 @@
   outline: none !important;
 }
 
-/* Dark theme syntax highlighting - matches app colors */
+/* Syntax highlighting mapped to the signal palette so it stays readable in
+   both light and dark themes. */
 .code-input-wrapper .token.comment,
 .code-input-wrapper .token.prolog,
 .code-input-wrapper .token.doctype,
 .code-input-wrapper .token.cdata {
-  color: #6a9955;
+  color: var(--faint);
 }
 
 .code-input-wrapper .token.punctuation {
-  color: #d4d4d4;
+  color: var(--smoke);
 }
 
 .code-input-wrapper .token.property,
@@ -44,12 +45,12 @@
 .code-input-wrapper .token.constant,
 .code-input-wrapper .token.symbol,
 .code-input-wrapper .token.deleted {
-  color: #ce9178;
+  color: var(--sig-ai);
 }
 
 .code-input-wrapper .token.boolean,
 .code-input-wrapper .token.number {
-  color: #b5cea8;
+  color: var(--sig-fn);
 }
 
 .code-input-wrapper .token.selector,
@@ -58,7 +59,7 @@
 .code-input-wrapper .token.char,
 .code-input-wrapper .token.builtin,
 .code-input-wrapper .token.inserted {
-  color: #ce9178;
+  color: var(--sig-out);
 }
 
 .code-input-wrapper .token.operator,
@@ -67,26 +68,26 @@
 .code-input-wrapper .language-css .token.string,
 .code-input-wrapper .style .token.string,
 .code-input-wrapper .token.variable {
-  color: #d4d4d4;
+  color: var(--ink);
 }
 
 .code-input-wrapper .token.atrule,
 .code-input-wrapper .token.attr-value,
 .code-input-wrapper .token.keyword {
-  color: #569cd6;
+  color: var(--sig-net);
 }
 
 .code-input-wrapper .token.function {
-  color: #dcdcaa;
+  color: var(--sig-logic);
 }
 
 .code-input-wrapper .token.class-name {
-  color: #4ec9b0;
+  color: var(--sig-audio);
 }
 
 .code-input-wrapper .token.regex,
 .code-input-wrapper .token.important {
-  color: #d16969;
+  color: var(--danger);
 }
 
 .code-input-wrapper .token.important,

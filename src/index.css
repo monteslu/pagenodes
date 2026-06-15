@@ -1,27 +1,74 @@
 @import './fontawesome.css';
 
+/* ============================================================
+   PATCHBAY design tokens (light + dark)
+   ============================================================ */
 :root {
-  /* Colors */
-  --bg-color: #1e1e1e;
-  --canvas-bg: #2d2d2d;
-  --sidebar-bg: #252526;
-  --panel-bg: #2d2d2d;
-  --header-bg: #333333;
-  --border-color: #444;
-  --text-color: #e0e0e0;
-  --text-muted: #888;
-  --hover-bg: #3a3a3a;
-  --active-bg: #4a4a4a;
-  --button-bg: #3a3a3a;
-  --input-bg: #1e1e1e;
-  --selection-color: #4a9eff;
-  --accent-color: #4a9eff;
-  --accent-hover: #3a8eef;
-  --grid-color: #3a3a3a;
+  --paper:#F5F1E8; --card:#FCFAF3; --board:#FBF8F0; --deep:#ECE5D6;
+  --hair:#DBD2C0; --ink:#1B1A16; --smoke:#6C6557; --faint:#A79E8C;
+  --edge:#1B1A16;
+  --volt:#5B4DF1; --volt-soft:#ECE9FE; --volt-ink:#3A2FC4;
+  --logo-node:var(--card);
+  --sig-in:#0E9DB8; --sig-out:#2E9E4F; --sig-fn:#DC8638;
+  --sig-ai:#8257F0; --sig-logic:#CC9A28; --sig-net:#3B7DD8; --sig-audio:#1FA0A0;
+  --warn:#D98A1F; --danger:#C0392B;
+  --grid-dot:rgba(27,26,22,.10);
+  --noise-op:.030;
 
-  /* Typography */
-  --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  --sans:'Space Grotesk', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --mono:'Spline Sans Mono', ui-monospace, 'SF Mono', monospace;
+
+  --r:3px; --r-node:6px; --r-chip:2px;
+  --sh:4px 4px 0 var(--edge);
+  --sh-sm:3px 3px 0 var(--edge);
+  --sh-lg:8px 8px 0 var(--edge);
+  --ease:cubic-bezier(.2,.7,.3,1);
+
+  /* ---- legacy aliases: map old token names onto PATCHBAY ---- */
+  --bg-color:var(--paper);
+  --canvas-bg:var(--board);
+  --sidebar-bg:var(--card);
+  --panel-bg:var(--card);
+  --header-bg:var(--deep);
+  --border-color:var(--hair);
+  --text-color:var(--ink);
+  --text-muted:var(--smoke);
+  --hover-bg:var(--deep);
+  --active-bg:var(--hair);
+  --button-bg:var(--card);
+  --input-bg:var(--board);
+  --selection-color:var(--volt);
+  --accent-color:var(--volt);
+  --accent-hover:var(--volt-ink);
+  --grid-color:var(--hair);
+  --code-bg:var(--board);
+  --code-color:var(--volt-ink);
+  --font-family:var(--sans);
 }
+
+:root[data-theme="dark"] {
+  --paper:#21252C; --card:#282E36; --board:#1B1F25; --deep:#191D23;
+  --hair:#363D47; --ink:#E9ECF1; --smoke:#9AA3AE; --faint:#6B7480;
+  --edge:#10131A;
+  --volt:#8479FF; --volt-soft:#2A2750; --volt-ink:#B6AEFF;
+  --logo-node:#E7EAEF;
+  --sig-in:#34C3DC; --sig-out:#57C97A; --sig-fn:#F0A65C;
+  --sig-ai:#A98BFF; --sig-logic:#F2C25A; --sig-net:#6BA4F2; --sig-audio:#3FC2C2;
+  --warn:#F2B33D; --danger:#FF6B6B;
+  --grid-dot:rgba(255,255,255,.07);
+  --noise-op:.045;
+}
+
+/* signal-kind helper: a node/chip gets .k-<kind>, descendants read var(--k) */
+.k-in{--k:var(--sig-in)} .k-out{--k:var(--sig-out)} .k-fn{--k:var(--sig-fn)}
+.k-ai{--k:var(--sig-ai)} .k-logic{--k:var(--sig-logic)} .k-net{--k:var(--sig-net)}
+.k-audio{--k:var(--sig-audio)} .k-neutral{--k:var(--smoke)}
+
+/* Shared button polish: primary actions get the block shadow + hover lift,
+   so dialog buttons read the same as the node editor buttons. */
+.btn-save, .btn-import, .btn-primary { box-shadow: var(--sh-sm); }
+.btn-save:hover, .btn-import:hover, .btn-primary:hover { transform: translate(-2px, -2px); box-shadow: var(--sh); }
+.btn-save:active, .btn-import:active, .btn-primary:active { transform: translate(0, 0); box-shadow: 1px 1px 0 var(--edge); }
 
 * {
   box-sizing: border-box;
@@ -36,12 +83,24 @@ html, body, #root {
 }
 
 body {
-  font-family: var(--font-family);
+  font-family: var(--sans);
   font-size: 14px;
-  color: var(--text-color);
-  background: var(--bg-color);
+  color: var(--ink);
+  background: var(--paper);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background .35s var(--ease), color .35s var(--ease);
+}
+
+/* grain overlay */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: var(--noise-op);
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
 /* Prevent text selection on interactive elements */
@@ -60,19 +119,20 @@ button,
 
 /* Scrollbar styling */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 9px;
+  height: 9px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--sidebar-bg);
+  background: var(--board);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--border-color);
-  border-radius: 4px;
+  background: var(--hair);
+  border: 2px solid var(--board);
+  border-radius: 0;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--text-muted);
+  background: var(--smoke);
 }

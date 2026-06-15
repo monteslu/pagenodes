@@ -51,11 +51,11 @@
 }
 
 .btn-danger {
-  background: #c44;
-  border-color: #b33;
+  background: var(--danger);
+  border-color: var(--danger);
   color: white;
 }
 
 .btn-danger:hover {
-  background: #b33;
+  background: var(--danger);
 }

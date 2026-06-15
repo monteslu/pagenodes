@@ -1,6 +1,7 @@
 import { useMemo, useCallback } from 'react';
 import { nodeRegistry } from '../../nodes';
 import { calcNodeHeight, calcNodeHeightWithAudio, calcNodeWidth } from '../../utils/geometry';
+import { nodeSignalColor } from '../../utils/signalKind';
 
 // Helper to get node label
 function getNodeLabel(node, def) {
@@ -86,13 +87,13 @@ export function FlowMinimap({ flowId, nodes, size = 50, onClick }) {
         y={0}
         width={bounds.size}
         height={bounds.size}
-        fill="var(--bg-color)"
+        fill="var(--board)"
       />
 
       {/* Nodes as simple colored rectangles */}
       {flowNodes.map(node => {
         const def = nodeRegistry.get(node.type);
-        const color = def?.color || '#ddd';
+        const color = nodeSignalColor(def);
         const nodeHeight = getNodeHeight(node, def);
         const label = getNodeLabel(node, def);
         const hasIcon = def?.icon && def?.faChar;

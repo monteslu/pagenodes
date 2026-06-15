@@ -1,12 +1,76 @@
+.canvas-viewport {
+  flex: 1;
+  position: relative;
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+}
+
 .canvas-container {
   flex: 1;
   overflow: auto;
-  background: var(--bg-color);
+  background: var(--board);
   position: relative;
   min-height: 0;
   touch-action: none; /* Prevent browser handling of touch gestures */
   -webkit-user-select: none;
   user-select: none;
+}
+
+/* Corner overlay: fit button + minimap, pinned to the viewport */
+.canvas-overlay {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+  pointer-events: none;
+  z-index: 20;
+}
+
+.canvas-overlay > * {
+  pointer-events: auto;
+}
+
+.canvas-fit-btn {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--edge);
+  border-radius: var(--r);
+  background: var(--card);
+  color: var(--ink);
+  cursor: pointer;
+  box-shadow: var(--sh-sm);
+  transition: transform 0.13s var(--ease), box-shadow 0.13s var(--ease);
+}
+
+.canvas-fit-btn .node-icon {
+  font-family: 'Font Awesome 6 Free', sans-serif;
+  font-weight: 900;
+  font-size: 14px;
+}
+
+.canvas-fit-btn:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: var(--sh);
+}
+
+.canvas-fit-btn:active {
+  transform: translate(0, 0);
+  box-shadow: 1px 1px 0 var(--edge);
+}
+
+.canvas-minimap {
+  display: block;
+  border: 2px solid var(--edge);
+  border-radius: var(--r);
+  background: var(--board);
+  box-shadow: var(--sh-sm);
+  cursor: pointer;
 }
 
 .canvas-svg {
@@ -25,75 +89,57 @@
   cursor: move;
 }
 
-.node:hover .node-body {
-  filter: brightness(1.08);
-}
-
-.node.selected .node-body {
-  filter: brightness(1.1);
-}
-
-/* Error nodes - preserve red shadow on hover/selected */
-.node.has-errors .node-body {
-  filter: url(#errorGlow);
-}
-
-.node.has-errors:hover .node-body {
-  filter: url(#errorGlow) brightness(1.08);
-}
-
-.node.has-errors.selected .node-body {
-  filter: url(#errorSelectedGlow) brightness(1.1);
-}
-
-.node.has-errors.selected:hover .node-body {
-  filter: url(#errorSelectedGlow) brightness(1.1);
-}
-
-/* Drag-over state for file drop */
-.node.drag-over .node-body {
-  stroke: #4CAF50;
-  stroke-width: 3;
-  stroke-dasharray: 5 3;
-  filter: brightness(1.15);
-}
-
 .node-shadow {
   pointer-events: none;
 }
 
 .node-body {
-  transition: filter 0.15s ease, stroke-width 0.15s ease;
+  transition: filter 0.13s var(--ease);
 }
 
 .node:hover .node-body {
-  stroke-width: 2;
-  stroke: #444;
+  filter: brightness(1.03);
 }
 
-.node.selected .node-body {
-  stroke-width: 2;
-  stroke: #ff9900;
+.node-grip {
+  transition: filter 0.13s var(--ease);
 }
 
-.node.selected:hover .node-body {
-  stroke-width: 2;
-  stroke: #ffbb33;
+/* Drag-over state for file drop */
+.node.drag-over .node-body {
+  stroke: var(--sig-out);
+  stroke-width: 3;
+  stroke-dasharray: 5 3;
+}
+
+.node-button-body {
+  transition: filter 0.13s var(--ease);
+}
+.node-button:hover .node-button-body {
+  filter: brightness(1.06);
 }
 
 .node-icon {
-  font-family: 'Font Awesome 5 Free', sans-serif;
+  font-family: 'Font Awesome 6 Free', sans-serif;
+  font-weight: 900;
+  user-select: none;
+}
+
+.node-icon-brand {
+  font-family: 'Font Awesome 6 Brands', sans-serif;
+  font-weight: 400;
   user-select: none;
 }
 
 .node-type {
   user-select: none;
-  font-family: var(--font-family);
+  font-family: var(--mono);
+  letter-spacing: 0.01em;
 }
 
 .node-label {
   user-select: none;
-  font-family: var(--font-family);
+  font-family: var(--mono);
 }
 
 /* ============================================
@@ -102,158 +148,72 @@
 
 .port {
   cursor: crosshair;
-  transition: fill 0.15s ease, stroke 0.15s ease, transform 0.1s ease;
+  transition: fill 0.13s var(--ease), stroke 0.13s var(--ease);
 }
 
 .port:hover {
-  fill: #cc6600;
-  stroke: #333;
-  stroke-width: 2;
+  fill: var(--volt);
+  stroke: var(--volt);
+}
+
+.audio-port {
+  cursor: crosshair;
+  transition: filter 0.13s var(--ease);
+}
+.audio-port:hover {
+  filter: brightness(1.12);
 }
 
 /* ============================================
-   WIRES
+   WIRES (patch cables)
    ============================================ */
 
 .wire-group {
   cursor: pointer;
 }
 
-.wire-outer {
+.pn-wire-hit {
   fill: none;
-  stroke: #ddd;
-  stroke-width: 5;
+  stroke: transparent;
+  stroke-width: 14;
   stroke-linecap: round;
   pointer-events: stroke;
 }
 
-.wire-inner {
+.pn-wire-glow {
   fill: none;
-  stroke: url(#wireGradient);
-  stroke-width: 3;
-  stroke-linecap: round;
-  pointer-events: none;
-  transition: stroke 0.2s ease;
-}
-
-.wire-inner-selected {
-  fill: none;
-  stroke: url(#wireSelectedGradient);
-  stroke-width: 3;
+  stroke-width: 8;
+  opacity: 0.15;
   stroke-linecap: round;
   pointer-events: none;
 }
 
-.wire-group:hover .wire-outer {
-  stroke: #fff;
-}
-
-.wire-group:hover .wire-inner {
-  stroke: #ffcc00;
-}
-
-/* ============================================
-   TEMP WIRE (drawing new connection)
-   ============================================ */
-
-/* Temp wire - thinner and grey when not connected */
-.wire-outer-temp {
-  stroke: #666;
-  stroke-width: 3;
-}
-
-.wire-inner-temp {
-  stroke: #888;
-  stroke-width: 1.5;
-}
-
-/* Temp wire - colored when hovering over valid input */
-.wire-inner-connecting {
-  stroke: url(#wireGradient);
-  stroke-width: 1.5;
-}
-
-.wire-connecting .wire-outer-temp {
-  stroke: #999;
-}
-
-/* Pending wire - connected but not deployed yet (thin but colored) */
-.wire-outer-pending {
-  stroke: #666;
-  stroke-width: 3;
-}
-
-.wire-inner-pending {
-  stroke: url(#wireGradient);
-  stroke-width: 1.5;
-}
-
-/* Temp wire should stay grey on hover when not connected */
-.wire-temp:hover .wire-outer-temp {
-  stroke: #666;
-}
-
-.wire-temp:hover .wire-inner-temp {
-  stroke: #888;
-}
-
-/* ============================================
-   AUDIO STREAM WIRES (green)
-   ============================================ */
-
-.wire-group-stream {
-  cursor: pointer;
-}
-
-.wire-outer-stream {
+.pn-wire {
   fill: none;
-  stroke: #1a5c1a;
-  stroke-width: 5;
-  stroke-linecap: round;
-  pointer-events: stroke;
-}
-
-.wire-inner-stream {
-  fill: none;
-  stroke: #2d9a2d;
-  stroke-width: 3;
+  stroke-width: 2.6;
   stroke-linecap: round;
   pointer-events: none;
-  transition: stroke 0.2s ease;
+  transition: stroke-width 0.13s var(--ease);
 }
 
-.wire-inner-selected-stream {
-  fill: none;
-  stroke: #4cff4c;
-  stroke-width: 3;
-  stroke-linecap: round;
-  pointer-events: none;
+.pn-wire.is-selected {
+  stroke-width: 3.2;
 }
 
-.wire-group-stream:hover .wire-outer-stream {
-  stroke: #2a8a2a;
+.wire-group:hover .pn-wire {
+  stroke-width: 3.4;
+}
+.wire-group:hover .pn-wire-glow {
+  opacity: 0.28;
 }
 
-.wire-group-stream:hover .wire-inner-stream {
-  stroke: #4cff4c;
+@keyframes pn-flow {
+  to { stroke-dashoffset: -26; }
 }
-
-/* Stream temp wire - thinner and grey when not connected */
-.wire-inner-temp-stream {
-  stroke: #446644;
-  stroke-width: 1.5;
-}
-
-/* Stream temp wire - colored when hovering over valid input */
-.wire-inner-connecting-stream {
-  stroke: #2d9a2d;
-  stroke-width: 1.5;
-}
-
-/* Stream pending wire - connected but not deployed */
-.wire-inner-pending-stream {
-  stroke: #2d9a2d;
-  stroke-width: 1.5;
+@media (prefers-reduced-motion: no-preference) {
+  .pn-wire-flow {
+    animation: pn-flow 1.4s linear infinite;
+  }
 }
 
 /* ============================================
@@ -261,9 +221,9 @@
    ============================================ */
 
 .selection-box {
-  fill: rgba(74, 158, 255, 0.1);
-  stroke: var(--selection-color);
-  stroke-width: 1;
+  fill: color-mix(in srgb, var(--volt) 12%, transparent);
+  stroke: var(--volt);
+  stroke-width: 1.5;
   stroke-dasharray: 6 3;
   pointer-events: none;
 }

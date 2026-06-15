@@ -1,13 +1,18 @@
-// Node dimensions (matching pagenodes 1)
-export const NODE_WIDTH = 100;
-export const MIN_NODE_WIDTH = 100;
-export const MAX_NODE_WIDTH = 200;
-export const NODE_HEIGHT = 30;
-export const MIN_NODE_HEIGHT = 30;
+// Node dimensions (PATCHBAY: squared tile, left grip + icon + mono label)
+export const NODE_WIDTH = 120;
+export const MIN_NODE_WIDTH = 118;
+export const MAX_NODE_WIDTH = 240;
+export const NODE_HEIGHT = 34;
+export const MIN_NODE_HEIGHT = 34;
 export const STEP_HEIGHT = 20;
-export const PORT_SIZE = 10;
-export const WIRE_CURVE_OFFSET = 60;
-export const CHAR_WIDTH = 7; // Approximate width per character at font-size 12
+export const PORT_SIZE = 11;
+export const WIRE_CURVE_OFFSET = 55;
+export const CHAR_WIDTH = 7.3; // Approximate width per character of the mono label at 12px
+
+// Left content offset: grip + icon when an icon is present, grip only otherwise
+export const LABEL_OFFSET_ICON = 34;
+export const LABEL_OFFSET_NOICON = 16;
+export const LABEL_RIGHT_PAD = 16;
 
 // Audio port constants
 export const AUDIO_PORT_OFFSET = 8; // Vertical offset between message and audio ports
@@ -16,13 +21,9 @@ export const AUDIO_PORT_OFFSET = 8; // Vertical offset between message and audio
 export function calcNodeWidth(label, hasIcon = false) {
   if (!label) return MIN_NODE_WIDTH;
 
-  // Base padding for ports and margins
-  const basePadding = 30;
-  // Extra padding if there's an icon
-  const iconPadding = hasIcon ? 26 : 0;
-
+  const leftOffset = hasIcon ? LABEL_OFFSET_ICON : LABEL_OFFSET_NOICON;
   const textWidth = label.length * CHAR_WIDTH;
-  const neededWidth = textWidth + basePadding + iconPadding;
+  const neededWidth = leftOffset + textWidth + LABEL_RIGHT_PAD;
 
   return Math.min(MAX_NODE_WIDTH, Math.max(MIN_NODE_WIDTH, neededWidth));
 }
@@ -31,9 +32,8 @@ export function calcNodeWidth(label, hasIcon = false) {
 export function truncateLabel(label, hasIcon = false) {
   if (!label) return '';
 
-  const basePadding = 30;
-  const iconPadding = hasIcon ? 26 : 0;
-  const availableWidth = MAX_NODE_WIDTH - basePadding - iconPadding;
+  const leftOffset = hasIcon ? LABEL_OFFSET_ICON : LABEL_OFFSET_NOICON;
+  const availableWidth = MAX_NODE_WIDTH - leftOffset - LABEL_RIGHT_PAD;
   const maxChars = Math.floor(availableWidth / CHAR_WIDTH);
 
   if (label.length <= maxChars) return label;

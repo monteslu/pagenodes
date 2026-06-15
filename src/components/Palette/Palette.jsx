@@ -1,6 +1,7 @@
 import { useState, useCallback, useMemo, useEffect } from 'react';
 import { nodeRegistry } from '../../nodes';
 import { useRuntime } from '../../context/runtime.js';
+import { categoryKindColor } from '../../utils/signalKind';
 import { PaletteNode } from './PaletteNode';
 import './Palette.css';
 
@@ -142,11 +143,12 @@ export function Palette() {
                 className="category-header"
                 onClick={() => !isSearching && toggleCategory(category)}
               >
-                <span className={`category-toggle ${isExpanded ? 'expanded' : ''}`}>
-                  ▶
-                </span>
+                <span className="category-dot" style={{ background: categoryKindColor(category) }} />
                 <span className="category-name">{CATEGORY_DISPLAY_NAMES[category] || category}</span>
                 {isSearching && <span className="category-count">{nodes.length}</span>}
+                <span className={`category-toggle ${isExpanded ? 'expanded' : ''}`}>
+                  ▾
+                </span>
               </div>
               {isExpanded && (
                 <div className="category-nodes">

@@ -7,6 +7,7 @@ import { useDrag } from '../../hooks/useDrag';
 import { Node } from './Node';
 import { Wire } from './Wire';
 import { SVGDefs } from './SVGDefs';
+import { Minimap, getFlowBounds } from './Minimap';
 import { getPortPosition, getStreamPortPosition, calcNodeHeight, calcNodeHeightWithAudio, calcNodeWidth, normalizeRect, isNodeInSelection, wouldCreateCycle } from '../../utils/geometry';
 import { nodeRegistry } from '../../nodes';
 import { logger } from '../../utils/logger';
@@ -35,6 +36,50 @@ export function Canvas({ onEditNode, onInject, onFileDrop, onNodeInteraction }) 
 
   // Track if we just finished a selection drag (to prevent click from clearing it)
   const justSelectedRef = useRef(false);
+
+  // Viewport metrics for the corner minimap (updated on scroll/resize/zoom)
+  const [viewport, setViewport] = useState({ sl: 0, st: 0, cw: 0, ch: 0 });
+  const syncViewport = useCallback(() => {
+    const c = containerRef.current;
+    if (!c) return;
+    setViewport({ sl: c.scrollLeft, st: c.scrollTop, cw: c.clientWidth, ch: c.clientHeight });
+  }, []);
+
+  useEffect(() => {
+    syncViewport();
+    window.addEventListener('resize', syncViewport);
+    return () => window.removeEventListener('resize', syncViewport);
+  }, [syncViewport]);
+
+  useEffect(() => {
+    syncViewport();
+  }, [editor.zoom, syncViewport]);
+
+  // Recenter the canvas on a point (used by the minimap)
+  const handleRecenter = useCallback((x, y) => {
+    dispatch({ type: 'SCROLL_TO', x, y });
+  }, [dispatch]);
+
+  // Fit the whole active flow into view
+  const handleFit = useCallback(() => {
+    const c = containerRef.current;
+    const bounds = getFlowBounds(activeNodes);
+    if (!c || !bounds) return;
+    const margin = 80;
+    const contentW = (bounds.maxX - bounds.minX) || 1;
+    const contentH = (bounds.maxY - bounds.minY) || 1;
+    const fitZoom = Math.min(
+      (c.clientWidth - margin) / contentW,
+      (c.clientHeight - margin) / contentH
+    );
+    const zoom = Math.max(0.25, Math.min(1.5, fitZoom));
+    dispatch({ type: 'SET_ZOOM', zoom });
+    dispatch({
+      type: 'SCROLL_TO',
+      x: (bounds.minX + bounds.maxX) / 2,
+      y: (bounds.minY + bounds.maxY) / 2
+    });
+  }, [activeNodes, dispatch]);
 
   // Build wire list from node.wires (message wires)
   const wires = useMemo(() => {
@@ -427,9 +472,11 @@ export function Canvas({ onEditNode, onInject, onFileDrop, onNodeInteraction }) 
   }, [editor.scrollTarget, editor.zoom, dispatch]);
 
   return (
+    <div className="canvas-viewport">
     <div
       ref={containerRef}
       className="canvas-container"
+      onScroll={syncViewport}
       onMouseDown={handleCanvasMouseDown}
       onMouseMove={handleCanvasMouseMove}
       onMouseUp={handleCanvasMouseUp}
@@ -458,7 +505,7 @@ export function Canvas({ onEditNode, onInject, onFileDrop, onNodeInteraction }) 
             y="0"
             width="5000"
             height="5000"
-            fill="url(#gridLarge)"
+            fill="url(#dotGrid)"
           />
 
           {/* Wires */}
@@ -546,6 +593,24 @@ export function Canvas({ onEditNode, onInject, onFileDrop, onNodeInteraction }) 
           )}
         </g>
       </svg>
+    </div>
+
+      <div className="canvas-overlay">
+        <button
+          className="canvas-fit-btn"
+          onClick={handleFit}
+          title="Fit flow to view"
+          aria-label="Fit flow to view"
+        >
+          <span className="node-icon">{''}</span>
+        </button>
+        <Minimap
+          activeNodes={activeNodes}
+          viewport={viewport}
+          zoom={editor.zoom}
+          onRecenter={handleRecenter}
+        />
+      </div>
     </div>
   );
 }

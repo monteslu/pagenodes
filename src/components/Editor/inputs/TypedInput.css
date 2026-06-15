@@ -40,7 +40,7 @@
 }
 
 .typed-input-json {
-  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-family: var(--mono);
 }
 
 .typed-input-menu {

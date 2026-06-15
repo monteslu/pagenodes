@@ -7,12 +7,13 @@
 
 // Layout definitions
 // emitNumber: true means payload will be a number, false means string
+// PATCHBAY keypad palette (from the design system). Playful multi-color faces.
 const LAYOUTS = {
   '2x2': {
     cols: 2,
     rows: 2,
     labels: ['1', '2', '3', '4'],
-    colors: ['#E74C3C', '#3498DB', '#2ECC71', '#F39C12'],
+    colors: ['#E0524B', '#2E86C9', '#2E9E4F', '#E08A2B'],
     emitNumber: true
   },
   '5x2': {
@@ -20,8 +21,8 @@ const LAYOUTS = {
     rows: 2,
     labels: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'],
     colors: [
-      '#E74C3C', '#3498DB', '#2ECC71', '#F39C12', '#9B59B6',
-      '#1ABC9C', '#E91E63', '#00BCD4', '#8BC34A', '#FF5722'
+      '#6A3FC0', '#E0524B', '#2E86C9', '#2E9E4F', '#E08A2B',
+      '#7E4FD0', '#1FA0A0', '#D24D86', '#2FB6CF', '#4FA83A'
     ],
     emitNumber: true
   },
@@ -30,10 +31,10 @@ const LAYOUTS = {
     rows: 4,
     labels: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '*', '0', '#'],
     colors: [
-      '#E74C3C', '#3498DB', '#2ECC71',
-      '#F39C12', '#9B59B6', '#1ABC9C',
-      '#E91E63', '#00BCD4', '#8BC34A',
-      '#FF5722', '#673AB7', '#009688'
+      '#E0524B', '#2E86C9', '#2E9E4F',
+      '#E08A2B', '#7E4FD0', '#1FA0A0',
+      '#D24D86', '#2FB6CF', '#4FA83A',
+      '#E0613A', '#6A3FC0', '#1F9E7A'
     ],
     emitNumber: false
   },
@@ -42,10 +43,10 @@ const LAYOUTS = {
     rows: 4,
     labels: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'],
     colors: [
-      '#E74C3C', '#3498DB', '#2ECC71', '#F39C12',
-      '#9B59B6', '#1ABC9C', '#E91E63', '#00BCD4',
-      '#8BC34A', '#FF5722', '#673AB7', '#009688',
-      '#795548', '#607D8B', '#FF9800', '#4CAF50'
+      '#6A3FC0', '#E0524B', '#2E86C9', '#2E9E4F',
+      '#E08A2B', '#7E4FD0', '#1FA0A0', '#D24D86',
+      '#2FB6CF', '#4FA83A', '#E0613A', '#1F9E7A',
+      '#C2477E', '#3E7BD0', '#5AA83A', '#D9912B'
     ],
     emitNumber: false
   }
@@ -121,27 +122,6 @@ export const buttonsNode = {
     const startX = PADDING;
     const startY = PADDING;
 
-    // Darken a color
-    const darkenColor = (hex, amount = 0.3) => {
-      const num = parseInt(hex.slice(1), 16);
-      const r = Math.max(0, (num >> 16) - Math.round(255 * amount));
-      const g = Math.max(0, ((num >> 8) & 0x00FF) - Math.round(255 * amount));
-      const b = Math.max(0, (num & 0x0000FF) - Math.round(255 * amount));
-      return `rgb(${r},${g},${b})`;
-    };
-
-    // Lighten a color
-    const lightenColor = (hex, amount = 0.2) => {
-      const num = parseInt(hex.slice(1), 16);
-      const r = Math.min(255, (num >> 16) + Math.round(255 * amount));
-      const g = Math.min(255, ((num >> 8) & 0x00FF) + Math.round(255 * amount));
-      const b = Math.min(255, (num & 0x0000FF) + Math.round(255 * amount));
-      return `rgb(${r},${g},${b})`;
-    };
-
-    // Generate unique gradient IDs for this node instance
-    const nodeId = node?.id || 'btn';
-
     const buttons = [];
     for (let row = 0; row < layoutDef.rows; row++) {
       for (let col = 0; col < layoutDef.cols; col++) {
@@ -155,8 +135,6 @@ export const buttonsNode = {
         // Emit number for numeric layouts, string for others
         const buttonValue = layoutDef.emitNumber ? parseInt(label, 10) : label;
         const isActive = activeButton === label;
-        const gradientId = `btn-grad-${nodeId}-${index}`;
-        const pressedGradientId = `btn-grad-pressed-${nodeId}-${index}`;
 
         buttons.push(
           <g
@@ -184,52 +162,52 @@ export const buttonsNode = {
               }
             }}
           >
-            {/* Gradient definitions */}
-            <defs>
-              {/* Raised button gradient - light at top, dark at bottom */}
-              <linearGradient id={gradientId} x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stopColor={lightenColor(color, 0.25)} />
-                <stop offset="50%" stopColor={color} />
-                <stop offset="100%" stopColor={darkenColor(color, 0.25)} />
-              </linearGradient>
-              {/* Pressed button gradient - inverted, dark at top */}
-              <linearGradient id={pressedGradientId} x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stopColor={darkenColor(color, 0.3)} />
-                <stop offset="50%" stopColor={darkenColor(color, 0.15)} />
-                <stop offset="100%" stopColor={color} />
-              </linearGradient>
-            </defs>
-            {/* Outer border / bezel - darker */}
+            {/* Flat key face with a hard edge border */}
             <rect
               x={x}
               y={y}
               width={buttonWidth}
               height={buttonHeight}
-              rx={4}
-              ry={4}
-              fill={darkenColor(color, 0.4)}
-              pointerEvents="none"
-            />
-            {/* Button face with gradient */}
-            <rect
-              x={x + 2}
-              y={isActive ? y + 3 : y + 1}
-              width={buttonWidth - 4}
-              height={buttonHeight - 4}
               rx={3}
               ry={3}
-              fill={isActive ? `url(#${pressedGradientId})` : `url(#${gradientId})`}
+              fill={color}
+              stroke="var(--edge)"
+              strokeWidth={2}
             />
-            {/* Top highlight shine - only when not pressed */}
+            {/* Top inset highlight (subtle bevel) */}
             {!isActive && (
               <rect
-                x={x + 4}
+                x={x + 3}
                 y={y + 3}
-                width={buttonWidth - 8}
-                height={8}
+                width={buttonWidth - 6}
+                height={Math.round(buttonHeight * 0.34)}
                 rx={2}
                 ry={2}
-                fill="rgba(255,255,255,0.3)"
+                fill="rgba(255,255,255,0.28)"
+                pointerEvents="none"
+              />
+            )}
+            {/* Bottom inset shadow */}
+            <rect
+              x={x + 3}
+              y={y + buttonHeight - 6}
+              width={buttonWidth - 6}
+              height={3}
+              rx={1}
+              ry={1}
+              fill="rgba(0,0,0,0.18)"
+              pointerEvents="none"
+            />
+            {/* Pressed overlay */}
+            {isActive && (
+              <rect
+                x={x}
+                y={y}
+                width={buttonWidth}
+                height={buttonHeight}
+                rx={3}
+                ry={3}
+                fill="rgba(0,0,0,0.22)"
                 pointerEvents="none"
               />
             )}
@@ -239,11 +217,12 @@ export const buttonsNode = {
               y={y + buttonHeight / 2 + (isActive ? 1 : 0)}
               textAnchor="middle"
               dominantBaseline="central"
-              fill="white"
+              fill="#fff"
               fontSize="18"
               fontWeight="bold"
+              fontFamily="var(--sans)"
               pointerEvents="none"
-              style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}
+              style={{ textShadow: '0 1px 1px rgba(0,0,0,0.45)' }}
             >
               {label}
             </text>

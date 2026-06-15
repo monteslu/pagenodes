@@ -74,7 +74,7 @@
   min-height: 200px;
   padding: 10px;
   font-size: 12px;
-  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-family: var(--mono);
   line-height: 1.4;
   background: var(--input-bg);
   border: 1px solid var(--border-color);
@@ -98,7 +98,7 @@
   background: rgba(229, 57, 53, 0.1);
   border: 1px solid rgba(229, 57, 53, 0.3);
   border-radius: 4px;
-  color: #e53935;
+  color: var(--danger);
   font-size: 12px;
 }
 
@@ -115,13 +115,19 @@
 }
 
 .import-dialog-footer .btn {
-  padding: 8px 16px;
-  border-radius: 4px;
-  font-size: 13px;
-  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 16px;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-radius: var(--r);
   cursor: pointer;
-  border: 1px solid transparent;
-  transition: all 0.15s ease;
+  border: 2px solid var(--edge);
+  transition: transform 0.13s var(--ease), box-shadow 0.13s var(--ease), background 0.13s var(--ease);
 }
 
 .import-dialog-footer .btn-file {

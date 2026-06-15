@@ -1,0 +1,976 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PATCHBAY — PageNodes Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+/* ============================================================
+   PATCHBAY — design tokens
+   ============================================================ */
+:root{
+  --paper:#F5F1E8; --card:#FCFAF3; --board:#FBF8F0; --deep:#ECE5D6;
+  --hair:#DBD2C0; --ink:#1B1A16; --smoke:#6C6557; --faint:#A79E8C;
+  --edge:#1B1A16;
+  --volt:#5B4DF1; --volt-soft:#ECE9FE; --volt-ink:#3A2FC4;
+  --sig-in:#0E9DB8; --sig-out:#2E9E4F; --sig-fn:#DC8638;
+  --sig-ai:#8257F0; --sig-logic:#CC9A28; --sig-net:#3B7DD8; --sig-audio:#1FA0A0;
+  --warn:#D98A1F; --danger:#C0392B;
+  --grid-dot:rgba(27,26,22,.10);
+  --noise-op:.030;
+  --sans:'Space Grotesk',system-ui,sans-serif;
+  --mono:'Spline Sans Mono',ui-monospace,monospace;
+  --r:3px; --r-node:6px; --r-chip:2px;
+  --sh:4px 4px 0 var(--edge);
+  --sh-sm:3px 3px 0 var(--edge);
+  --sh-lg:8px 8px 0 var(--edge);
+  --ease:cubic-bezier(.2,.7,.3,1);
+}
+[data-theme="dark"]{
+  --paper:#21252C; --card:#282E36; --board:#1B1F25; --deep:#191D23;
+  --hair:#363D47; --ink:#E9ECF1; --smoke:#9AA3AE; --faint:#6B7480;
+  --edge:#10131A;
+  --volt:#8479FF; --volt-soft:#2A2750; --volt-ink:#B6AEFF;
+  --sig-in:#34C3DC; --sig-out:#57C97A; --sig-fn:#F0A65C;
+  --sig-ai:#A98BFF; --sig-logic:#F2C25A; --sig-net:#6BA4F2; --sig-audio:#3FC2C2;
+  --warn:#F2B33D; --danger:#FF6B6B;
+  --grid-dot:rgba(255,255,255,.07);
+  --noise-op:.045;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:var(--sans);font-size:16px;line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+  transition:background .35s var(--ease),color .35s var(--ease);
+}
+/* grain overlay */
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;opacity:var(--noise-op);
+  background:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1120px;margin:0 auto;padding:0 28px}
+.mono{font-family:var(--mono);text-transform:uppercase;letter-spacing:.14em;font-size:11px;color:var(--smoke)}
+.eyebrow{font-family:var(--mono);text-transform:uppercase;letter-spacing:.22em;font-size:11px;color:var(--volt);font-weight:600}
+
+/* ============ status strip ============ */
+.strip{background:#0F1217;color:#C9CFD8;font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase}
+[data-theme="dark"] .strip{background:#0B0E13}
+.strip .wrap{display:flex;align-items:center;gap:18px;height:34px}
+.strip .sdot{width:7px;height:7px;border-radius:50%;background:var(--sig-out);box-shadow:0 0 0 3px rgba(46,158,79,.18)}
+.strip .right{margin-left:auto;display:flex;gap:18px;opacity:.7}
+.strip .right span{display:none}
+@media(min-width:720px){.strip .right span{display:inline}}
+
+/* ============ sticky nav ============ */
+header.nav{position:sticky;top:0;z-index:200;background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(9px);border-bottom:2px solid var(--edge)}
+.nav .wrap{display:flex;align-items:center;gap:18px;height:62px}
+.brand{display:flex;align-items:center;gap:11px;font-weight:700;font-size:19px;letter-spacing:-.01em}
+.brand .mark{flex:0 0 auto}
+.brand .sub{font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;color:var(--faint);text-transform:uppercase;border-left:1px solid var(--hair);padding-left:9px;margin-left:1px}
+.nav-links{margin-left:auto;display:none;gap:4px}
+@media(min-width:900px){.nav-links{display:flex}}
+.nav-links a{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--smoke);padding:8px 11px;border:2px solid transparent;border-radius:var(--r);transition:.15s var(--ease)}
+.nav-links a:hover{color:var(--ink)}
+.nav-links a.active{color:var(--ink);border-color:var(--edge);background:var(--card)}
+.toggle{width:38px;height:38px;display:grid;place-items:center;background:var(--card);border:2px solid var(--edge);border-radius:var(--r);cursor:pointer;color:var(--ink);box-shadow:var(--sh-sm);transition:.13s var(--ease)}
+.toggle:hover{transform:translate(-1px,-1px);box-shadow:4px 4px 0 var(--edge)}
+.toggle .fa-moon{display:none}.toggle .fa-sun{display:inline}
+[data-theme="dark"] .toggle .fa-sun{display:none}[data-theme="dark"] .toggle .fa-moon{display:inline}
+
+/* ============ hero ============ */
+.hero{position:relative;padding:76px 0 56px;overflow:hidden}
+.hero .grid-bg{position:absolute;inset:0;z-index:0;
+  background-image:radial-gradient(var(--grid-dot) 1.5px,transparent 1.5px);background-size:26px 26px;
+  -webkit-mask-image:linear-gradient(180deg,#000 30%,transparent 100%);mask-image:linear-gradient(180deg,#000 30%,transparent 100%)}
+.hero .wrap{position:relative;z-index:2}
+.hero h1{font-size:clamp(52px,9vw,104px);font-weight:700;line-height:.92;letter-spacing:-.035em;margin:14px 0 0}
+.hero h1 .v{color:var(--volt)}
+.hero .lede{max-width:560px;font-size:18px;color:var(--smoke);margin:20px 0 0;line-height:1.5}
+.hero .meta{margin-top:26px;display:flex;flex-wrap:wrap;gap:10px}
+.metachip{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--smoke);background:var(--card);border:2px solid var(--edge);border-radius:var(--r-chip);padding:6px 11px;box-shadow:var(--sh-sm);display:inline-flex;align-items:center;gap:7px}
+.metachip i{color:var(--volt)}
+.hero-cables{position:absolute;right:-40px;top:40px;width:46%;height:300px;z-index:1;opacity:.9;display:none}
+@media(min-width:980px){.hero-cables{display:block}}
+
+/* ============ section scaffold ============ */
+section.sec{padding:64px 0;border-top:2px solid var(--edge)}
+.sechead{display:flex;align-items:flex-end;gap:16px;margin-bottom:34px}
+.sechead .num{font-family:var(--mono);font-size:13px;letter-spacing:.16em;color:var(--volt);font-weight:600}
+.sechead h2{font-size:34px;font-weight:700;letter-spacing:-.02em;margin:4px 0 0;line-height:1}
+.sechead p{margin:6px 0 0;color:var(--smoke);font-size:15px;max-width:520px}
+.sechead .hr{flex:1;height:2px;background:var(--hair);margin-bottom:9px}
+
+.subhead{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin:36px 0 16px;display:flex;align-items:center;gap:10px}
+.subhead::after{content:'';flex:1;height:1px;background:var(--hair)}
+
+/* spec card */
+.spec{background:var(--card);border:2px solid var(--edge);border-radius:var(--r);box-shadow:var(--sh-sm)}
+.spec .demo{padding:30px;display:flex;flex-wrap:wrap;gap:18px;align-items:center;
+  background-image:radial-gradient(var(--grid-dot) 1.3px,transparent 1.3px);background-size:20px 20px}
+.spec .cap{border-top:2px solid var(--edge);padding:11px 16px;display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--smoke)}
+.spec .cap .tag{color:var(--volt)}
+.cards{display:grid;gap:18px}
+.g2{grid-template-columns:1fr} @media(min-width:760px){.g2{grid-template-columns:1fr 1fr}}
+.g3{grid-template-columns:1fr} @media(min-width:760px){.g3{grid-template-columns:1fr 1fr}} @media(min-width:1000px){.g3{grid-template-columns:repeat(3,1fr)}}
+
+/* ============ logo section ============ */
+.logo-hero{display:grid;grid-template-columns:1fr;gap:18px}
+@media(min-width:820px){.logo-hero{grid-template-columns:1.25fr 1fr}}
+.logo-stage{background:var(--card);border:2px solid var(--edge);border-radius:var(--r);box-shadow:var(--sh);display:grid;place-items:center;padding:54px;
+  background-image:radial-gradient(var(--grid-dot) 1.4px,transparent 1.4px);background-size:24px 24px;position:relative}
+.logo-stage.dark{background:#13161C;--grid-dot:rgba(255,255,255,.08)}
+.logo-stage.dark *{--card:#262C35;--edge:#0B0E13;--volt:#8479FF;--sig-in:#34C3DC;--sig-out:#57C97A;--ink:#E9ECF1}
+.copyrow{display:flex;flex-wrap:wrap;gap:9px;margin-top:16px}
+.minibtn{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink);background:var(--board);border:2px solid var(--edge);border-radius:var(--r);padding:8px 12px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:.13s var(--ease)}
+.minibtn:hover{box-shadow:var(--sh-sm);transform:translate(-1px,-1px)}
+.minibtn.ok{background:var(--sig-out);color:#06270f;border-color:var(--edge)}
+[data-theme="dark"] .minibtn.ok{color:#06270f}
+.lockup{display:flex;align-items:center;gap:16px;font-weight:700;letter-spacing:-.02em}
+.lockup .verbadge{font-family:var(--mono);font-size:11px;letter-spacing:.06em;background:var(--volt);color:#fff;border:2px solid var(--edge);border-radius:var(--r-chip);padding:2px 8px;align-self:center}
+[data-theme="dark"] .lockup .verbadge{color:#0F1217}
+.constructionnote{font-family:var(--mono);font-size:10.5px;color:var(--faint);letter-spacing:.06em;line-height:1.8}
+.dos{display:grid;gap:14px;grid-template-columns:1fr 1fr}
+.dobox{border:2px solid var(--edge);border-radius:var(--r);overflow:hidden}
+.dobox .top{padding:26px;display:grid;place-items:center;background-image:radial-gradient(var(--grid-dot) 1.3px,transparent 1.3px);background-size:18px 18px;min-height:120px}
+.dobox .lab{padding:9px 13px;font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;border-top:2px solid var(--edge);display:flex;align-items:center;gap:8px}
+.dobox .lab.no{color:var(--danger)} .dobox .lab.yes{color:var(--sig-out)}
+
+/* ============ color section ============ */
+.swatches{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+@media(min-width:620px){.swatches{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:980px){.swatches{grid-template-columns:repeat(4,1fr)}}
+.sw{border:2px solid var(--edge);border-radius:var(--r);overflow:hidden;background:var(--card);box-shadow:var(--sh-sm);cursor:pointer;transition:.13s var(--ease)}
+.sw:hover{transform:translate(-1px,-1px);box-shadow:var(--sh)}
+.sw .chip{height:72px;border-bottom:2px solid var(--edge);position:relative}
+.sw .chip .ring{position:absolute;inset:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.12)}
+.sw .meta{padding:10px 11px}
+.sw .nm{font-family:var(--mono);font-size:11px;letter-spacing:.04em;color:var(--ink);font-weight:600}
+.sw .hx{font-family:var(--mono);font-size:10.5px;color:var(--smoke);margin-top:3px;text-transform:uppercase}
+.sw .role{font-family:var(--mono);font-size:9px;color:var(--faint);margin-top:5px;letter-spacing:.08em;text-transform:uppercase}
+
+/* ============ type section ============ */
+.typerow{border:2px solid var(--edge);border-radius:var(--r);background:var(--card);padding:22px 24px;display:flex;align-items:baseline;gap:20px;flex-wrap:wrap;box-shadow:var(--sh-sm)}
+.typerow .lbl{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);width:120px;flex:0 0 auto}
+.typerow .samp{color:var(--ink)}
+.fontcard{border:2px solid var(--edge);border-radius:var(--r);background:var(--card);padding:24px;box-shadow:var(--sh-sm)}
+.fontcard .big{font-size:46px;font-weight:700;letter-spacing:-.02em;line-height:1}
+.fontcard .row{margin-top:14px;font-size:22px;letter-spacing:.02em}
+.fontcard .role{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--volt);margin-bottom:14px}
+
+/* ============ buttons / pills ============ */
+.btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-weight:600;font-size:12px;letter-spacing:.06em;text-transform:uppercase;padding:9px 16px;border:2px solid var(--edge);border-radius:var(--r);cursor:pointer;transition:.13s var(--ease);background:var(--card);color:var(--ink)}
+.btn:hover{transform:translate(-2px,-2px);box-shadow:var(--sh)}
+.btn:active{transform:translate(0,0);box-shadow:1px 1px 0 var(--edge)}
+.btn-primary{background:var(--volt);color:#fff;box-shadow:var(--sh-sm)}
+[data-theme="dark"] .btn-primary{color:#0F1217}
+.btn-deploy{background:var(--sig-out);color:#06270f;box-shadow:var(--sh-sm)}
+[data-theme="dark"] .btn-deploy{color:#072a12}
+.btn-ghost{background:transparent;box-shadow:none}
+.btn-ghost:hover{background:var(--board);box-shadow:none;transform:none}
+.iconbtn{width:38px;height:38px;display:grid;place-items:center;border:2px solid var(--edge);border-radius:var(--r);background:var(--card);color:var(--ink);cursor:pointer;box-shadow:var(--sh-sm);transition:.13s var(--ease)}
+.iconbtn:hover{transform:translate(-1px,-1px);box-shadow:var(--sh)}
+.mcp-pill{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;background:var(--volt-soft);color:var(--volt-ink);border:2px solid var(--volt);border-radius:var(--r-chip);padding:5px 10px}
+.dotpulse{width:7px;height:7px;border-radius:50%;background:var(--sig-out);animation:blink 1.8s steps(2) infinite}
+@keyframes blink{0%,55%{opacity:1}56%,100%{opacity:.3}}
+.badge{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;background:var(--board);border:2px solid var(--edge);border-radius:var(--r-chip);padding:5px 10px;display:inline-flex;align-items:center;gap:7px;color:var(--smoke)}
+.badge i{color:var(--volt)}
+
+/* ============ form fields ============ */
+.field{margin-bottom:16px;max-width:420px}
+.field label{display:block;font-size:13px;font-weight:500;color:var(--ink);margin-bottom:6px}
+.field label .req{color:var(--danger);font-weight:700;margin-left:2px}
+.field label .opt{font-family:var(--mono);font-size:9.5px;color:var(--faint);letter-spacing:.06em;text-transform:uppercase;margin-left:6px}
+.input{width:100%;font-family:var(--mono);font-size:13px;color:var(--ink);background:var(--board);border:2px solid var(--edge);border-radius:var(--r);padding:10px 12px;outline:none;transition:.13s var(--ease)}
+.input::placeholder{color:var(--faint)}
+.input:focus{border-color:var(--volt);box-shadow:0 0 0 3px var(--volt-soft)}
+.input.bad{border-color:var(--danger)}
+.input.bad:focus{box-shadow:0 0 0 3px color-mix(in srgb,var(--danger) 22%,transparent)}
+.reqmsg{font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;color:var(--danger);margin-top:6px;display:flex;align-items:center;gap:6px}
+.search{display:flex;align-items:center;gap:9px;border:2px solid var(--edge);border-radius:var(--r);padding:8px 11px;background:var(--board);color:var(--smoke);max-width:260px}
+.search input{border:none;background:none;outline:none;font-family:var(--mono);font-size:12px;color:var(--ink);width:100%}
+.search input::placeholder{color:var(--faint)}
+
+/* ============ tabs ============ */
+.insp-tabs{display:flex;border:2px solid var(--edge);border-radius:var(--r);overflow:hidden;max-width:320px}
+.insp-tabs button{flex:1;border:none;background:var(--card);padding:12px 0;cursor:pointer;font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--smoke);border-bottom:2px solid transparent;transition:.13s var(--ease)}
+.insp-tabs button+button{border-left:2px solid var(--edge)}
+.insp-tabs button.on{color:var(--ink);border-bottom-color:var(--volt);background:var(--board)}
+.ftabs{display:flex;gap:6px;align-items:center}
+.ftab{display:flex;align-items:center;gap:8px;padding:5px 11px 5px 7px;border:2px solid var(--hair);border-radius:var(--r);background:var(--card);cursor:pointer;color:var(--smoke);font-size:12px;font-weight:500;transition:.13s var(--ease)}
+.ftab:hover{color:var(--ink);border-color:var(--edge)}
+.ftab.active{color:var(--ink);border-color:var(--edge);box-shadow:var(--sh-sm)}
+.ftab .thumb{width:26px;height:18px;border-radius:2px;background:#11141A;border:1px solid var(--edge);display:block}
+
+/* ============ NODES (editor anatomy) ============ */
+.nodestage{position:relative;padding:34px 30px;border:2px solid var(--edge);border-radius:var(--r);background:var(--board);box-shadow:var(--sh-sm);
+  background-image:radial-gradient(var(--grid-dot) 1.4px,transparent 1.4px);background-size:22px 22px;display:flex;flex-wrap:wrap;gap:30px 44px;align-items:flex-start;min-height:120px}
+.node{position:relative;background:var(--card);border:2px solid var(--edge);border-radius:var(--r-node);box-shadow:var(--sh-sm);display:inline-flex;align-items:center;gap:8px;padding:10px 14px 10px 0;font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.02em;color:var(--ink);min-width:120px}
+.node .grip{width:7px;align-self:stretch;border-radius:0;margin:-2px 0;background:var(--smoke)}
+.node .ni{width:18px;text-align:center;font-size:13px;margin-left:5px}
+.node.sel{outline:2px dashed var(--volt);outline-offset:3px}
+.node.warn{outline:2px dashed var(--warn);outline-offset:3px}
+.node.err{outline:2px dashed var(--danger);outline-offset:3px}
+.node .warnbadge{color:var(--warn);font-size:13px;margin-left:auto;padding-left:8px}
+.port{position:absolute;width:11px;height:11px;border-radius:50%;background:var(--card);border:2px solid var(--edge);top:50%;transform:translateY(-50%);z-index:3}
+.port.l{left:-7px}.port.r{right:-7px}
+.k-in .grip{background:var(--sig-in)} .k-in .ni{color:var(--sig-in)}
+.k-out .grip{background:var(--sig-out)} .k-out .ni{color:var(--sig-out)}
+.k-fn .grip{background:var(--sig-fn)} .k-fn .ni{color:var(--sig-fn)}
+.k-ai .grip{background:var(--sig-ai)} .k-ai .ni{color:var(--sig-ai)}
+.k-logic .grip{background:var(--sig-logic)} .k-logic .ni{color:var(--sig-logic)}
+.k-net .grip{background:var(--sig-net)} .k-net .ni{color:var(--sig-net)}
+.k-audio .grip{background:var(--sig-audio)} .k-audio .ni{color:var(--sig-audio)}
+/* solid-fill node variant (like bluetooth out) */
+.node.fill{color:#fff;border-color:var(--edge)}
+.node.fill .ni{color:#fff}
+.node.fill .grip{background:rgba(255,255,255,.5)}
+.node.fill.net{background:var(--sig-net)}
+[data-theme="dark"] .node.fill{color:#0F1217}[data-theme="dark"] .node.fill .ni{color:#0F1217}
+
+/* multi-output node */
+.mnode{position:relative;background:var(--sig-out);border:2px solid var(--edge);border-radius:var(--r-node);box-shadow:var(--sh-sm);display:flex;align-items:center;min-width:150px;min-height:78px;color:#06270f}
+[data-theme="dark"] .mnode{color:#06270f}
+.mnode .mgrip{width:26px;align-self:stretch;display:grid;place-items:center;color:rgba(0,0,0,.55);font-size:13px;border-right:1px solid rgba(0,0,0,.2)}
+.mnode .mlabel{flex:1;text-align:center;font-family:var(--mono);font-size:12px;font-weight:600}
+.mnode .outs{position:absolute;right:-7px;top:0;bottom:0;display:flex;flex-direction:column;justify-content:space-evenly}
+.mnode .oport{width:18px;height:18px;border-radius:50%;border:2px solid var(--edge);display:grid;place-items:center;font-size:8px;color:#fff}
+
+/* widget: keypad */
+.wnode{position:relative;background:var(--card);border:2px solid var(--edge);border-radius:var(--r-node);box-shadow:var(--sh);padding:12px}
+.wnode .wttl{font-family:var(--mono);font-size:11px;letter-spacing:.04em;color:var(--ink);text-align:center;margin-bottom:11px}
+.keypad{display:grid;grid-template-columns:repeat(3,46px);gap:8px}
+.key{height:46px;border:2px solid var(--edge);border-radius:var(--r);font-family:var(--sans);font-weight:700;font-size:18px;color:#fff;display:grid;place-items:center;
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.28),inset 0 -3px 0 rgba(0,0,0,.18);text-shadow:0 1px 1px rgba(0,0,0,.35);cursor:pointer;transition:transform .08s var(--ease)}
+.key:active{transform:translateY(1px)}
+.k1{background:#E0524B}.k2{background:#2E86C9}.k3{background:#2E9E4F}
+.k4{background:#E08A2B}.k5{background:#7E4FD0}.k6{background:#1FA0A0}
+.k7{background:#D24D86}.k8{background:#2FB6CF}.k9{background:#4FA83A}
+.ks{background:#E0613A}.k0{background:#6A3FC0}.kh{background:#1F9E7A}
+
+/* widget: slider */
+.snode{position:relative;background:var(--card);border:2px solid var(--edge);border-radius:var(--r-node);box-shadow:var(--sh);padding:12px 15px 14px;width:240px}
+.snode .sh-ttl{font-family:var(--mono);font-size:11px;color:var(--ink);margin-bottom:12px;display:flex;align-items:center;gap:7px;justify-content:center}
+.snode .sh-ttl i{color:var(--sig-net);font-size:11px}
+.srow{display:flex;align-items:center;gap:11px}
+.track{flex:1;height:6px;background:var(--deep);border:1px solid var(--edge);position:relative;cursor:pointer}
+.fill{position:absolute;left:0;top:0;bottom:0;background:var(--sig-net)}
+.knob{position:absolute;top:50%;width:15px;height:15px;border-radius:2px;background:var(--card);border:2px solid var(--edge);transform:translate(-50%,-50%)}
+.sval{font-family:var(--mono);font-size:13px;font-weight:600;background:var(--board);border:1px solid var(--edge);border-radius:2px;padding:3px 8px;min-width:46px;text-align:center}
+
+/* wires demo */
+.wiredemo{position:relative;height:200px}
+#cableSvg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.wire{fill:none;stroke-width:2.8;stroke-linecap:round}
+.wire-glow{fill:none;stroke-width:9;opacity:.16;stroke-linecap:round}
+@keyframes flow{to{stroke-dashoffset:-22}}
+@media (prefers-reduced-motion:no-preference){.wire-dash{stroke-dasharray:5 9;animation:flow 1.4s linear infinite}}
+.dnode{position:absolute;background:var(--card);border:2px solid var(--edge);border-radius:var(--r-node);box-shadow:var(--sh-sm);padding:9px 13px 9px 0;font-family:var(--mono);font-size:11px;font-weight:600;display:inline-flex;align-items:center;gap:7px}
+.dnode .grip{width:6px;align-self:stretch;margin:-2px 0}
+
+/* ============ panels ============ */
+.panel{border:2px solid var(--edge);border-radius:var(--r);background:var(--card);box-shadow:var(--sh-sm);overflow:hidden;width:100%;max-width:340px}
+.panel .ph{padding:12px 14px;border-bottom:1px solid var(--hair);font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--faint)}
+.cat-h{display:flex;align-items:center;gap:8px;padding:11px 14px;cursor:pointer;font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--smoke);border-bottom:1px solid var(--hair)}
+.cat-h .chev{margin-left:auto;font-size:10px}
+.cat-dot{width:8px;height:8px;border-radius:2px}
+.cat-body{padding:10px 12px;display:flex;flex-direction:column;gap:7px}
+.chip{display:flex;align-items:center;gap:9px;padding:8px 10px 8px 0;border:2px solid var(--edge);border-radius:var(--r-node);background:var(--board);cursor:grab;font-family:var(--mono);font-size:11.5px;font-weight:500;color:var(--ink);transition:.13s var(--ease);position:relative;overflow:hidden}
+.chip:hover{transform:translateX(2px);box-shadow:var(--sh-sm)}
+.chip .cgrip{width:6px;align-self:stretch}
+.chip .ci{width:16px;text-align:center;font-size:12px;margin-left:2px}
+.k-in .cgrip{background:var(--sig-in)}.k-in .ci{color:var(--sig-in)}
+.k-out .cgrip{background:var(--sig-out)}.k-out .ci{color:var(--sig-out)}
+.k-net .cgrip{background:var(--sig-net)}.k-net .ci{color:var(--sig-net)}
+.k-fn .cgrip{background:var(--sig-fn)}.k-fn .ci{color:var(--sig-fn)}
+
+/* info panel */
+.infosec{padding:14px 16px;border-bottom:1px solid var(--hair)}
+.infosec .lab{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin-bottom:10px}
+.kv{display:flex;justify-content:space-between;gap:14px;padding:6px 0;font-family:var(--mono);font-size:11px;border-bottom:1px dashed var(--hair)}
+.kv:last-child{border-bottom:none}
+.kv .k{color:var(--faint);text-transform:uppercase;letter-spacing:.08em}
+.kv .val{color:var(--ink);text-align:right;word-break:break-all}
+.abouttxt{font-size:13px;color:var(--smoke);line-height:1.6}
+.optlist{margin:10px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px}
+.optlist li{font-size:12.5px;color:var(--smoke);line-height:1.45;padding-left:16px;position:relative}
+.optlist li::before{content:'';position:absolute;left:0;top:7px;width:7px;height:7px;border-radius:1px;background:var(--volt)}
+.optlist li b{color:var(--ink);font-weight:600}
+
+/* debug panel */
+.debughead{display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid var(--hair)}
+.debughead .seg{margin-left:auto;display:flex;border:2px solid var(--edge);border-radius:var(--r);overflow:hidden}
+.debughead .seg button{border:none;background:var(--card);padding:5px 12px;font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--smoke);cursor:pointer}
+.debughead .seg button.on{background:var(--sig-out);color:#06270f}
+.debughead .seg button+button{border-left:2px solid var(--edge)}
+.inject{display:flex;gap:8px;padding:12px 14px;border-bottom:1px solid var(--hair)}
+.inject .input{flex:1}
+.debug-line{font-family:var(--mono);font-size:11px;padding:7px 10px;border-left:3px solid var(--hair);margin:6px 14px;background:var(--board)}
+.debug-line .t{color:var(--faint)}
+.debug-line.ok{border-left-color:var(--sig-out)}
+.debug-line.ai{border-left-color:var(--sig-ai)}
+.debug-line.net{border-left-color:var(--sig-net)}
+.emptyline{padding:24px 14px;text-align:center;font-family:var(--mono);font-size:11px;color:var(--faint);letter-spacing:.06em}
+
+/* ============ modal ============ */
+.modal-overlay{position:fixed;inset:0;background:rgba(12,12,16,.55);z-index:500;display:none;align-items:center;justify-content:center;padding:24px}
+.modal-overlay.open{display:flex}
+[data-theme="dark"] .modal-overlay{background:rgba(0,0,0,.66)}
+.modal{width:100%;max-width:540px;background:var(--card);border:2px solid var(--edge);border-radius:var(--r);box-shadow:var(--sh-lg);max-height:88vh;overflow:auto}
+.modal-head{display:flex;align-items:center;gap:12px;padding:16px 18px;border-bottom:2px solid var(--edge)}
+.modal-head .close{margin-left:auto;width:30px;height:30px;display:grid;place-items:center;border:2px solid var(--edge);border-radius:var(--r);background:var(--board);cursor:pointer;color:var(--smoke)}
+.modal-head .close:hover{color:var(--ink)}
+.modal-body{padding:20px 18px}
+.modal-foot{display:flex;justify-content:flex-end;gap:10px;padding:14px 18px;border-top:2px solid var(--edge);background:var(--board)}
+
+/* ============ voice / rules ============ */
+.rulecard{border:2px solid var(--edge);border-radius:var(--r);background:var(--card);box-shadow:var(--sh-sm);overflow:hidden}
+.rulecard .rh{padding:13px 16px;border-bottom:1px solid var(--hair);font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;display:flex;align-items:center;gap:9px}
+.rulecard.no .rh{color:var(--danger)}.rulecard.yes .rh{color:var(--sig-out)}
+.rulecard .rb{padding:14px 16px;font-size:13.5px;color:var(--smoke);line-height:1.6}
+.rulecard .rb code{font-family:var(--mono);font-size:12px;background:var(--board);border:1px solid var(--hair);border-radius:2px;padding:1px 6px;color:var(--ink)}
+
+.principles{display:grid;gap:14px;grid-template-columns:1fr}
+@media(min-width:680px){.principles{grid-template-columns:1fr 1fr}}
+@media(min-width:1000px){.principles{grid-template-columns:repeat(3,1fr)}}
+.prin{border:2px solid var(--edge);border-radius:var(--r);background:var(--card);box-shadow:var(--sh-sm);padding:18px}
+.prin .pi{width:38px;height:38px;border:2px solid var(--edge);border-radius:var(--r);display:grid;place-items:center;color:var(--volt);font-size:15px;background:var(--board);margin-bottom:13px}
+.prin h4{margin:0 0 6px;font-size:15px;font-weight:600}
+.prin p{margin:0;font-size:13px;color:var(--smoke);line-height:1.5}
+
+/* footer */
+footer{border-top:2px solid var(--edge);background:var(--deep);padding:40px 0}
+footer .wrap{display:flex;flex-wrap:wrap;gap:20px;align-items:center}
+footer .mono{font-size:10.5px}
+footer .right{margin-left:auto;display:flex;gap:9px;flex-wrap:wrap}
+
+.note{font-family:var(--mono);font-size:10.5px;color:var(--faint);letter-spacing:.04em;margin-top:14px;line-height:1.7}
+</style>
+</head>
+<body>
+
+<!-- status strip -->
+<div class="strip"><div class="wrap">
+  <span class="sdot"></span><span>PATCHBAY</span><span>·</span><span>DESIGN SYSTEM</span>
+  <div class="right"><span>v1.0</span><span>PAGENODES</span><span>MIT</span><span>HTML FOREVER</span></div>
+</div></div>
+
+<!-- nav -->
+<header class="nav"><div class="wrap">
+  <a class="brand" href="#top">
+    <span class="lslot mark" data-size="34" data-mode="theme"></span>
+    PATCHBAY<span class="sub">PageNodes</span>
+  </a>
+  <nav class="nav-links">
+    <a href="#logo">Logo</a>
+    <a href="#color">Color</a>
+    <a href="#type">Type</a>
+    <a href="#components">Components</a>
+    <a href="#nodes">Nodes</a>
+    <a href="#voice">Voice</a>
+  </nav>
+  <button class="toggle" id="toggle" aria-label="Toggle theme">
+    <i class="fa-solid fa-moon"></i><i class="fa-solid fa-sun"></i>
+  </button>
+</div></header>
+
+<!-- hero -->
+<div class="hero" id="top">
+  <div class="grid-bg"></div>
+  <svg class="hero-cables" id="heroCables" viewBox="0 0 520 300" preserveAspectRatio="none"></svg>
+  <div class="wrap">
+    <div class="eyebrow">Design System · v1.0</div>
+    <h1>PATCH<span class="v">BAY</span></h1>
+    <p class="lede">The visual language for PageNodes. Color-coded patch cables, squared nodes, hard block shadows, and monospace metadata. Built to look like the thing it documents: a browser that wires modules into running flows.</p>
+    <div class="meta">
+      <span class="metachip"><i class="fa-solid fa-bolt"></i> Electric indigo accent</span>
+      <span class="metachip"><i class="fa-solid fa-diagram-project"></i> Patch cable signature</span>
+      <span class="metachip"><i class="fa-solid fa-font"></i> Space Grotesk + Spline Sans Mono</span>
+      <span class="metachip"><i class="fa-solid fa-circle-half-stroke"></i> Light and dark</span>
+    </div>
+  </div>
+</div>
+
+<!-- PRINCIPLES -->
+<section class="sec" style="border-top:none;padding-top:34px">
+  <div class="wrap">
+    <div class="subhead">Operating principles</div>
+    <div class="principles">
+      <div class="prin"><div class="pi"><i class="fa-solid fa-bolt"></i></div><h4>One accent, used sparingly</h4><p>Electric indigo carries focus, links, and the active node. Everything structural stays in warm neutrals. Signal colors are functional, not decoration.</p></div>
+      <div class="prin"><div class="pi"><i class="fa-solid fa-square"></i></div><h4>Square corners</h4><p>Radii top out at 6px on nodes, 3px on controls, 2px on chips. No soft pill shapes. The grid stays honest.</p></div>
+      <div class="prin"><div class="pi"><i class="fa-solid fa-layer-group"></i></div><h4>Hard offset shadows</h4><p>A 4px solid block shadow in the edge color. No blur, no glow. Elements read like cut paper or physical tiles.</p></div>
+      <div class="prin"><div class="pi"><i class="fa-solid fa-terminal"></i></div><h4>Monospace metadata</h4><p>IDs, counts, statuses, and labels run in Spline Sans Mono, uppercase, with wide letter spacing. The interface narrates its own state.</p></div>
+      <div class="prin"><div class="pi"><i class="fa-solid fa-diagram-project"></i></div><h4>Hierarchy through font, not weight</h4><p>The jump from sans display to mono label does the heavy lifting. Size and family separate roles before bold ever does.</p></div>
+      <div class="prin"><div class="pi"><i class="fa-solid fa-circle-nodes"></i></div><h4>The cable is the brand</h4><p>Color-coded bezier wires appear everywhere a connection exists. Animated on marketing, functional in the editor, decorative at rest.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- LOGO -->
+<section class="sec" id="logo">
+  <div class="wrap">
+    <div class="sechead"><div><div class="num">01</div><h2>Logo</h2><p>A wiring tree. Two gold wires leave the source node together and fork smoothly, one rising to the wide indigo processor, one dropping to a second node. The mark reads as a small flow caught mid-run.</p></div><div class="hr"></div></div>
+
+    <div class="logo-hero">
+      <div class="logo-stage" id="logoStageLight">
+        <span class="lslot" data-size="240" data-mode="theme"></span>
+      </div>
+      <div>
+        <div class="subhead" style="margin-top:0">Primary mark</div>
+        <p style="color:var(--smoke);font-size:14px;margin:0 0 14px">The full-color mark on a light surface. The processor node carries the indigo fill and runs as a long bar across the top. The wiring is a single warm gold that leaves the source node, forks in smooth curves, and plugs straight into each node, a nod to the original PageNodes favicon.</p>
+        <div class="copyrow">
+          <button class="minibtn" data-copy="svg-light"><i class="fa-solid fa-code"></i> Copy SVG (light)</button>
+          <button class="minibtn" data-copy="svg-dark"><i class="fa-solid fa-code"></i> Copy SVG (dark)</button>
+        </div>
+        <div class="note">Built on a 120 unit grid. Node stroke 4, gold wire stroke 5, node radius 6. The processor sits as a long bar across the top. Wires run behind the nodes and plug straight into the edges, no connection dots. The favicon variant thickens the strokes and sits on a dark tile so it holds at 16px.</div>
+      </div>
+    </div>
+
+    <div class="subhead">Lockups</div>
+    <div class="cards g2">
+      <div class="spec">
+        <div class="demo" style="justify-content:center;min-height:130px">
+          <span class="lockup" style="font-size:30px">
+            <span class="lslot" data-size="46" data-mode="theme"></span>
+            PageNodes
+          </span>
+        </div>
+        <div class="cap"><span class="tag">LOCKUP</span> Horizontal · primary</div>
+      </div>
+      <div class="spec">
+        <div class="demo" style="justify-content:center;min-height:130px">
+          <span class="lockup" style="font-size:30px">
+            <span class="lslot" data-size="46" data-mode="theme"></span>
+            PageNodes <span class="verbadge">2</span>
+          </span>
+        </div>
+        <div class="cap"><span class="tag">LOCKUP</span> With version badge · editor app</div>
+      </div>
+    </div>
+
+    <div class="subhead">Variations and surfaces</div>
+    <div class="dos">
+      <div class="dobox">
+        <div class="top" style="background:#F5F1E8;--grid-dot:rgba(27,26,22,.10)">
+          <span class="lslot" data-size="92" data-mode="theme" data-fx="1"></span>
+        </div>
+        <div class="lab yes"><i class="fa-solid fa-check"></i> Full color on light</div>
+      </div>
+      <div class="dobox">
+        <div class="top" style="background:#13161C;--grid-dot:rgba(255,255,255,.08)">
+          <span class="lslot" data-size="92" data-mode="dark"></span>
+        </div>
+        <div class="lab yes"><i class="fa-solid fa-check"></i> Full color on dark</div>
+      </div>
+      <div class="dobox">
+        <div class="top" style="background:var(--card)">
+          <span class="lslot" data-size="92" data-mode="ink"></span>
+        </div>
+        <div class="lab yes"><i class="fa-solid fa-check"></i> Single ink (one color print)</div>
+      </div>
+      <div class="dobox">
+        <div class="top" style="background:var(--card);gap:18px;grid-auto-flow:column">
+          <span class="lslot" data-size="48" data-mode="fav"></span>
+          <span class="lslot" data-size="26" data-mode="fav"></span>
+        </div>
+        <div class="lab yes"><i class="fa-solid fa-check"></i> Favicon · simplifies at small size</div>
+      </div>
+    </div>
+
+    <div class="subhead">Clear space and misuse</div>
+    <div class="cards g3">
+      <div class="rulecard yes"><div class="rh"><i class="fa-solid fa-check"></i> Clear space</div><div class="rb">Keep padding equal to the height of one node (the indigo block) on every side. Nothing crowds the mark.</div></div>
+      <div class="rulecard no"><div class="rh"><i class="fa-solid fa-xmark"></i> Do not recolor the processor</div><div class="rb">The hero node stays indigo. Do not swap it for a gradient or a signal color. The wiring stays gold.</div></div>
+      <div class="rulecard no"><div class="rh"><i class="fa-solid fa-xmark"></i> Do not soften it</div><div class="rb">No drop shadows with blur, no rounded pill nodes, no outline glow. The mark is flat and cut from the same grid as the UI.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- COLOR -->
+<section class="sec" id="color">
+  <div class="wrap">
+    <div class="sechead"><div><div class="num">02</div><h2>Color</h2><p>Warm neutrals hold the structure. Indigo is the single brand accent. The signal palette is a functional taxonomy that maps to node categories. Toggle the theme to see every value shift.</p></div><div class="hr"></div></div>
+
+    <div class="subhead">Surface</div>
+    <div class="swatches" id="sw-surface"></div>
+    <div class="subhead">Ink</div>
+    <div class="swatches" id="sw-ink"></div>
+    <div class="subhead">Brand</div>
+    <div class="swatches" id="sw-brand"></div>
+    <div class="subhead">Signal taxonomy · node categories</div>
+    <div class="swatches" id="sw-signal"></div>
+    <div class="subhead">State</div>
+    <div class="swatches" id="sw-state"></div>
+    <div class="note">Click any swatch to copy its hex for the active theme. Light values listed by default, dark values appear when the theme is dark.</div>
+  </div>
+</section>
+
+<!-- TYPE -->
+<section class="sec" id="type">
+  <div class="wrap">
+    <div class="sechead"><div><div class="num">03</div><h2>Typography</h2><p>Two families. Space Grotesk for display, interface, and body. Spline Sans Mono for every label, value, code token, and eyebrow. The contrast between them carries the hierarchy.</p></div><div class="hr"></div></div>
+
+    <div class="cards g2">
+      <div class="fontcard">
+        <div class="role">Space Grotesk · display + body</div>
+        <div class="big">Wire it up.</div>
+        <div class="row">The quick brown fox patches twelve nodes.</div>
+        <div class="row" style="font-weight:500">Aa Bb Cc 0123456789 &amp; ? !</div>
+      </div>
+      <div class="fontcard">
+        <div class="role">Spline Sans Mono · metadata + code</div>
+        <div class="big" style="font-family:var(--mono);font-size:38px">RUNTIME LOCAL</div>
+        <div class="row" style="font-family:var(--mono);text-transform:uppercase;letter-spacing:.12em;font-size:15px">node.id · e6nz3C10 · 60 FPS · NO SERVER</div>
+        <div class="row" style="font-family:var(--mono);font-size:15px">msg.payload = { value: 50 }</div>
+      </div>
+    </div>
+
+    <div class="subhead">Type scale</div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="typerow"><span class="lbl">Display · 104</span><span class="samp" style="font-size:64px;font-weight:700;letter-spacing:-.035em;line-height:1">PATCHBAY</span></div>
+      <div class="typerow"><span class="lbl">Section · 34</span><span class="samp" style="font-size:34px;font-weight:700;letter-spacing:-.02em">Editor anatomy</span></div>
+      <div class="typerow"><span class="lbl">Heading · 19</span><span class="samp" style="font-size:19px;font-weight:600">Node configuration</span></div>
+      <div class="typerow"><span class="lbl">Body · 16</span><span class="samp" style="font-size:16px">PageNodes runs entirely in the browser with no server.</span></div>
+      <div class="typerow"><span class="lbl">Small · 14</span><span class="samp" style="font-size:14px;color:var(--smoke)">Creates an HTML canvas and executes drawing commands.</span></div>
+      <div class="typerow"><span class="lbl">Mono label · 11</span><span class="samp mono" style="font-size:11px">PROPERTIES · WIDTH · HEIGHT</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- COMPONENTS -->
+<section class="sec" id="components">
+  <div class="wrap">
+    <div class="sechead"><div><div class="num">04</div><h2>Components</h2><p>Buttons, pills, tabs, and form fields. Every interactive surface gets a 2px edge, a square corner, and a hard shadow that lifts on hover.</p></div><div class="hr"></div></div>
+
+    <div class="subhead">Buttons</div>
+    <div class="spec">
+      <div class="demo">
+        <button class="btn btn-primary"><i class="fa-solid fa-check"></i> Done</button>
+        <button class="btn btn-deploy"><i class="fa-solid fa-bolt"></i> Redeploy</button>
+        <button class="btn">View source</button>
+        <button class="btn btn-ghost">Cancel</button>
+        <button class="iconbtn"><i class="fa-solid fa-bars"></i></button>
+        <button class="iconbtn"><i class="fa-solid fa-plus"></i></button>
+      </div>
+      <div class="cap"><span class="tag">BUTTON</span> primary (volt) · deploy (green) · default · ghost · icon</div>
+    </div>
+
+    <div class="subhead">Pills and badges</div>
+    <div class="spec">
+      <div class="demo">
+        <span class="mcp-pill"><span class="dotpulse"></span> MCP Connected</span>
+        <span class="badge"><i class="fa-solid fa-cube"></i> HTML forever</span>
+        <span class="badge"><i class="fa-solid fa-server"></i> No build step</span>
+        <span class="badge"><i class="fa-solid fa-house-laptop"></i> Local first</span>
+      </div>
+      <div class="cap"><span class="tag">PILL</span> MCP status with pulse · build badges</div>
+    </div>
+
+    <div class="subhead">Form fields</div>
+    <div class="cards g2">
+      <div class="spec">
+        <div class="demo" style="display:block">
+          <div class="field"><label>Name <span class="opt">Optional</span></label><input class="input" placeholder="Node name (optional)"></div>
+          <div class="field" style="margin-bottom:0"><label>Service UUID <span class="req">*</span></label><input class="input bad" placeholder="Service UUID"><div class="reqmsg"><i class="fa-solid fa-circle-exclamation"></i> Required</div></div>
+        </div>
+        <div class="cap"><span class="tag">FIELD</span> optional · required with validation</div>
+      </div>
+      <div class="spec">
+        <div class="demo" style="display:block">
+          <div class="field" style="margin-bottom:18px"><label>Filter nodes</label><div class="search"><i class="fa-solid fa-magnifying-glass" style="font-size:11px"></i><input placeholder="Filter nodes..."></div></div>
+          <div class="field" style="margin-bottom:0"><label>Background</label><input class="input" value="#ffffff"></div>
+        </div>
+        <div class="cap"><span class="tag">FIELD</span> search · value input</div>
+      </div>
+    </div>
+
+    <div class="subhead">Tabs</div>
+    <div class="cards g2">
+      <div class="spec">
+        <div class="demo" style="justify-content:flex-start">
+          <div class="insp-tabs"><button class="on">Info</button><button>Debug</button></div>
+        </div>
+        <div class="cap"><span class="tag">TABS</span> inspector · underline marks active</div>
+      </div>
+      <div class="spec">
+        <div class="demo" style="justify-content:flex-start">
+          <div class="ftabs">
+            <span class="ftab"><span class="thumb"></span> Flow 1</span>
+            <span class="ftab active"><span class="thumb"></span> Space Fighter</span>
+            <span class="ftab"><i class="fa-solid fa-plus" style="font-size:11px"></i></span>
+          </div>
+        </div>
+        <div class="cap"><span class="tag">TABS</span> flow tabs with thumbnail</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- NODES -->
+<section class="sec" id="nodes">
+  <div class="wrap">
+    <div class="sechead"><div><div class="num">05</div><h2>Editor anatomy</h2><p>The node graph is where PATCHBAY earns its name. Nodes are squared tiles with a colored grip, an icon, a label, and ports. The grip color names the category. Cables carry the signal.</p></div><div class="hr"></div></div>
+
+    <div class="subhead">Node taxonomy</div>
+    <div class="nodestage">
+      <span class="node k-in"><span class="grip"></span><i class="ni fa-solid fa-arrow-right-to-bracket"></i><span>inject</span><span class="port r"></span></span>
+      <span class="node k-out"><span class="port l"></span><span class="grip"></span><i class="ni fa-solid fa-bug"></i><span>debug</span></span>
+      <span class="node k-fn"><span class="port l"></span><span class="grip"></span><i class="ni fa-solid fa-code"></i><span>function</span><span class="port r"></span></span>
+      <span class="node k-ai"><span class="port l"></span><span class="grip"></span><i class="ni fa-solid fa-robot"></i><span>llm</span><span class="port r"></span></span>
+      <span class="node k-logic"><span class="port l"></span><span class="grip"></span><i class="ni fa-solid fa-code-branch"></i><span>switch</span><span class="port r"></span></span>
+      <span class="node k-net"><span class="port l"></span><span class="grip"></span><i class="ni fa-solid fa-globe"></i><span>http in</span><span class="port r"></span></span>
+      <span class="node k-audio"><span class="port l"></span><span class="grip"></span><i class="ni fa-solid fa-volume-high"></i><span>audio out</span></span>
+    </div>
+    <div class="note">INPUT cyan · OUTPUT green · FUNCTION orange · AI violet · LOGIC amber · NETWORK blue · AUDIO teal. The grip and icon share the category color.</div>
+
+    <div class="subhead">Node states</div>
+    <div class="nodestage">
+      <div style="display:flex;flex-direction:column;gap:8px;align-items:center"><span class="node k-fn"><span class="port l"></span><span class="grip"></span><i class="ni fa-solid fa-code"></i><span>function</span><span class="port r"></span></span><span class="mono" style="font-size:9px">DEFAULT</span></div>
+      <div style="display:flex;flex-direction:column;gap:8px;align-items:center"><span class="node k-fn sel"><span class="port l"></span><span class="grip"></span><i class="ni fa-solid fa-code"></i><span>function</span><span class="port r"></span></span><span class="mono" style="font-size:9px;color:var(--volt)">SELECTED</span></div>
+      <div style="display:flex;flex-direction:column;gap:8px;align-items:center"><span class="node warn"><span class="port l"></span><span class="grip" style="background:var(--warn)"></span><i class="ni fa-solid fa-triangle-exclamation" style="color:var(--warn)"></i><span>catch</span><i class="warnbadge fa-solid fa-triangle-exclamation"></i><span class="port r"></span></span><span class="mono" style="font-size:9px;color:var(--warn)">WARNING</span></div>
+      <div style="display:flex;flex-direction:column;gap:8px;align-items:center"><span class="node err"><span class="port l"></span><span class="grip" style="background:var(--danger)"></span><i class="ni fa-solid fa-circle-xmark" style="color:var(--danger)"></i><span>error</span><span class="port r"></span></span><span class="mono" style="font-size:9px;color:var(--danger)">ERROR</span></div>
+      <div style="display:flex;flex-direction:column;gap:8px;align-items:center"><span class="node fill net"><span class="port l"></span><span class="grip"></span><i class="ni fa-brands fa-bluetooth-b"></i><span>bluetooth out</span></span><span class="mono" style="font-size:9px">SOLID FILL</span></div>
+    </div>
+
+    <div class="subhead">Ports and cables</div>
+    <div class="spec">
+      <div class="demo" style="display:block;padding:0">
+        <div class="wiredemo" id="wiredemo">
+          <div class="dnode k-in" id="dnA" style="left:28px;top:36px"><span class="grip" style="background:var(--sig-in)"></span><i class="ci fa-solid fa-gamepad" style="color:var(--sig-in)"></i><span>controller</span><span class="port r"></span></div>
+          <div class="dnode k-fn" id="dnB" style="left:300px;top:24px"><span class="port l"></span><span class="grip" style="background:var(--sig-fn)"></span><i class="ci fa-solid fa-code" style="color:var(--sig-fn)"></i><span>update</span><span class="port r"></span></div>
+          <div class="dnode k-out" id="dnC" style="left:300px;top:120px"><span class="port l"></span><span class="grip" style="background:var(--sig-out)"></span><i class="ci fa-solid fa-tv" style="color:var(--sig-out)"></i><span>screen</span></div>
+          <svg id="cableSvg" viewBox="0 0 600 200" preserveAspectRatio="none"></svg>
+        </div>
+      </div>
+      <div class="cap"><span class="tag">CABLE</span> 2.6px stroke · flowing dash · soft glow · color matches the source port</div>
+    </div>
+
+    <div class="subhead">Widget nodes</div>
+    <div class="nodestage" style="gap:34px">
+      <div class="wnode">
+        <div class="wttl">buttons</div>
+        <div class="keypad">
+          <div class="key k1">1</div><div class="key k2">2</div><div class="key k3">3</div>
+          <div class="key k4">4</div><div class="key k5">5</div><div class="key k6">6</div>
+          <div class="key k7">7</div><div class="key k8">8</div><div class="key k9">9</div>
+          <div class="key ks">*</div><div class="key k0">0</div><div class="key kh">#</div>
+        </div>
+        <span class="port r" style="top:auto;bottom:46%"></span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:34px">
+        <div class="snode" id="sliderNode">
+          <div class="sh-ttl"><i class="fa-solid fa-sliders"></i> slider</div>
+          <div class="srow">
+            <div class="track" id="track"><div class="fill" id="fill" style="width:50%"></div><div class="knob" id="knob" style="left:50%"></div></div>
+            <span class="sval" id="sval">50</span>
+          </div>
+          <span class="port r"></span>
+        </div>
+        <div class="mnode">
+          <div class="mgrip"><i class="fa-solid fa-bars"></i></div>
+          <div class="mlabel">stems</div>
+          <div class="outs">
+            <span class="oport" style="background:var(--sig-logic)"><i class="fa-solid fa-star"></i></span>
+            <span class="oport" style="background:var(--danger)"><i class="fa-solid fa-image"></i></span>
+            <span class="oport" style="background:var(--sig-out)"><i class="fa-solid fa-music"></i></span>
+            <span class="oport" style="background:var(--sig-net)"><i class="fa-solid fa-headphones"></i></span>
+            <span class="oport" style="background:var(--danger)"><i class="fa-solid fa-microphone"></i></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="note">Widget nodes render live controls inside the node body. The keypad keeps its playful multi-color faces. Multi-output nodes stack icon-labeled ports down the right edge.</div>
+
+    <div class="subhead">Panels</div>
+    <div class="cards g3">
+      <!-- palette -->
+      <div class="panel">
+        <div class="cat-h" style="border-bottom:1px solid var(--hair)"><span class="cat-dot" style="background:var(--sig-in)"></span> Hardware <i class="fa-solid fa-chevron-down chev"></i></div>
+        <div class="cat-body">
+          <span class="chip k-in"><span class="cgrip"></span><i class="ci fa-solid fa-gauge-high"></i> accelerometer</span>
+          <span class="chip k-net"><span class="cgrip"></span><i class="ci fa-brands fa-bluetooth-b"></i> bluetooth in</span>
+          <span class="chip k-fn"><span class="cgrip"></span><i class="ci fa-solid fa-gamepad"></i> gamepad</span>
+          <span class="chip k-out"><span class="cgrip"></span><i class="ci fa-solid fa-microchip"></i> gpio out</span>
+        </div>
+      </div>
+      <!-- info -->
+      <div class="panel">
+        <div class="insp-tabs" style="border:none;border-bottom:2px solid var(--edge);border-radius:0"><button class="on">Info</button><button>Debug</button></div>
+        <div class="infosec"><div class="lab">Node</div>
+          <div class="kv"><span class="k">Type</span><span class="val">canvas</span></div>
+          <div class="kv"><span class="k">ID</span><span class="val">e6nz3C10Sa2rVQa3veaZTA</span></div>
+        </div>
+        <div class="infosec"><div class="lab">Properties</div>
+          <div class="kv"><span class="k">Width</span><span class="val">400</span></div>
+          <div class="kv"><span class="k">Height</span><span class="val">300</span></div>
+          <div class="kv"><span class="k">Background</span><span class="val">#ffffff</span></div>
+          <div class="kv"><span class="k">Quality</span><span class="val">0.92</span></div>
+        </div>
+        <div class="infosec" style="border-bottom:none"><div class="lab">About</div>
+          <div class="abouttxt">Creates an HTML canvas and executes drawing commands. Full Canvas 2D API support for visualization, charts, games, or graphics.</div>
+          <ul class="optlist">
+            <li><b>Width / Height.</b> Canvas dimensions in pixels.</li>
+            <li><b>Output format.</b> PNG or JPEG for the output image.</li>
+          </ul>
+        </div>
+      </div>
+      <!-- debug -->
+      <div class="panel">
+        <div class="debughead"><span class="mono" style="font-size:10px;color:var(--faint)">Debug</span><div class="seg"><button class="on">On</button><button>Clear</button></div></div>
+        <div class="inject"><input class="input" placeholder="Type to inject..." style="font-size:12px;padding:8px 10px"><button class="iconbtn" style="box-shadow:none"><i class="fa-solid fa-arrow-right"></i></button></div>
+        <div style="padding:10px 0">
+          <div class="debug-line ok"><span class="t">12:04:51</span> msg.payload : "deployed"</div>
+          <div class="debug-line net"><span class="t">12:04:52</span> GET /flow 200</div>
+          <div class="debug-line ai"><span class="t">12:04:55</span> llm: 18 tokens</div>
+        </div>
+        <div class="cat-h" style="border-top:1px solid var(--hair)"><i class="fa-solid fa-chevron-down" style="font-size:10px"></i> Files</div>
+        <div class="emptyline">No files yet</div>
+      </div>
+    </div>
+
+    <div class="subhead">Node configuration modal</div>
+    <div class="spec">
+      <div class="demo" style="justify-content:center">
+        <button class="btn btn-primary" id="openModal"><i class="fa-solid fa-pen"></i> Open node editor</button>
+        <span class="note" style="margin:0">Opens the dialog used to edit a node. Cancel, Done, or the close button dismiss it.</span>
+      </div>
+      <div class="cap"><span class="tag">MODAL</span> node chip header · validated fields · Cancel / Done footer</div>
+    </div>
+  </div>
+</section>
+
+<!-- VOICE -->
+<section class="sec" id="voice">
+  <div class="wrap">
+    <div class="sechead"><div><div class="num">06</div><h2>Voice and copy</h2><p>PATCHBAY writes plainly. Short sentences, concrete nouns, no decoration. These rules are absolute across marketing, docs, and UI strings.</p></div><div class="hr"></div></div>
+    <div class="cards g2">
+      <div class="rulecard no"><div class="rh"><i class="fa-solid fa-ban"></i> Never</div><div class="rb">No em-dashes. No emojis. No bold or italic inside prose. No filler vocabulary like <code>delve</code>, <code>leverage</code>, <code>seamless</code>, <code>robust</code>. No antithetical constructions like <code>not X, it's Y</code>.</div></div>
+      <div class="rulecard yes"><div class="rh"><i class="fa-solid fa-check"></i> Always</div><div class="rb">Lead with the concrete capability. Say what the thing does in one breath. Let monospace metadata carry numbers and state. Use periods and commas where a dash would tempt you.</div></div>
+    </div>
+    <div class="cards g2" style="margin-top:18px">
+      <div class="rulecard yes"><div class="rh"><i class="fa-solid fa-quote-left"></i> On voice</div><div class="rb">PageNodes runs in your browser. No server, no install, no account. Wire nodes together and watch the flow run.</div></div>
+      <div class="rulecard no"><div class="rh"><i class="fa-solid fa-quote-left"></i> Off voice</div><div class="rb"><span style="text-decoration:line-through;opacity:.7">Leverage our robust, seamless platform to unlock powerful flows. It's not just an editor, it's a revolution.</span></div></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <a class="brand" href="#top" style="font-size:17px">
+      <span class="lslot mark" data-size="30" data-mode="theme"></span>
+      PATCHBAY
+    </a>
+    <div class="right">
+      <span class="badge"><i class="fa-solid fa-code-branch"></i> v1.0</span>
+      <span class="badge"><i class="fa-brands fa-github"></i> monteslu/pagenodes</span>
+      <span class="badge"><i class="fa-solid fa-scale-balanced"></i> MIT</span>
+    </div>
+  </div>
+  <div class="wrap" style="margin-top:18px"><span class="mono" style="color:var(--faint)">PATCHBAY · DESIGN SYSTEM FOR PAGENODES · RUNS IN THE BROWSER · NO SERVER</span></div>
+</footer>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="modal-head">
+      <span class="node fill net" style="min-width:auto;box-shadow:none;cursor:default"><i class="ni fa-brands fa-bluetooth-b"></i><span>bluetooth out</span></span>
+      <button class="close" id="closeModal" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="field"><label>Name <span class="opt">Optional</span></label><input class="input" placeholder="Node name (optional)"></div>
+      <div class="field"><label>Device name</label><input class="input" placeholder=""></div>
+      <div class="field"><label>Name prefix</label><input class="input" placeholder=""></div>
+      <div class="field"><label>Service UUID <span class="req">*</span></label><input class="input bad" placeholder="Service UUID"><div class="reqmsg"><i class="fa-solid fa-circle-exclamation"></i> Required</div></div>
+      <div class="field" style="margin-bottom:0"><label>Characteristic UUID <span class="req">*</span></label><input class="input bad" placeholder="Characteristic UUID"><div class="reqmsg"><i class="fa-solid fa-circle-exclamation"></i> Required</div></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" id="cancelModal">Cancel</button>
+      <button class="btn btn-primary"><i class="fa-solid fa-check"></i> Done</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const root=document.documentElement;
+
+/* ===== logo: single source of truth (refined fan-out) ===== */
+function markSVG(size,mode){
+  mode=mode||'theme';
+  // color sets per mode
+  let node,hero,wire,edge,tile=null;
+  if(mode==='lightfx'){ node='#FCFAF3'; hero='#5B4DF1'; wire='#CC9A28'; edge='#1B1A16'; }
+  else if(mode==='dark'){ node='#E7EAEF'; hero='#8479FF'; wire='#F2C25A'; edge='#0B0E13'; }
+  else if(mode==='ink'){ node='none'; hero='var(--ink)'; wire='var(--ink)'; edge='var(--ink)'; }
+  else if(mode==='fav'){ tile='#10131A'; node='#EDEBE3'; hero='#6C5CFF'; wire='#F2C25A'; edge='#0B0E13'; }
+  else { node='var(--card)'; hero='var(--volt)'; wire='var(--sig-logic)'; edge='var(--edge)'; }
+  const nsw = mode==='fav' ? 5 : 4;         // node stroke
+  const wsw = mode==='fav' ? 6 : 5;         // wire stroke (chunkier gold)
+  const tilePart = tile ? `<rect x="2" y="2" width="116" height="116" rx="24" fill="${tile}"/>` : '';
+  return `<svg width="${size}" height="${size}" viewBox="0 0 120 120" aria-label="PageNodes">
+    ${tilePart}
+    <path d="M34 58 C 44 58 48 33 58 33" fill="none" stroke="${wire}" stroke-width="${wsw}" stroke-linecap="round"/>
+    <path d="M34 58 C 50 58 60 82 80 82" fill="none" stroke="${wire}" stroke-width="${wsw}" stroke-linecap="round"/>
+    <rect x="8" y="46" width="26" height="24" rx="6" fill="${node}" stroke="${edge}" stroke-width="${nsw}"/>
+    <rect x="80" y="70" width="28" height="24" rx="6" fill="${node}" stroke="${edge}" stroke-width="${nsw}"/>
+    <rect x="58" y="22" width="54" height="22" rx="6" fill="${hero}" stroke="${edge}" stroke-width="${nsw}"/>
+  </svg>`;
+}
+function paintLogos(){ document.querySelectorAll('.lslot').forEach(s=>{ const m=s.dataset.mode||'theme'; s.innerHTML=markSVG(+s.dataset.size||34, m==='theme'&&s.dataset.fx?'lightfx':m); }); }
+paintLogos();
+
+/* theme toggle */
+document.getElementById('toggle').addEventListener('click',()=>{
+  root.dataset.theme = root.dataset.theme==='dark' ? 'light' : 'dark';
+  refreshSwatches(); drawCables(); drawHero();
+});
+
+/* ===== color swatches ===== */
+const SW={
+  surface:[['paper','#F5F1E8','#21252C','page'],['card','#FCFAF3','#282E36','panels'],['board','#FBF8F0','#1B1F25','canvas'],['deep','#ECE5D6','#191D23','bars'],['hair','#DBD2C0','#363D47','dividers']],
+  ink:[['ink','#1B1A16','#E9ECF1','text'],['smoke','#6C6557','#9AA3AE','muted'],['faint','#A79E8C','#6B7480','labels'],['edge','#1B1A16','#10131A','borders']],
+  brand:[['volt','#5B4DF1','#8479FF','accent'],['volt-soft','#ECE9FE','#2A2750','accent bg'],['volt-ink','#3A2FC4','#B6AEFF','accent text']],
+  signal:[['sig-in','#0E9DB8','#34C3DC','input'],['sig-out','#2E9E4F','#57C97A','output'],['sig-fn','#DC8638','#F0A65C','function'],['sig-ai','#8257F0','#A98BFF','ai'],['sig-logic','#CC9A28','#F2C25A','logic'],['sig-net','#3B7DD8','#6BA4F2','network'],['sig-audio','#1FA0A0','#3FC2C2','audio']],
+  state:[['warn','#D98A1F','#F2B33D','warning'],['danger','#C0392B','#FF6B6B','error / required']]
+};
+function buildSwatches(){
+  for(const [grp,arr] of Object.entries(SW)){
+    const host=document.getElementById('sw-'+grp); if(!host) continue;
+    host.innerHTML = arr.map(([n,l,d,role])=>
+      `<div class="sw" data-l="${l}" data-d="${d}" title="Click to copy">
+         <div class="chip" style="background:var(--${n})"><span class="ring"></span></div>
+         <div class="meta"><div class="nm">--${n}</div><div class="hx">${l}</div><div class="role">${role}</div></div>
+       </div>`).join('');
+  }
+  document.querySelectorAll('.sw').forEach(el=>{
+    el.addEventListener('click',()=>{
+      const dark=root.dataset.theme==='dark';
+      copyText(dark?el.dataset.d:el.dataset.l, el.querySelector('.hx'));
+    });
+  });
+}
+function refreshSwatches(){
+  const dark=root.dataset.theme==='dark';
+  document.querySelectorAll('.sw').forEach(el=>{
+    el.querySelector('.hx').textContent = dark?el.dataset.d:el.dataset.l;
+  });
+}
+buildSwatches();
+
+/* ===== copy helper ===== */
+function copyText(str, flashEl){
+  const done=()=>{ if(flashEl){const o=flashEl.textContent;flashEl.textContent='copied';flashEl.style.color='var(--sig-out)';setTimeout(()=>{flashEl.textContent=o;flashEl.style.color='';},900);} };
+  try{ navigator.clipboard.writeText(str).then(done,done); }
+  catch(e){ const t=document.createElement('textarea');t.value=str;document.body.appendChild(t);t.select();try{document.execCommand('copy')}catch(_){}t.remove();done(); }
+}
+
+/* ===== logo SVG export ===== */
+const SVG_LIGHT=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <path d="M34 58 C 44 58 48 33 58 33" fill="none" stroke="#CC9A28" stroke-width="5" stroke-linecap="round"/>
+  <path d="M34 58 C 50 58 60 82 80 82" fill="none" stroke="#CC9A28" stroke-width="5" stroke-linecap="round"/>
+  <rect x="8" y="46" width="26" height="24" rx="6" fill="#FCFAF3" stroke="#1B1A16" stroke-width="4"/>
+  <rect x="80" y="70" width="28" height="24" rx="6" fill="#FCFAF3" stroke="#1B1A16" stroke-width="4"/>
+  <rect x="58" y="22" width="54" height="22" rx="6" fill="#5B4DF1" stroke="#1B1A16" stroke-width="4"/>
+</svg>`;
+const SVG_DARK=SVG_LIGHT
+  .replaceAll('#FCFAF3','#282E36').replaceAll('#1B1A16','#10131A')
+  .replaceAll('#5B4DF1','#8479FF').replaceAll('#CC9A28','#F2C25A');
+document.querySelectorAll('[data-copy]').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const svg = btn.dataset.copy==='svg-dark' ? SVG_DARK : SVG_LIGHT;
+    copyText(svg);
+    const o=btn.innerHTML; btn.classList.add('ok'); btn.innerHTML='<i class="fa-solid fa-check"></i> Copied';
+    setTimeout(()=>{btn.classList.remove('ok');btn.innerHTML=o;},1100);
+  });
+});
+
+/* ===== modal ===== */
+const modal=document.getElementById('modal');
+document.getElementById('openModal').addEventListener('click',()=>modal.classList.add('open'));
+const closeM=()=>modal.classList.remove('open');
+document.getElementById('closeModal').addEventListener('click',closeM);
+document.getElementById('cancelModal').addEventListener('click',closeM);
+modal.addEventListener('click',e=>{if(e.target===modal)closeM();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeM();});
+
+/* ===== slider widget ===== */
+(function(){
+  const track=document.getElementById('track'),fill=document.getElementById('fill'),knob=document.getElementById('knob'),sval=document.getElementById('sval');
+  let drag=false;
+  function set(clientX){
+    const r=track.getBoundingClientRect();
+    let p=Math.max(0,Math.min(1,(clientX-r.left)/r.width));
+    const v=Math.round(p*100);
+    fill.style.width=(p*100)+'%'; knob.style.left=(p*100)+'%'; sval.textContent=v;
+  }
+  track.addEventListener('pointerdown',e=>{drag=true;set(e.clientX);});
+  window.addEventListener('pointermove',e=>{if(drag)set(e.clientX);});
+  window.addEventListener('pointerup',()=>drag=false);
+})();
+
+/* ===== cable demo wires ===== */
+function centerOf(el, host){
+  const r=el.getBoundingClientRect(), h=host.getBoundingClientRect();
+  return {l:{x:r.left-h.left, y:r.top-h.top+r.height/2}, r:{x:r.right-h.left, y:r.top-h.top+r.height/2}};
+}
+function bez(x1,y1,x2,y2){const dx=Math.max(40,Math.abs(x2-x1)*0.5);return `M${x1},${y1} C${x1+dx},${y1} ${x2-dx},${y2} ${x2},${y2}`;}
+function drawCables(){
+  const host=document.getElementById('wiredemo'); if(!host) return;
+  const svg=document.getElementById('cableSvg');
+  const A=centerOf(document.getElementById('dnA'),host);
+  const B=centerOf(document.getElementById('dnB'),host);
+  const C=centerOf(document.getElementById('dnC'),host);
+  const edges=[[A.r,B.l,'var(--sig-in)'],[A.r,C.l,'var(--sig-out)']];
+  // scale to viewBox 600x200
+  const w=host.clientWidth||600, h=host.clientHeight||200, sx=600/w, sy=200/h;
+  let out='';
+  edges.forEach(([p,q,c])=>{
+    const d=bez(p.x*sx,p.y*sy,q.x*sx,q.y*sy);
+    out+=`<path class="wire-glow" d="${d}" stroke="${c}"/>`;
+    out+=`<path class="wire wire-dash" d="${d}" stroke="${c}"/>`;
+  });
+  svg.innerHTML=out;
+}
+
+/* ===== hero decorative cables (pixel space, connected) ===== */
+function drawHero(){
+  const svg=document.getElementById('heroCables'); if(!svg) return;
+  const W=svg.clientWidth, H=svg.clientHeight; if(!W||!H) return;
+  svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+  const nodeW=92, nodeH=92;
+  let nx=Math.round(W*0.70); if(nx+nodeW>W-26) nx=W-nodeW-26;
+  const ny=Math.round((H-nodeH)/2);
+  const inX=nx, midY=ny+nodeH/2;
+  const ins=[midY-26, midY, midY+26];
+  const srcX=14, srcs=[Math.round(H*0.24),Math.round(H*0.5),Math.round(H*0.76)];
+  const cols=['var(--sig-in)','var(--sig-out)','var(--volt)'];
+  let out=`<rect x="${nx}" y="${ny}" width="${nodeW}" height="${nodeH}" rx="12" fill="var(--volt)" stroke="var(--edge)" stroke-width="4"/>`;
+  for(let i=0;i<3;i++){
+    const y1=srcs[i], y2=ins[i], dx=Math.max(70,(inX-srcX)*0.55);
+    const d=`M${srcX},${y1} C${srcX+dx},${y1} ${inX-dx},${y2} ${inX},${y2}`;
+    out+=`<path class="wire-glow" d="${d}" stroke="${cols[i]}"/>`;
+    out+=`<path class="wire wire-dash" d="${d}" stroke="${cols[i]}"/>`;
+  }
+  for(let i=0;i<3;i++){
+    out+=`<circle cx="${srcX}" cy="${srcs[i]}" r="6.5" fill="${cols[i]}" stroke="var(--edge)" stroke-width="2.5"/>`;
+    out+=`<circle cx="${inX}" cy="${ins[i]}" r="4.5" fill="${cols[i]}" stroke="var(--edge)" stroke-width="2"/>`;
+  }
+  svg.innerHTML=out;
+}
+
+window.addEventListener('load',()=>{refreshSwatches();drawCables();drawHero();});
+window.addEventListener('resize',()=>{drawCables();drawHero();});
+
+/* ===== scrollspy ===== */
+const links=[...document.querySelectorAll('.nav-links a')];
+const map={}; links.forEach(a=>map[a.getAttribute('href').slice(1)]=a);
+const spy=new IntersectionObserver(es=>{
+  es.forEach(e=>{ if(e.isIntersecting){ links.forEach(l=>l.classList.remove('active')); const a=map[e.target.id]; if(a)a.classList.add('active'); } });
+},{rootMargin:'-40% 0px -55% 0px'});
+['logo','color','type','components','nodes','voice'].forEach(id=>{const el=document.getElementById(id);if(el)spy.observe(el);});
+</script>
+</body>
+</html>

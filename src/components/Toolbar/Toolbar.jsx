@@ -11,7 +11,8 @@ import { ConfigNodesDialog } from './ConfigNodesDialog';
 import { ConfirmDialog } from './ConfirmDialog';
 import { SettingsDialog } from './SettingsDialog';
 import { FlowEditDialog } from './FlowEditDialog';
-import { FlowMinimap } from './FlowMinimap';
+import { ThemeToggle } from './ThemeToggle';
+import { FlowThumb } from './FlowThumb';
 import { logger } from '../../utils/logger';
 import './Toolbar.css';
 
@@ -316,7 +317,14 @@ export function Toolbar() {
             </div>
           )}
         </div>
-        <h1 className="toolbar-title">PageNodes 2</h1>
+        <svg className="toolbar-brand-mark" width="28" height="28" viewBox="0 0 120 120" fill="none" aria-hidden="true">
+          <path d="M34 58 C 44 58 48 33 58 33" fill="none" stroke="var(--sig-logic)" strokeWidth="5" strokeLinecap="round" />
+          <path d="M34 58 C 50 58 60 82 80 82" fill="none" stroke="var(--sig-logic)" strokeWidth="5" strokeLinecap="round" />
+          <rect x="8" y="46" width="26" height="24" rx="6" fill="var(--logo-node)" stroke="var(--edge)" strokeWidth="4" />
+          <rect x="80" y="70" width="28" height="24" rx="6" fill="var(--logo-node)" stroke="var(--edge)" strokeWidth="4" />
+          <rect x="58" y="22" width="54" height="22" rx="6" fill="var(--volt)" stroke="var(--edge)" strokeWidth="4" />
+        </svg>
+        <h1 className="toolbar-title">PageNodes <span style={{ color: 'var(--smoke)', fontWeight: 500 }}>2</span></h1>
         {mcpStatus !== 'disabled' && (
           <div
             className={`mcp-indicator ${mcpStatus}`}
@@ -341,16 +349,8 @@ export function Toolbar() {
               }}
               title={flow.disabled ? `${flow.label} (disabled)` : flow.label}
             >
+              <FlowThumb nodes={flowState.nodes} flowId={flow.id} />
               <div className="toolbar-tab-label">{flow.label}</div>
-              <FlowMinimap
-                flowId={flow.id}
-                nodes={flowState.nodes}
-                size={50}
-                onClick={(x, y) => {
-                  dispatch({ type: 'SET_ACTIVE_FLOW', id: flow.id });
-                  dispatch({ type: 'SCROLL_TO', x, y });
-                }}
-              />
             </div>
           ))}
           <button
@@ -387,12 +387,14 @@ export function Toolbar() {
             +
           </button>
         </div>
+        <ThemeToggle />
         <button
           className={`toolbar-btn deploy ${editor.dirty ? 'dirty' : ''} ${isRunning ? 'running' : ''}`}
           onClick={handleDeploy}
           disabled={!isReady}
           title={isRunning ? 'Redeploy flows' : 'Deploy flows'}
         >
+          <span className="node-icon" style={{ fontSize: 11 }}>{''}</span>
           {isRunning ? 'Redeploy' : 'Deploy'}
         </button>
       </div>

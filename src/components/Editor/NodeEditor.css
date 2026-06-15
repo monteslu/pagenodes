@@ -4,30 +4,34 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(12, 12, 16, 0.55);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
 }
 
+:root[data-theme="dark"] .node-editor-overlay {
+  background: rgba(0, 0, 0, 0.66);
+}
+
 .node-editor {
-  background: var(--panel-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
+  background: var(--card);
+  border: 2px solid var(--edge);
+  border-radius: var(--r);
   width: min(550px, 92vw);
   min-height: min(450px, 75vh);
   max-height: 90vh;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--sh-lg);
 }
 
 .node-editor-header {
   display: flex;
   align-items: center;
-  padding: 12px 16px;
-  border-bottom: 1px solid var(--border-color);
+  padding: 14px 16px;
+  border-bottom: 2px solid var(--edge);
   gap: 10px;
 }
 
@@ -40,27 +44,28 @@
 }
 
 .node-editor-close {
-  background: none;
-  border: none;
-  color: var(--text-muted);
-  font-size: 20px;
+  background: var(--board);
+  border: 2px solid var(--edge);
+  border-radius: var(--r);
+  color: var(--smoke);
+  font-size: 16px;
   cursor: pointer;
   padding: 0;
-  width: 24px;
-  height: 24px;
+  width: 30px;
+  height: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .node-editor-close:hover {
-  color: var(--text-color);
+  color: var(--ink);
 }
 
 .node-editor-content {
   flex: 1;
   overflow-y: auto;
-  padding: 16px;
+  padding: 18px 16px;
 }
 
 .form-row {
@@ -70,39 +75,46 @@
 .form-row label {
   display: block;
   margin-bottom: 6px;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 500;
-  color: var(--text-muted);
-  text-transform: capitalize;
+  color: var(--ink);
 }
 
 .required-indicator {
-  color: #c44;
+  color: var(--danger);
+  font-weight: 700;
   margin-left: 2px;
 }
 
 .field-hint {
   display: block;
-  font-size: 11px;
-  color: #c44;
-  margin-top: 4px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  color: var(--danger);
+  margin-top: 6px;
 }
 
 .form-input {
   width: 100%;
-  padding: 8px 10px;
+  padding: 10px 12px;
+  font-family: var(--mono);
   font-size: 13px;
-  font-family: inherit;
-  background: var(--input-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  color: var(--text-color);
+  background: var(--board);
+  border: 2px solid var(--edge);
+  border-radius: var(--r);
+  color: var(--ink);
   outline: none;
-  transition: border-color 0.15s ease;
+  transition: border-color 0.13s var(--ease), box-shadow 0.13s var(--ease);
+}
+
+.form-input::placeholder {
+  color: var(--faint);
 }
 
 .form-input:focus {
-  border-color: var(--accent-color);
+  border-color: var(--volt);
+  box-shadow: 0 0 0 3px var(--volt-soft);
 }
 
 .form-select {
@@ -126,17 +138,18 @@
   width: 16px;
   height: 16px;
   cursor: pointer;
+  accent-color: var(--volt);
 }
 
 .form-checkbox-description {
   font-size: 11px;
-  color: var(--text-muted);
+  color: var(--smoke);
   margin-left: 24px;
   line-height: 1.4;
 }
 
 .form-code {
-  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-family: var(--mono);
   font-size: 12px;
   line-height: 1.5;
   resize: vertical;
@@ -146,38 +159,55 @@
 .node-editor-footer {
   display: flex;
   justify-content: flex-end;
-  gap: 8px;
-  padding: 12px 16px;
-  border-top: 1px solid var(--border-color);
+  gap: 10px;
+  padding: 14px 16px;
+  border-top: 2px solid var(--edge);
+  background: var(--board);
 }
 
 .btn {
-  padding: 8px 16px;
-  font-size: 13px;
-  font-weight: 500;
-  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 16px;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-radius: var(--r);
   cursor: pointer;
-  transition: all 0.15s ease;
-  border: 1px solid transparent;
+  transition: transform 0.13s var(--ease), box-shadow 0.13s var(--ease), background 0.13s var(--ease);
+  border: 2px solid var(--edge);
+  background: var(--card);
+  color: var(--ink);
 }
 
 .btn-cancel {
   background: transparent;
-  border-color: var(--border-color);
-  color: var(--text-color);
+  color: var(--ink);
 }
 
 .btn-cancel:hover {
-  background: var(--hover-bg);
+  background: var(--board);
 }
 
 .btn-save {
-  background: var(--accent-color);
-  color: white;
+  background: var(--volt);
+  color: #fff;
+  box-shadow: var(--sh-sm);
 }
 
+:root[data-theme="dark"] .btn-save { color: #0F1217; }
+
 .btn-save:hover {
-  background: var(--accent-hover);
+  transform: translate(-2px, -2px);
+  box-shadow: var(--sh);
+}
+
+.btn-save:active {
+  transform: translate(0, 0);
+  box-shadow: 1px 1px 0 var(--edge);
 }
 
 /* Switch/Change rule styles */
@@ -216,29 +246,29 @@
 
 .change-rule-label {
   font-size: 12px;
-  color: var(--text-muted);
+  color: var(--smoke);
   white-space: nowrap;
 }
 
 /* Small button variant */
 .btn-small {
-  padding: 4px 10px;
+  padding: 6px 11px;
   font-size: 11px;
-  background: var(--button-bg);
-  border: 1px solid var(--border-color);
-  color: var(--text-color);
+  background: var(--card);
+  border: 2px solid var(--edge);
+  color: var(--ink);
 }
 
 .btn-small:hover {
-  background: var(--hover-bg);
+  background: var(--board);
 }
 
 /* Lint errors */
 .lint-errors {
   flex: 1;
-  background: rgba(244, 68, 68, 0.1);
-  border: 1px solid rgba(244, 68, 68, 0.3);
-  border-radius: 4px;
+  background: color-mix(in srgb, var(--danger) 10%, transparent);
+  border: 2px solid color-mix(in srgb, var(--danger) 30%, transparent);
+  border-radius: var(--r);
   padding: 8px;
   max-height: 120px;
   overflow-y: auto;
@@ -249,7 +279,7 @@
   gap: 8px;
   font-size: 12px;
   padding: 4px 0;
-  border-bottom: 1px solid rgba(244, 68, 68, 0.15);
+  border-bottom: 1px solid color-mix(in srgb, var(--danger) 15%, transparent);
 }
 
 .lint-error:last-child {
@@ -262,12 +292,12 @@
 }
 
 .lint-error-line {
-  color: #f44;
-  font-family: monospace;
+  color: var(--danger);
+  font-family: var(--mono);
   white-space: nowrap;
   min-width: 70px;
 }
 
 .lint-error-reason {
-  color: var(--text-color);
+  color: var(--ink);
 }

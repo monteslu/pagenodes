@@ -24,22 +24,31 @@
 }
 
 .info-edit-btn {
-  display: block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
   margin-top: 12px;
-  padding: 8px 12px;
+  padding: 9px 12px;
+  font-family: var(--mono);
   font-size: 12px;
-  font-weight: 500;
-  background: var(--accent-color);
-  color: white;
-  border: none;
-  border-radius: 4px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: var(--volt);
+  color: #fff;
+  border: 2px solid var(--edge);
+  border-radius: var(--r);
   cursor: pointer;
-  transition: background 0.15s ease;
+  box-shadow: var(--sh-sm);
+  transition: transform 0.13s var(--ease), box-shadow 0.13s var(--ease);
 }
 
+:root[data-theme="dark"] .info-edit-btn { color: #0F1217; }
+
 .info-edit-btn:hover {
-  background: var(--accent-hover);
+  transform: translate(-1px, -1px);
+  box-shadow: var(--sh);
 }
 
 .info-edit-icon {
@@ -66,22 +75,24 @@
 }
 
 .info-section h4 {
-  margin: 0 0 8px 0;
-  font-size: 11px;
+  margin: 0 0 10px 0;
+  font-family: var(--mono);
+  font-size: 10px;
   font-weight: 600;
   text-transform: uppercase;
-  color: var(--text-muted);
-  letter-spacing: 0.5px;
+  color: var(--faint);
+  letter-spacing: 0.16em;
 }
 
 .info-table {
   width: 100%;
-  font-size: 12px;
+  font-family: var(--mono);
+  font-size: 11px;
   border-collapse: collapse;
 }
 
 .info-table tr {
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px dashed var(--hair);
 }
 
 .info-table tr:last-child {
@@ -94,33 +105,34 @@
 }
 
 .info-label {
-  color: var(--text-muted);
+  color: var(--faint);
   width: 80px;
-  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
 }
 
 .info-value {
-  color: var(--text-color);
+  color: var(--ink);
   word-break: break-word;
+  text-align: right;
 }
 
 .info-id {
-  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-family: var(--mono);
   font-size: 10px;
 }
 
 .info-blank {
-  color: var(--text-muted);
-  font-style: italic;
+  color: var(--faint);
 }
 
 .info-required {
-  color: #c44;
+  color: var(--danger);
   font-weight: 500;
 }
 
 .info-required-star {
-  color: #c44;
+  color: var(--danger);
   margin-left: 2px;
 }
 
@@ -130,9 +142,9 @@
 }
 
 .info-config-id {
-  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-family: var(--mono);
   font-size: 10px;
-  color: var(--text-muted);
+  color: var(--faint);
 }
 
 .info-help {
@@ -160,7 +172,7 @@
   color: var(--code-color, #f8a);
   padding: 2px 5px;
   border-radius: 4px;
-  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', monospace;
+  font-family: var(--mono);
   font-size: 11px;
 }
 
@@ -203,7 +215,7 @@
   padding: 10px 12px;
   border-radius: 6px;
   border: 1px solid var(--border-color);
-  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', monospace;
+  font-family: var(--mono);
   font-size: 11px;
   line-height: 1.5;
   overflow-x: auto;

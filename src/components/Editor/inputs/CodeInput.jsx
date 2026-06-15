@@ -20,7 +20,7 @@ export function CodeInput({ value, onChange, language = 'javascript', style }) {
         className="code-input-editor"
         textareaClassName="code-input-textarea"
         style={{
-          fontFamily: '"Fira Code", "Consolas", "Monaco", monospace',
+          fontFamily: 'var(--mono)',
           fontSize: 13,
           lineHeight: 1.4,
         }}
